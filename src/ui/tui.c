@@ -4,6 +4,7 @@
 #include <inttypes.h>
 #include "zobrist.h"
 #include <stdarg.h>
+#include <io/logging.h>
 
 
 void TuiBoardPrintSquares(const Board* board, ui_config_t config, Square* squares, size_t count)
@@ -32,9 +33,10 @@ void TuiBoardPrintSquares(const Board* board, ui_config_t config, Square* square
 
             if (squares != NULL) {
                 for (size_t i = 0; i < count; ++i) {
-                    int square_rank = squares[i] / 8;
+                    int square_rank = 7-(squares[i] / 8);
                     int square_file = squares[i] % 8;
 
+                    // Adjust for perspective if necessary
                     if (config.perspective) {
                         square_rank = 7 - square_rank;
                     }
@@ -113,52 +115,58 @@ void TuiBoardPrintSquares(const Board* board, ui_config_t config, Square* square
     printf("\n");
 }
 
+#define TERMINATOR 64
+#define INITIAL_ALLOCATION 100
+
 void TuiBoardPrint(const Board* board, ui_config_t config, Square first, ...)
 {
     Square* squares = NULL;
     int count = 0;
 
-    if (first != 64) { // Use 64 as the terminator value
+    if (first != TERMINATOR) {
         va_list args;
         va_start(args, first);
 
-        squares = (Square*)malloc(100 * sizeof(Square)); // Allocate memory for squares
+        squares = (Square*)malloc(INITIAL_ALLOCATION * sizeof(Square)); 
         if (!squares) {
             perror("malloc failed");
+            va_end(args);
             return;
         }
 
         squares[count++] = first;
 
         Square next_square;
-        while ((next_square = va_arg(args, int)) != 64) { // Fetch arguments as int
-            squares[count++] = next_square;
-            if (count % 100 == 0) {
-                squares = (Square*)realloc(squares, (count + 100) * sizeof(Square));
-                if (!squares) {
+        while ((next_square = va_arg(args, int)) != TERMINATOR) {
+            if (count >= INITIAL_ALLOCATION) {
+                Square* temp = realloc(squares, (count + INITIAL_ALLOCATION) * sizeof(Square));
+                if (!temp) {
                     perror("realloc failed");
+                    free(squares);
                     va_end(args);
                     return;
                 }
+                squares = temp;
             }
+            squares[count++] = next_square;
         }
+
         va_end(args);
 
-        // Resize to exact size
-        squares = (Square*)realloc(squares, count * sizeof(Square));
-        if (!squares) {
+        // Resize to the exact number of squares used
+        Square* temp = realloc(squares, count * sizeof(Square));
+        if (!temp) {
             perror("realloc failed");
+            free(squares);
             return;
         }
+        squares = temp;
     }
 
-    // Print the board with the collected squares
     TuiBoardPrintSquares(board, config, squares, count);
 
-    // Free allocated memory
     if (squares) {
         free(squares);
-        squares = NULL;
     }
 }
 

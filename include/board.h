@@ -81,10 +81,10 @@ Bitboard GetBlack(const Board* board);
 void Uint32Print(uint32_t value);
 void Uint64Print(uint64_t value);
 
-static inline _Bool IsSquareAttacked(Board board, Square square, Color color);
-static inline _Bool IsKingInCheck(Board board, Color color);
-static inline _Bool IsSquareEmpty(const Board* board, Square square);
-static inline _Bool IsSquareOccupiedBy(const Board* board, Square square, Color color);
+_Bool IsSquareAttacked(Board board, Square square, Color color);
+_Bool IsKingInCheck(Board board, Color color);
+_Bool IsSquareEmpty(const Board* board, Square square);
+_Bool IsSquareOccupiedBy(const Board* board, Square square, Color color);
 
 size_t NumberOfPieces(const Board* board, Color color);
 

@@ -109,7 +109,7 @@ void BoardPrintBitboards(Board board)
 }
 
 
-static inline _Bool IsSquareOccupiedBy(const Board* board, Square square, Color color)
+_Bool IsSquareOccupiedBy(const Board* board, Square square, Color color)
 {
     uint64_t occupied = 0;
     for (int i = color * 6; i < (color + 1) * 6; ++i) {
@@ -118,7 +118,7 @@ static inline _Bool IsSquareOccupiedBy(const Board* board, Square square, Color 
     return (occupied & (1ULL << square)) != 0;
 }
 
-static inline _Bool IsSquareEmpty(const Board* board, Square square)
+_Bool IsSquareEmpty(const Board* board, Square square)
 {
     for (int i = 0; i < 12; ++i) {
         if (board->bitboards[i] & (1ULL << square)) {
@@ -128,7 +128,7 @@ static inline _Bool IsSquareEmpty(const Board* board, Square square)
     return 1;
 }
 
-static inline _Bool IsSquareAttacked(Board board, Square square, Color color)
+_Bool IsSquareAttacked(Board board, Square square, Color color)
 {
     if (!IsSquareValid(square)) {
         return 0;
@@ -201,7 +201,7 @@ static inline _Bool IsSquareAttacked(Board board, Square square, Color color)
     return 0;
 }
 
-static inline _Bool IsKingInCheck(Board board, Color color) {
+_Bool IsKingInCheck(Board board, Color color) {
     uint64_t king_bitboard = board.bitboards[!color * 6 + 5];
     if (king_bitboard == 0) {
         fprintf(stderr, "No king found for color %d\n", color);

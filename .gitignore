@@ -7,3 +7,4 @@ compile_commands.json
 engine
 .changelog
 .version-conf
+libengine.*
