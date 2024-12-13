@@ -93,7 +93,7 @@ uint8_t GetFlag(Move move)
     return flags;
 }
 
-void MoveFreely(Board* board, Move move, uint8_t color)
+void MoveFreely(Board* board, Move move, Color color)
 {
     Square from, to;
     uint8_t promotion, flags;
@@ -155,7 +155,7 @@ void MovePrint(Move move)
             promotion, flags);
 }
 
-_Bool MoveIsValid(const Board* board, Move move, uint8_t color)
+_Bool MoveIsValid(const Board* board, Move move, Color color)
 {
     Square from, to;
     uint8_t promotion, flags;
@@ -204,7 +204,7 @@ _Bool PieceCanMove(const Board* board, Square from, Square to, Flag* flag)
     if (piece.type == ' ') {
         return 0;
     }
-    uint8_t color = PieceAt(board, from).color;
+    Color color = PieceAt(board, from).color;
 
     *flag = FLAG_NORMAL;
     switch (tolower(piece.type)) {
@@ -284,7 +284,7 @@ _Bool PieceCanMove(const Board* board, Square from, Square to, Flag* flag)
 //     return 1;
 // }
 
-Bitboard GenerateKnightMoves(const Board* board, Square from, uint8_t color)
+Bitboard GenerateKnightMoves(const Board* board, Square from, Color color)
 {
     Bitboard moves = 0;
     int inverted = (7 - (from/ 8)) * 8 + (from% 8);
@@ -312,7 +312,7 @@ Bitboard GenerateKnightMoves(const Board* board, Square from, uint8_t color)
     return moves;
 }
 
-Bitboard GenerateRookMoves(const Board* board, Square from, uint8_t color)
+Bitboard GenerateRookMoves(const Board* board, Square from, Color color)
 {
     Bitboard moves = 0;
     int square = (7 - (from/8))*8 + (from%8);
@@ -342,7 +342,7 @@ Bitboard GenerateRookMoves(const Board* board, Square from, uint8_t color)
     return moves;
 }
 
-Bitboard GenerateBishopMoves(const Board* board, Square from, uint8_t color)
+Bitboard GenerateBishopMoves(const Board* board, Square from, Color color)
 {
     Bitboard moves = 0;
     int inverted = (7 - (from / 8)) * 8 + (from % 8);
@@ -394,13 +394,13 @@ Bitboard GenerateBishopMoves(const Board* board, Square from, uint8_t color)
     return moves;
 }
 
-Bitboard GenerateQueenMoves(const Board* board, Square from, uint8_t color)
+Bitboard GenerateQueenMoves(const Board* board, Square from, Color color)
 {
     return GenerateBishopMoves(board, from, color)
          | GenerateRookMoves(board, from, color); 
 }
 
-Bitboard GenerateKingMoves(const Board* board, Square from, uint8_t color)
+Bitboard GenerateKingMoves(const Board* board, Square from, Color color)
 {
     Bitboard moves = 0;
     int inverted = (7 - (from/ 8)) * 8 + (from% 8);
@@ -426,7 +426,7 @@ Bitboard GenerateKingMoves(const Board* board, Square from, uint8_t color)
     return moves;
 }
 
-Bitboard GeneratePawnMoves(const Board* board, Square from, uint8_t color)
+Bitboard GeneratePawnMoves(const Board* board, Square from, Color color)
 {
     Bitboard moves = 0;
     int rank = 7 - (from / 8); // Current rank
@@ -461,7 +461,7 @@ Bitboard GeneratePawnMoves(const Board* board, Square from, uint8_t color)
     return moves;
 }
 
-Bitboard GenerateLegalMovesBitboard(const Board* board, uint8_t color)
+Bitboard GenerateLegalMovesBitboard(const Board* board, Color color)
 {
     Bitboard piecesBitboard = (color == PIECE_COLOR_WHITE) ? GetWhite(board) : GetBlack(board);
     Bitboard result = 0;
@@ -512,7 +512,7 @@ Bitboard GenerateLegalMovesBitboard(const Board* board, uint8_t color)
     return result;
 }
 
-void GenerateLegalMoves(const Board* board, uint8_t color, Move* moves, size_t* move_count)
+void GenerateLegalMoves(const Board* board, Color color, Move* moves, size_t* move_count)
 {
     *move_count = 0;
     

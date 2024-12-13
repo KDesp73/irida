@@ -9,7 +9,7 @@
 void TuiBoardPrintSquares(const Board* board, ui_config_t config, Square* squares, size_t count)
 {
     const char* yellow_bg = "\033[48;5;214m"; // Background yellow color
-    const char* reset = "\033[0m";             // Reset color formatting
+    const char* reset = "\033[0m";            // Reset color formatting
 
     const char* padding = "   ";
 
@@ -19,12 +19,12 @@ void TuiBoardPrintSquares(const Board* board, ui_config_t config, Square* square
 
     printf("%s┌───┬───┬───┬───┬───┬───┬───┬───┐\n", (config.coords) ? padding : "");
 
-    for (int rank = (config.perspective ? 0 : 7);
-         config.perspective ? rank <= 7 : rank >= 0;
-         config.perspective ? rank++ : rank--) {
+    for (int rank = (config.perspective ? 7 : 0);
+         config.perspective ? rank >= 0 : rank <= 7;
+         config.perspective ? rank-- : rank++) {
 
         if (config.coords) {
-            printf(" %d ", !config.perspective ? rank + 1 : 8 - rank);
+            printf(" %d ", config.perspective ? rank + 1 : 8 - rank);
         }
 
         for (int file = 0; file <= 7; ++file) {
@@ -35,7 +35,7 @@ void TuiBoardPrintSquares(const Board* board, ui_config_t config, Square* square
                     int square_rank = squares[i] / 8;
                     int square_file = squares[i] % 8;
 
-                    if (!config.perspective) {
+                    if (config.perspective) {
                         square_rank = 7 - square_rank;
                     }
 
@@ -64,7 +64,7 @@ void TuiBoardPrintSquares(const Board* board, ui_config_t config, Square* square
         }
         printf("│\n");
 
-        if (rank != (!config.perspective ? 0 : 7)) {
+        if (rank != (config.perspective ? 0 : 7)) {
             printf("%s├───┼───┼───┼───┼───┼───┼───┼───┤\n", (config.coords) ? padding : "");
         }
     }

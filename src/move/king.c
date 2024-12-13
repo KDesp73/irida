@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <chess/piece.h>
 
-_Bool CanMoveKing(const Board* board, Square from, Square to, uint8_t color, Flag* flag)
+_Bool CanMoveKing(const Board* board, Square from, Square to, Color color, Flag* flag)
 {
     if (!IsSquareValid(from) || !IsSquareValid(to)) {
         return 0;

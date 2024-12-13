@@ -59,6 +59,13 @@ typedef enum {
     PROMOTION_KNIGHT
 } Promotion;
 
+typedef enum {
+    COLOR_NONE = -1,
+    COLOR_BLACK = 0,
+    COLOR_WHITE,
+} Color;
+
+
 char PromotionToChar(uint8_t promotion);
 uint8_t CharToPromotion(char promotion);
 
@@ -74,12 +81,12 @@ Bitboard GetBlack(const Board* board);
 void Uint32Print(uint32_t value);
 void Uint64Print(uint64_t value);
 
-_Bool IsSquareAttacked(Board board, Square square, uint8_t color);
-_Bool IsKingInCheck(Board board, uint8_t color);
-_Bool IsSquareEmpty(const Board* board, Square square);
-_Bool IsSquareOccupiedBy(const Board* board, Square square, uint8_t color);
+static inline _Bool IsSquareAttacked(Board board, Square square, Color color);
+static inline _Bool IsKingInCheck(Board board, Color color);
+static inline _Bool IsSquareEmpty(const Board* board, Square square);
+static inline _Bool IsSquareOccupiedBy(const Board* board, Square square, Color color);
 
-size_t NumberOfPieces(const Board* board, uint8_t color);
+size_t NumberOfPieces(const Board* board, Color color);
 
 _Bool IsCheckmate(Board* board);
 _Bool IsStalemate(Board* board);
@@ -92,5 +99,7 @@ Square* AttackPathToKing(Board* board, Square king, Square attacker, size_t* pat
 
 void TuiBoardPrintSquares(const Board* board, ui_config_t config, Square* squares, size_t count);
 void TuiBoardPrint(const Board* board, ui_config_t config, Square first, ...);
+
+void BoardToBoardT(const Board* board, board_t* board_t);
 
 #endif // ENGINE_BOARD_H

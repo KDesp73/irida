@@ -1,6 +1,6 @@
 #include "move.h"
 
-_Bool CanMoveRook(const Board* board, Square from, Square to, uint8_t color) {
+_Bool CanMoveRook(const Board* board, Square from, Square to, Color color) {
     if (!IsSquareValid(from) || !IsSquareValid(to)) {
         return 0;
     }

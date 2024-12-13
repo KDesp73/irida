@@ -1,5 +1,4 @@
 #include "board.h"
-#include "square.h"
 #include <stdio.h>
 
 void Uint32Print(uint32_t value)
@@ -35,14 +34,13 @@ void BitboardPrint(Bitboard bitboard)
     const char* reset = "\033[0m";             // Reset color formatting
     const char* padding = "   ";
 
-    // Assuming you have 64 squares on the board (8x8 grid)
     printf("%s┌───┬───┬───┬───┬───┬───┬───┬───┐\n", padding);
 
     for (int rank = 0; rank <= 7; rank++) {
-        printf(" %d ", 8-rank);  // Rank label (1-8)
+        printf(" %d ", 8 - rank);  // Rank label (1-8)
 
         for (int file = 0; file <= 7; ++file) {
-            int square_index = (7-rank) * 8 + file;
+            int square_index = rank * 8 + file;  // Adjusted for a1 -> 0
             char piece = ' ';
 
             // Check if a piece is on this square

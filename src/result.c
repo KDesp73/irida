@@ -1,7 +1,7 @@
 #include "board.h"
 #include <chess/piece.h>
 
-_Bool IsCheckmateColor(Board* board, uint8_t color)
+_Bool IsCheckmateColor(Board* board, Color color)
 {
     // uint64_t kingBitboard = board->bitboards[color == PIECE_COLOR_BLACK ? INDEX_BLACK_KING : INDEX_WHITE_KING];
     // 

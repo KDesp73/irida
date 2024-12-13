@@ -3,9 +3,10 @@
 
 #include "board.h"
 #include "square.h"
+#include <stdint.h>
 typedef struct {
     char type;
-    uint8_t color;
+    Color color;
 } Piece;
 #define PIECE_PRINT(piece)\
     printf("%s = {.type=%c, .color=%d}\n", #piece, piece.type, piece.color)

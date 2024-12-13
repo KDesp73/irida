@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-_Bool CanMoveBishop(const Board* board, Square from, Square to, uint8_t color)
+_Bool CanMoveBishop(const Board* board, Square from, Square to, Color color)
 {
     if (!IsSquareValid(from) || !IsSquareValid(to)) {
         return 0;

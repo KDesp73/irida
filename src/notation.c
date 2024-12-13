@@ -32,13 +32,13 @@ void FenImport(Board *board, const char *fen)
     memset(board, 0, sizeof(Board));
 
     const char *ptr = fen;
-    int rank = 0;
+    int rank = 7;
     int file = 0;
 
     // Parse board state
     while (*ptr && *ptr != ' ') {
         if (*ptr == '/') {
-            rank++;
+            rank--;
             file = 0;
         } else if (isdigit(*ptr)) {
             file += *ptr - '0';
@@ -48,9 +48,8 @@ void FenImport(Board *board, const char *fen)
                 return; // Invalid piece character
             }
 
-            int square = rank * 8 + file; // Calculate square index (0 = a8, ..., 63 = h1)
-            int inverted = (7 - (square/ 8)) * 8 + (square % 8);
-            board->bitboards[piece_index] |= (1ULL << inverted);
+            int square = rank * 8 + file; // Calculate square index (0 = a1, ..., 63 = h8)
+            board->bitboards[piece_index] |= (1ULL << square);
             file++;
         }
         ptr++;
@@ -89,7 +88,7 @@ void FenImport(Board *board, const char *fen)
             return; // Invalid FEN
         }
         // Convert 'a1'-'h8' to 0-63 (bitboard index)
-        board->enpassant_square = (7 - (rank_char - '1')) * 8 + (file_char - 'a');
+        board->enpassant_square = (rank_char - '1') * 8 + (file_char - 'a');
         ptr += 2;
     }
 

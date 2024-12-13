@@ -3,7 +3,7 @@
 #include <chess/piece.h>
 #include <stdlib.h>
 
-_Bool CanMovePawn(const Board* board, Square from, Square to, uint8_t color, Flag* flag)
+_Bool CanMovePawn(const Board* board, Square from, Square to, Color color, Flag* flag)
 {
     if (!IsSquareValid(from) || !IsSquareValid(to)) {
         return 0;
