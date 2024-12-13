@@ -1,0 +1,7 @@
+#ifndef ENGINE_VERSION_H
+#define ENGINE_VERSION_H
+
+#define CHESS_ENGINE_VERSION "0.1.0"
+
+#endif // ENGINE_VERSION_H
+

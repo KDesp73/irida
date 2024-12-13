@@ -1,7 +1,7 @@
 # Compiler and flags
 CC = gcc
 CFLAGS = -Wall -Iinclude
-LDFLAGS =
+LDFLAGS = -lchess
 
 # Directories
 SRC_DIR = src
@@ -10,7 +10,7 @@ BUILD_DIR = build
 DIST_DIR = dist
 
 # Target and version info
-TARGET = project
+TARGET = engine
 version_file = include/version.h
 VERSION_MAJOR = $(shell sed -n -e 's/\#define VERSION_MAJOR \([0-9]*\)/\1/p' $(version_file))
 VERSION_MINOR = $(shell sed -n -e 's/\#define VERSION_MINOR \([0-9]*\)/\1/p' $(version_file))
@@ -51,6 +51,8 @@ check_tools: ## Check if necessary tools are available
 $(BUILD_DIR): ## Create the build directory if it doesn't exist
 	@echo "[INFO] Creating build directory"
 	mkdir -p $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)/ui
+	mkdir -p $(BUILD_DIR)/move
 
 $(TARGET): $(OBJ_FILES) ## Build the shell executable
 	@echo "[INFO] Building the project"
