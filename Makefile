@@ -63,6 +63,7 @@ $(BUILD_DIR): ## Create the build directory if it doesn't exist
 	mkdir -p $(BUILD_DIR)/ui
 	mkdir -p $(BUILD_DIR)/move
 	mkdir -p $(BUILD_DIR)/bin
+	mkdir -p $(BUILD_DIR)/bitboard
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c ## Compile source files
 	$(eval counter=$(shell echo $$(($(counter)+1))))

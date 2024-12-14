@@ -17,8 +17,8 @@
 #include <chess/zobrist.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "bitboard.h"
 
-typedef uint64_t Bitboard;
 
 typedef struct {
     Bitboard bitboards[PIECE_TYPES];
@@ -72,17 +72,13 @@ uint8_t CharToPromotion(char promotion);
 void BoardInitFen(Board* board, const char* fen);
 void BoardPrint(Board board);
 void BoardPrintBitboards(Board board);
-void BitboardPrint(Bitboard bitboard);
-void PiecesPrint(const Board* board, int index);
 
 Bitboard GetWhite(const Board* board);
 Bitboard GetBlack(const Board* board);
-
-void Uint32Print(uint32_t value);
-void Uint64Print(uint64_t value);
+Bitboard GetEmpty(const Board* board);
 
 _Bool IsSquareAttacked(Board board, Square square, Color color);
-_Bool IsKingInCheck(Board board, Color color);
+// _Bool IsKingInCheck(Board board, Color color);
 _Bool IsSquareEmpty(const Board* board, Square square);
 _Bool IsSquareOccupiedBy(const Board* board, Square square, Color color);
 

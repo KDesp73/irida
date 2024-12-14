@@ -128,90 +128,6 @@ _Bool IsSquareEmpty(const Board* board, Square square)
     return 1;
 }
 
-_Bool IsSquareAttacked(Board board, Square square, Color color)
-{
-    if (!IsSquareValid(square)) {
-        return 0;
-    }
-
-    // Check for pawn attacks
-    int direction = (color == PIECE_COLOR_WHITE) ? -1 : 1;
-    Square left_attack = square + direction * BOARD_SIZE - 1;
-    Square right_attack = square + direction * BOARD_SIZE + 1;
-
-    if (IsSquareValid(left_attack) && board.bitboards[color * 6 + 0] & (1ULL << left_attack)) {
-        return 1;
-    }
-    if (IsSquareValid(right_attack) && board.bitboards[color * 6 + 0] & (1ULL << right_attack)) {
-        return 1;
-    }
-
-    // Check for knight attacks
-    for (int i = 0; i < 8; ++i) {
-        Square knight_square = square + KNIGHT_OFFSETS[i];
-        if (IsSquareValid(knight_square) && (board.bitboards[color * 6 + 1] & (1ULL << knight_square))) {
-            return 1;
-        }
-    }
-
-    // Check for bishop and queen diagonal attacks
-    for (int i = 0; i < 4; ++i) {
-        Square current = square;
-        while (1) {
-            current += BISHOP_OFFSETS[i];
-            if (!IsSquareValid(current)) {
-                break;
-            }
-            if (!IsSquareEmpty(&board, current)) {
-                if (board.bitboards[color * 6 + 2] & (1ULL << current) || // Bishop
-                    board.bitboards[color * 6 + 4] & (1ULL << current)) { // Queen
-                    return 1;
-                }
-                break;
-            }
-        }
-    }
-
-    // Check for rook and queen straight attacks
-    for (int i = 0; i < 4; ++i) {
-        Square current = square;
-        while (1) {
-            current += ROOK_OFFSETS[i];
-            if (!IsSquareValid(current)) {
-                break;
-            }
-            if (!IsSquareEmpty(&board, current)) {
-                if (board.bitboards[color * 6 + 3] & (1ULL << current) || // Rook
-                    board.bitboards[color * 6 + 4] & (1ULL << current)) { // Queen
-                    return 1;
-                }
-                break;
-            }
-        }
-    }
-
-    // Check for king attacks
-    for (int i = 0; i < 8; ++i) {
-        Square king_square = square + KING_OFFSETS[i];
-        if (IsSquareValid(king_square) && (board.bitboards[color * 6 + 5] & (1ULL << king_square))) {
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
-_Bool IsKingInCheck(Board board, Color color) {
-    uint64_t king_bitboard = board.bitboards[!color * 6 + 5];
-    if (king_bitboard == 0) {
-        fprintf(stderr, "No king found for color %d\n", color);
-        return 0;
-    }
-
-    Square king_square = __builtin_ctzll(king_bitboard); // Get index of the first set bit
-    return IsSquareAttacked(board, king_square, 1 - color);
-}
-
 Square UpdateEnpassantSquare(Board* board, Move move)
 {
     Piece piece = PieceAt(board, GetFrom(move));
@@ -312,81 +228,6 @@ size_t NumberOfPieces(const Board* board, Color color)
     return count;
 }
 
-Square* SquareIsAttackedBy(const Board* board, Square square, int attacked_by, size_t* count)
-{
-    *count = 0;
-    static Square attackedSquares[64];  // Array to hold attacked squares
-
-    // Define bitboard for the attacking piece
-    uint64_t attackedBitboard = 0;
-
-    switch (attacked_by) {
-        case PIECE_COLOR_WHITE:
-        case PIECE_COLOR_BLACK:
-            break;
-        default:
-            return NULL;
-    }
-
-    // Store attacked squares in attackedSquares array
-    for (int i = 0; i < 64; i++) {
-        if (attackedBitboard & (1ULL << i)) {
-            attackedSquares[*count] = (Square)i;
-            (*count)++;
-        }
-    }
-
-    return attackedSquares;
-}
-
-Square* SquareIsAccessibleBy(const Board* board, Square square, char piece, size_t* count)
-{
-    *count = 0;
-    static Square accessibleSquares[64];  // Array to hold accessible squares
-
-    int color = piece_color(piece); 
-    uint64_t accessibleBitboard = 0;
-
-    switch (piece) {
-        case 'R':
-        case 'r':  // Rook
-            accessibleBitboard = GenerateRookMoves(board, square, color);
-            break;
-        case 'B':
-        case 'b':  // Bishop
-            accessibleBitboard = GenerateBishopMoves(board, square, color);
-            break;
-        case 'N':
-        case 'n':  // Knight
-            accessibleBitboard = GenerateKnightMoves(board, square, color);
-            break;
-        case 'Q':
-        case 'q':  // Queen
-            accessibleBitboard = GenerateQueenMoves(board, square, color);
-            break;
-        case 'K':
-        case 'k':  // King
-            accessibleBitboard = GenerateKingMoves(board, square, color);
-            break;
-        case 'P':
-        case 'p':  // Pawn
-            accessibleBitboard = GeneratePawnMoves(board, square, color);
-            break;
-        default:
-            return NULL;
-    }
-
-    // Store accessible squares in accessibleSquares array
-    for (int i = 0; i < 64; i++) {
-        if (accessibleBitboard & (1ULL << i)) {
-            accessibleSquares[*count] = (Square)i;
-            (*count)++;
-        }
-    }
-
-    return accessibleSquares;
-}
-
 Square* AttackPathToKing(Board* board, Square king, Square attacker, size_t* path_count)
 {
     *path_count = 0;
@@ -441,3 +282,7 @@ Bitboard GetBlack(const Board* board)
          | board->bitboards[INDEX_BLACK_KING];
 }
 
+Bitboard GetEmpty(const Board* board)
+{
+    return ~(GetWhite(board) | GetBlack(board));
+}

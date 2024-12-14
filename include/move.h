@@ -61,13 +61,6 @@ void GenerateLegalMoves(const Board* board, Color color, Move* moves, size_t* mo
 Bitboard GenerateLegalMovesBitboard(const Board* board, Color color);
 void GenerateLegalMovesPiece(const Board* board, Square piece, Move* moves, size_t* move_count);
 
-Bitboard GeneratePawnMoves(const Board* board, Square from, Color color);
-Bitboard GenerateKingMoves(const Board* board, Square from, Color color);
-Bitboard GenerateQueenMoves(const Board* board, Square from, Color color);
-Bitboard GenerateBishopMoves(const Board* board, Square from, Color color);
-Bitboard GenerateRookMoves(const Board* board, Square from, Color color);
-Bitboard GenerateKnightMoves(const Board* board, Square from, Color color);
-
 void UpdateHalfmove(Board* board, Move move, size_t piece_count_before, size_t piece_count_after, char piece);
 uint8_t UpdateCastlingRights(Board* board, Square from);
 Square UpdateEnpassantSquare(Board* board, Move move);

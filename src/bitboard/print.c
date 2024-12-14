@@ -1,4 +1,4 @@
-#include "board.h"
+#include "bitboard.h"
 #include <stdio.h>
 
 void Uint32Print(uint32_t value)
@@ -23,24 +23,19 @@ void Uint64Print(uint64_t value)
     printf("\n");
 }
 
-void PiecesPrint(const Board* board, int index)
-{
-    BitboardPrint(board->bitboards[index]);
-}
-
 void BitboardPrint(Bitboard bitboard)
 {
-    const char* yellow_bg = "\033[48;5;214m"; // Background yellow color
-    const char* reset = "\033[0m";             // Reset color formatting
+    const char* yellow_bg = "\033[48;5;214m";
+    const char* reset = "\033[0m";
     const char* padding = "   ";
 
     printf("%s┌───┬───┬───┬───┬───┬───┬───┬───┐\n", padding);
 
     for (int rank = 0; rank <= 7; rank++) {
-        printf(" %d ", 8 - rank);  // Rank label (1-8)
+        printf(" %d ", 8 - rank);
 
         for (int file = 0; file <= 7; ++file) {
-            int square_index = rank * 8 + file;  // Adjusted for a1 -> 0
+            int square_index = (7-rank) * 8 + file;
             char piece = ' ';
 
             // Check if a piece is on this square
@@ -78,4 +73,5 @@ void BitboardPrint(Bitboard bitboard)
     printf("\n");
     Uint64Print(bitboard);
 }
+
 

@@ -28,9 +28,8 @@ Square NameToSquare(const char buffer[3]);
 
 int Rank(Square square);
 int File(Square square);
-_Bool IsSquareValid(Square square);
+bool IsSquareValid(Square square);
 
-Square SquareFromRF(size_t rank, size_t file);
 Square SquareFromCoords(size_t y, size_t x);
 Square SquareFromName(const char* name);
 

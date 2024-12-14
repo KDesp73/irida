@@ -3,13 +3,9 @@
 #include <assert.h>
 #include <string.h>
 
-Square SquareFromRF(size_t rank, size_t file)
-{
-    return rank * 8 + file;
-}
 Square SquareFromCoords(size_t y, size_t x)
 {
-    return (y + 1) * 8 + (x + 1);
+    return y * 8 + x;
 }
 Square SquareFromName(const char* name)
 {
@@ -53,7 +49,7 @@ void SquareToSquareT(square_t* square, Square src)
 
 int Rank(Square square)
 {
-    return 7-(square / BOARD_SIZE);
+    return square / BOARD_SIZE;
 }
 
 int File(Square square)
@@ -61,7 +57,7 @@ int File(Square square)
     return square % BOARD_SIZE;
 }
 
-_Bool IsSquareValid(Square square)
+bool IsSquareValid(Square square)
 {
     return square >= 0 && square <= 63;
 }

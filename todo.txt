@@ -1,0 +1,3 @@
+TODO: implement all bitboard.h methods
+TODO: tests
+TODO: performance optimization
