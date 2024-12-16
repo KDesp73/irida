@@ -12,15 +12,11 @@ int main(){
     InitializeMasks();
 
     Board board;
-    BoardInitFen(&board, "1k6/8/1p3R2/4r3/8/2Q1B3/8/1Kn3P1 w - - 0 1");
+    BoardInitFen(&board, "rnbqkbnr/pp3ppp/2p5/3Pp3/8/2N5/PPPP1PPP/R1BQKBNR w KQkq e6 0 1");
     
-    BoardPrintBitboard(&board, MINIMAL_CONFIG, WhitePawnPushes(board.bitboards[INDEX_WHITE_PAWN], GetEmpty(&board)));
+    Bitboard moves = GenerateWhitePawnMoves(board.bitboards[INDEX_WHITE_PAWN], board.bitboards[INDEX_WHITE_KING], GetEmpty(&board), GetEnemy(&board), board.enpassant_square);
+    BoardPrintBitboard(&board, MINIMAL_CONFIG, moves);
 
-    // for(size_t i = 0; i < 64; i++){
-    //     BitboardPrint(KnightAttacks(1ULL << i));
-    //     getchar();
-    // }
-    //
     board_free(&board);
     return 0;
 }

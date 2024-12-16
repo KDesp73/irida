@@ -11,5 +11,4 @@ Here’s a list of the methods ranked by ease of implementation:
 ### **Most Complex**  
 19. `GenerateCastlingMoves`  
 20. `GenerateEnPassantMoves`  
-21. `IsKingInCheck`  
 22. `IsMoveLegal`

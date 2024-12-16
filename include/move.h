@@ -39,6 +39,9 @@ Move MoveEncode(Square from, Square to, uint8_t promotion, uint8_t flag);
 Move MoveEncodeNames(const char* from, const char* to, uint8_t promotion, uint8_t flag);
 void MoveDecode(Move move, Square* from, Square* to, uint8_t* promotion, uint8_t* flag);
 
+Bitboard DoMove(Bitboard* current, Move move);
+Bitboard UndoMove(Bitboard* current, Move move);
+
 _Bool MoveMake(Board* board, Move move);
 void MoveFreely(Board* board, Move move, Color color);
 void MovePrint(Move move);

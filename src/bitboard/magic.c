@@ -4,16 +4,16 @@
 
 Bitboard WhitePawnPushes(Bitboard pawns, Bitboard emptySquares)
 {
-    uint64_t oneSquarePushes = (pawns << 8) & emptySquares;
-    uint64_t twoSquarePushes = ((pawns & RANK_2) << 16) & emptySquares;
+    Bitboard oneSquarePushes = (pawns << 8) & emptySquares;
+    Bitboard twoSquarePushes = (((pawns & RANK_2) << 8) & emptySquares) << 8;
 
     return oneSquarePushes | twoSquarePushes;
 }
 
 Bitboard BlackPawnPushes(Bitboard pawns, Bitboard emptySquares)
 {
-    uint64_t oneSquarePushes = (pawns >> 8) & emptySquares;
-    uint64_t twoSquarePushes = ((pawns & RANK_7) >> 16) & emptySquares;
+    Bitboard oneSquarePushes = (pawns >> 8) & emptySquares;
+    Bitboard twoSquarePushes = (((pawns & RANK_7) >> 8) & emptySquares) >> 8;
 
     return oneSquarePushes | twoSquarePushes;
 }
