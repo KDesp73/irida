@@ -59,14 +59,6 @@ Bitboard BlackPawnPromotions(Bitboard pawns, Bitboard emptySquares);
 Bitboard WhitePawnPromotionCaptures(Bitboard pawns, Bitboard opponentPieces);
 Bitboard BlackPawnPromotionCaptures(Bitboard pawns, Bitboard opponentPieces);
 
-/*** Move Generation ***/
-Bitboard GenerateWhitePawnMoves(Bitboard pieces, Bitboard king, Bitboard emptySquares, Bitboard enemySquares, Square enpassantSquare);
-Bitboard GenerateBlackPawnMoves(Bitboard pieces, Bitboard king, Bitboard emptySquares, Bitboard enemySquares, Square enpassantSquare);
-Bitboard GenerateKnightMoves(Bitboard pieces, Bitboard king, Bitboard emptySquares, Bitboard enemySquares);
-Bitboard GenerateBishopMoves(Bitboard pieces, Bitboard king, Bitboard emptySquares, Bitboard enemySquares);
-Bitboard GenerateRookMoves(Bitboard pieces, Bitboard king, Bitboard emptySquares, Bitboard enemySquares);
-Bitboard GenerateQueenMoves(Bitboard pieces, Bitboard king, Bitboard emptySquares, Bitboard enemySquares);
-Bitboard GenerateKingMoves(Bitboard pieces, Bitboard king, Bitboard emptySquares, Bitboard enemySquares);
 
 /*** King Safety ***/
 bool IsKingInCheck(Bitboard kingPosition, Bitboard enemyAttacks);

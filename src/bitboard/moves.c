@@ -2,6 +2,9 @@
 #include "board.h"
 #include "masks.h"
 #include "move.h"
+#include "square.h"
+#include <chess/ui.h>
+#include <io/logging.h>
 
 Bitboard DoMove(Bitboard* current, Move move)
 {
@@ -47,40 +50,118 @@ Bitboard UndoMove(Bitboard* current, Move move)
     return 0;
 }
 
-Bitboard GenerateWhitePawnMoves(Bitboard pieces, Bitboard king, Bitboard emptySquares, Bitboard enemySquares, Square enpassantSquare)
+Bitboard GenerateWhitePawnMovesPieces(const Board *board, Bitboard pieces)
 {
     Bitboard moves = 0ULL;
-    while(pieces){
+    Bitboard emptySquares = GetEmpty(board);
+    Bitboard enemySquares = GetEnemyColor(board, COLOR_WHITE);
+    Square enpassantSquare = board->enpassant_square;
+    Bitboard king = board->bitboards[INDEX_WHITE_KING];
+
+    while (pieces) {
         Square current = lsb(pieces);
         Bitboard currentPawn = 1ULL << current;
-        Bitboard pseudoLegal = WhitePawnAttacks(currentPawn, enemySquares) 
-            | WhitePawnPushes(currentPawn, emptySquares)
-            | (WhitePawnAttacks(currentPawn, ~0ULL) & (1ULL << enpassantSquare));
+        Bitboard pseudoLegal = 0ULL;
 
-        while(pseudoLegal){
+        if((1ULL << enpassantSquare) & RANK_3){
+            pseudoLegal = WhitePawnAttacks(currentPawn, enemySquares) 
+                | WhitePawnPushes(currentPawn, emptySquares)
+                | (WhitePawnAttacks(currentPawn, ~0ULL) & (1ULL << enpassantSquare));
+        } else {
+            pseudoLegal = WhitePawnAttacks(currentPawn, enemySquares) 
+                | WhitePawnPushes(currentPawn, emptySquares);
+        }
+
+        while (pseudoLegal) {
             Square target = lsb(pseudoLegal);
             Move move = MoveEncode(current, target, PROMOTION_NONE, FLAG_NORMAL);
 
-            DoMove(&pieces, move);
-            if (!IsKingInCheck(king, enemySquares)) {
+            // Create a temporary board to check the legality of the move
+            Board temp = BoardCopy(board);
+            Bitboard tempPieces = temp.bitboards[INDEX_WHITE_PAWN]; // Store the original pawn positions
+            DoMove(&tempPieces, move); // Apply the move on the temporary board
+            temp.bitboards[INDEX_WHITE_PAWN] = tempPieces; // Update the board with the modified state
+
+            // Check if the move leaves the king in check
+            if (!IsKingInCheck(temp.bitboards[INDEX_WHITE_KING], GetPseudoValidAttacks(&temp, COLOR_BLACK))) {
                 moves |= (1ULL << target);
             }
-            UndoMove(&pieces, move);
+            UndoMove(&tempPieces, move); // Undo the move on the temporary board
+            temp.bitboards[INDEX_WHITE_PAWN] = tempPieces; // Restore the original pawn state
 
+            // Remove the target from pseudoLegal moves
             off(&pseudoLegal, target);
         }
-        off(&pieces, current);
+        off(&pieces, current); // Move to the next pawn
     }
 
     return moves;
 }
 
-Bitboard GenerateBlackPawnMoves(Bitboard pieces, Bitboard king, Bitboard emptySquares, Bitboard enemySquares, Square enpassantSquare);
-Bitboard GenerateKnightMoves(Bitboard pieces, Bitboard king, Bitboard emptySquares, Bitboard enemySquares);
-Bitboard GenerateBishopMoves(Bitboard pieces, Bitboard king, Bitboard emptySquares, Bitboard enemySquares);
-Bitboard GenerateRookMoves(Bitboard pieces, Bitboard king, Bitboard emptySquares, Bitboard enemySquares);
-Bitboard GenerateQueenMoves(Bitboard pieces, Bitboard king, Bitboard emptySquares, Bitboard enemySquares);
-Bitboard GenerateKingMoves(Bitboard pieces, Bitboard king, Bitboard emptySquares, Bitboard enemySquares);
+Bitboard GenerateWhitePawnMoves(const Board* board)
+{
+    Bitboard pieces = board->bitboards[INDEX_WHITE_PAWN];
+    return GenerateWhitePawnMovesPieces(board, pieces);
+}
+
+Bitboard GenerateBlackPawnMovesPieces(const Board* board, Bitboard pieces)
+{
+    Bitboard moves = 0ULL;
+    Bitboard emptySquares = GetEmpty(board);
+    Bitboard enemySquares = GetEnemyColor(board, COLOR_BLACK);
+    Square enpassantSquare = board->enpassant_square;
+    Bitboard king = board->bitboards[INDEX_BLACK_KING];
+
+    while (pieces) {
+        Square current = lsb(pieces);
+        Bitboard currentPawn = 1ULL << current;
+        Bitboard pseudoLegal;
+
+        if((1ULL << enpassantSquare) & RANK_3){
+            pseudoLegal = BlackPawnAttacks(currentPawn, enemySquares) 
+                | BlackPawnPushes(currentPawn, emptySquares)
+                | (BlackPawnAttacks(currentPawn, ~0ULL) & (1ULL << enpassantSquare));
+        } else {
+            pseudoLegal = BlackPawnAttacks(currentPawn, enemySquares) 
+                | BlackPawnPushes(currentPawn, emptySquares);
+        }
+
+        while (pseudoLegal) {
+            Square target = lsb(pseudoLegal);
+            Move move = MoveEncode(current, target, PROMOTION_NONE, FLAG_NORMAL);
+
+            // Create a temporary board to check the legality of the move
+            Board temp = BoardCopy(board);
+            Bitboard tempPieces = temp.bitboards[INDEX_BLACK_PAWN]; // Store the original pawn positions
+            DoMove(&tempPieces, move); // Apply the move on the temporary board
+            temp.bitboards[INDEX_BLACK_PAWN] = tempPieces; // Update the board with the modified state
+
+            // Check if the move leaves the king in check
+            if (!IsKingInCheck(temp.bitboards[INDEX_BLACK_KING], GetPseudoValidAttacks(&temp, COLOR_WHITE))) {
+                moves |= (1ULL << target);
+            }
+            UndoMove(&tempPieces, move); // Undo the move on the temporary board
+            temp.bitboards[INDEX_BLACK_PAWN] = tempPieces; // Restore the original pawn state
+
+            // Remove the target from pseudoLegal moves
+            off(&pseudoLegal, target);
+        }
+        off(&pieces, current); // Move to the next pawn
+    }
+
+    return moves;
+}
+Bitboard GenerateBlackPawnMoves(const Board* board)
+{
+    Bitboard pieces = board->bitboards[INDEX_BLACK_PAWN];
+    return GenerateBlackPawnMovesPieces(board, pieces);
+}
+
+Bitboard GenerateKnightMoves(const Board* board);
+Bitboard GenerateBishopMoves(const Board* board);
+Bitboard GenerateRookMoves(const Board* board);
+Bitboard GenerateQueenMoves(const Board* board);
+Bitboard GenerateKingMoves(const Board* board);
 
 bool IsKingInCheck(Bitboard kingPosition, Bitboard enemyAttacks)
 {

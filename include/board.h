@@ -73,8 +73,21 @@ void BoardInitFen(Board* board, const char* fen);
 
 Bitboard GetWhite(const Board* board);
 Bitboard GetBlack(const Board* board);
+Bitboard GetEnemyColor(const Board *board, Color color);
 Bitboard GetEnemy(const Board* board);
 Bitboard GetEmpty(const Board* board);
+Bitboard GetPseudoValidAttacks(const Board* board, Color color);
+
+/*** Move Generation ***/
+Bitboard GenerateWhitePawnMoves(const Board* board);
+Bitboard GenerateWhitePawnMovesPieces(const Board* board, Bitboard pieces);
+Bitboard GenerateBlackPawnMoves(const Board* board);
+Bitboard GenerateBlackPawnMovesPieces(const Board* board, Bitboard pieces);
+Bitboard GenerateKnightMoves(const Board* board);
+Bitboard GenerateBishopMoves(const Board* board);
+Bitboard GenerateRookMoves(const Board* board);
+Bitboard GenerateQueenMoves(const Board* board);
+Bitboard GenerateKingMoves(const Board* board);
 
 _Bool IsSquareAttacked(Board board, Square square, Color color);
 // _Bool IsKingInCheck(Board board, Color color);
@@ -94,6 +107,7 @@ void BoardPrintBitboard(const Board* board, ui_config_t config, Bitboard highlig
 void BoardPrint(const Board* board, ui_config_t config, Square first, ...);
 void BoardPrintBitboards(Board board);
 
+Board BoardCopy(const Board* board);
 void BoardToBoardT(const Board* board, board_t* board_t);
 
 #endif // ENGINE_BOARD_H

@@ -4,12 +4,39 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "bitboard.h"
 #include "move.h"
 #include "notation.h"
 #include "piece.h"
 #include "square.h"
 #include <chess/board.h>
 #include <chess/piece.h>
+
+Bitboard GetPseudoValidAttacks(const Board* board, Color color)
+{
+    size_t start = (color) ? 6 : 0;
+    Bitboard enemy = GetEnemyColor(board, color);
+    Bitboard empty = GetEmpty(board);
+    return (color) 
+        ? WhitePawnAttacks(board->bitboards[INDEX_WHITE_PAWN], enemy)
+        : BlackPawnAttacks(board->bitboards[INDEX_BLACK_PAWN], enemy)
+        | KnightAttacks(board->bitboards[start + 1], empty, enemy)
+        | BishopAttacks(board->bitboards[start + 2], empty, enemy)
+        | RookAttacks(board->bitboards[start + 3], empty, enemy)
+        | QueenAttacks(board->bitboards[start + 4], empty, enemy)
+        | KingAttacks(board->bitboards[start + 5], empty, enemy)
+        ;
+}
+
+Board BoardCopy(const Board* board)
+{
+    Board b = {0};
+    b.state = board->state;
+    b.enpassant_square = board->enpassant_square;
+    memcpy(b.bitboards, board->bitboards, sizeof(b.bitboards));
+
+    return b;
+}
 
 void BoardToBoardT(const Board* board, board_t* board_t)
 {
@@ -213,11 +240,16 @@ Bitboard GetBlack(const Board* board)
          | board->bitboards[INDEX_BLACK_KING];
 }
 
-Bitboard GetEnemy(const Board *board)
+Bitboard GetEnemyColor(const Board *board, Color color)
 {
-    return (board->state.turn) 
+    return (color) 
         ? GetBlack(board)
         : GetWhite(board);
+}
+
+Bitboard GetEnemy(const Board *board)
+{
+    return GetEnemyColor(board, board->state.turn);
 }
 
 Bitboard GetEmpty(const Board* board)
