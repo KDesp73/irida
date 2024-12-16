@@ -36,7 +36,7 @@ Square NameToSquare(const char buffer[3])
 
     int rankIndex = rank - '1';
 
-    Square square = rankIndex + (fileIndex*8);
+    Square square = (rankIndex*8) + fileIndex;
 
     return square;
 }

@@ -6,6 +6,7 @@ void load()
 {
     LOAD_TEST("test_piece_at");
     LOAD_TEST("test_name_to_square");
+    LOAD_TEST("test_square_to_name");
 }
 
 int main(int argc, char** argv)
@@ -14,6 +15,7 @@ int main(int argc, char** argv)
 
     START_TESTS
         RUN_TEST(test_piece_at),
-        RUN_TEST(test_name_to_square)
+        RUN_TEST(test_name_to_square),
+        RUN_TEST(test_square_to_name)
     END_TESTS
 }
