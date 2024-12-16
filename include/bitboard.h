@@ -41,6 +41,8 @@ Square lsb(Bitboard b);
 Square msb(Bitboard b);
 Bitboard shift(Bitboard b, Direction D);
 Square poplsb(Bitboard* b);
+void on(Bitboard* bitboard, Square square);
+void off(Bitboard* bitboard, Square square);
 
 /*** Psudo Valid Attack Maps ***/
 Bitboard WhitePawnAttacks(Bitboard pawns, Bitboard enemySquares);

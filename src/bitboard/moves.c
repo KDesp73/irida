@@ -49,11 +49,30 @@ Bitboard UndoMove(Bitboard* current, Move move)
 
 Bitboard GenerateWhitePawnMoves(Bitboard pieces, Bitboard king, Bitboard emptySquares, Bitboard enemySquares, Square enpassantSquare)
 {
-    Bitboard pseudoLegal = WhitePawnAttacks(pieces, enemySquares) 
-        | WhitePawnPushes(pieces, emptySquares)
-        | (WhitePawnAttacks(pieces, ~0ULL) & (1ULL << enpassantSquare));
+    Bitboard moves = 0ULL;
+    while(pieces){
+        Square current = lsb(pieces);
+        Bitboard currentPawn = 1ULL << current;
+        Bitboard pseudoLegal = WhitePawnAttacks(currentPawn, enemySquares) 
+            | WhitePawnPushes(currentPawn, emptySquares)
+            | (WhitePawnAttacks(currentPawn, ~0ULL) & (1ULL << enpassantSquare));
 
-    return pseudoLegal;
+        while(pseudoLegal){
+            Square target = lsb(pseudoLegal);
+            Move move = MoveEncode(current, target, PROMOTION_NONE, FLAG_NORMAL);
+
+            DoMove(&pieces, move);
+            if (!IsKingInCheck(king, enemySquares)) {
+                moves |= (1ULL << target);
+            }
+            UndoMove(&pieces, move);
+
+            off(&pseudoLegal, target);
+        }
+        off(&pieces, current);
+    }
+
+    return moves;
 }
 
 Bitboard GenerateBlackPawnMoves(Bitboard pieces, Bitboard king, Bitboard emptySquares, Bitboard enemySquares, Square enpassantSquare);

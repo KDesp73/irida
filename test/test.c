@@ -2,10 +2,18 @@
 #include <io/test.h>
 #include "tests.h"
 
-int main() {
+void load()
+{
     LOAD_TEST("test_piece_at");
+    LOAD_TEST("test_name_to_square");
+}
+
+int main(int argc, char** argv)
+{
+    load();
 
     START_TESTS
-        RUN_TEST(test_piece_at)
+        RUN_TEST(test_piece_at),
+        RUN_TEST(test_name_to_square)
     END_TESTS
 }

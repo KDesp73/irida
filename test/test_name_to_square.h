@@ -1,0 +1,70 @@
+#ifndef test_name_to_square_h
+#define test_name_to_square_h
+
+#define TEST_test_name_to_square \
+	test_name_to_square("a1", 0), \
+	test_name_to_square("a2", 1), \
+	test_name_to_square("a3", 2), \
+	test_name_to_square("a4", 3), \
+	test_name_to_square("a5", 4), \
+	test_name_to_square("a6", 5), \
+	test_name_to_square("a7", 6), \
+	test_name_to_square("a8", 7), \
+	test_name_to_square("b1", 8), \
+	test_name_to_square("b2", 9), \
+	test_name_to_square("b3", 10), \
+	test_name_to_square("b4", 11), \
+	test_name_to_square("b5", 12), \
+	test_name_to_square("b6", 13), \
+	test_name_to_square("b7", 14), \
+	test_name_to_square("b8", 15), \
+	test_name_to_square("c1", 16), \
+	test_name_to_square("c2", 17), \
+	test_name_to_square("c3", 18), \
+	test_name_to_square("c4", 19), \
+	test_name_to_square("c5", 20), \
+	test_name_to_square("c6", 21), \
+	test_name_to_square("c7", 22), \
+	test_name_to_square("c8", 23), \
+	test_name_to_square("d1", 24), \
+	test_name_to_square("d2", 25), \
+	test_name_to_square("d3", 26), \
+	test_name_to_square("d4", 27), \
+	test_name_to_square("d5", 28), \
+	test_name_to_square("d6", 29), \
+	test_name_to_square("d7", 30), \
+	test_name_to_square("d8", 31), \
+	test_name_to_square("e1", 32), \
+	test_name_to_square("e2", 33), \
+	test_name_to_square("e3", 34), \
+	test_name_to_square("e4", 35), \
+	test_name_to_square("e5", 36), \
+	test_name_to_square("e6", 37), \
+	test_name_to_square("e7", 38), \
+	test_name_to_square("e8", 39), \
+	test_name_to_square("f1", 40), \
+	test_name_to_square("f2", 41), \
+	test_name_to_square("f3", 42), \
+	test_name_to_square("f4", 43), \
+	test_name_to_square("f5", 44), \
+	test_name_to_square("f6", 45), \
+	test_name_to_square("f7", 46), \
+	test_name_to_square("f8", 47), \
+	test_name_to_square("g1", 48), \
+	test_name_to_square("g2", 49), \
+	test_name_to_square("g3", 50), \
+	test_name_to_square("g4", 51), \
+	test_name_to_square("g5", 52), \
+	test_name_to_square("g6", 53), \
+	test_name_to_square("g7", 54), \
+	test_name_to_square("g8", 55), \
+	test_name_to_square("h1", 56), \
+	test_name_to_square("h2", 57), \
+	test_name_to_square("h3", 58), \
+	test_name_to_square("h4", 59), \
+	test_name_to_square("h5", 60), \
+	test_name_to_square("h6", 61), \
+	test_name_to_square("h7", 62), \
+	test_name_to_square("h8", 63)
+
+#endif

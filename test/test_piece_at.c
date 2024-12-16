@@ -10,7 +10,7 @@ int test_piece_at(const char* fen, Square square, char expected)
 
     char piece = PieceAt(&board, square).type;
     if(piece != expected){
-        FAIL(fen, "Expected: %c. Found: %c", expected, piece);
+        FAILF(fen, "Expected: %c. Found: %c", expected, piece);
         return 0;
     }
     SUCC("Passed");

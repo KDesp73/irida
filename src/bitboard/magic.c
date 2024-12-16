@@ -5,7 +5,7 @@
 Bitboard WhitePawnPushes(Bitboard pawns, Bitboard emptySquares)
 {
     Bitboard oneSquarePushes = (pawns << 8) & emptySquares;
-    Bitboard twoSquarePushes = (((pawns & RANK_2) << 8) & emptySquares) << 8;
+    Bitboard twoSquarePushes = (((pawns & RANK_2) << 8) & emptySquares) << 8 & emptySquares;
 
     return oneSquarePushes | twoSquarePushes;
 }
@@ -13,7 +13,7 @@ Bitboard WhitePawnPushes(Bitboard pawns, Bitboard emptySquares)
 Bitboard BlackPawnPushes(Bitboard pawns, Bitboard emptySquares)
 {
     Bitboard oneSquarePushes = (pawns >> 8) & emptySquares;
-    Bitboard twoSquarePushes = (((pawns & RANK_7) >> 8) & emptySquares) >> 8;
+    Bitboard twoSquarePushes = (((pawns & RANK_7) >> 8) & emptySquares) >> 8 & emptySquares;
 
     return oneSquarePushes | twoSquarePushes;
 }

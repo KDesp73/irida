@@ -1,6 +1,7 @@
 #include "square.h"
 #include "board.h"
 #include <assert.h>
+#include <io/logging.h>
 #include <string.h>
 
 Square SquareFromCoords(size_t y, size_t x)
@@ -17,7 +18,7 @@ void SquareToName(char buffer[3], Square square)
     assert(square >= 0 && square <= 63);
 
     char file = 'a' + (square % 8);
-    char rank = '1' + (7 - (square / 8));
+    char rank = '1' + (square / 8);
 
     buffer[0] = file;
     buffer[1] = rank;
@@ -33,9 +34,9 @@ Square NameToSquare(const char buffer[3])
 
     int fileIndex = file - 'a';
 
-    int rankIndex = '8' - rank;
+    int rankIndex = rank - '1';
 
-    Square square = (rankIndex * 8) + fileIndex;
+    Square square = rankIndex + (fileIndex*8);
 
     return square;
 }

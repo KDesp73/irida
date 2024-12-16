@@ -88,3 +88,13 @@ Square poplsb(Bitboard* b)
     *b &= *b - 1;
     return s;
 }
+
+void on(Bitboard* bitboard, Square square)
+{
+    *bitboard |= (1ULL << square);
+}
+
+void off(Bitboard* bitboard, Square square)
+{
+    *bitboard &= ~(1ULL << square);
+}
