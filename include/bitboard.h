@@ -41,6 +41,7 @@ Square lsb(Bitboard b);
 Square msb(Bitboard b);
 Bitboard shift(Bitboard b, Direction D);
 Square poplsb(Bitboard* b);
+int popcount(Bitboard bb);
 void on(Bitboard* bitboard, Square square);
 void off(Bitboard* bitboard, Square square);
 
@@ -58,7 +59,6 @@ Bitboard WhitePawnPromotions(Bitboard pawns, Bitboard emptySquares);
 Bitboard BlackPawnPromotions(Bitboard pawns, Bitboard emptySquares);
 Bitboard WhitePawnPromotionCaptures(Bitboard pawns, Bitboard opponentPieces);
 Bitboard BlackPawnPromotionCaptures(Bitboard pawns, Bitboard opponentPieces);
-
 
 /*** King Safety ***/
 bool IsKingInCheck(Bitboard kingPosition, Bitboard enemyAttacks);

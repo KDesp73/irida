@@ -76,30 +76,55 @@ Bitboard GetBlack(const Board* board);
 Bitboard GetEnemyColor(const Board *board, Color color);
 Bitboard GetEnemy(const Board* board);
 Bitboard GetEmpty(const Board* board);
-Bitboard GetPseudoValidAttacks(const Board* board, Color color);
+Bitboard GetPseudoLegalAttacks(const Board* board, Color color);
 
 /*** Move Generation ***/
-Bitboard GenerateWhitePawnMoves(const Board* board);
-Bitboard GenerateWhitePawnMovesPieces(const Board* board, Bitboard pieces);
-Bitboard GenerateBlackPawnMoves(const Board* board);
-Bitboard GenerateBlackPawnMovesPieces(const Board* board, Bitboard pieces);
-Bitboard GenerateKnightMoves(const Board* board);
-Bitboard GenerateBishopMoves(const Board* board);
-Bitboard GenerateRookMoves(const Board* board);
-Bitboard GenerateQueenMoves(const Board* board);
-Bitboard GenerateKingMoves(const Board* board);
+Bitboard GeneratePawnMoves(const Board* board, Bitboard pieces, Color color);
+#define GenerateWhitePawnMoves(board) \
+    GeneratePawnMoves(board, (board)->bitboards[INDEX_WHITE_PAWN], COLOR_WHITE)
+#define GenerateBlackPawnMoves(board) \
+    GeneratePawnMoves(board, (board)->bitboards[INDEX_BLACK_PAWN], COLOR_BLACK)
 
-_Bool IsSquareAttacked(Board board, Square square, Color color);
-// _Bool IsKingInCheck(Board board, Color color);
-_Bool IsSquareEmpty(const Board* board, Square square);
-_Bool IsSquareOccupiedBy(const Board* board, Square square, Color color);
+Bitboard GenerateKnightMoves(const Board* board, Bitboard pieces, Color color);
+#define GenerateWhiteKnightMoves(board) \
+    GenerateKnightMoves(board, (board)->bitboards[INDEX_WHITE_KNIGHT], COLOR_WHITE)
+#define GenerateBlackKnightMoves(board) \
+    GenerateKnightMoves(board, (board)->bitboards[INDEX_BLACK_KNIGHT], COLOR_BLACK)
+
+Bitboard GenerateBishopMoves(const Board* board, Bitboard pieces, Color color);
+#define GenerateWhiteBishopMoves(board) \
+    GenerateBishopMoves(board, (board)->bitboards[INDEX_WHITE_BISHOP], COLOR_WHITE)
+#define GenerateBlackBishopMoves(board) \
+    GenerateBishopMoves(board, (board)->bitboards[INDEX_BLACK_BISHOP], COLOR_BLACK)
+
+Bitboard GenerateRookMoves(const Board* board, Bitboard pieces, Color color);
+#define GenerateWhiteRookMoves(board) \
+    GenerateRookMoves(board, (board)->bitboards[INDEX_WHITE_ROOK], COLOR_WHITE)
+#define GenerateBlackRookMoves(board) \
+    GenerateRookMoves(board, (board)->bitboards[INDEX_BLACK_ROOK], COLOR_BLACK)
+
+Bitboard GenerateQueenMoves(const Board* board, Bitboard pieces, Color color);
+#define GenerateWhiteQueenMoves(board) \
+    GenerateQueenMoves(board, (board)->bitboards[INDEX_WHITE_QUEEN], COLOR_WHITE)
+#define GenerateBlackQueenMoves(board) \
+    GenerateQueenMoves(board, (board)->bitboards[INDEX_BLACK_QUEEN], COLOR_BLACK)
+
+Bitboard GenerateKingMoves(const Board* board, Bitboard pieces, Color color);
+#define GenerateWhiteKingMoves(board) \
+    GenerateKingMoves(board, (board)->bitboards[INDEX_WHITE_KING], COLOR_WHITE)
+#define GenerateBlackKingMoves(board) \
+    GenerateKingMoves(board, (board)->bitboards[INDEX_BLACK_KING], COLOR_BLACK)
+
+bool IsSquareAttacked(const Board* board, Square square, Color color);
+bool IsSquareEmpty(const Board* board, Square square);
+bool IsSquareOccupiedBy(const Board* board, Square square, Color color);
 
 size_t NumberOfPieces(const Board* board, Color color);
 
-_Bool IsCheckmate(Board* board);
-_Bool IsStalemate(Board* board);
-_Bool IsInsufficientMaterial(Board* board);
-_Bool IsThreefoldRepetition(Board* board);
+bool IsCheckmate(Board* board);
+bool IsStalemate(Board* board);
+bool IsInsufficientMaterial(Board* board);
+bool IsThreefoldRepetition(Board* board);
 
 
 void BoardPrintSquares(const Board* board, ui_config_t config, Square* squares, size_t count);

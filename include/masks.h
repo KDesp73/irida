@@ -8,6 +8,12 @@ typedef uint64_t Bitboard;
 static Bitboard DIAGONAL_MASKS[64];
 static Bitboard ANTI_DIAGONAL_MASKS[64];
 
+typedef enum {
+    DIAGONAL,
+    VERTICAL,
+    HORIZONTAL
+} RayType;
+
 Bitboard GeneralOccupancy(Bitboard whitePieces, Bitboard blackPieces);
 Bitboard BlockerMasks(Bitboard slidingPiece, Bitboard occupancy);
 

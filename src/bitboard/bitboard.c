@@ -83,9 +83,8 @@ Bitboard shift(Bitboard b, Direction D)
 
 Square poplsb(Bitboard* b)
 {
-    assert(b);
-    const Square s = lsb(*b);
-    *b &= *b - 1;
+    Square s = lsb(*b);
+    off(b, s);
     return s;
 }
 
@@ -97,4 +96,17 @@ void on(Bitboard* bitboard, Square square)
 void off(Bitboard* bitboard, Square square)
 {
     *bitboard &= ~(1ULL << square);
+}
+
+int popcount(Bitboard bb)
+{
+    int count = 0;
+
+    // Loop through all set bits using bitwise operations
+    while (bb) {
+        bb &= (bb - 1); // Clear the least significant set bit
+        count++;
+    }
+
+    return count;
 }

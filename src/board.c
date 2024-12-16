@@ -12,7 +12,7 @@
 #include <chess/board.h>
 #include <chess/piece.h>
 
-Bitboard GetPseudoValidAttacks(const Board* board, Color color)
+Bitboard GetPseudoLegalAttacks(const Board* board, Color color)
 {
     size_t start = (color) ? 6 : 0;
     Bitboard enemy = GetEnemyColor(board, color);
@@ -147,9 +147,10 @@ no_enpassant:
     return 64;
 }
 
-uint8_t UpdateCastlingRights(Board* board, Square from)
+uint8_t UpdateCastlingRights(Board* board, Square from, Square to)
 {
     Piece piece = PieceAt(board, from);
+    Piece toPiece = PieceAt(board, to);
     int color = piece.color;
     uint8_t castling_rights = board->state.castling_rights;
 
@@ -167,6 +168,25 @@ uint8_t UpdateCastlingRights(Board* board, Square from)
                 castling_rights &= ~CASTLE_BLACK_QUEENSIDE;
             }
             if (from == 63) {
+                castling_rights &= ~CASTLE_BLACK_KINGSIDE;
+            }
+        }
+    }
+
+    // If rook is captured we can't castle there
+    if (toPiece.type == 'r' || toPiece.type == 'R') {
+        if (color == PIECE_COLOR_WHITE) {
+            if (to == 0) {
+                castling_rights &= ~CASTLE_WHITE_QUEENSIDE;
+            }
+            if (to == 7) {
+                castling_rights &= ~CASTLE_WHITE_KINGSIDE;
+            }
+        } else if (color == PIECE_COLOR_BLACK) {
+            if (to == 56) {
+                castling_rights &= ~CASTLE_BLACK_QUEENSIDE;
+            }
+            if (to == 63) {
                 castling_rights &= ~CASTLE_BLACK_KINGSIDE;
             }
         }

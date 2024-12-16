@@ -8,6 +8,17 @@
 #include <stdlib.h>
 #include <chess/piece.h>
 
+#include <stdlib.h>
+
+void BitboardToMoves(Bitboard bitboard, Square from, Move moves[])
+{
+    size_t index = 0;
+    while (bitboard) {
+        Square to = poplsb(&bitboard);
+        moves[index++] = MoveEncode(from, to, PROMOTION_NONE, FLAG_NORMAL);
+    }
+}
+
 Move SquaresToMove(square_t from, square_t to, uint8_t promotion, uint8_t flags)
 {
     // Encode the 'rank' and 'file' as a 6-bit index (0-63)
@@ -196,6 +207,7 @@ uint8_t CharToPromotion(char promotion)
           return PROMOTION_NONE;
     }
 }
+
 
 // _Bool MoveMake(Board* board, Move move)
 // {

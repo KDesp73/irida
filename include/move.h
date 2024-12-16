@@ -57,10 +57,12 @@ Bitboard GenerateLegalMovesBitboard(const Board* board, Color color);
 void GenerateLegalMovesPiece(const Board* board, Square piece, Move* moves, size_t* move_count);
 
 void UpdateHalfmove(Board* board, Move move, size_t piece_count_before, size_t piece_count_after, char piece);
-uint8_t UpdateCastlingRights(Board* board, Square from);
+uint8_t UpdateCastlingRights(Board* board, Square from, Square to);
 Square UpdateEnpassantSquare(Board* board, Move move);
 
 void MoveToSquares(Move move, square_t* from, square_t* to, uint8_t* promotion, uint8_t* flags);
 Move SquaresToMove(square_t from, square_t to, uint8_t promotion, uint8_t flags);
+
+void BitboardToMoves(Bitboard bitboard, Square from, Move moves[]);
 
 #endif // ENGINE_MOVE_H

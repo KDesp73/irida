@@ -100,6 +100,9 @@ Bitboard KingAttacks(Bitboard king, Bitboard emptySquares, Bitboard enemySquares
          & emptyOrEnemySquares;
 }
 
+#undef DEBU
+#define DEBU(fmt, ...)
+
 Bitboard generateDiagonal(Square square, int direction, Bitboard emptySquares, Bitboard enemySquares)
 {
     Bitboard emptyOrEnemySquares = emptySquares | enemySquares;
@@ -116,18 +119,18 @@ Bitboard generateDiagonal(Square square, int direction, Bitboard emptySquares, B
         }
 
         // Break if the shift wraps around the board
-        if ((direction == 9 || direction == -7) && (current & FILE_A)) { break; } // Wraps to FILE_A
-        if ((direction == 7 || direction == -9) && (current & FILE_H)) { break; } // Wraps to FILE_H
-        if (!current) { break; } // Outside the board
+        if ((direction == 9 || direction == -7) && (current & FILE_A)) { DEBU("Out of bounds");break; } // Wraps to FILE_A
+        if ((direction == 7 || direction == -9) && (current & FILE_H)) { DEBU("Out of bounds");break; } // Wraps to FILE_H
+        if (!current) { DEBU("Out of bounds");break; } // Outside the board
 
         // Check if the square is occupied by a friendly piece (stop there)
-        if (friendlyPieces & current) { break; }
+        if (friendlyPieces & current) { DEBU("Friendly piece");break; }
 
         // Add the square to attacks only if it is an empty or enemy piece
         attacks |= current;
 
         // Stop if it is an enemy piece (capture)
-        if (enemySquares & current) { break; }
+        if (enemySquares & current) { DEBU("Enemy piece");break; }
     }
 
     return attacks;
