@@ -74,40 +74,6 @@ void BoardInitFen(Board *board, const char *fen)
     init_hash_table(&board->state.history, 1000, fen);
 }
 
-/**
- * Prints a Board structure for debugging purposes.
- */
-void BoardPrint(Board board)
-{
-    for (int rank = 0; rank <= 7; rank++) {
-        for (int file = 0; file < 8; file++) {
-            int square = rank * 8 + file;
-            char piece = '.';
-            for (int i = 0; i < PIECE_TYPES; i++) {
-                if (board.bitboards[i] & (1ULL << square)) {
-                    piece = "pnbrqkPNBRQK"[i];
-                    break;
-                }
-            }
-            printf("%c ", piece);
-        }
-        printf("\n");
-    }
-    printf("\n");
-    printf("Active color: %c\n", board.state.turn ? 'w' : 'b');
-    printf("Castling rights: %x\n", board.state.castling_rights);
-    printf("En passant square: %d\n", board.enpassant_square);
-    printf("Halfmove clock: %zu\n", board.state.halfmove);
-    printf("Fullmove number: %zu\n", board.state.fullmove);
-}
-void BoardPrintBitboards(Board board)
-{
-    for(size_t i = 0; i < PIECE_TYPES; i++){
-        printf("%2zu) %c ", i, PIECES[i]);
-        Uint64Print(board.bitboards[i]);
-    }
-}
-
 
 _Bool IsSquareOccupiedBy(const Board* board, Square square, Color color)
 {
@@ -228,41 +194,6 @@ size_t NumberOfPieces(const Board* board, Color color)
     return count;
 }
 
-Square* AttackPathToKing(Board* board, Square king, Square attacker, size_t* path_count)
-{
-    *path_count = 0;
-    static Square path[64];
-
-    char attackerPiece = PieceAt(board, attacker).type;
-
-    if (attackerPiece == 'r' || attackerPiece == 'q') {
-        if (attacker % 8 == king % 8) {  // Same column
-            int step = (king < attacker) ? -1 : 1;
-            for (int i = attacker + step; i != king; i += step) {
-                path[*path_count] = (Square)i;
-                (*path_count)++;
-            }
-        } else if (attacker / 8 == king / 8) {  // Same row
-            int step = (king < attacker) ? -1 : 1;
-            for (int i = attacker + step; i != king; i += step) {
-                path[*path_count] = (Square)i;
-                (*path_count)++;
-            }
-        }
-    } else if (attackerPiece == 'b' || attackerPiece == 'q') {
-        int stepRow = (king / 8 > attacker / 8) ? 1 : -1;
-        int stepCol = (king % 8 > attacker % 8) ? 1 : -1;
-        int i = attacker + stepRow * 8 + stepCol;
-        while (i != king) {
-            path[*path_count] = (Square)i;
-            (*path_count)++;
-            i += stepRow * 8 + stepCol;
-        }
-    }
-
-    return path;
-}
-
 Bitboard GetWhite(const Board* board)
 {
     return board->bitboards[INDEX_WHITE_PAWN]
@@ -280,6 +211,13 @@ Bitboard GetBlack(const Board* board)
          | board->bitboards[INDEX_BLACK_ROOK]
          | board->bitboards[INDEX_BLACK_QUEEN]
          | board->bitboards[INDEX_BLACK_KING];
+}
+
+Bitboard GetEnemy(const Board *board)
+{
+    return (board->state.turn) 
+        ? GetBlack(board)
+        : GetWhite(board);
 }
 
 Bitboard GetEmpty(const Board* board)

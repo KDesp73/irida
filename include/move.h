@@ -38,6 +38,7 @@ _Bool MoveIsValid(const Board* board, Move move, Color color);
 Move MoveEncode(Square from, Square to, uint8_t promotion, uint8_t flag);
 Move MoveEncodeNames(const char* from, const char* to, uint8_t promotion, uint8_t flag);
 void MoveDecode(Move move, Square* from, Square* to, uint8_t* promotion, uint8_t* flag);
+
 _Bool MoveMake(Board* board, Move move);
 void MoveFreely(Board* board, Move move, Color color);
 void MovePrint(Move move);
@@ -46,15 +47,6 @@ Square GetFrom(Move move);
 Square GetTo(Move move);
 uint8_t GetPromotion(Move move);
 uint8_t GetFlag(Move move);
-
-// Piece Movement Functions
-_Bool PieceCanMove(const Board* board, Square from, Square to, Flag* flag);
-_Bool CanMovePawn(const Board* board, Square from, Square to, Color color, Flag* flag);
-_Bool CanMoveKnight(const Board* board, Square from, Square to, Color color);
-_Bool CanMoveBishop(const Board* board, Square from, Square to, Color color);
-_Bool CanMoveRook(const Board* board, Square from, Square to, Color color);
-_Bool CanMoveQueen(const Board* board, Square from, Square to, Color color);
-_Bool CanMoveKing(const Board* board, Square from, Square to, Color color, Flag* flag);
 
 // Move List Generation
 void GenerateLegalMoves(const Board* board, Color color, Move* moves, size_t* move_count);

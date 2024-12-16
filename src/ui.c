@@ -1,13 +1,14 @@
 #include "board.h"
 #include "square.h"
+#include <chess/square.h>
 #include <stdio.h>
 #include <inttypes.h>
 #include "zobrist.h"
 #include <stdarg.h>
 #include <io/logging.h>
+#include <stdlib.h>
 
-
-void TuiBoardPrintSquares(const Board* board, ui_config_t config, Square* squares, size_t count)
+void BoardPrintSquares(const Board* board, ui_config_t config, Square* squares, size_t count)
 {
     const char* yellow_bg = "\033[48;5;214m"; // Background yellow color
     const char* reset = "\033[0m";            // Reset color formatting
@@ -115,10 +116,29 @@ void TuiBoardPrintSquares(const Board* board, ui_config_t config, Square* square
     printf("\n");
 }
 
+void BoardPrintBitboard(const Board* board, ui_config_t config, Bitboard highlight)
+{
+    Square* squares = NULL;
+    int count = 0;
+
+    squares = (Square*)malloc(64 * sizeof(Square)); 
+    if (!squares) {
+        perror("malloc failed");
+        return;
+    }
+
+    for(size_t i = 0; i < 64; i++){
+        if(highlight & (1ULL << i)) squares[count++] = (Square) i;
+    }
+
+    BoardPrintSquares(board, config, squares, count);
+    free(squares);
+}
+
+
 #define TERMINATOR 64
 #define INITIAL_ALLOCATION 100
-
-void TuiBoardPrint(const Board* board, ui_config_t config, Square first, ...)
+void BoardPrint(const Board* board, ui_config_t config, Square first, ...)
 {
     Square* squares = NULL;
     int count = 0;
@@ -163,10 +183,18 @@ void TuiBoardPrint(const Board* board, ui_config_t config, Square first, ...)
         squares = temp;
     }
 
-    TuiBoardPrintSquares(board, config, squares, count);
+    BoardPrintSquares(board, config, squares, count);
 
     if (squares) {
         free(squares);
+    }
+}
+
+void BoardPrintBitboards(Board board)
+{
+    for(size_t i = 0; i < PIECE_TYPES; i++){
+        printf("%2zu) %c ", i, PIECES[i]);
+        Uint64Print(board.bitboards[i]);
     }
 }
 

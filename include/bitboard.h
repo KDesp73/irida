@@ -1,10 +1,23 @@
 #ifndef BITBOARD_H
 #define BITBOARD_H
 
+#include "square.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include <assert.h>
 
 typedef uint64_t Bitboard;
+
+typedef enum {
+    NORTH = 8,
+    SOUTH = -8,
+    EAST = 1,
+    WEST = -1,
+    NORTH_EAST = 9,
+    NORTH_WEST = 7,
+    SOUTH_EAST = -7,
+    SOUTH_WEST = -9
+} Direction;
 
 #define FILE_A  0x0101010101010101ULL  // File A (a1, a2, ..., a8)
 #define FILE_B  0x0202020202020202ULL  // File B (b1, b2, ..., b8)
@@ -24,32 +37,29 @@ typedef uint64_t Bitboard;
 #define RANK_7  0x00FF000000000000ULL  // Rank 7 (a7-h7)
 #define RANK_8  0xFF00000000000000ULL  // Rank 8 (a8-h8)
 
+Square lsb(Bitboard b);
+Square msb(Bitboard b);
+Bitboard shift(Bitboard b, Direction D);
+Square poplsb(Bitboard* b);
 
-/*** Attack Maps ***/
-Bitboard WhitePawnAttacks(Bitboard pawns);
-Bitboard BlackPawnAttacks(Bitboard pawns);
-Bitboard KnightAttacks(Bitboard knights);
-Bitboard KingAttacks(Bitboard king);
-Bitboard BishopAttacks(Bitboard bishops, Bitboard occupancy);
-Bitboard RookAttacks(Bitboard rooks, Bitboard occupancy);
-Bitboard QueenAttacks(Bitboard queens, Bitboard occupancy);
 
-/*** Move Generation ***/
+/*** Psudo Valid Attack Maps ***/
+Bitboard WhitePawnAttacks(Bitboard pawns, Bitboard enemySquares);
+Bitboard BlackPawnAttacks(Bitboard pawns, Bitboard enemySquares);
+Bitboard KnightAttacks(Bitboard knights, Bitboard emptySquares, Bitboard enemySquares);
+Bitboard KingAttacks(Bitboard king, Bitboard emptySquares, Bitboard enemySquares);
+Bitboard BishopAttacks(Bitboard bishops, Bitboard emptySquares, Bitboard enemySquares);
+Bitboard RookAttacks(Bitboard rooks, Bitboard emptySquares, Bitboard enemySquares);
+Bitboard QueenAttacks(Bitboard queens, Bitboard emptySquares, Bitboard enemySquares);
 Bitboard WhitePawnPushes(Bitboard pawns, Bitboard emptySquares);
 Bitboard BlackPawnPushes(Bitboard pawns, Bitboard emptySquares);
 Bitboard WhitePawnPromotions(Bitboard pawns, Bitboard emptySquares);
 Bitboard BlackPawnPromotions(Bitboard pawns, Bitboard emptySquares);
 Bitboard WhitePawnPromotionCaptures(Bitboard pawns, Bitboard opponentPieces);
 Bitboard BlackPawnPromotionCaptures(Bitboard pawns, Bitboard opponentPieces);
-Bitboard GenerateKnightMoves(Bitboard knights, Bitboard emptySquares, Bitboard enemyPieces);
-Bitboard GenerateKingMoves(Bitboard kingPosition, Bitboard enemyAttacks);
-Bitboard GenerateBishopMoves(Bitboard bishops, Bitboard occupancy, Bitboard emptySquares);
-Bitboard GenerateRookMoves(Bitboard rooks, Bitboard occupancy, Bitboard emptySquares);
-Bitboard GenerateQueenMoves(Bitboard queens, Bitboard occupancy, Bitboard emptySquares);
 
-/*** Occupancy Masks ***/
-Bitboard GeneralOccupancy(Bitboard whitePieces, Bitboard blackPieces);
-Bitboard BlockerMasks(Bitboard slidingPiece, Bitboard occupancy);
+/*** Move Generation ***/
+Bitboard GenerateMoves(Bitboard pieces, Bitboard king, Bitboard emptySquares, Bitboard enemySquares);
 
 /*** King Safety ***/
 bool IsKingInCheck(Bitboard kingPosition, Bitboard enemyAttacks);

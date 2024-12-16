@@ -60,7 +60,6 @@ check_tools: ## Check if necessary tools are available
 $(BUILD_DIR): ## Create the build directory if it doesn't exist
 	@echo "[INFO] Creating build directory"
 	mkdir -p $(BUILD_DIR)
-	mkdir -p $(BUILD_DIR)/ui
 	mkdir -p $(BUILD_DIR)/move
 	mkdir -p $(BUILD_DIR)/bin
 	mkdir -p $(BUILD_DIR)/bitboard

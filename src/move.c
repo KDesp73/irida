@@ -197,34 +197,6 @@ uint8_t CharToPromotion(char promotion)
     }
 }
 
-_Bool PieceCanMove(const Board* board, Square from, Square to, Flag* flag)
-{
-    Piece piece = PieceAt(board, from);
-
-    if (piece.type == ' ') {
-        return 0;
-    }
-    Color color = PieceAt(board, from).color;
-
-    *flag = FLAG_NORMAL;
-    switch (tolower(piece.type)) {
-        case 'p':
-            return CanMovePawn(board, from, to, color, flag);
-        case 'n':
-            return CanMoveKnight(board, from, to, color);
-        case 'b':
-            return CanMoveBishop(board, from, to, color);
-        case 'r':
-            return CanMoveRook(board, from, to, color);
-        case 'q':
-            return CanMoveQueen(board, from, to, color);
-        case 'k':
-            return CanMoveKing(board, from, to, color, flag);
-        default:
-            return 0; // Unsupported piece type
-    }
-}
-
 // _Bool MoveMake(Board* board, Move move)
 // {
 //     Square from, to;
