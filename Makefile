@@ -90,6 +90,9 @@ test: ## Build and run the tests
 	make clean
 	make all
 	clear
+	./$(CHECK) load
+	make all
+	clear
 	./$(CHECK)
 
 .PHONY: shared
