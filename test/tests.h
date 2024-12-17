@@ -2,6 +2,9 @@
 #define ENGINE_TESTS_H
 #include "square.h"
 
+#define FAILF(fen, fmt, ...) \
+    fprintf(stderr, ANSI_RED "FAILED: (%s) " fmt ANSI_RESET "\n", fen, ##__VA_ARGS__)
+
 #include "test_piece_at.h"
 int test_piece_at(const char* fen, Square square, char expected);
 

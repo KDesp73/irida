@@ -1,7 +1,7 @@
 #ifndef test_name_to_square_h
 #define test_name_to_square_h
 
-#define TEST_test_name_to_square \
+#define TEST_test_name_to_square\
 	test_name_to_square("a1", 0), \
 	test_name_to_square("b1", 1), \
 	test_name_to_square("c1", 2), \

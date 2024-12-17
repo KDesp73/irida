@@ -1,7 +1,7 @@
 #ifndef test_pawn_moves_h
 #define test_pawn_moves_h
 
-#define TEST_test_pawn_moves \
+#define TEST_test_pawn_moves\
 	test_pawn_moves("r1bqk2r/pppp1ppp/2n2n2/4p3/2b1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1", "a2", "a3", "a4", NULL), \
 	test_pawn_moves("r1bqk2r/pppp1ppp/2n2n2/4p3/2b1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1", "b2", "b3", "b4", NULL), \
 	test_pawn_moves("r1bqk2r/pppp1ppp/2n2n2/4p3/2b1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1", "c2", "c3", NULL), \
