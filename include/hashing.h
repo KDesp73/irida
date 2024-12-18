@@ -11,13 +11,13 @@ typedef struct {
 } HashEntry;
 
 typedef struct {
+    uint64_t last_added;
     HashEntry* entries;
-    size_t size;
-    size_t capacity;
+    size_t count;
 } HashTable;
 
-void InitHashTable(HashTable* table, size_t capacity, const char* starting_fen);
-void InitHashTableHash(HashTable* table, size_t capacity, uint64_t starting_hash);
+void InitHashTable(HashTable* table, const char* starting_fen);
+void InitHashTableHash(HashTable* table, uint64_t starting_hash);
 _Bool UpdateHashTable(HashTable* table, uint64_t hash);
 void FreeHashTable(HashTable* table);
 

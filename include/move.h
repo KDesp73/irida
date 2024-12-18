@@ -26,10 +26,10 @@ typedef enum {
 
 typedef enum {
     PROMOTION_NONE = 0,
-    PROMOTION_QUEEN,
-    PROMOTION_ROOK,
+    PROMOTION_KNIGHT,
     PROMOTION_BISHOP,
-    PROMOTION_KNIGHT
+    PROMOTION_ROOK,
+    PROMOTION_QUEEN,
 } Promotion;
 
 enum {
@@ -40,6 +40,7 @@ enum {
 };
 
 typedef uint32_t Move;
+
 #define MOVES_CAPACITY 512
 typedef struct {
     Move list[MOVES_CAPACITY];
@@ -47,6 +48,8 @@ typedef struct {
 } Moves;
 void MovesAppend(Moves* moves, Move move);
 void MovesAppendList(Moves* dest, Moves src);
+
+Undo MakeUndo(const Board* board, Move move);
 
 #define KNIGHT_OFFSETS_COUNT 8
 const static int KNIGHT_OFFSETS[] = {

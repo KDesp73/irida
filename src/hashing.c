@@ -1,45 +1,44 @@
 #include "hashing.h"
+#include "board.h"
 #include "notation.h"
 #include "zobrist.h"
 #include <io/logging.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-void InitHashTableHash(HashTable* table, size_t capacity, uint64_t starting_hash)
+void InitHashTableHash(HashTable* table, uint64_t starting_hash)
 {
     if (!table) {
         ERRO("hash_table_t pointer is NULL.\n");
         exit(EXIT_FAILURE);
     }
 
-    table->entries = calloc(capacity, sizeof(HashEntry));
+    table->entries = calloc(MAX_MOVES, sizeof(HashEntry));
     if (!table->entries) {
         ERRO("Memory allocation failed for hash_table entries.\n");
         exit(EXIT_FAILURE);
     }
 
-    table->size = 0;
-    table->capacity = capacity;
+    table->count = 0;
 
     // Adding starting position
     UpdateHashTable(table, starting_hash);
 }
 
-void InitHashTable(HashTable* table, size_t capacity, const char* starting_fen)
+void InitHashTable(HashTable* table, const char* starting_fen)
 {
     if (!table) {
         ERRO("hash_table_t pointer is NULL.\n");
         exit(EXIT_FAILURE);
     }
 
-    table->entries = calloc(capacity, sizeof(HashEntry));
+    table->entries = calloc(MAX_MOVES, sizeof(HashEntry));
     if (!table->entries) {
         ERRO("Memory allocation failed for hash_table entries.\n");
         exit(EXIT_FAILURE);
     }
 
-    table->size = 0;
-    table->capacity = capacity;
+    table->count = 0;
 
     // Adding starting position
     Board board;
@@ -54,17 +53,19 @@ void FreeHashTable(HashTable* table)
 
 _Bool UpdateHashTable(HashTable* table, uint64_t hash)
 {
-    for (size_t i = 0; i < table->size; i++) {
+    for (size_t i = 0; i < table->count; i++) {
         if (table->entries[i].hash == hash) {
             table->entries[i].count++;
+            table->last_added = hash;
             return table->entries[i].count >= 3;
         }
     }
 
-    if (table->size < table->capacity) {
-        table->entries[table->size].hash = hash;
-        table->entries[table->size].count = 1;
-        table->size++;
+    if (table->count < MAX_MOVES) {
+        table->entries[table->count].hash = hash;
+        table->entries[table->count].count = 1;
+        table->count++;
+        table->last_added = hash;
     }
 
     return 0;

@@ -2,12 +2,11 @@
 #define ENGINE_BOARD_H
 
 
-/*--------------------------------------------.
-| Bitboard representation of the chess board. |
-`--------------------------------------------*/
+/*-----------------------------------.
+| Representation of the chess board. |
+`-----------------------------------*/
 
-#include "hashing.h"
-
+#include "history.h"
 #include "square.h"
 #include <stddef.h>
 #include <stdint.h>
@@ -45,8 +44,12 @@ typedef struct {
     uint8_t castling_rights;
     size_t halfmove;
     size_t fullmove;
-    HashTable history;
+
+    History history;
 } Board;
+
+bool HistoryAdd(History* history, const Board* board, uint32_t move);
+void HistoryRemove(History* history);
 
 #define PIECES "pnbrqkPNBRQK"
 enum {
@@ -69,7 +72,6 @@ typedef enum {
     COLOR_BLACK = 0,
     COLOR_WHITE,
 } Color;
-
 
 char PromotionToChar(uint8_t promotion);
 uint8_t CharToPromotion(char promotion);

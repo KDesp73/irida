@@ -1,13 +1,26 @@
 #include "bitboard.h"
 #include "board.h"
 #include "move.h"
+#include "masks.h"
 #include "piece.h"
 #include "square.h"
+#include "zobrist.h"
 
+#include <ctype.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdlib.h>
+
+Undo MakeUndo(const Board* board, Move move)
+{
+    return (Undo) {
+        .move = move,
+        .castling = board->castling_rights,
+        .enpassant = board->enpassant_square,
+        .fiftyMove=  board->halfmove
+    };
+}
 
 Moves BitboardToMoves(Bitboard bitboard, Square from)
 {
@@ -18,37 +31,6 @@ Moves BitboardToMoves(Bitboard bitboard, Square from)
     }
     return moves;
 }
-
-// Move SquaresToMove(square_t from, square_t to, uint8_t promotion, uint8_t flags)
-// {
-//     // Encode the 'rank' and 'file' as a 6-bit index (0-63)
-//     size_t from_index = (from.rank * BOARD_SIZE) + from.file; // Calculate 0-63 index from rank/file
-//     size_t to_index = (to.rank * BOARD_SIZE) + to.file;       // Calculate 0-63 index from rank/file
-//
-//     // Build Move by packing from_index, to_index, promotion, and flags
-//     return (from_index & 0x3F) | 
-//            ((to_index & 0x3F) << 6) | 
-//            ((promotion & 0xF) << 12) | 
-//            ((flags & 0x3) << 16);
-// }
-//
-// void MoveToSquares(Move move, square_t* from, square_t* to, uint8_t* promotion, uint8_t* flags)
-// {
-//     size_t from_index = move & 0x3F;               // Extract bits 0-5 for from index
-//     size_t to_index = (move >> 6) & 0x3F;          // Extract bits 6-11 for to index
-//     *promotion = (move >> 12) & 0xF;               // Extract bits 12-15 for promotion
-//     *flags = (move >> 16) & 0x3;                   // Extract bits 16-17 for flags
-//
-//     // Convert the indices back to rank/file for both from and to squares
-//     from->rank = from_index / BOARD_SIZE;          // Rank = index / BOARD_SIZE
-//     from->file = from_index % BOARD_SIZE;          // File = index % BOARD_SIZE
-//     to->rank = to_index / BOARD_SIZE;              // Rank = index / BOARD_SIZE
-//     to->file = to_index % BOARD_SIZE;              // File = index % BOARD_SIZE
-//
-//     // Optional: Fill in `name` or other fields if needed
-//     snprintf(from->name, sizeof(from->name), "%c%d", 'A' + (int)from->file, BOARD_SIZE - (int)from->rank);
-//     snprintf(to->name, sizeof(to->name), "%c%d", 'A' + (int)to->file, BOARD_SIZE - (int)to->rank);
-// }
 
 Move MoveEncodeNames(const char* from, const char* to, uint8_t promotion, uint8_t flag)
 {
@@ -104,11 +86,20 @@ uint8_t GetFlag(Move move)
     return flags;
 }
 
+
 void MoveFreely(Board* board, Move move, Color color)
 {
     Square from, to;
     uint8_t promotion, flags;
     MoveDecode(move, &from, &to, &promotion, &flags);
+
+    if(promotion == PROMOTION_NONE){
+        board->grid[COORDS(to)] = board->grid[COORDS(from)];
+    } else {
+        char p = PromotionToChar(promotion);
+        board->grid[COORDS(to)] = (color) ? p : tolower(p);
+    }
+    board->grid[COORDS(from)] = EMPTY_SQUARE;
 
     uint64_t from_bb = 1ULL << from;
     uint64_t to_bb = 1ULL << to;
@@ -120,7 +111,7 @@ void MoveFreely(Board* board, Move move, Color color)
             board->bitboards[color * 6 + piece] ^= from_bb; // Remove from source
             if (promotion) {
                 // Add promoted piece
-                board->bitboards[color * 6 + promotion - 1] |= to_bb;
+                board->bitboards[color * 6 + promotion] |= to_bb;
             } else {
                 // Move to destination
                 board->bitboards[color * 6 + piece] |= to_bb;
@@ -201,7 +192,7 @@ char PromotionToChar(uint8_t promotion)
     case PROMOTION_ROOK: return 'R';
     case PROMOTION_BISHOP: return 'B';
     case PROMOTION_KNIGHT: return 'N';
-    case PROMOTION_NONE: 
+    case PROMOTION_NONE:
     default:
           return '\0';
     }
@@ -252,27 +243,11 @@ bool Enpassant(Board* board, Move move);
 
 void MakeMove(Board* board, Move move)
 {
-    Square from, to;
-    uint8_t promotion, flag;
-    MoveDecode(move, &from, &to, &promotion, &flag);
+    Piece piece = PieceAt(board, GetFrom(move));
+    if(piece.color != board->turn) return;
+    if(piece.type == COLOR_NONE) return;
 
-    Bitboard promotionBB = DoMove(&board->bitboards[getBitboardIndexFromSquare(board, from)], move);
-    size_t start = (board->turn) ? 6 : 0;
-
-    switch (promotion) {
-    case PROMOTION_QUEEN:
-        board->bitboards[start + INDEX_BLACK_QUEEN] |= promotionBB;
-        break;
-    case PROMOTION_ROOK:
-        board->bitboards[start + INDEX_BLACK_ROOK] |= promotionBB;
-        break;
-    case PROMOTION_BISHOP:
-        board->bitboards[start + INDEX_BLACK_BISHOP] |= promotionBB;
-        break;
-    case PROMOTION_KNIGHT:
-        board->bitboards[start + INDEX_BLACK_KNIGHT] |= promotionBB;
-        break;
-    }
+    MoveFreely(board, move, board->turn);
 
     board->turn = !board->turn;
 }
@@ -284,20 +259,20 @@ void UnmakeMove(Board* board, Move move)
     MoveDecode(move, &from, &to, &promotion, &flag);
 
     Bitboard promotionBB = UndoMove(&board->bitboards[getBitboardIndexFromSquare(board, from)], move);
-    size_t start = (board->turn) ? 6 : 0;
+    int color = board->turn;
 
     switch (promotion) {
     case PROMOTION_QUEEN:
-        board->bitboards[start + INDEX_BLACK_QUEEN] &= ~promotionBB;
+        board->bitboards[color*6 + INDEX_BLACK_QUEEN] &= ~promotionBB;
         break;
     case PROMOTION_ROOK:
-        board->bitboards[start + INDEX_BLACK_ROOK] &= ~promotionBB;
+        board->bitboards[color*6 + INDEX_BLACK_ROOK] &= ~promotionBB;
         break;
     case PROMOTION_BISHOP:
-        board->bitboards[start + INDEX_BLACK_BISHOP] &= ~promotionBB;
+        board->bitboards[color*6 + INDEX_BLACK_BISHOP] &= ~promotionBB;
         break;
     case PROMOTION_KNIGHT:
-        board->bitboards[start + INDEX_BLACK_KNIGHT] &= ~promotionBB;
+        board->bitboards[color*6 + INDEX_BLACK_KNIGHT] &= ~promotionBB;
         break;
     }
 

@@ -37,7 +37,7 @@ Board BoardCopy(const Board* board)
 
 void BoardFree(Board* board)
 {
-    FreeHashTable(&board->history);
+    FreeHashTable(&board->history.positions);
 }
 
 /**
@@ -52,7 +52,7 @@ void BoardInitFen(Board *board, const char *fen)
 
     FenImport(board, fen);
 
-    InitHashTable(&board->history, 1000, fen);
+    InitHashTable(&board->history.positions, fen);
 }
 
 
