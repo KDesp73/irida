@@ -14,6 +14,8 @@ typedef struct {
     size_t fiftyMove;
 } Undo;
 
+void UndoPrint(Undo undo);
+
 typedef struct {
     HashTable positions;
     Undo moves[MAX_MOVES];

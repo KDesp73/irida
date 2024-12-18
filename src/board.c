@@ -234,6 +234,7 @@ Bitboard GetEmpty(const Board* board)
     return ~(GetWhite(board) | GetBlack(board));
 }
 
+
 int HasCastlingRights(const Board* board, uint8_t castling_rights)
 {
     return board->castling_rights & castling_rights;

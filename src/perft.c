@@ -17,10 +17,9 @@ u64 Perft(Board* board, int depth)
     for (i = 0; i < n_moves; i++) {
         MakeMove(board, moves.list[i]);
         if (!IsInCheck(board)) {
-            u64 childNodes = Perft(board, depth - 1);
-            nodes += childNodes;
+            nodes += Perft(board, depth - 1);
         }
-        UnmakeMove(board, moves.list[i]);
+        UnmakeMove(board);
     }
 
     return nodes;
@@ -41,7 +40,7 @@ u64 PerftLegal(Board* board, int depth)
     for (i = 0; i < n_moves; i++) {
         MakeMove(board, moves.list[i]);
         nodes += Perft(board, depth - 1);
-        UnmakeMove(board, moves.list[i]);
+        UnmakeMove(board);
     }
 
     return nodes;

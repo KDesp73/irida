@@ -1,5 +1,6 @@
 #include "bitboard.h"
 #include "board.h"
+#include "history.h"
 #include "masks.h"
 #include "move.h"
 #include "perft.h"
@@ -26,18 +27,20 @@ int main(int argc, char** argv){
     InitMasks();
 
     Board board;
-    BoardInitFen(&board,"6r1/1k5P/8/8/8/3K4/5p2/6R1 b - - 0 1");
+    BoardInitFen(&board,"rnbqkbnr/pp1pp1pp/8/4Pp2/1Pp5/8/P1PP1PPP/RNBQKBNR b KQkq b3 0 1");
 
     BoardPrint(&board, 64);
+    // BoardPrintGrid(&board);
+
+    Move move = MoveEncodeNames("c4", "b3", PROMOTION_NONE, FLAG_NORMAL);
+    MakeMove(&board, move);
+
+    BoardPrintMove(&board, move);
     BoardPrintGrid(&board);
 
-    MakeMove(&board, 
-            MoveEncode(
-                SquareFromName("f2"), SquareFromName("g1"), 
-                PROMOTION_QUEEN, FLAG_PROMOTION)
-            );
+    UnmakeMove(&board);
 
-    BoardPrint(&board, 64);
+    BoardPrintMove(&board, move);
     BoardPrintGrid(&board);
 
     BoardFree(&board);

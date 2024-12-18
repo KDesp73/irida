@@ -2,11 +2,11 @@
 #define test_perft_h
 
 #define TEST_test_perft\
-	test_perft(1, 20), \
-	test_perft(2, 400), \
-	test_perft(3, 8902), \
-	test_perft(4, 197281), \
+	test_perft(6, 119060324), \
 	test_perft(5, 4865609), \
-	test_perft(6, 119060324)
+	test_perft(4, 197281), \
+	test_perft(3, 8902), \
+	test_perft(2, 400), \
+	test_perft(1, 20)
 
 #endif

@@ -41,7 +41,7 @@ enum {
 
 typedef uint32_t Move;
 
-#define MOVES_CAPACITY 512
+#define MOVES_CAPACITY 256
 typedef struct {
     Move list[MOVES_CAPACITY];
     size_t count;
@@ -80,11 +80,14 @@ Move MoveEncode(Square from, Square to, uint8_t promotion, uint8_t flag);
 Move MoveEncodeNames(const char* from, const char* to, uint8_t promotion, uint8_t flag);
 void MoveDecode(Move move, Square* from, Square* to, uint8_t* promotion, uint8_t* flag);
 
+void MoveSetFlag(Move* move, Flag flag);
+void MoveSetPromotion(Move* move, Promotion promotion);
+
 Bitboard DoMove(Bitboard* current, Move move);
 Bitboard UndoMove(Bitboard* current, Move move);
 
 void MakeMove(Board* board, Move move);
-void UnmakeMove(Board* board, Move move);
+void UnmakeMove(Board* board);
 bool Castle(Board* board, Move move);
 bool Enpassant(Board* board, Move move);
 
@@ -103,9 +106,8 @@ void UpdateHalfmove(Board* board, Move move, size_t piece_count_before, size_t p
 uint8_t UpdateCastlingRights(Board* board, Square from, Square to);
 Square UpdateEnpassantSquare(Board* board, Move move);
 
-// void MoveToSquares(Move move, square_t* from, square_t* to, uint8_t* promotion, uint8_t* flags);
-// Move SquaresToMove(square_t from, square_t to, uint8_t promotion, uint8_t flags);
-
 Moves BitboardToMoves(Bitboard bitboard, Square from);
+
+void BoardPrintMove(const Board* board, Move move);
 
 #endif // ENGINE_MOVE_H

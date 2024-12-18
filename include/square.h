@@ -23,7 +23,7 @@ typedef uint8_t Square;
         printf("%s = %s %d\n", #square, __square_name__, square);\
     } while(0)
 
-#define COORDS(square) square / 8][square % 8
+#define COORDS(square) (square) / 8][(square) % 8
 
 void SquareToName(char buffer[3], Square square);
 Square NameToSquare(const char buffer[3]);

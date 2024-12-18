@@ -1,16 +1,35 @@
 #include "bitboard.h"
 #include "board.h"
 #include "move.h"
+#include "hashing.h"
 #include "masks.h"
 #include "piece.h"
 #include "square.h"
 #include "zobrist.h"
 
 #include <ctype.h>
+#include <io/logging.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdlib.h>
+
+void MoveSetFlag(Move* move, Flag flag)
+{
+    *move &= ~(0x7 << 16);
+    *move |= ((flag & 0x7) << 16);
+}
+void MoveSetPromotion(Move* move, Promotion promotion)
+{
+    *move &= ~(0xF << 12);
+    *move |= ((promotion & 0xF) << 12); 
+}
+
+void BoardPrintMove(const Board* board, Move move)
+{
+    MOVE_DECODE(move);
+    BoardPrint(board, src, dst, 64);
+}
 
 Undo MakeUndo(const Board* board, Move move)
 {
@@ -128,19 +147,6 @@ void MoveFreely(Board* board, Move move, Color color)
             break;
         }
     }
-
-    // Special moves
-    if (flags == 1) {
-        // Handle castling
-        if (to == 6) { // Kingside castling
-            board->bitboards[color * 6 + 0] ^= (1ULL << 7) | (1ULL << 5); // Move rook
-        } else if (to == 2) { // Queenside castling
-            board->bitboards[color * 6 + 0] ^= (1ULL << 0) | (1ULL << 3); // Move rook
-        }
-    } else if (flags == 2) {
-        // Handle en passant
-        board->bitboards[opponent * 6 + 5] ^= (1ULL << (to - (color ? 8 : -8)));
-    }
 }
 
 void MoveToString(Move move, char* buffer)
@@ -231,50 +237,218 @@ size_t getBitboardIndexFromSquare(Board* board, Square square)
     }
 }
 
+bool IsCastle(const Board* board, Move* move)
+{
+    Square from, to;
+    uint8_t promotion, flag;
+    MoveDecode(*move, &from, &to, &promotion, &flag);
+
+    Piece piece = PieceAt(board, from);
+    if (tolower(piece.type) != 'k' || piece.color != board->turn) {
+        return false;
+    }
+
+    // Castling is a king move of exactly two squares horizontally
+    int rowFrom = from / 8;
+    int colFrom = from % 8;
+    int rowTo = to / 8;
+    int colTo = to % 8;
+
+    if (rowFrom != rowTo) { // King must stay in the same rank
+        return false;
+    }
+
+    int colDiff = colTo - colFrom;
+    if (abs(colDiff) != 2) {
+        return false;
+    }
+
+    // Verify castling rights
+    if (colDiff == 2) { // Short castling (kingside)
+        if (
+            !HasCastlingRights(board, CASTLE_WHITE_KINGSIDE) 
+            && !HasCastlingRights(board, CASTLE_BLACK_KINGSIDE)
+        ) {
+            return false;
+        }
+    } else if (colDiff == -2) { // Long castling (queenside)
+        if (
+            !HasCastlingRights(board, CASTLE_WHITE_QUEENSIDE) 
+            && !HasCastlingRights(board, CASTLE_BLACK_QUEENSIDE)
+        ) {
+            return false;
+        }
+    }
+
+    MoveSetFlag(move, FLAG_CASTLING);
+
+    return true;
+}
+#define CASTLE_ROOK(dst_k, dst_q)\
+    if (dst == dst_k) { \
+        board->grid[COORDS(dst-1)] = dst_k < 8 ? 'R' : 'r'; \
+        board->grid[COORDS(dst+1)] = EMPTY_SQUARE; \
+        board->bitboards[color * 6 + INDEX_BLACK_ROOK] ^= (1ULL << (dst+1)) | (1ULL << (dst-1)); \
+    } else if (dst == dst_q) { \
+        board->grid[COORDS(dst+1)] = dst_q < 8 ? 'R' : 'r'; \
+        board->grid[COORDS(dst-2)] = EMPTY_SQUARE; \
+        board->bitboards[color * 6 + INDEX_BLACK_ROOK] ^= (1ULL << (dst-2)) | (1ULL << (dst+1)); \
+    }
+
+
 bool Castle(Board* board, Move move)
 {
     MOVE_DECODE(move);
+    Color color = board->turn;
 
     if(flag != FLAG_CASTLING) return false;
-    
+
+    CASTLE_ROOK(6, 2);
+    CASTLE_ROOK(62, 58)
+
+    return true;
 }
 
-bool Enpassant(Board* board, Move move);
+bool IsEnpassant(const Board* board, Move* move)
+{
+    Square from, to;
+    uint8_t promotion, flag;
+
+    // Decode the move into its components
+    MoveDecode(*move, &from, &to, &promotion, &flag);
+
+    // Ensure the piece moving is a pawn
+    int color = board->turn;
+    Bitboard pawnBB = board->bitboards[color * 6 + INDEX_BLACK_PAWN];
+    if (!(pawnBB & (1ULL << from))) {
+        return false; // Not a pawn move
+    }
+
+    // Ensure it's a diagonal move (en passant is always diagonal)
+    int file_diff = abs((to % 8) - (from % 8));
+    int rank_diff = abs((to / 8) - (from / 8));
+    if (file_diff != 1 || rank_diff != 1) {
+        return false; // Not a diagonal move
+    }
+
+    // Check if the destination square matches the en passant square
+    if (to != board->enpassant_square) {
+        return false; // Not en passant
+    }
+
+    MoveSetFlag(move, FLAG_ENPASSANT);
+    return true;
+}
+bool Enpassant(Board* board, Move move)
+{
+    MOVE_DECODE(move);
+    Color color = board->turn;
+
+    if (flag != FLAG_ENPASSANT) return false;
+
+    if (dst != board->enpassant_square) return false;
+
+    Square captured_square = color == COLOR_WHITE ? dst - 8 : dst + 8;
+
+    // Remove the captured pawn
+    board->bitboards[!color * 6 + INDEX_BLACK_PAWN] &= ~(1ULL << captured_square);
+    board->grid[COORDS(captured_square)] = ' ';
+
+    // Clear the en passant target square (no en passant is possible now)
+    board->enpassant_square = 64;
+
+    // Update the halfmove clock
+    board->halfmove = 0;
+
+    return true;
+}
 
 void MakeMove(Board* board, Move move)
 {
+
     Piece piece = PieceAt(board, GetFrom(move));
     if(piece.color != board->turn) return;
     if(piece.type == COLOR_NONE) return;
 
-    MoveFreely(board, move, board->turn);
+    Square enpassant = UpdateEnpassantSquare(board, move);
+    uint8_t castling = UpdateCastlingRights(board, GetFrom(move), GetTo(move));
 
+    bool succ = true;
+    if(IsCastle(board, &move)){
+        succ = Castle(board, move);
+    } else if(IsEnpassant(board, &move)){
+        succ = Enpassant(board, move);
+    } 
+
+    if(!succ) return;
+    HistoryAddUndo(&board->history, board, move);
+
+    MoveFreely(board, move, board->turn);
+    board->enpassant_square = enpassant;
+    board->castling_rights = castling;
+
+    if (board->turn == COLOR_BLACK) {
+        board->fullmove++;
+    }
+
+
+    UpdateHashTable(&board->history.positions, CalculateZobristHash(board));
     board->turn = !board->turn;
 }
 
-void UnmakeMove(Board* board, Move move)
+void UnmakeMove(Board* board)
 {
-    Square from, to;
-    uint8_t promotion, flag;
-    MoveDecode(move, &from, &to, &promotion, &flag);
+    Undo undo = board->history.moves[board->history.count-1];
 
-    Bitboard promotionBB = UndoMove(&board->bitboards[getBitboardIndexFromSquare(board, from)], move);
-    int color = board->turn;
+    board->halfmove = undo.fiftyMove;
+    board->enpassant_square = undo.enpassant;
+    board->castling_rights = undo.castling;
 
-    switch (promotion) {
-    case PROMOTION_QUEEN:
-        board->bitboards[color*6 + INDEX_BLACK_QUEEN] &= ~promotionBB;
-        break;
-    case PROMOTION_ROOK:
-        board->bitboards[color*6 + INDEX_BLACK_ROOK] &= ~promotionBB;
-        break;
-    case PROMOTION_BISHOP:
-        board->bitboards[color*6 + INDEX_BLACK_BISHOP] &= ~promotionBB;
-        break;
-    case PROMOTION_KNIGHT:
-        board->bitboards[color*6 + INDEX_BLACK_KNIGHT] &= ~promotionBB;
-        break;
+    MOVE_DECODE(undo.move);
+
+    Bitboard specialBB = UndoMove(&board->bitboards[getBitboardIndexFromSquare(board, dst)], undo.move);
+    board->grid[COORDS(src)] = board->grid[COORDS(dst)];
+    board->grid[COORDS(dst)] = EMPTY_SQUARE;
+    
+    int color = !board->turn;
+
+    if(flag == FLAG_PROMOTION){
+        switch (promotion) {
+        case PROMOTION_QUEEN:
+            board->bitboards[color*6 + INDEX_BLACK_QUEEN] &= ~specialBB;
+            break;
+        case PROMOTION_ROOK:
+            board->bitboards[color*6 + INDEX_BLACK_ROOK] &= ~specialBB;
+            break;
+        case PROMOTION_BISHOP:
+            board->bitboards[color*6 + INDEX_BLACK_BISHOP] &= ~specialBB;
+            break;
+        case PROMOTION_KNIGHT:
+            board->bitboards[color*6 + INDEX_BLACK_KNIGHT] &= ~specialBB;
+            break;
+        }
+
+        board->bitboards[color*6 + INDEX_BLACK_PAWN] |= 1ULL << src;
+    } else if(flag == FLAG_CASTLING){
+        if(File(dst) > File(src)){
+            board->grid[COORDS(dst+1)] = (color) ? 'R' : 'r';
+            board->grid[COORDS(dst-1)] = EMPTY_SQUARE;
+        } else {
+            board->grid[COORDS(dst+1)] = (color) ? 'R' : 'r';
+            board->grid[COORDS(dst-2)] = EMPTY_SQUARE;
+        }
+
+        board->bitboards[color*6 + INDEX_BLACK_ROOK] ^= specialBB;
+    } else if(flag == FLAG_ENPASSANT) {
+        board->bitboards[!color*6 + INDEX_BLACK_PAWN] |= specialBB;
+        board->grid[COORDS(dst + ((color) ? -8 : 8))] = (color) ? 'p' : 'P';
     }
+
+    if(board->turn == COLOR_WHITE){
+        board->fullmove--;
+    }
+
+    HistoryRemove(&board->history);
 
     board->turn = !board->turn;
 }

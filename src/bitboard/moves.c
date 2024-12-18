@@ -17,11 +17,10 @@ Bitboard DoMove(Bitboard* current, Move move)
     *current &= ~(1ULL << source);
 
     // Set the destination bit
-    if(promotion == PROMOTION_NONE)
-        *current |= (1ULL << destination);
-    else {
+    *current |= (1ULL << destination);
+
+    if(flag == FLAG_PROMOTION){
         *current &= ~(1ULL << destination);
-        // Returning the promotion square so it can be or'd with the appropriate bitboard 
         return 1ULL << destination; 
     }
 
@@ -30,21 +29,25 @@ Bitboard DoMove(Bitboard* current, Move move)
 
 Bitboard UndoMove(Bitboard* current, Move move)
 {
-    Square source, destination;
-    uint8_t promotion, flag;
-    MoveDecode(move, &source, &destination, &promotion, &flag);
+    MOVE_DECODE(move);
 
-    // Revert the move on the bitboard
-    // Clear the destination bit
-    *current &= ~(1ULL << destination);
+    *current &= ~(1ULL << dst);
 
-    // Restore the source bit
-    *current |= (1ULL << source);
+    *current |= (1ULL << src);
 
-    // Handle promotions
-    if (promotion != PROMOTION_NONE) {
-        *current &= ~(1ULL << source);
-        return 1ULL << source;
+    if (flag == FLAG_PROMOTION) {
+        *current &= ~(1ULL << src);
+        return 1ULL << dst;
+    }
+    if(flag == FLAG_CASTLING) {
+        if(File(dst) > File(src))
+            return 1ULL << (dst+1) | 1ULL << (dst-1);
+        else 
+            return 1ULL << (dst+1) | 1ULL << (dst-2);
+    }
+    if(flag == FLAG_ENPASSANT) {
+        int color = (Rank(dst) > Rank(src));
+        return 1ULL << (dst + ((color) ? -8 : 8));
     }
 
     return 0;

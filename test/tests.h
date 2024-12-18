@@ -6,6 +6,12 @@
 #define FAILF(fen, fmt, ...) \
     fprintf(stderr, ANSI_RED "FAILED: (%s) " fmt ANSI_RESET "\n", fen, ##__VA_ARGS__)
 
+#include "test_perft_5.h"
+int test_perft_5(int depth, u64 expected);
+
+#include "test_perft_2.h"
+int test_perft_2(int depth, u64 expected);
+
 #include "test_perft.h"
 int test_perft(int depth, u64 expected);
 

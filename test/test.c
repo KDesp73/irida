@@ -8,6 +8,8 @@ void load()
     LOAD_TEST("test_piece_at");
     LOAD_TEST("test_name_to_square");
     LOAD_TEST("test_perft");
+    LOAD_TEST("test_perft_2");
+    LOAD_TEST("test_perft_5");
     LOAD_TEST("test_square_to_name");
 
     LOAD_TEST("test_pawn_moves");
@@ -33,10 +35,12 @@ int main(int argc, char** argv)
     }
 
     START_TESTS
-        RUN_TEST(test_piece_at),
+        // RUN_TEST(test_piece_at),
         // RUN_TEST(test_name_to_square),
         // RUN_TEST(test_square_to_name),
-        // RUN_TEST(test_perft),
+        RUN_TEST(test_perft),
+        // RUN_TEST(test_perft_2),
+        // RUN_TEST(test_perft_5),
 
         // RUN_TEST(test_pawn_moves),
         // RUN_TEST(test_knight_moves),

@@ -125,7 +125,6 @@ void BoardPrintBitboard(const Board* board, Bitboard highlight)
     free(squares);
 }
 
-
 #define TERMINATOR 64
 #define INITIAL_ALLOCATION 100
 void BoardPrint(const Board* board, Square first, ...)
