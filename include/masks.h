@@ -22,7 +22,7 @@ Bitboard ComputeDiagonalMask(int square);
 // Helper function to compute anti-diagonal mask for a given square
 Bitboard ComputeAntiDiagonalMask(int square);
 // Precompute diagonal and anti-diagonal masks for all squares
-void InitializeMasks();
+void InitMasks();
 
 // Accessors for diagonal and anti-diagonal masks
 Bitboard DiagonalMask(int square);

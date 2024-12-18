@@ -1,95 +1,43 @@
 #include "board.h"
+#include "bitboard.h"
+#include "hashing.h"
+#include "move.h"
+#include "notation.h"
+#include "piece.h"
+#include "square.h"
+#include "generator.h"
+
 #include <ctype.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "bitboard.h"
-#include "move.h"
-#include "notation.h"
-#include "piece.h"
-#include "square.h"
-#include <chess/board.h>
-#include <chess/piece.h>
-
-Bitboard GeneratePseudoLegalAttacks(const Board* board, Color color)
-{
-    size_t start = (color) ? 6 : 0;
-    Bitboard enemy = GetEnemyColor(board, color);
-    Bitboard empty = GetEmpty(board);
-    return (color) 
-        ? WhitePawnAttacks(board->bitboards[INDEX_WHITE_PAWN], enemy)
-        : BlackPawnAttacks(board->bitboards[INDEX_BLACK_PAWN], enemy)
-        | KnightAttacks(board->bitboards[start + 1], empty, enemy)
-        | BishopAttacks(board->bitboards[start + 2], empty, enemy)
-        | RookAttacks(board->bitboards[start + 3], empty, enemy)
-        | QueenAttacks(board->bitboards[start + 4], empty, enemy)
-        | KingAttacks(board->bitboards[start + 5], empty, enemy)
-        ;
-}
 
 
 bool IsInCheck(const Board* board)
 {
-    size_t offset = board->state.turn ? 6 : 0;
+    size_t offset = board->turn ? 6 : 0;
 
-    return IsKingInCheck(board->bitboards[offset + INDEX_BLACK_KING], GeneratePseudoLegalAttacks(board, !board->state.turn));
+    return IsKingInCheck(board->bitboards[offset + INDEX_BLACK_KING], GeneratePseudoLegalAttacks(board, !board->turn));
 }
 
 Board BoardCopy(const Board* board)
 {
     Board b = {0};
-    b.state = board->state;
+    b.turn = board->turn;
+    b.history = board->history;
+    b.fullmove = board->fullmove;
+    b.halfmove = board->halfmove;
+    b.castling_rights = board->castling_rights;
     b.enpassant_square = board->enpassant_square;
     memcpy(b.bitboards, board->bitboards, sizeof(b.bitboards));
 
     return b;
 }
 
-void BoardToBoardT(const Board* board, board_t* board_t)
+void BoardFree(Board* board)
 {
-    // Initialize the board_t's grid to empty squares (' ')
-    for (int rank = 0; rank < 8; ++rank) {
-        for (int file = 0; file < 8; ++file) {
-            board_t->grid[rank][file] = ' ';
-        }
-    }
-
-    // Populate the grid from the bitboards
-    for (int piece_type = 0; piece_type < PIECE_TYPES; ++piece_type) {
-        Bitboard bitboard = board->bitboards[piece_type];
-        while (bitboard) {
-            // Find the least significant bit set
-            Square square = __builtin_ctzll(bitboard);
-
-            // Convert square to rank and file (adjusted for a1 -> 0 convention)
-            int rank = square / 8;
-            int file = square % 8;
-
-            // Set the corresponding piece in the grid
-            board_t->grid[7 - rank][file] = PIECES[piece_type];  // Adjust rank for printing
-
-            // Clear the least significant bit
-            bitboard &= bitboard - 1;
-        }
-    }
-
-    // Copy state
-    board_t->state = board->state;
-
-    // Convert en passant square to a human-readable format
-    if (board->enpassant_square != 64) {
-        int rank = Rank(board->enpassant_square);
-        int file = File(board->enpassant_square);
-
-        board_t->enpassant_square[0] = 'a' + file; // Convert file to letter
-        board_t->enpassant_square[1] = '8' - rank; // Adjust rank for printing (8-1)
-        board_t->enpassant_square[2] = '\0';       // Null terminator
-    } else {
-        // No en passant square
-        board_t->enpassant_square[0] = '-';
-        board_t->enpassant_square[1] = '\0';
-    }
+    FreeHashTable(&board->history);
 }
 
 /**
@@ -104,13 +52,11 @@ void BoardInitFen(Board *board, const char *fen)
 
     FenImport(board, fen);
 
-    board->state.error = 0;
-    board->state.result = RESULT_NONE;
-    init_hash_table(&board->state.history, 1000, fen);
+    InitHashTable(&board->history, 1000, fen);
 }
 
 
-_Bool IsSquareOccupiedBy(const Board* board, Square square, Color color)
+bool IsSquareOccupiedBy(const Board* board, Square square, Color color)
 {
     uint64_t occupied = 0;
     for (int i = color * 6; i < (color + 1) * 6; ++i) {
@@ -119,7 +65,7 @@ _Bool IsSquareOccupiedBy(const Board* board, Square square, Color color)
     return (occupied & (1ULL << square)) != 0;
 }
 
-_Bool IsSquareEmpty(const Board* board, Square square)
+bool IsSquareEmpty(const Board* board, Square square)
 {
     for (int i = 0; i < 12; ++i) {
         if (board->bitboards[i] & (1ULL << square)) {
@@ -160,18 +106,18 @@ uint8_t UpdateCastlingRights(Board* board, Square from, Square to)
     Piece piece = PieceAt(board, from);
     Piece toPiece = PieceAt(board, to);
     int color = piece.color;
-    uint8_t castling_rights = board->state.castling_rights;
+    uint8_t castling_rights = board->castling_rights;
 
     // Handle rook moves: disable relevant castling rights
     if (piece.type == 'r' || piece.type == 'R') {
-        if (color == PIECE_COLOR_WHITE) {
+        if (color == COLOR_WHITE) {
             if (from == 0) {
                 castling_rights &= ~CASTLE_WHITE_QUEENSIDE;
             }
             if (from == 7) {
                 castling_rights &= ~CASTLE_WHITE_KINGSIDE;
             }
-        } else if (color == PIECE_COLOR_BLACK) {
+        } else if (color == COLOR_BLACK) {
             if (from == 56) {
                 castling_rights &= ~CASTLE_BLACK_QUEENSIDE;
             }
@@ -183,14 +129,14 @@ uint8_t UpdateCastlingRights(Board* board, Square from, Square to)
 
     // If rook is captured we can't castle there
     if (toPiece.type == 'r' || toPiece.type == 'R') {
-        if (color == PIECE_COLOR_WHITE) {
+        if (color == COLOR_WHITE) {
             if (to == 0) {
                 castling_rights &= ~CASTLE_WHITE_QUEENSIDE;
             }
             if (to == 7) {
                 castling_rights &= ~CASTLE_WHITE_KINGSIDE;
             }
-        } else if (color == PIECE_COLOR_BLACK) {
+        } else if (color == COLOR_BLACK) {
             if (to == 56) {
                 castling_rights &= ~CASTLE_BLACK_QUEENSIDE;
             }
@@ -201,12 +147,12 @@ uint8_t UpdateCastlingRights(Board* board, Square from, Square to)
     }
 
     if (piece.type == 'k') {
-        if (color == PIECE_COLOR_BLACK) {
+        if (color == COLOR_BLACK) {
             castling_rights &= ~CASTLE_BLACK_KINGSIDE;
             castling_rights &= ~CASTLE_BLACK_QUEENSIDE;
         }
     } else if (piece.type == 'K') {
-        if (color == PIECE_COLOR_WHITE) {
+        if (color == COLOR_WHITE) {
             castling_rights &= ~CASTLE_WHITE_KINGSIDE;
             castling_rights &= ~CASTLE_WHITE_QUEENSIDE;
         }
@@ -215,24 +161,31 @@ uint8_t UpdateCastlingRights(Board* board, Square from, Square to)
     return castling_rights;
 }
 
+int pieceColor(char piece)
+{
+    if(piece == ' ') return COLOR_NONE;
+
+    return (piece < 'a') == COLOR_WHITE;
+}
+
 void UpdateHalfmove(Board* board, Move move, size_t piece_count_before, size_t piece_count_after, char piece)
 {
-    int color = piece_color(piece);
-    int direction = (color == PIECE_COLOR_WHITE) ? 1 : -1;
-    _Bool is_pawn = tolower(piece) == 'p';
-    _Bool is_capture = (piece_count_after < piece_count_before);
+    int color = pieceColor(piece);
+    int direction = (color == COLOR_WHITE) ? 1 : -1;
+    bool is_pawn = tolower(piece) == 'p';
+    bool is_capture = (piece_count_after < piece_count_before);
     int from_rank = Rank(GetFrom(move));
     int to_rank = Rank(GetTo(move));
 
     // Check if it's a pawn move
-    _Bool is_pawn_advancement = is_pawn && (from_rank == (color == PIECE_COLOR_WHITE ? 7 : 2)) &&
+    bool is_pawn_advancement = is_pawn && (from_rank == (color == COLOR_WHITE ? 7 : 2)) &&
                                 (to_rank == from_rank + direction);
 
     // If it's a pawn move, pawn advancement, or a capture, reset halfmove
     if (is_pawn_advancement || is_capture || is_pawn) {
-        board->state.halfmove = 0;
+        board->halfmove = 0;
     } else {
-        board->state.halfmove++;
+        board->halfmove++;
     }
 }
 
@@ -241,7 +194,7 @@ size_t NumberOfPieces(const Board* board, Color color)
     size_t count = 0;
 
     for (size_t i = 0; i < PIECE_TYPES; i++) {
-        if ((color == PIECE_COLOR_BLACK && i < 6) || (color == PIECE_COLOR_WHITE && i >= 6)) {
+        if ((color == COLOR_BLACK && i < 6) || (color == COLOR_WHITE && i >= 6)) {
             count += __builtin_popcountll(board->bitboards[i]);
         }
     }
@@ -277,10 +230,22 @@ Bitboard GetEnemyColor(const Board *board, Color color)
 
 Bitboard GetEnemy(const Board *board)
 {
-    return GetEnemyColor(board, board->state.turn);
+    return GetEnemyColor(board, board->turn);
 }
 
 Bitboard GetEmpty(const Board* board)
 {
     return ~(GetWhite(board) | GetBlack(board));
 }
+
+int HasCastlingRights(const Board* board, uint8_t castling_rights)
+{
+    return board->castling_rights & castling_rights;
+}
+
+void RevokeCastlingRights(Board* board, uint8_t castling_rights)
+{
+    board->castling_rights &= ~castling_rights;
+}
+
+

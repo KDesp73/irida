@@ -1,7 +1,7 @@
 # Compiler and flags
 CC = gcc
 CFLAGS = -Wall -Iinclude -fPIC
-LDFLAGS = -lchess
+LDFLAGS = 
 
 # Directories
 SRC_DIR = src

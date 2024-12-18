@@ -176,8 +176,8 @@ Bitboard GenerateLegalKingMoves(const Board* board, Bitboard pieces, Color color
 Moves GenerateLegalMoves(const Board* board)
 {
     Moves moves = {0};
-    size_t start = board->state.turn ? 6 : 0;
-    Color color = board->state.turn;
+    size_t start = board->turn ? 6 : 0;
+    Color color = board->turn;
 
     Bitboard pawnsBB = board->bitboards[start + INDEX_BLACK_PAWN];
     while(pawnsBB){

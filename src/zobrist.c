@@ -4,6 +4,36 @@
 #include <stdio.h>
 #include <chess/zobrist.h>
 
+
+void InitZobrist()
+{
+    srand(12345);  // Fixed seed for reproducibility
+
+    // Initialize zobrist_table
+    for (int piece = 0; piece < PIECE_TYPES; piece++) {
+        for (int rank = 0; rank < BOARD_SIZE; rank++) {
+            for (int file = 0; file < BOARD_SIZE; file++) {
+                uint64_t high = ((uint64_t)rand() & 0xFFFF) << 48;
+                uint64_t mid = ((uint64_t)rand() & 0xFFFF) << 32;
+                uint64_t low = ((uint64_t)rand() & 0xFFFFFFFF);
+                zobrist_table[piece][rank][file] = high | mid | low;
+            }
+        }
+    }
+
+    // Initialize castling rights
+    for (int i = 0; i < CASTLING_OPTIONS; i++) {
+        zobrist_castling[i] = ((uint64_t)rand() << 32) | rand();
+    }
+
+    // Initialize en passant files
+    for (int file = 0; file < BOARD_SIZE; file++) {
+        zobrist_en_passant[file] = ((uint64_t)rand() << 32) | rand();
+    }
+
+    zobrist_black_to_move = ((uint64_t)rand() << 32) | rand();
+}
+
 int PieceToIndex(char piece)
 {
     switch (piece) {
@@ -50,10 +80,10 @@ uint64_t CalculateZobristHash(const Board* board)
         }
     }
 
-    if (board->state.castling_rights & CASTLE_WHITE_KINGSIDE) hash ^= zobrist_castling[0];
-    if (board->state.castling_rights & CASTLE_WHITE_QUEENSIDE) hash ^= zobrist_castling[1];
-    if (board->state.castling_rights & CASTLE_BLACK_KINGSIDE) hash ^= zobrist_castling[2];
-    if (board->state.castling_rights & CASTLE_BLACK_QUEENSIDE) hash ^= zobrist_castling[3];
+    if (board->castling_rights & CASTLE_WHITE_KINGSIDE) hash ^= zobrist_castling[0];
+    if (board->castling_rights & CASTLE_WHITE_QUEENSIDE) hash ^= zobrist_castling[1];
+    if (board->castling_rights & CASTLE_BLACK_KINGSIDE) hash ^= zobrist_castling[2];
+    if (board->castling_rights & CASTLE_BLACK_QUEENSIDE) hash ^= zobrist_castling[3];
 
     if (board->enpassant_square != 64) {
         int enpassant_file = board->enpassant_square % BOARD_SIZE;
@@ -64,7 +94,7 @@ uint64_t CalculateZobristHash(const Board* board)
         }
     }
 
-    if (board->state.turn == 0) {
+    if (board->turn == 0) {
         hash ^= zobrist_black_to_move;
     }
 

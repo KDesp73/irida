@@ -34,7 +34,7 @@ Bitboard ComputeAntiDiagonalMask(int square)
     return result;
 }
 
-void InitializeMasks()
+void InitMasks()
 {
     for (int square = 0; square < 64; ++square) {
         DIAGONAL_MASKS[square] = ComputeDiagonalMask(square);

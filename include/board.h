@@ -6,24 +6,24 @@
 | Bitboard representation of the chess board. |
 `--------------------------------------------*/
 
-#ifdef CHESS_DEVELOPMENT
-    #error "Build the chess library in release mode"
-#endif
-
+#include "hashing.h"
 
 #include "square.h"
-#include <chess/ui.h>
-#include <chess/hashing.h>
-#include <chess/zobrist.h>
 #include <stddef.h>
 #include <stdint.h>
 #include "bitboard.h"
 
 
+#define BOARD_SIZE 8
+#define PIECE_TYPES 12
 typedef struct {
     Bitboard bitboards[PIECE_TYPES];
     Square enpassant_square;
-    state_t state;
+    bool turn;
+    uint8_t castling_rights;
+    size_t halfmove;
+    size_t fullmove;
+    HashTable history;
 } Board;
 
 #define PIECES "pnbrqkPNBRQK"
@@ -70,12 +70,16 @@ char PromotionToChar(uint8_t promotion);
 uint8_t CharToPromotion(char promotion);
 
 void BoardInitFen(Board* board, const char* fen);
+void BoardFree(Board* board);
 
 Bitboard GetWhite(const Board* board);
 Bitboard GetBlack(const Board* board);
 Bitboard GetEnemyColor(const Board *board, Color color);
 Bitboard GetEnemy(const Board* board);
 Bitboard GetEmpty(const Board* board);
+
+int HasCastlingRights(const Board* board, uint8_t castling_rights);
+void RevokeCastlingRights(Board* board, uint8_t castling_rights);
 
 bool IsSquareAttacked(const Board* board, Square square, Color color);
 bool IsSquareEmpty(const Board* board, Square square);
@@ -90,12 +94,11 @@ bool IsThreefoldRepetition(Board* board);
 bool IsInCheck(const Board* board);
 
 
-void BoardPrintSquares(const Board* board, ui_config_t config, Square* squares, size_t count);
-void BoardPrintBitboard(const Board* board, ui_config_t config, Bitboard highlight);
-void BoardPrint(const Board* board, ui_config_t config, Square first, ...);
+void BoardPrintSquares(const Board* board, Square* squares, size_t count);
+void BoardPrintBitboard(const Board* board, Bitboard highlight);
+void BoardPrint(const Board* board, Square first, ...);
 void BoardPrintBitboards(Board board);
 
 Board BoardCopy(const Board* board);
-void BoardToBoardT(const Board* board, board_t* board_t);
 
 #endif // ENGINE_BOARD_H

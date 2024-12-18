@@ -59,17 +59,17 @@ void FenImport(Board *board, const char *fen)
     ptr++;
 
     // Parse active color
-    board->state.turn = (*ptr == 'w') ? 1 : 0;
+    board->turn = (*ptr == 'w') ? 1 : 0;
     ptr += 2;
 
     // Parse castling rights
-    board->state.castling_rights = 0;
+    board->castling_rights = 0;
     while (*ptr && *ptr != ' ') {
         switch (*ptr) {
-            case 'K': board->state.castling_rights |= 0x1; break; // White kingside
-            case 'Q': board->state.castling_rights |= 0x2; break; // White queenside
-            case 'k': board->state.castling_rights |= 0x4; break; // Black kingside
-            case 'q': board->state.castling_rights |= 0x8; break; // Black queenside
+            case 'K': board->castling_rights |= 0x1; break; // White kingside
+            case 'Q': board->castling_rights |= 0x2; break; // White queenside
+            case 'k': board->castling_rights |= 0x4; break; // Black kingside
+            case 'q': board->castling_rights |= 0x8; break; // Black queenside
         }
         ptr++;
     }
@@ -96,14 +96,14 @@ void FenImport(Board *board, const char *fen)
     ptr++;
 
     // Parse halfmove clock
-    board->state.halfmove = atoi(ptr);
+    board->halfmove = atoi(ptr);
     while (*ptr && *ptr != ' ') ptr++;
 
     if (*ptr != ' ') return;
     ptr++;
 
     // Parse fullmove number
-    board->state.fullmove = atoi(ptr);
+    board->fullmove = atoi(ptr);
 }
 
 void FenExport(const Board* board, char buffer[])
@@ -147,15 +147,15 @@ void FenExport(const Board* board, char buffer[])
     *ptr++ = ' ';
 
     // Side to move
-    *ptr++ = (board->state.turn) ? 'w' : 'b';
+    *ptr++ = (board->turn) ? 'w' : 'b';
     *ptr++ = ' ';
 
     // Castling rights
     _Bool castling_written = 0;
-    if (board->state.castling_rights & 0x1) { *ptr++ = 'K'; castling_written = 1; }
-    if (board->state.castling_rights & 0x2) { *ptr++ = 'Q'; castling_written = 1; }
-    if (board->state.castling_rights & 0x4) { *ptr++ = 'k'; castling_written = 1; }
-    if (board->state.castling_rights & 0x8) { *ptr++ = 'q'; castling_written = 1; }
+    if (board->castling_rights & 0x1) { *ptr++ = 'K'; castling_written = 1; }
+    if (board->castling_rights & 0x2) { *ptr++ = 'Q'; castling_written = 1; }
+    if (board->castling_rights & 0x4) { *ptr++ = 'k'; castling_written = 1; }
+    if (board->castling_rights & 0x8) { *ptr++ = 'q'; castling_written = 1; }
     if (!castling_written) {
         *ptr++ = '-';
     }
@@ -173,10 +173,10 @@ void FenExport(const Board* board, char buffer[])
     *ptr++ = ' ';
 
     // Halfmove clock
-    ptr += sprintf(ptr, "%zu ", board->state.halfmove);
+    ptr += sprintf(ptr, "%zu ", board->halfmove);
 
     // Fullmove number
-    ptr += sprintf(ptr, "%zu", board->state.fullmove);
+    ptr += sprintf(ptr, "%zu", board->fullmove);
 
     // Null-terminate the buffer
     *ptr = '\0';

@@ -1,15 +1,12 @@
 #include "bitboard.h"
 #include "board.h"
 #include "move.h"
-#include "generator.h"
 #include "piece.h"
 #include "square.h"
-#include <ctype.h>
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <chess/piece.h>
-
 #include <stdlib.h>
 
 Moves BitboardToMoves(Bitboard bitboard, Square from)
@@ -250,7 +247,7 @@ void MakeMove(Board* board, Move move)
     MoveDecode(move, &from, &to, &promotion, &flag);
 
     Bitboard promotionBB = DoMove(&board->bitboards[getBitboardIndexFromSquare(board, from)], move);
-    size_t start = (board->state.turn) ? 6 : 0;
+    size_t start = (board->turn) ? 6 : 0;
 
     switch (promotion) {
     case PROMOTION_QUEEN:
@@ -267,7 +264,7 @@ void MakeMove(Board* board, Move move)
         break;
     }
 
-    board->state.turn = !board->state.turn;
+    board->turn = !board->turn;
 }
 
 void UnmakeMove(Board* board, Move move)
@@ -277,7 +274,7 @@ void UnmakeMove(Board* board, Move move)
     MoveDecode(move, &from, &to, &promotion, &flag);
 
     Bitboard promotionBB = UndoMove(&board->bitboards[getBitboardIndexFromSquare(board, from)], move);
-    size_t start = (board->state.turn) ? 6 : 0;
+    size_t start = (board->turn) ? 6 : 0;
 
     switch (promotion) {
     case PROMOTION_QUEEN:
@@ -294,6 +291,6 @@ void UnmakeMove(Board* board, Move move)
         break;
     }
 
-    board->state.turn = !board->state.turn;
+    board->turn = !board->turn;
 }
 
