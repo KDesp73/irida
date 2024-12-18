@@ -25,9 +25,19 @@ void SquareToName(char buffer[3], Square square)
     buffer[2] = '\0';  // Null-terminate the string
 }
 
+_Bool squareIsValid(const char* name)
+{
+    if(name == NULL) return 0;
+    if(strlen(name) != 2) return 0;
+    if(name[0] < 'a' || name[0] > 'h') return 0;
+    if(name[1] < '1' || name[1] > '8') return 0;
+    
+    return 1;
+}
+
 Square NameToSquare(const char buffer[3])
 {
-    if(!square_is_valid(buffer)) return 64;
+    if(!squareIsValid(buffer)) return 64;
 
     char file = buffer[0];
     char rank = buffer[1];
@@ -41,12 +51,12 @@ Square NameToSquare(const char buffer[3])
     return square;
 }
 
-void SquareToSquareT(square_t* square, Square src)
-{
-    int file = (src% 8);
-    int rank = (7 - (src/ 8));
-    square_from_coords(square, rank, file);
-}
+// void SquareToSquareT(square_t* square, Square src)
+// {
+//     int file = (src% 8);
+//     int rank = (7 - (src/ 8));
+//     square_from_coords(square, rank, file);
+// }
 
 int Rank(Square square)
 {

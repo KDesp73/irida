@@ -4,8 +4,6 @@
 #include "move.h"
 #include "generator.h"
 #include "square.h"
-#include <chess/board.h>
-#include <chess/ui.h>
 #include <io/logging.h>
 
 Bitboard DoMove(Bitboard* current, Move move)

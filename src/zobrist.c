@@ -1,8 +1,7 @@
 #include "zobrist.h"
 #include "board.h"
-#include <chess/board.h>
 #include <stdio.h>
-#include <chess/zobrist.h>
+#include "move.h"
 
 
 void InitZobrist()

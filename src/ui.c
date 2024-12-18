@@ -6,6 +6,44 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void BoardPrintGrid(const Board* board)
+{
+    const char* yellow_bg = "\033[48;5;214m"; // Background yellow color
+    const char* reset = "\033[0m";            // Reset color formatting
+
+    const char* padding = "   ";
+
+    printf("%s┌───┬───┬───┬───┬───┬───┬───┬───┐\n", padding);
+
+    for (int rank = 7; rank >= 0; rank--) {
+        printf(" %d ", rank + 1);
+
+        for (int file = 0; file <= 7; ++file) {
+            int highlighted = 0;
+
+            printf("│");
+
+            printf(" %c ", board->grid[rank][file]);
+        }
+        printf("│\n");
+
+        if (rank != 0) {
+            printf("%s├───┼───┼───┼───┼───┼───┼───┼───┤\n", padding);
+        }
+    }
+    printf("%s└───┴───┴───┴───┴───┴───┴───┴───┘\n", padding);
+
+    printf("%s", padding);
+    for (int file = 0; file < 8; ++file) {
+        char label = 'a' + file;
+        printf("  %c ", label);
+    }
+    printf("\n");
+
+    printf("\n");
+
+}
+
 void BoardPrintSquares(const Board* board, Square* squares, size_t count)
 {
     const char* yellow_bg = "\033[48;5;214m"; // Background yellow color

@@ -23,7 +23,13 @@ int main(int argc, char** argv){
     InitZobrist();
     InitMasks();
 
-    perft(argc, argv);
+    Board board;
+    BoardInitFen(&board, NULL);
+
+    BoardPrint(&board, 64);
+    BoardPrintGrid(&board);
+
+    BoardFree(&board);
 
     return 0;
 }

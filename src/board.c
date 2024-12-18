@@ -83,11 +83,13 @@ Square UpdateEnpassantSquare(Board* board, Move move)
         goto no_enpassant;
     }
 
-    square_t from, to;
-    square_from_fr(&from, Rank(GetFrom(move)), File(GetFrom(move)));
+    int from_file = Rank(GetFrom(move));
+    int to_file = Rank(GetTo(move));
+    int from_rank = File(GetFrom(move));
+    int to_rank = File(GetTo(move));
 
-    int file_diff = abs((int)from.file - (int)to.file);
-    int rank_diff = (int)to.rank - (int)from.rank;
+    int file_diff = abs((int)from_file - (int)to_file);
+    int rank_diff = (int)to_rank - (int)from_rank;
 
     if(file_diff != 0) goto no_enpassant;
 
@@ -95,7 +97,7 @@ Square UpdateEnpassantSquare(Board* board, Move move)
         goto no_enpassant;
     }
 
-    return ((piece.color) ? 3 : 6) * 8 + to.file;
+    return ((piece.color) ? 3 : 6) * 8 + to_file;
 
 no_enpassant:
     return 64;
@@ -161,16 +163,10 @@ uint8_t UpdateCastlingRights(Board* board, Square from, Square to)
     return castling_rights;
 }
 
-int pieceColor(char piece)
-{
-    if(piece == ' ') return COLOR_NONE;
-
-    return (piece < 'a') == COLOR_WHITE;
-}
 
 void UpdateHalfmove(Board* board, Move move, size_t piece_count_before, size_t piece_count_after, char piece)
 {
-    int color = pieceColor(piece);
+    int color = PieceColor(piece);
     int direction = (color == COLOR_WHITE) ? 1 : -1;
     bool is_pawn = tolower(piece) == 'p';
     bool is_capture = (piece_count_after < piece_count_before);

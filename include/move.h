@@ -14,6 +14,31 @@
 #include "board.h"
 #include "square.h"
 
+
+typedef enum {
+    FLAG_NORMAL = 0,
+    FLAG_CASTLING,
+    FLAG_ENPASSANT,
+    FLAG_PAWN_DOUBLE_MOVE,
+    FLAG_PROMOTION,
+    FLAG_PROMOTION_WITH_CAPTURE,
+} Flag;
+
+typedef enum {
+    PROMOTION_NONE = 0,
+    PROMOTION_QUEEN,
+    PROMOTION_ROOK,
+    PROMOTION_BISHOP,
+    PROMOTION_KNIGHT
+} Promotion;
+
+enum {
+    CASTLE_WHITE_KINGSIDE = 0b0001,
+    CASTLE_WHITE_QUEENSIDE = 0b0010,
+    CASTLE_BLACK_KINGSIDE = 0b0100,
+    CASTLE_BLACK_QUEENSIDE = 0b1000,
+};
+
 typedef uint32_t Move;
 #define MOVES_CAPACITY 512
 typedef struct {
@@ -40,6 +65,12 @@ const static int KING_OFFSETS[] = {
     -9, -8, -7, -1, 1, 7, 8, 9
 };
 
+// Adds src, dst, promotion and flag withing the current scope
+#define MOVE_DECODE(move) \
+    Square src, dst; \
+    uint8_t promotion, flag; \
+    MoveDecode(move, &src, &dst, &promotion, &flag)
+
 
 _Bool MoveIsValid(const Board* board, Move move, Color color);
 Move MoveEncode(Square from, Square to, uint8_t promotion, uint8_t flag);
@@ -51,6 +82,8 @@ Bitboard UndoMove(Bitboard* current, Move move);
 
 void MakeMove(Board* board, Move move);
 void UnmakeMove(Board* board, Move move);
+bool Castle(Board* board, Move move);
+bool Enpassant(Board* board, Move move);
 
 _Bool MoveMake(Board* board, Move move);
 void MoveFreely(Board* board, Move move, Color color);
@@ -67,8 +100,8 @@ void UpdateHalfmove(Board* board, Move move, size_t piece_count_before, size_t p
 uint8_t UpdateCastlingRights(Board* board, Square from, Square to);
 Square UpdateEnpassantSquare(Board* board, Move move);
 
-void MoveToSquares(Move move, square_t* from, square_t* to, uint8_t* promotion, uint8_t* flags);
-Move SquaresToMove(square_t from, square_t to, uint8_t promotion, uint8_t flags);
+// void MoveToSquares(Move move, square_t* from, square_t* to, uint8_t* promotion, uint8_t* flags);
+// Move SquaresToMove(square_t from, square_t to, uint8_t promotion, uint8_t flags);
 
 Moves BitboardToMoves(Bitboard bitboard, Square from);
 

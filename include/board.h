@@ -13,11 +13,33 @@
 #include <stdint.h>
 #include "bitboard.h"
 
+#define BLACK_ROOK 'r'
+#define BLACK_KNIGHT 'n'
+#define BLACK_BISHOP 'b'
+#define BLACK_KING 'k'
+#define BLACK_QUEEN 'q'
+#define BLACK_PAWN 'p'
+
+#define WHITE_ROOK 'R'
+#define WHITE_KNIGHT 'N'
+#define WHITE_BISHOP 'B'
+#define WHITE_KING 'K'
+#define WHITE_QUEEN 'Q'
+#define WHITE_PAWN 'P'
+
+#define EMPTY_SQUARE ' '
+
+#define STARTING_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 #define BOARD_SIZE 8
 #define PIECE_TYPES 12
 typedef struct {
+    // Hybrid Representation
+    // `grid` is used for fast piece lookup
     Bitboard bitboards[PIECE_TYPES];
+    char grid[8][8];
+
+    // State
     Square enpassant_square;
     bool turn;
     uint8_t castling_rights;
@@ -41,23 +63,6 @@ enum {
     INDEX_WHITE_QUEEN,
     INDEX_WHITE_KING,
 };
-
-typedef enum {
-    FLAG_NORMAL = 0,
-    FLAG_CASTLING,
-    FLAG_ENPASSANT,
-    FLAG_PAWN_DOUBLE_MOVE,
-    FLAG_PROMOTION,
-    FLAG_PROMOTION_WITH_CAPTURE,
-} Flag;
-
-typedef enum {
-    PROMOTION_NONE = 0,
-    PROMOTION_QUEEN,
-    PROMOTION_ROOK,
-    PROMOTION_BISHOP,
-    PROMOTION_KNIGHT
-} Promotion;
 
 typedef enum {
     COLOR_NONE = -1,
@@ -98,6 +103,7 @@ void BoardPrintSquares(const Board* board, Square* squares, size_t count);
 void BoardPrintBitboard(const Board* board, Bitboard highlight);
 void BoardPrint(const Board* board, Square first, ...);
 void BoardPrintBitboards(Board board);
+void BoardPrintGrid(const Board* board);
 
 Board BoardCopy(const Board* board);
 

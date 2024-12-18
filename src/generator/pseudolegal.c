@@ -1,6 +1,5 @@
 #include "board.h"
 #include "generator.h"
-#include <chess/board.h>
 
 Bitboard GeneratePseudoLegalAttacks(const Board* board, Color color)
 {

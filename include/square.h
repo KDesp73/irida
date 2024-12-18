@@ -10,7 +10,7 @@
 | finish with h1                      |
 `------------------------------------*/
 
-#include <chess/square.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -23,6 +23,8 @@ typedef uint8_t Square;
         printf("%s = %s %d\n", #square, __square_name__, square);\
     } while(0)
 
+#define COORDS(square) square / 8][square % 8
+
 void SquareToName(char buffer[3], Square square);
 Square NameToSquare(const char buffer[3]);
 
@@ -32,8 +34,6 @@ bool IsSquareValid(Square square);
 
 Square SquareFromCoords(size_t y, size_t x);
 Square SquareFromName(const char* name);
-
-void SquareToSquareT(square_t* square, Square src);
 
 #define SR(s)\
     (7 - (s/ 8)) * 8 + (s% 8)

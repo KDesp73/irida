@@ -12,6 +12,8 @@ typedef struct {
 #define PIECE_PRINT(piece)\
     printf("%s = {.type=%c, .color=%d}\n", #piece, piece.type, piece.color)
 
+
+int PieceColor(char piece);
 Piece PieceAt(const Board* board, Square square);
 
 #endif // ENGINE_PIECE_H

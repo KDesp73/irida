@@ -12,7 +12,7 @@ void InitHashTableHash(HashTable* table, size_t capacity, uint64_t starting_hash
         exit(EXIT_FAILURE);
     }
 
-    table->entries = calloc(capacity, sizeof(hash_entry_t));
+    table->entries = calloc(capacity, sizeof(HashEntry));
     if (!table->entries) {
         ERRO("Memory allocation failed for hash_table entries.\n");
         exit(EXIT_FAILURE);
@@ -32,7 +32,7 @@ void InitHashTable(HashTable* table, size_t capacity, const char* starting_fen)
         exit(EXIT_FAILURE);
     }
 
-    table->entries = calloc(capacity, sizeof(hash_entry_t));
+    table->entries = calloc(capacity, sizeof(HashEntry));
     if (!table->entries) {
         ERRO("Memory allocation failed for hash_table entries.\n");
         exit(EXIT_FAILURE);
