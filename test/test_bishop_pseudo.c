@@ -1,13 +1,11 @@
-#include "bitboard.h"
-#include "generator.h"
-#include "board.h"
-#include "piece.h"
-#include "square.h"
-#include "tests.h"
-#include <stdarg.h>
 #include <io/test.h>
+#include "bitboard.h"
+#include "board.h"
+#include "generator.h"
+#include "piece.h"
+#include "tests.h"
 
-int test_queen_moves(const char* fen, const char* square, const char* first, ...)
+int test_bishop_pseudo(const char* fen, const char* square, const char* first, ...)
 {
     Board board;
     BoardInitFen(&board, fen);
@@ -28,7 +26,7 @@ int test_queen_moves(const char* fen, const char* square, const char* first, ...
     }
 
     Color color = PieceAt(&board, from).color;
-    Bitboard found = GenerateLegalQueenMoves(&board, 1ULL << from, color);
+    Bitboard found = GenerateBishopMoves(&board, 1ULL << from, color);
     if(found != moves){
         FAILF(fen, "For square %s", square);
         printf("Expected: \n");
@@ -41,4 +39,3 @@ int test_queen_moves(const char* fen, const char* square, const char* first, ...
     SUCC("Passed");
     return true;
 }
-

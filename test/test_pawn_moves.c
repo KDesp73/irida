@@ -1,4 +1,5 @@
 #include "bitboard.h"
+#include "generator.h"
 #include "board.h"
 #include "piece.h"
 #include "square.h"
@@ -27,11 +28,13 @@ int test_pawn_moves(const char* fen, const char* square, const char* first, ...)
     }
 
     Color color = PieceAt(&board, from).color;
-    Bitboard found = GeneratePawnMoves(&board, 1ULL << from, color);
+    Bitboard found = GenerateLegalPawnMoves(&board, 1ULL << from, color);
     if(found != moves){
         FAILF(fen, "For square %s", square);
-        Uint64Print(moves);
-        Uint64Print(found);
+        printf("Expected: \n");
+        BitboardPrint(moves);
+        printf("Found: \n");
+        BitboardPrint(found);
         return false;
     }
 

@@ -15,6 +15,13 @@
 #include "square.h"
 
 typedef uint32_t Move;
+#define MOVES_CAPACITY 512
+typedef struct {
+    Move list[MOVES_CAPACITY];
+    size_t count;
+} Moves;
+void MovesAppend(Moves* moves, Move move);
+void MovesAppendList(Moves* dest, Moves src);
 
 #define KNIGHT_OFFSETS_COUNT 8
 const static int KNIGHT_OFFSETS[] = {
@@ -42,19 +49,19 @@ void MoveDecode(Move move, Square* from, Square* to, uint8_t* promotion, uint8_t
 Bitboard DoMove(Bitboard* current, Move move);
 Bitboard UndoMove(Bitboard* current, Move move);
 
+void MakeMove(Board* board, Move move);
+void UnmakeMove(Board* board, Move move);
+
 _Bool MoveMake(Board* board, Move move);
 void MoveFreely(Board* board, Move move, Color color);
 void MovePrint(Move move);
+void MoveToString(Move move, char* buffer);
 
 Square GetFrom(Move move);
 Square GetTo(Move move);
 uint8_t GetPromotion(Move move);
 uint8_t GetFlag(Move move);
 
-// Move List Generation
-void GenerateLegalMoves(const Board* board, Color color, Move* moves, size_t* move_count);
-Bitboard GenerateLegalMovesBitboard(const Board* board, Color color);
-void GenerateLegalMovesPiece(const Board* board, Square piece, Move* moves, size_t* move_count);
 
 void UpdateHalfmove(Board* board, Move move, size_t piece_count_before, size_t piece_count_after, char piece);
 uint8_t UpdateCastlingRights(Board* board, Square from, Square to);
@@ -63,6 +70,6 @@ Square UpdateEnpassantSquare(Board* board, Move move);
 void MoveToSquares(Move move, square_t* from, square_t* to, uint8_t* promotion, uint8_t* flags);
 Move SquaresToMove(square_t from, square_t to, uint8_t promotion, uint8_t flags);
 
-void BitboardToMoves(Bitboard bitboard, Square from, Move moves[]);
+Moves BitboardToMoves(Bitboard bitboard, Square from);
 
 #endif // ENGINE_MOVE_H

@@ -45,20 +45,28 @@ int popcount(Bitboard bb);
 void on(Bitboard* bitboard, Square square);
 void off(Bitboard* bitboard, Square square);
 
-/*** Psudo Valid Attack Maps ***/
+/*** Pseudo Valid Attack Maps ***/
+Bitboard PawnAttacks(Bitboard pawns, Bitboard enemySquares, uint8_t color);
 Bitboard WhitePawnAttacks(Bitboard pawns, Bitboard enemySquares);
 Bitboard BlackPawnAttacks(Bitboard pawns, Bitboard enemySquares);
+
+Bitboard PawnPushes(Bitboard pawns, Bitboard emptySquares, uint8_t color);
+Bitboard WhitePawnPushes(Bitboard pawns, Bitboard emptySquares);
+Bitboard BlackPawnPushes(Bitboard pawns, Bitboard emptySquares);
+
+Bitboard PawnPromotions(Bitboard pawns, Bitboard emptySquares, uint8_t color);
+Bitboard WhitePawnPromotions(Bitboard pawns, Bitboard emptySquares);
+Bitboard BlackPawnPromotions(Bitboard pawns, Bitboard emptySquares);
+
+Bitboard PawnPromotionCaptures(Bitboard pawns, Bitboard opponentPieces, uint8_t color);
+Bitboard WhitePawnPromotionCaptures(Bitboard pawns, Bitboard opponentPieces);
+Bitboard BlackPawnPromotionCaptures(Bitboard pawns, Bitboard opponentPieces);
+
 Bitboard KnightAttacks(Bitboard knights, Bitboard emptySquares, Bitboard enemySquares);
 Bitboard KingAttacks(Bitboard king, Bitboard emptySquares, Bitboard enemySquares);
 Bitboard BishopAttacks(Bitboard bishops, Bitboard emptySquares, Bitboard enemySquares);
 Bitboard RookAttacks(Bitboard rooks, Bitboard emptySquares, Bitboard enemySquares);
 Bitboard QueenAttacks(Bitboard queens, Bitboard emptySquares, Bitboard enemySquares);
-Bitboard WhitePawnPushes(Bitboard pawns, Bitboard emptySquares);
-Bitboard BlackPawnPushes(Bitboard pawns, Bitboard emptySquares);
-Bitboard WhitePawnPromotions(Bitboard pawns, Bitboard emptySquares);
-Bitboard BlackPawnPromotions(Bitboard pawns, Bitboard emptySquares);
-Bitboard WhitePawnPromotionCaptures(Bitboard pawns, Bitboard opponentPieces);
-Bitboard BlackPawnPromotionCaptures(Bitboard pawns, Bitboard opponentPieces);
 
 /*** King Safety ***/
 bool IsKingInCheck(Bitboard kingPosition, Bitboard enemyAttacks);

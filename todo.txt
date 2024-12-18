@@ -1,3 +1,4 @@
-TODO: implement all bitboard.h methods
 TODO: tests
 TODO: performance optimization
+TODO: move generation
+TODO: perft testing

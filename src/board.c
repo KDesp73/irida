@@ -12,7 +12,7 @@
 #include <chess/board.h>
 #include <chess/piece.h>
 
-Bitboard GetPseudoLegalAttacks(const Board* board, Color color)
+Bitboard GeneratePseudoLegalAttacks(const Board* board, Color color)
 {
     size_t start = (color) ? 6 : 0;
     Bitboard enemy = GetEnemyColor(board, color);
@@ -26,6 +26,14 @@ Bitboard GetPseudoLegalAttacks(const Board* board, Color color)
         | QueenAttacks(board->bitboards[start + 4], empty, enemy)
         | KingAttacks(board->bitboards[start + 5], empty, enemy)
         ;
+}
+
+
+bool IsInCheck(const Board* board)
+{
+    size_t offset = board->state.turn ? 6 : 0;
+
+    return IsKingInCheck(board->bitboards[offset + INDEX_BLACK_KING], GeneratePseudoLegalAttacks(board, !board->state.turn));
 }
 
 Board BoardCopy(const Board* board)

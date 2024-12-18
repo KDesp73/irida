@@ -1,5 +1,7 @@
+#include "bitboard.h"
 #include "board.h"
 #include "move.h"
+#include "generator.h"
 #include "piece.h"
 #include "square.h"
 #include <ctype.h>
@@ -10,13 +12,14 @@
 
 #include <stdlib.h>
 
-void BitboardToMoves(Bitboard bitboard, Square from, Move moves[])
+Moves BitboardToMoves(Bitboard bitboard, Square from)
 {
-    size_t index = 0;
+    Moves moves = {0};
     while (bitboard) {
         Square to = poplsb(&bitboard);
-        moves[index++] = MoveEncode(from, to, PROMOTION_NONE, FLAG_NORMAL);
+        moves.list[moves.count++] = MoveEncode(from, to, PROMOTION_NONE, FLAG_NORMAL);
     }
+    return moves;
 }
 
 Move SquaresToMove(square_t from, square_t to, uint8_t promotion, uint8_t flags)
@@ -152,6 +155,17 @@ void MoveFreely(Board* board, Move move, Color color)
     }
 }
 
+void MoveToString(Move move, char* buffer)
+{
+    Square from, to;
+    uint8_t promotion, flag;
+    MoveDecode(move, &from, &to, &promotion, &flag);
+    char fromName[3], toName[3];
+    SquareToName(fromName, from);
+    SquareToName(toName, to);
+    sprintf(buffer, "%s%s", fromName, toName); 
+}
+
 void MovePrint(Move move)
 {
     Square from, to;
@@ -208,62 +222,78 @@ uint8_t CharToPromotion(char promotion)
     }
 }
 
+size_t getBitboardIndexFromSquare(Board* board, Square square)
+{
+    Piece piece = PieceAt(board, square);
+    
+    switch (piece.type) {
+        case 'p': return 0;
+        case 'n': return 1;
+        case 'b': return 2;
+        case 'r': return 3;
+        case 'q': return 4;
+        case 'k': return 5;
+        case 'P': return 6;
+        case 'N': return 7;
+        case 'B': return 8;
+        case 'R': return 9;
+        case 'Q': return 10;
+        case 'K': return 11;
+        default:  return -1; // Invalid piece
+    }
+}
 
-// _Bool MoveMake(Board* board, Move move)
-// {
-//     Square from, to;
-//     uint8_t promotion, flag;
-//     MoveDecode(move, &from, &to, &promotion, &flag);
-//
-//     Piece from_before = PieceAt(board, from);
-//     int color = from_before.color;
-//
-//     size_t piece_count_before = NumberOfPieces(board, PIECE_COLOR_NONE); // Count all pieces before the move
-//
-//     uint8_t castling_rights_to_revoke = UpdateCastlingRights(board, from);
-//     Square enpassant_square = UpdateEnpassantSquare(board, move);
-//
-//     // Execute the move
-//     if(king_is_castling(board, from, to)){ 
-//         if(!king_can_castle(board, from, to)){
-//             board->state.error = ERROR_INVALID_MOVE;
-//             return 0;
-//         }
-//         king_castle(board, from, to);
-//     } else if(pawn_is_enpassanting(board, from, to)) {
-//         if(!pawn_can_enpassant(board, from, to)){
-//             board->state.error = ERROR_INVALID_MOVE;
-//             return 0;
-//         }
-//         pawn_enpassant(board, from, to);
-//     } else if(pawn_is_promoting(board, from, to)) {
-//         if(!pawn_promote(board, from, to, promotion)) {
-//             board->state.error = ERROR_INVALID_MOVE;
-//             return 0;
-//         }
-//     } else {
-//         MoveFreely(board, from, to);
-//     }
-//
-//     revoke_castling_rights(&board->state, castling_rights_to_revoke);
-//     board->enpassant_square = enpassant_square;
-//
-//     size_t piece_count_after = NumberOfPieces(board, PIECE_COLOR_NONE);
-//
-//     if(board->state.turn == PIECE_COLOR_BLACK) board->state.fullmove++;
-//
-//     UpdateHalfmove(board, move, piece_count_before, piece_count_after, from_before.type);
-//
-//     board->state.turn = !board->state.turn;
-//
-//     // Check for the posibility of a result
-//     if(board->state.halfmove >= 50) board->state.result = RESULT_DRAW_DUE_TO_50_MOVE_RULE;
-//     if(IsCheckmate(board)) board->state.result = (color == PIECE_COLOR_WHITE)
-//                                             ? RESULT_WHITE_WON
-//                                             : RESULT_BLACK_WON;
-//     if(IsStalemate(board)) board->state.result = RESULT_STALEMATE;
-//     if(IsInsufficientMaterial(board)) board->state.result = RESULT_DRAW_DUE_TO_INSUFFICIENT_MATERIAL;
-//     if(IsThreefoldRepetition(board)) board->state.result = RESULT_DRAW_BY_REPETITION;
-//
-//     return 1;
-// }
+void MakeMove(Board* board, Move move)
+{
+    Square from, to;
+    uint8_t promotion, flag;
+    MoveDecode(move, &from, &to, &promotion, &flag);
+
+    Bitboard promotionBB = DoMove(&board->bitboards[getBitboardIndexFromSquare(board, from)], move);
+    size_t start = (board->state.turn) ? 6 : 0;
+
+    switch (promotion) {
+    case PROMOTION_QUEEN:
+        board->bitboards[start + INDEX_BLACK_QUEEN] |= promotionBB;
+        break;
+    case PROMOTION_ROOK:
+        board->bitboards[start + INDEX_BLACK_ROOK] |= promotionBB;
+        break;
+    case PROMOTION_BISHOP:
+        board->bitboards[start + INDEX_BLACK_BISHOP] |= promotionBB;
+        break;
+    case PROMOTION_KNIGHT:
+        board->bitboards[start + INDEX_BLACK_KNIGHT] |= promotionBB;
+        break;
+    }
+
+    board->state.turn = !board->state.turn;
+}
+
+void UnmakeMove(Board* board, Move move)
+{
+    Square from, to;
+    uint8_t promotion, flag;
+    MoveDecode(move, &from, &to, &promotion, &flag);
+
+    Bitboard promotionBB = UndoMove(&board->bitboards[getBitboardIndexFromSquare(board, from)], move);
+    size_t start = (board->state.turn) ? 6 : 0;
+
+    switch (promotion) {
+    case PROMOTION_QUEEN:
+        board->bitboards[start + INDEX_BLACK_QUEEN] &= ~promotionBB;
+        break;
+    case PROMOTION_ROOK:
+        board->bitboards[start + INDEX_BLACK_ROOK] &= ~promotionBB;
+        break;
+    case PROMOTION_BISHOP:
+        board->bitboards[start + INDEX_BLACK_BISHOP] &= ~promotionBB;
+        break;
+    case PROMOTION_KNIGHT:
+        board->bitboards[start + INDEX_BLACK_KNIGHT] &= ~promotionBB;
+        break;
+    }
+
+    board->state.turn = !board->state.turn;
+}
+

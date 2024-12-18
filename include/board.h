@@ -76,44 +76,6 @@ Bitboard GetBlack(const Board* board);
 Bitboard GetEnemyColor(const Board *board, Color color);
 Bitboard GetEnemy(const Board* board);
 Bitboard GetEmpty(const Board* board);
-Bitboard GetPseudoLegalAttacks(const Board* board, Color color);
-
-/*** Move Generation ***/
-Bitboard GeneratePawnMoves(const Board* board, Bitboard pieces, Color color);
-#define GenerateWhitePawnMoves(board) \
-    GeneratePawnMoves(board, (board)->bitboards[INDEX_WHITE_PAWN], COLOR_WHITE)
-#define GenerateBlackPawnMoves(board) \
-    GeneratePawnMoves(board, (board)->bitboards[INDEX_BLACK_PAWN], COLOR_BLACK)
-
-Bitboard GenerateKnightMoves(const Board* board, Bitboard pieces, Color color);
-#define GenerateWhiteKnightMoves(board) \
-    GenerateKnightMoves(board, (board)->bitboards[INDEX_WHITE_KNIGHT], COLOR_WHITE)
-#define GenerateBlackKnightMoves(board) \
-    GenerateKnightMoves(board, (board)->bitboards[INDEX_BLACK_KNIGHT], COLOR_BLACK)
-
-Bitboard GenerateBishopMoves(const Board* board, Bitboard pieces, Color color);
-#define GenerateWhiteBishopMoves(board) \
-    GenerateBishopMoves(board, (board)->bitboards[INDEX_WHITE_BISHOP], COLOR_WHITE)
-#define GenerateBlackBishopMoves(board) \
-    GenerateBishopMoves(board, (board)->bitboards[INDEX_BLACK_BISHOP], COLOR_BLACK)
-
-Bitboard GenerateRookMoves(const Board* board, Bitboard pieces, Color color);
-#define GenerateWhiteRookMoves(board) \
-    GenerateRookMoves(board, (board)->bitboards[INDEX_WHITE_ROOK], COLOR_WHITE)
-#define GenerateBlackRookMoves(board) \
-    GenerateRookMoves(board, (board)->bitboards[INDEX_BLACK_ROOK], COLOR_BLACK)
-
-Bitboard GenerateQueenMoves(const Board* board, Bitboard pieces, Color color);
-#define GenerateWhiteQueenMoves(board) \
-    GenerateQueenMoves(board, (board)->bitboards[INDEX_WHITE_QUEEN], COLOR_WHITE)
-#define GenerateBlackQueenMoves(board) \
-    GenerateQueenMoves(board, (board)->bitboards[INDEX_BLACK_QUEEN], COLOR_BLACK)
-
-Bitboard GenerateKingMoves(const Board* board, Bitboard pieces, Color color);
-#define GenerateWhiteKingMoves(board) \
-    GenerateKingMoves(board, (board)->bitboards[INDEX_WHITE_KING], COLOR_WHITE)
-#define GenerateBlackKingMoves(board) \
-    GenerateKingMoves(board, (board)->bitboards[INDEX_BLACK_KING], COLOR_BLACK)
 
 bool IsSquareAttacked(const Board* board, Square square, Color color);
 bool IsSquareEmpty(const Board* board, Square square);
@@ -125,6 +87,7 @@ bool IsCheckmate(Board* board);
 bool IsStalemate(Board* board);
 bool IsInsufficientMaterial(Board* board);
 bool IsThreefoldRepetition(Board* board);
+bool IsInCheck(const Board* board);
 
 
 void BoardPrintSquares(const Board* board, ui_config_t config, Square* squares, size_t count);

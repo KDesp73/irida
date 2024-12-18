@@ -1,6 +1,14 @@
 #include "bitboard.h"
 #include "square.h"
 #include <io/logging.h>
+#include <stdint.h>
+
+Bitboard PawnPushes(Bitboard pawns, Bitboard emptySquares, uint8_t color)
+{
+    return (color)
+        ? WhitePawnPushes(pawns, emptySquares)
+        : BlackPawnPushes(pawns, emptySquares);
+}
 
 Bitboard WhitePawnPushes(Bitboard pawns, Bitboard emptySquares)
 {
@@ -18,6 +26,13 @@ Bitboard BlackPawnPushes(Bitboard pawns, Bitboard emptySquares)
     return oneSquarePushes | twoSquarePushes;
 }
 
+Bitboard PawnPromotions(Bitboard pawns, Bitboard emptySquares, uint8_t color)
+{
+    return (color)
+        ? WhitePawnPromotions(pawns, emptySquares)
+        : BlackPawnPromotions(pawns, emptySquares);
+}
+
 Bitboard WhitePawnPromotions(Bitboard pawns, Bitboard emptySquares)
 {
     return (pawns << 8) & emptySquares & RANK_8;
@@ -26,6 +41,13 @@ Bitboard WhitePawnPromotions(Bitboard pawns, Bitboard emptySquares)
 Bitboard BlackPawnPromotions(Bitboard pawns, Bitboard emptySquares)
 {
     return (pawns >> 8) & emptySquares & RANK_1;
+}
+
+Bitboard PawnPromotionCaptures(Bitboard pawns, Bitboard opponentPieces, uint8_t color)
+{
+    return (color)
+        ? WhitePawnPromotionCaptures(pawns, opponentPieces)
+        : BlackPawnPromotionCaptures(pawns, opponentPieces);
 }
 
 Bitboard WhitePawnPromotionCaptures(Bitboard pawns, Bitboard opponentPieces)
@@ -50,6 +72,12 @@ Bitboard BlackPawnPromotionCaptures(Bitboard pawns, Bitboard opponentPieces)
     return leftCapture | rightCapture;
 }
 
+Bitboard PawnAttacks(Bitboard pawns, Bitboard enemySquares, uint8_t color)
+{
+    return (color)
+        ? WhitePawnAttacks(pawns, enemySquares)
+        : BlackPawnAttacks(pawns, enemySquares);
+}
 Bitboard WhitePawnAttacks(Bitboard pawns, Bitboard enemySquares)
 {
     uint64_t left_attacks = (pawns & ~FILE_A) << 7;

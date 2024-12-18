@@ -1,20 +1,31 @@
 #include "bitboard.h"
 #include "board.h"
 #include "masks.h"
+#include "perft.h"
 #include <chess/board.h>
 #include <chess/ui.h>
 #include <chess/zobrist.h>
+#include <io/logging.h>
 
-int main(){
+void perft(int argc, char** argv)
+{
+    if(argc != 2) {
+        ERRO("Specify the depth");
+        return;
+    }
+
+    Board board;
+    BoardInitFen(&board, NULL);
+    u64 count = Perft(&board, atoi(argv[1]));
+    INFO("count: %llu", count);
+    board_free(&board);
+}
+
+int main(int argc, char** argv){
     init_zobrist();
     InitializeMasks();
 
-    Board board;
-    BoardInitFen(&board, "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1");
-    
-    Bitboard moves = GenerateWhiteKingMoves(&board);
-    BoardPrintBitboard(&board, MINIMAL_CONFIG, moves);
+    perft(argc, argv);
 
-    board_free(&board);
     return 0;
 }
