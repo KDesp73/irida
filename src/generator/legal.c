@@ -2,167 +2,6 @@
 #include "generator.h"
 #include "masks.h"
 
-// Helper function to check if two squares are on the same diagonal
-bool isOnSameDiagonal(Square pieceSquare, Square kingSquare)
-{
-    int dx = abs((pieceSquare % 8) - (kingSquare % 8)); // Column difference
-    int dy = abs((pieceSquare / 8) - (kingSquare / 8)); // Row difference
-
-    return dx == dy; // True if they are on the same diagonal
-}
-
-// Helper function to check if two squares are in the same column
-bool isOnSameColumn(Square pieceSquare, Square kingSquare)
-{
-    return (pieceSquare % 8) == (kingSquare % 8); // Same column
-}
-
-// Helper function to check if two squares are in the same row
-bool isOnSameRow(Square pieceSquare, Square kingSquare)
-{
-    return (pieceSquare / 8) == (kingSquare / 8); // Same row
-}
-
-// Helper function to check if a square is occupied by any piece
-bool isOccupied(const Board* board, Square square)
-{
-    return board->bitboards[INDEX_WHITE_PAWN] & (1ULL << square) ||
-           board->bitboards[INDEX_BLACK_PAWN] & (1ULL << square) ||
-           board->bitboards[INDEX_WHITE_KING] & (1ULL << square) ||
-           board->bitboards[INDEX_BLACK_KING] & (1ULL << square) ||
-           board->bitboards[INDEX_WHITE_BISHOP] & (1ULL << square) ||
-           board->bitboards[INDEX_BLACK_BISHOP] & (1ULL << square) ||
-           board->bitboards[INDEX_WHITE_ROOK] & (1ULL << square) ||
-           board->bitboards[INDEX_BLACK_ROOK] & (1ULL << square) ||
-           board->bitboards[INDEX_WHITE_QUEEN] & (1ULL << square) ||
-           board->bitboards[INDEX_BLACK_QUEEN] & (1ULL << square);
-}
-
-// Helper function to check if the path between the piece and the king is clear (no pieces blocking)
-bool isPathClear(const Board* board, Square pieceSquare, Square kingSquare, Color color, RayType rayType)
-{
-    int direction = (kingSquare > pieceSquare) ? 1 : -1; // Direction to move towards the king
-
-    // Check based on the ray type (diagonal, vertical, or horizontal)
-    if (rayType == DIAGONAL) {
-        // Move along the diagonal
-        int currentSquare = pieceSquare + direction * 9; // Diagonal direction (top-left to bottom-right)
-        while (currentSquare != kingSquare) {
-            if (isOccupied(board, currentSquare)) {
-                return false; // Path is blocked by another piece
-            }
-            currentSquare += direction * 9; // Continue moving along the diagonal
-        }
-    } else if (rayType == VERTICAL) {
-        // Move along the vertical line (same column)
-        int currentSquare = pieceSquare + direction * 8; // Move up or down the column
-        while (currentSquare != kingSquare) {
-            if (isOccupied(board, currentSquare)) {
-                return false; // Path is blocked by another piece
-            }
-            currentSquare += direction * 8;
-        }
-    } else if (rayType == HORIZONTAL) {
-        // Move along the horizontal line (same row)
-        int currentSquare = pieceSquare + direction; // Move left or right along the row
-        while (currentSquare != kingSquare) {
-            if (isOccupied(board, currentSquare)) {
-                return false; // Path is blocked by another piece
-            }
-            currentSquare += direction;
-        }
-    }
-
-    return true; // Path is clear
-}
-
-bool IsPiecePinned(const Board* board, Square pieceSquare, Color color)
-{
-    // Get the king's position
-    Square kingSquare = lsb(board->bitboards[(color == COLOR_WHITE) ? INDEX_WHITE_KING : INDEX_BLACK_KING]);
-
-    // Check if the piece is in line with the king (diagonal, horizontal, or vertical)
-    
-    // Check for diagonal alignment
-    if (isOnSameDiagonal(pieceSquare, kingSquare)) {
-        // Check if there are no pieces blocking the diagonal
-        if (isPathClear(board, pieceSquare, kingSquare, color, DIAGONAL)) {
-            return true; // Piece is pinned along the diagonal
-        }
-    }
-
-    // Check for vertical alignment (same column)
-    if (isOnSameColumn(pieceSquare, kingSquare)) {
-        // Check if there are no pieces blocking the vertical path
-        if (isPathClear(board, pieceSquare, kingSquare, color, VERTICAL)) {
-            return true; // Piece is pinned along the vertical
-        }
-    }
-
-    // Check for horizontal alignment (same row)
-    if (isOnSameRow(pieceSquare, kingSquare)) {
-        // Check if there are no pieces blocking the horizontal path
-        if (isPathClear(board, pieceSquare, kingSquare, color, HORIZONTAL)) {
-            return true; // Piece is pinned along the horizontal
-        }
-    }
-
-    return false; // Piece is not pinned
-}
-
-Bitboard GetPinPath(const Board* board, Square pieceSquare, Square kingSquare, RayType rayType)
-{
-    Bitboard path = 0ULL;  // Initialize path with 0
-
-    // Determine the direction of movement based on the ray type
-    int direction;
-    if (rayType == DIAGONAL) {
-        // Ensure both squares are on the same diagonal
-        if (abs((pieceSquare % 8) - (kingSquare % 8)) != abs((pieceSquare / 8) - (kingSquare / 8))) {
-            return 0ULL; // Not on the same diagonal
-        }
-        direction = ((kingSquare > pieceSquare) ? 1 : -1) * ((kingSquare % 8 > pieceSquare % 8) ? 9 : 7);
-    } else if (rayType == VERTICAL) {
-        // Ensure both squares are in the same column
-        if ((pieceSquare % 8) != (kingSquare % 8)) {
-            return 0ULL; // Not on the same column
-        }
-        direction = (kingSquare > pieceSquare) ? 8 : -8;
-    } else if (rayType == HORIZONTAL) {
-        // Ensure both squares are in the same row
-        if ((pieceSquare / 8) != (kingSquare / 8)) {
-            return 0ULL; // Not on the same row
-        }
-        direction = (kingSquare > pieceSquare) ? 1 : -1;
-    } else {
-        return 0ULL; // Invalid ray type
-    }
-
-    int currentSquare = pieceSquare + direction;
-
-    // Trace the path until we reach the king square
-    while (currentSquare != kingSquare) {
-        // Ensure the current square is still on the board
-        if (currentSquare < 0 || currentSquare >= 64) {
-            return 0ULL; // Invalid path
-        }
-
-        // Add the current square to the path
-        path |= (1ULL << currentSquare);
-
-        // Move to the next square
-        currentSquare += direction;
-    }
-
-    // Add the king's square to the path
-    path |= (1ULL << kingSquare);
-
-    return path;
-}
-
-
-
-
 Bitboard GenerateLegalPawnMoves(const Board *board, Bitboard pieces, Color color)
 {
     Bitboard moves = 0ULL;
@@ -173,8 +12,7 @@ Bitboard GenerateLegalPawnMoves(const Board *board, Bitboard pieces, Color color
 
     while (pieces) {
         Square current = poplsb(&pieces);
-        Bitboard currentPawn = 1ULL << current;
-        Bitboard pseudoLegal = GeneratePawnMoves(board, pieces, color);
+        Bitboard pseudoLegal = GeneratePawnMoves(board, 1ULL << current, color);
 
         while (pseudoLegal) {
             Square target = poplsb(&pseudoLegal);
@@ -206,7 +44,7 @@ Bitboard GenerateLegalKnightMoves(const Board* board, Bitboard pieces, Color col
 
     while (pieces) {
         Square current = poplsb(&pieces);
-        Bitboard pseudoLegal = GenerateKnightMoves(board, pieces, color);
+        Bitboard pseudoLegal = GenerateKnightMoves(board, 1ULL << current, color);
 
         while (pseudoLegal) {
             Square target = poplsb(&pseudoLegal);
