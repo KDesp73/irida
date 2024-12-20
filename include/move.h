@@ -86,7 +86,7 @@ void MoveSetPromotion(Move* move, Promotion promotion);
 Bitboard DoMove(Bitboard* current, Move move);
 Bitboard UndoMove(Bitboard* current, Move move);
 
-void MakeMove(Board* board, Move move);
+bool MakeMove(Board* board, Move move);
 void UnmakeMove(Board* board);
 bool Castle(Board* board, Move move);
 bool Enpassant(Board* board, Move move);

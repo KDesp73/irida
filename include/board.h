@@ -81,7 +81,7 @@ void BoardFree(Board* board);
 
 Bitboard GetWhite(const Board* board);
 Bitboard GetBlack(const Board* board);
-Bitboard GetEnemyColor(const Board *board, Color color);
+Bitboard GetEnemyColor(const Board *board, Color us);
 Bitboard GetEnemy(const Board* board);
 Bitboard GetEmpty(const Board* board);
 

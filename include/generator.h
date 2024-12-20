@@ -8,43 +8,21 @@
 /*** Pseudo-Legal Moves ***/
 
 Moves GeneratePseudoLegalMoves(const Board* board);
+
+Bitboard GeneratePseudoLegalPawnAttacks(Bitboard pawns, Bitboard enemy, Color color);
+Bitboard GeneratePseudoLegalKnightAttacks(Bitboard knights, Bitboard empty, Bitboard enemy);
+Bitboard GeneratePseudoLegalBishopAttacks(Bitboard bishops, Bitboard empty, Bitboard enemy);
+Bitboard GeneratePseudoLegalRookAttacks(Bitboard rooks, Bitboard empty, Bitboard enemy);
+Bitboard GeneratePseudoLegalQueenAttacks(Bitboard queens, Bitboard empty, Bitboard enemy);
+Bitboard GeneratePseudoLegalKingAttacks(Bitboard kings, Bitboard empty, Bitboard enemy);
 Bitboard GeneratePseudoLegalAttacks(const Board* board, Color color);
 
-Bitboard GeneratePawnMoves(const Board* board, Bitboard pieces, Color color);
-#define GenerateWhitePawnMoves(board) \
-    GeneratePawnMoves(board, (board)->bitboards[INDEX_WHITE_PAWN], COLOR_WHITE)
-#define GenerateBlackPawnMoves(board) \
-    GeneratePawnMoves(board, (board)->bitboards[INDEX_BLACK_PAWN], COLOR_BLACK)
-
-Bitboard GenerateKnightMoves(const Board* board, Bitboard pieces, Color color);
-#define GenerateWhiteKnightMoves(board) \
-    GenerateKnightMoves(board, (board)->bitboards[INDEX_WHITE_KNIGHT], COLOR_WHITE)
-#define GenerateBlackKnightMoves(board) \
-    GenerateKnightMoves(board, (board)->bitboards[INDEX_BLACK_KNIGHT], COLOR_BLACK)
-
-Bitboard GenerateBishopMoves(const Board* board, Bitboard pieces, Color color);
-#define GenerateWhiteBishopMoves(board) \
-    GenerateBishopMoves(board, (board)->bitboards[INDEX_WHITE_BISHOP], COLOR_WHITE)
-#define GenerateBlackBishopMoves(board) \
-    GenerateBishopMoves(board, (board)->bitboards[INDEX_BLACK_BISHOP], COLOR_BLACK)
-
-Bitboard GenerateRookMoves(const Board* board, Bitboard pieces, Color color);
-#define GenerateWhiteRookMoves(board) \
-    GenerateRookMoves(board, (board)->bitboards[INDEX_WHITE_ROOK], COLOR_WHITE)
-#define GenerateBlackRookMoves(board) \
-    GenerateRookMoves(board, (board)->bitboards[INDEX_BLACK_ROOK], COLOR_BLACK)
-
-Bitboard GenerateQueenMoves(const Board* board, Bitboard pieces, Color color);
-#define GenerateWhiteQueenMoves(board) \
-    GenerateQueenMoves(board, (board)->bitboards[INDEX_WHITE_QUEEN], COLOR_WHITE)
-#define GenerateBlackQueenMoves(board) \
-    GenerateQueenMoves(board, (board)->bitboards[INDEX_BLACK_QUEEN], COLOR_BLACK)
-
-Bitboard GenerateKingMoves(const Board* board, Bitboard pieces, Color color);
-#define GenerateWhiteKingMoves(board) \
-    GenerateLegalKingMoves(board, (board)->bitboards[INDEX_WHITE_KING], COLOR_WHITE)
-#define GenerateBlackKingMoves(board) \
-    GenerateKingMoves(board, (board)->bitboards[INDEX_BLACK_KING], COLOR_BLACK)
+Bitboard GeneratePawnMoves(const Board* board, Square piece, Color color);
+Bitboard GenerateKnightMoves(const Board* board, Square piece, Color color);
+Bitboard GenerateBishopMoves(const Board* board, Square piece, Color color);
+Bitboard GenerateRookMoves(const Board* board, Square piece, Color color);
+Bitboard GenerateQueenMoves(const Board* board, Square piece, Color color);
+Bitboard GenerateKingMoves(const Board* board, Square piece, Color color);
 
 /*** Legal Moves ***/
 

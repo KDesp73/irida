@@ -33,11 +33,13 @@ void BoardPrintMove(const Board* board, Move move)
 
 Undo MakeUndo(const Board* board, Move move)
 {
+    char capture = PieceAt(board, GetTo(move)).type;
     return (Undo) {
         .move = move,
         .castling = board->castling_rights,
         .enpassant = board->enpassant_square,
-        .fiftyMove=  board->halfmove
+        .fiftyMove=  board->halfmove,
+        .captured = capture
     };
 }
 
@@ -74,35 +76,19 @@ void MoveDecode(Move move, Square* from, Square* to, uint8_t* promotion, uint8_t
 
 Square GetFrom(Move move)
 {
-    Square from, to;
-    uint8_t promotion, flags;
-    MoveDecode(move, &from, &to, &promotion, &flags);
-
-    return from;
+    return move & 0x3F;
 }
 Square GetTo(Move move)
 {
-    Square from, to;
-    uint8_t promotion, flags;
-    MoveDecode(move, &from, &to, &promotion, &flags);
-
-    return to;
+    return (move >> 6) & 0x3F;
 }
 uint8_t GetPromotion(Move move)
 {
-    Square from, to;
-    uint8_t promotion, flags;
-    MoveDecode(move, &from, &to, &promotion, &flags);
-
-    return promotion;
+    return (move >> 12) & 0xF;
 }
 uint8_t GetFlag(Move move)
 {
-    Square from, to;
-    uint8_t promotion, flags;
-    MoveDecode(move, &from, &to, &promotion, &flags);
-
-    return flags;
+    return (move >> 16) & 0x7;
 }
 
 
@@ -216,11 +202,9 @@ uint8_t CharToPromotion(char promotion)
     }
 }
 
-size_t getBitboardIndexFromSquare(Board* board, Square square)
+size_t getBitboardIndexFromPiece(char piece)
 {
-    Piece piece = PieceAt(board, square);
-    
-    switch (piece.type) {
+    switch (piece) {
         case 'p': return 0;
         case 'n': return 1;
         case 'b': return 2;
@@ -235,6 +219,12 @@ size_t getBitboardIndexFromSquare(Board* board, Square square)
         case 'K': return 11;
         default:  return -1; // Invalid piece
     }
+}
+
+size_t getBitboardIndexFromSquare(Board* board, Square square)
+{
+    Piece piece = PieceAt(board, square);
+    return getBitboardIndexFromPiece(piece.type);
 }
 
 bool IsCastle(const Board* board, Move* move)
@@ -263,27 +253,10 @@ bool IsCastle(const Board* board, Move* move)
         return false;
     }
 
-    // Verify castling rights
-    if (colDiff == 2) { // Short castling (kingside)
-        if (
-            !HasCastlingRights(board, CASTLE_WHITE_KINGSIDE) 
-            && !HasCastlingRights(board, CASTLE_BLACK_KINGSIDE)
-        ) {
-            return false;
-        }
-    } else if (colDiff == -2) { // Long castling (queenside)
-        if (
-            !HasCastlingRights(board, CASTLE_WHITE_QUEENSIDE) 
-            && !HasCastlingRights(board, CASTLE_BLACK_QUEENSIDE)
-        ) {
-            return false;
-        }
-    }
-
     MoveSetFlag(move, FLAG_CASTLING);
-
     return true;
 }
+
 #define CASTLE_ROOK(dst_k, dst_q)\
     if (dst == dst_k) { \
         board->grid[COORDS(dst-1)] = dst_k < 8 ? 'R' : 'r'; \
@@ -302,6 +275,37 @@ bool Castle(Board* board, Move move)
     Color color = board->turn;
 
     if(flag != FLAG_CASTLING) return false;
+    Piece piece = PieceAt(board, src);
+
+    int colFrom = src % 8;
+    int colTo = dst % 8;
+
+    int colDiff = colTo - colFrom;
+
+    if (colDiff == 2) { // Short castling (kingside)
+        if (
+            !(HasCastlingRights(board, CASTLE_WHITE_KINGSIDE) && piece.color)
+            &&
+            !(HasCastlingRights(board, CASTLE_BLACK_KINGSIDE) && !piece.color)
+        ) return false;
+        if(
+            IsSquareAttacked(board, (color) ? 6 : 62, !color)
+            ||
+            IsSquareAttacked(board, (color) ? 5 : 61, !color)
+        ) return false;
+    } else if (colDiff == -2) { // Long castling (queenside)
+        if (
+            !(HasCastlingRights(board, CASTLE_WHITE_QUEENSIDE) && piece.color)
+            &&
+            !(HasCastlingRights(board, CASTLE_BLACK_QUEENSIDE) && !piece.color)
+        ) return false;
+        if(
+            IsSquareAttacked(board, (color) ? 3 : 59, !color)
+            ||
+            IsSquareAttacked(board, (color) ? 2 : 58, !color)
+        ) return false;
+    }
+
 
     CASTLE_ROOK(6, 2);
     CASTLE_ROOK(62, 58)
@@ -362,13 +366,28 @@ bool Enpassant(Board* board, Move move)
 
     return true;
 }
+bool IsPromotion(Board* board, Move* move)
+{
+    Square from = GetFrom(*move);
+    Square to = GetTo(*move);
+    Color color = PieceAt(board, from).color;
 
-void MakeMove(Board* board, Move move)
+    if(color && (Rank(from) != 6 || Rank(to) != 7)) return false;
+    if(!color && (Rank(from) != 1 || Rank(to) != 0)) return false;
+
+    // if(File(from) != File(to))
+    //     MoveSetFlag(move, FLAG_PROMOTION_WITH_CAPTURE);
+    // else 
+        MoveSetFlag(move, FLAG_PROMOTION);
+    return true;
+}
+
+bool MakeMove(Board* board, Move move)
 {
 
     Piece piece = PieceAt(board, GetFrom(move));
-    if(piece.color != board->turn) return;
-    if(piece.type == COLOR_NONE) return;
+    if(piece.color != board->turn) return false;
+    if(piece.type == COLOR_NONE) return false;
 
     Square enpassant = UpdateEnpassantSquare(board, move);
     uint8_t castling = UpdateCastlingRights(board, GetFrom(move), GetTo(move));
@@ -380,7 +399,10 @@ void MakeMove(Board* board, Move move)
         succ = Enpassant(board, move);
     } 
 
-    if(!succ) return;
+    if(!succ) return false;
+
+    IsPromotion(board, &move);
+
     HistoryAddUndo(&board->history, board, move);
 
     MoveFreely(board, move, board->turn);
@@ -394,6 +416,8 @@ void MakeMove(Board* board, Move move)
 
     UpdateHashTable(&board->history.positions, CalculateZobristHash(board));
     board->turn = !board->turn;
+
+    return true;
 }
 
 void UnmakeMove(Board* board)
@@ -427,8 +451,8 @@ void UnmakeMove(Board* board)
             board->bitboards[color*6 + INDEX_BLACK_KNIGHT] &= ~specialBB;
             break;
         }
-
         board->bitboards[color*6 + INDEX_BLACK_PAWN] |= 1ULL << src;
+        board->grid[COORDS(src)] = (color) ? 'P' : 'p';
     } else if(flag == FLAG_CASTLING){
         if(File(dst) > File(src)){
             board->grid[COORDS(dst+1)] = (color) ? 'R' : 'r';
@@ -442,6 +466,13 @@ void UnmakeMove(Board* board)
     } else if(flag == FLAG_ENPASSANT) {
         board->bitboards[!color*6 + INDEX_BLACK_PAWN] |= specialBB;
         board->grid[COORDS(dst + ((color) ? -8 : 8))] = (color) ? 'p' : 'P';
+    } 
+
+    if (undo.captured != EMPTY_SQUARE) {
+        int capturedPieceIndex = getBitboardIndexFromPiece(undo.captured);
+
+        board->bitboards[capturedPieceIndex] |= (1ULL << dst);
+        board->grid[COORDS(dst)] = undo.captured;
     }
 
     if(board->turn == COLOR_WHITE){

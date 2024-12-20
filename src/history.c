@@ -34,6 +34,7 @@ void UndoPrint(Undo undo)
     MovePrint(undo.move);
     printf("Castling: %d\n", undo.castling);
     printf("Halfmove: %zu\n", undo.fiftyMove);
+    printf("Captured: %c\n", undo.captured);
     if(undo.enpassant == 64)
         printf("Enpassant: -\n");
     else

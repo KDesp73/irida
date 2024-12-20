@@ -17,8 +17,9 @@
 bool IsInCheck(const Board* board)
 {
     size_t offset = board->turn ? 6 : 0;
+    Bitboard enemyAttacks = GeneratePseudoLegalAttacks(board, !board->turn);
 
-    return IsKingInCheck(board->bitboards[offset + INDEX_BLACK_KING], GeneratePseudoLegalAttacks(board, !board->turn));
+    return IsKingInCheck(board->bitboards[offset + INDEX_BLACK_KING], enemyAttacks);
 }
 
 Board BoardCopy(const Board* board)
@@ -217,9 +218,9 @@ Bitboard GetBlack(const Board* board)
          | board->bitboards[INDEX_BLACK_KING];
 }
 
-Bitboard GetEnemyColor(const Board *board, Color color)
+Bitboard GetEnemyColor(const Board *board, Color us)
 {
-    return (color) 
+    return (us) 
         ? GetBlack(board)
         : GetWhite(board);
 }

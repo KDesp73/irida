@@ -1,3 +1,4 @@
+#include "masks.h"
 #include <string.h>
 #define TEST_IMPLEMENTATION
 #include <io/test.h>
@@ -25,10 +26,13 @@ void load()
     LOAD_TEST("test_rook_pseudo");
     LOAD_TEST("test_queen_pseudo");
     LOAD_TEST("test_king_pseudo");
+
+    LOAD_TEST("test_is_in_check");
 }
 
 int main(int argc, char** argv)
 {
+    InitMasks();
     if(argc == 2 && !strcmp(argv[1], "load")){
         load();
         return 0;
@@ -55,6 +59,7 @@ int main(int argc, char** argv)
         // RUN_TEST(test_rook_pseudo),
         // RUN_TEST(test_queen_pseudo),
         // RUN_TEST(test_king_pseudo),
+        // RUN_TEST(test_is_in_check),
 
         1
     END_TESTS

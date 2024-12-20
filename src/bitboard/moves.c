@@ -56,7 +56,7 @@ Bitboard UndoMove(Bitboard* current, Move move)
 
 bool IsKingInCheck(Bitboard kingPosition, Bitboard enemyAttacks)
 {
-    return kingPosition & enemyAttacks;
+    return (kingPosition & enemyAttacks) != 0;
 }
 
 bool IsSquareAttacked(const Board* board, Square square, Color attackerColor)

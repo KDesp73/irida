@@ -6,6 +6,8 @@
 #define FAILF(fen, fmt, ...) \
     fprintf(stderr, ANSI_RED "FAILED: (%s) " fmt ANSI_RESET "\n", fen, ##__VA_ARGS__)
 
+
+// https://www.chessprogramming.org/Perft_Results
 #include "test_perft_5.h"
 int test_perft_5(int depth, u64 expected);
 
@@ -59,5 +61,8 @@ int test_queen_pseudo(const char* fen, const char* square, const char* first, ..
 
 #include "test_king_pseudo.h"
 int test_king_pseudo(const char* fen, const char* square, const char* first, ...);
+
+#include "test_is_in_check.h"
+int test_is_in_check(const char* fen, bool expected);
 
 #endif // ENGINE_TESTS_H

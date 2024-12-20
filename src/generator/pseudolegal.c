@@ -1,45 +1,110 @@
+#include "bitboard.h"
 #include "board.h"
+#include "masks.h"
 #include "generator.h"
+#include "square.h"
+#include <stdio.h>
 
-Bitboard GeneratePseudoLegalAttacks(const Board* board, Color color)
+Bitboard GeneratePseudoLegalPawnAttacks(Bitboard pawns, Bitboard enemy, Color color)
 {
-    size_t start = (color) ? 6 : 0;
-    Bitboard enemy = GetEnemyColor(board, color);
+    Bitboard result = 0ULL;
+    while(pawns){
+        Square current = poplsb(&pawns);
+        result |= PawnAttacks(current, enemy, color);
+    }
+    return result;
+}
+
+Bitboard GeneratePseudoLegalKnightAttacks(Bitboard knights, Bitboard empty, Bitboard enemy)
+{
+    Bitboard result = 0ULL;
+    while(knights){
+        Square current = poplsb(&knights);
+        result |= KnightAttacks(current, empty, enemy);
+    }
+    return result;
+}
+
+Bitboard GeneratePseudoLegalBishopAttacks(Bitboard bishops, Bitboard empty, Bitboard enemy)
+{
+    Bitboard result = 0ULL;
+    while(bishops){
+        Square current = poplsb(&bishops);
+        result |= BishopAttacks(current, empty, enemy);
+    }
+    return result;
+}
+
+Bitboard GeneratePseudoLegalRookAttacks(Bitboard rooks, Bitboard empty, Bitboard enemy)
+{
+    Bitboard result = 0ULL;
+    while(rooks){
+        Square current = poplsb(&rooks);
+        result |= RookAttacks(current, empty, enemy);
+    }
+    return result;
+}
+
+Bitboard GeneratePseudoLegalQueenAttacks(Bitboard queens, Bitboard empty, Bitboard enemy)
+{
+    Bitboard result = 0ULL;
+    while(queens){
+        Square current = poplsb(&queens);
+        result |= QueenAttacks(current, empty, enemy);
+    }
+    return result;
+}
+
+Bitboard GeneratePseudoLegalKingAttacks(Bitboard kings, Bitboard empty, Bitboard enemy)
+{
+    Bitboard result = 0ULL;
+    while(kings){
+        Square current = poplsb(&kings);
+        result |= KingAttacks(current, empty, enemy);
+    }
+    return result;
+}
+
+
+Bitboard GeneratePseudoLegalAttacks(const Board* board, Color attackerColor)
+{
+    size_t start = (attackerColor) ? 6 : 0;
+    Bitboard enemy = GetEnemyColor(board, attackerColor);
     Bitboard empty = GetEmpty(board);
     Square enpassantSquare = board->enpassant_square;
 
-    Bitboard attacks =  (color) 
-        ? WhitePawnAttacks(board->bitboards[INDEX_WHITE_PAWN], enemy)
-        : BlackPawnAttacks(board->bitboards[INDEX_BLACK_PAWN], enemy)
-        | KnightAttacks(board->bitboards[start + 1], empty, enemy)
-        | BishopAttacks(board->bitboards[start + 2], empty, enemy)
-        | RookAttacks(board->bitboards[start + 3], empty, enemy)
-        | QueenAttacks(board->bitboards[start + 4], empty, enemy)
-        | KingAttacks(board->bitboards[start + 5], empty, enemy)
+    Bitboard attacks = 
+        GeneratePseudoLegalPawnAttacks(board->bitboards[start + INDEX_BLACK_PAWN], enemy, attackerColor)
+        | GeneratePseudoLegalKnightAttacks(board->bitboards[start + INDEX_BLACK_KNIGHT], empty, enemy)
+        | GeneratePseudoLegalBishopAttacks(board->bitboards[start + INDEX_BLACK_BISHOP], empty, enemy)
+        | GeneratePseudoLegalRookAttacks(board->bitboards[start + INDEX_BLACK_ROOK], empty, enemy)
+        | GeneratePseudoLegalQueenAttacks(board->bitboards[start + INDEX_BLACK_QUEEN], empty, enemy)
+        | GeneratePseudoLegalKingAttacks(board->bitboards[start + INDEX_BLACK_KING], empty, enemy)
         ;
 
-    if(color == COLOR_WHITE){
-        if((1ULL << enpassantSquare) & RANK_6){
-            attacks |= (
-                    WhitePawnAttacks(board->bitboards[INDEX_WHITE_PAWN], ~0ULL) 
-                    & (1ULL << enpassantSquare)
-                    );
-        }
-    } else {
-        if((1ULL << enpassantSquare) & RANK_3){
-            attacks |= (
-                    BlackPawnAttacks(board->bitboards[INDEX_BLACK_PAWN], ~0ULL) 
-                    & (1ULL << enpassantSquare)
-                    );
+    if(enpassantSquare != 64){
+        if(attackerColor == COLOR_WHITE){
+            if((1ULL << enpassantSquare) & RANK_6){
+                attacks |= (
+                        PawnAttacks(board->bitboards[INDEX_WHITE_PAWN], ~0ULL, attackerColor) 
+                        & (1ULL << enpassantSquare)
+                        );
+            }
+        } else {
+            if((1ULL << enpassantSquare) & RANK_3){
+                attacks |= (
+                        PawnAttacks(board->bitboards[INDEX_BLACK_PAWN], ~0ULL, attackerColor) 
+                        & (1ULL << enpassantSquare)
+                        );
+            }
         }
     }
-
 
     return attacks;
 }
 
 
-Bitboard GeneratePawnMoves(const Board* board, Bitboard pieces, Color color)
+Bitboard GeneratePawnMoves(const Board* board, Square piece, Color color)
 {
     Bitboard pseudoLegal = 0ULL;
     Square enpassantSquare = board->enpassant_square;
@@ -48,24 +113,24 @@ Bitboard GeneratePawnMoves(const Board* board, Bitboard pieces, Color color)
 
     if(color == COLOR_WHITE){
         if((1ULL << enpassantSquare) & RANK_6){
-            pseudoLegal = WhitePawnAttacks(pieces, enemySquares) 
-                | WhitePawnPushes(pieces, emptySquares)
-                | (WhitePawnAttacks(pieces, ~0ULL) & (1ULL << enpassantSquare))
+            pseudoLegal = PawnAttacks(piece, enemySquares, color) 
+                | PawnPushes(piece, emptySquares, color)
+                | (PawnAttacks(piece, ~0ULL, color) & (1ULL << enpassantSquare))
                 ;
         } else {
-            pseudoLegal = WhitePawnAttacks(pieces, enemySquares) 
-                | WhitePawnPushes(pieces, emptySquares)
+            pseudoLegal = PawnAttacks(piece, enemySquares, color) 
+                | PawnPushes(piece, emptySquares, color)
                 ;
         }
     } else {
         if((1ULL << enpassantSquare) & RANK_3){
-            pseudoLegal = BlackPawnAttacks(pieces, enemySquares) 
-                | BlackPawnPushes(pieces, emptySquares)
-                | (BlackPawnAttacks(pieces, ~0ULL) & (1ULL << enpassantSquare))
+            pseudoLegal = PawnAttacks(piece, enemySquares, color) 
+                | PawnPushes(piece, emptySquares, color)
+                | (PawnAttacks(piece, ~0ULL, color) & (1ULL << enpassantSquare))
                 ;
         } else {
-            pseudoLegal = BlackPawnAttacks(pieces, enemySquares) 
-                | BlackPawnPushes(pieces, emptySquares)
+            pseudoLegal = PawnAttacks(piece, enemySquares, color) 
+                | PawnPushes(piece, emptySquares, color)
                 ;
         }
     }
@@ -73,39 +138,39 @@ Bitboard GeneratePawnMoves(const Board* board, Bitboard pieces, Color color)
     return pseudoLegal;
 }
 
-Bitboard GenerateKnightMoves(const Board* board, Bitboard pieces, Color color)
+Bitboard GenerateKnightMoves(const Board* board, Square piece, Color color)
 {
     Bitboard emptySquares = GetEmpty(board);
     Bitboard enemySquares = GetEnemyColor(board, color);
-    return KnightAttacks(pieces, emptySquares, enemySquares);
+    return KnightAttacks(piece, emptySquares, enemySquares);
 }
 
-Bitboard GenerateBishopMoves(const Board* board, Bitboard pieces, Color color)
+Bitboard GenerateBishopMoves(const Board* board, Square piece, Color color)
 {
     Bitboard emptySquares = GetEmpty(board);
     Bitboard enemySquares = GetEnemyColor(board, color);
-    return BishopAttacks(pieces, emptySquares, enemySquares);
+    return BishopAttacks(piece, emptySquares, enemySquares);
 }
 
-Bitboard GenerateRookMoves(const Board* board, Bitboard pieces, Color color)
+Bitboard GenerateRookMoves(const Board* board, Square piece, Color color)
 {
     Bitboard emptySquares = GetEmpty(board);
     Bitboard enemySquares = GetEnemyColor(board, color);
-    return RookAttacks(pieces, emptySquares, enemySquares);
+    return RookAttacks(piece, emptySquares, enemySquares);
 }
 
-Bitboard GenerateQueenMoves(const Board* board, Bitboard pieces, Color color)
+Bitboard GenerateQueenMoves(const Board* board, Square piece, Color color)
 {
     Bitboard emptySquares = GetEmpty(board);
     Bitboard enemySquares = GetEnemyColor(board, color);
-    return QueenAttacks(pieces, emptySquares, enemySquares);
+    return QueenAttacks(piece, emptySquares, enemySquares);
 }
 
-Bitboard GenerateKingMoves(const Board* board, Bitboard pieces, Color color)
+Bitboard GenerateKingMoves(const Board* board, Square piece, Color color)
 {
     Bitboard emptySquares = GetEmpty(board);
     Bitboard enemySquares = GetEnemyColor(board, color);
-    Bitboard pseudoLegal = KingAttacks(pieces, emptySquares, enemySquares);
+    Bitboard pseudoLegal = KingAttacks(piece, emptySquares, enemySquares);
 
     // Castling Logic
     if (!IsInCheck(board)) {
@@ -158,37 +223,37 @@ Moves GeneratePseudoLegalMoves(const Board* board)
     Bitboard pawnsBB = board->bitboards[start + INDEX_BLACK_PAWN];
     while(pawnsBB){
         Square current = poplsb(&pawnsBB);
-        MovesAppendList(&moves, BitboardToMoves(GeneratePawnMoves(board, 1ULL << current, color), current));
+        MovesAppendList(&moves, BitboardToMoves(GeneratePawnMoves(board, current, color), current));
     }
 
     Bitboard knightsBB = board->bitboards[start + INDEX_BLACK_KNIGHT];
     while(knightsBB){
         Square current = poplsb(&knightsBB);
-        MovesAppendList(&moves, BitboardToMoves(GenerateKnightMoves(board, 1ULL << current, color), current));
+        MovesAppendList(&moves, BitboardToMoves(GenerateKnightMoves(board, current, color), current));
     }
 
     Bitboard bishopsBB = board->bitboards[start + INDEX_BLACK_BISHOP];
     while(bishopsBB){
         Square current = poplsb(&bishopsBB);
-        MovesAppendList(&moves, BitboardToMoves(GenerateBishopMoves(board, 1ULL << current, color), current));
+        MovesAppendList(&moves, BitboardToMoves(GenerateBishopMoves(board, current, color), current));
     }
 
     Bitboard rooksBB = board->bitboards[start + INDEX_BLACK_ROOK];
     while(rooksBB){
         Square current = poplsb(&rooksBB);
-        MovesAppendList(&moves, BitboardToMoves(GenerateRookMoves(board, 1ULL << current, color), current));
+        MovesAppendList(&moves, BitboardToMoves(GenerateRookMoves(board, current, color), current));
     }
 
     Bitboard queensBB = board->bitboards[start + INDEX_BLACK_QUEEN];
     while(queensBB){
         Square current = poplsb(&queensBB);
-        MovesAppendList(&moves, BitboardToMoves(GenerateQueenMoves(board, 1ULL << current, color), current));
+        MovesAppendList(&moves, BitboardToMoves(GenerateQueenMoves(board, current, color), current));
     }
 
     Bitboard kingsBB = board->bitboards[start + INDEX_BLACK_KING];
     while(kingsBB){
         Square current = poplsb(&kingsBB);
-        MovesAppendList(&moves, BitboardToMoves(GenerateKingMoves(board, 1ULL << current, color), current));
+        MovesAppendList(&moves, BitboardToMoves(GenerateKingMoves(board, current, color), current));
     }
 
     return moves;

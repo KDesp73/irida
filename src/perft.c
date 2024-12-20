@@ -15,7 +15,7 @@ u64 Perft(Board* board, int depth)
         return (u64) moves.count;
 
     for (i = 0; i < n_moves; i++) {
-        MakeMove(board, moves.list[i]);
+        if(!MakeMove(board, moves.list[i])) continue;
         if (!IsInCheck(board)) {
             nodes += Perft(board, depth - 1);
         }

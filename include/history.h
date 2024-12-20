@@ -12,6 +12,7 @@ typedef struct {
     uint8_t castling;
     Square enpassant;
     size_t fiftyMove;
+    char captured;
 } Undo;
 
 void UndoPrint(Undo undo);
