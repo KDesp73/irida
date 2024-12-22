@@ -50,6 +50,8 @@ typedef struct {
 
 bool HistoryAddUndo(History* history, const Board* board, uint32_t move);
 void HistoryRemove(History* history);
+Undo HistoryGetLast(History history);
+Undo LoadLastUndo(Board* board);
 
 #define PIECES "pnbrqkPNBRQK"
 enum {
@@ -72,11 +74,14 @@ typedef enum {
     COLOR_BLACK = 0,
     COLOR_WHITE,
 } Color;
+#define WHITE COLOR_WHITE
+#define BLACK COLOR_BLACK
 
 char PromotionToChar(uint8_t promotion);
 uint8_t CharToPromotion(char promotion);
 
 void BoardInitFen(Board* board, const char* fen);
+Board* BoardInitFenHeap(const char* fen);
 void BoardFree(Board* board);
 
 Bitboard GetWhite(const Board* board);
@@ -98,6 +103,7 @@ bool IsCheckmate(Board* board);
 bool IsStalemate(Board* board);
 bool IsInsufficientMaterial(Board* board);
 bool IsThreefoldRepetition(Board* board);
+bool IsInCheckColor(const Board* board, Color color);
 bool IsInCheck(const Board* board);
 
 

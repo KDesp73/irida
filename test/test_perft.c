@@ -6,7 +6,7 @@ int test_perft(int depth, u64 expected)
 {
     Board board;
     BoardInitFen(&board, NULL);
-    u64 count = Perft(&board, depth);
+    u64 count = PerftLegal(&board, depth);
     BoardFree(&board);
 
     if(count != expected){

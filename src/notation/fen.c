@@ -186,34 +186,3 @@ void FenExport(const Board* board, char buffer[])
     // Null-terminate the buffer
     *ptr = '\0';
 }
-
-// void MoveToSan(Board board, Move move, san_move_t* san)
-// {
-//     Square from, to;
-//     uint8_t promotion, flag;
-//     MoveDecode(move, &from, &to, &promotion, &flag);
-//
-//     char fen[64];
-//     FenExport(&board, fen);
-//     board_t board_;
-//     fen_import(&board_, fen);
-//     square_t from_square, to_square;
-//     SquareToSquareT(&from_square, from);
-//     SquareToSquareT(&to_square, to);
-//
-//     move_to_san(&board_, from_square, to_square, PromotionToChar(promotion), san);
-// }
-//
-// Move SanToMove(Board board, san_move_t san)
-// {
-//     char fen[64];
-//     FenExport(&board, fen);
-//     board_t board_;
-//     fen_import(&board_, fen);
-//
-//     square_t from, to;
-//     char promotion;
-//
-//     san_to_move(&board_, san, &from, &to, &promotion);
-//     return SquaresToMove(from, to, CharToPromotion(promotion), FLAG_NORMAL);
-// }

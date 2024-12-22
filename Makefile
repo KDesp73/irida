@@ -64,6 +64,7 @@ $(BUILD_DIR): ## Create the build directory if it doesn't exist
 	mkdir -p $(BUILD_DIR)/bin
 	mkdir -p $(BUILD_DIR)/bitboard
 	mkdir -p $(BUILD_DIR)/generator
+	mkdir -p $(BUILD_DIR)/notation
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c ## Compile source files
 	$(eval counter=$(shell echo $$(($(counter)+1))))

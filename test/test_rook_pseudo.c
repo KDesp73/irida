@@ -28,7 +28,7 @@ int test_rook_pseudo(const char* fen, const char* square, const char* first, ...
     }
 
     Color color = PieceAt(&board, from).color;
-    Bitboard found = GenerateRookMoves(&board, 1ULL << from, color);
+    Bitboard found = GenerateRookMoves(&board, from, color);
     if(found != moves){
         FAILF(fen, "For square %s", square);
         printf("Expected: \n");

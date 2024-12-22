@@ -39,7 +39,9 @@ enum {
     CASTLE_BLACK_QUEENSIDE = 0b1000,
 };
 
+
 typedef uint32_t Move;
+#define NULL_MOVE ((Move) 0);
 
 #define MOVES_CAPACITY 256
 typedef struct {
@@ -48,6 +50,7 @@ typedef struct {
 } Moves;
 void MovesAppend(Moves* moves, Move move);
 void MovesAppendList(Moves* dest, Moves src);
+Moves MovesCombine(Moves m1, Moves m2);
 
 Undo MakeUndo(const Board* board, Move move);
 
@@ -89,7 +92,9 @@ Bitboard UndoMove(Bitboard* current, Move move);
 bool MakeMove(Board* board, Move move);
 void UnmakeMove(Board* board);
 bool Castle(Board* board, Move move);
+bool IsCastle(const Board* board, Move* move);
 bool Enpassant(Board* board, Move move);
+bool IsEnpassant(const Board* board, Move* move);
 
 _Bool MoveMake(Board* board, Move move);
 void MoveFreely(Board* board, Move move, Color color);
@@ -107,6 +112,7 @@ uint8_t UpdateCastlingRights(Board* board, Square from, Square to);
 Square UpdateEnpassantSquare(Board* board, Move move);
 
 Moves BitboardToMoves(Bitboard bitboard, Square from);
+Bitboard MovesToBitboard(Moves moves);
 
 void BoardPrintMove(const Board* board, Move move);
 

@@ -15,7 +15,10 @@ Square SquareFromName(const char* name)
 
 void SquareToName(char buffer[3], Square square)
 {
-    assert(square >= 0 && square <= 63);
+    if(!(square >= 0 && square <= 63)){
+        strcat(buffer, "-");
+        return;
+    }
 
     char file = 'a' + (square % 8);
     char rank = '1' + (square / 8);

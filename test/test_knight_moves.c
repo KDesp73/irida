@@ -1,6 +1,7 @@
 #include "bitboard.h"
 #include "generator.h"
 #include "board.h"
+#include "move.h"
 #include "piece.h"
 #include "square.h"
 #include "tests.h"
@@ -28,14 +29,13 @@ int test_knight_moves(const char* fen, const char* square, const char* first, ..
     }
 
     Color color = PieceAt(&board, from).color;
-    Bitboard found = GenerateLegalKnightMoves(&board, 1ULL << from, color);
+    Bitboard found = MovesToBitboard(GenerateLegalKnightMoves(&board, BB(from), color));
     if(found != moves){
         FAILF(fen, "For square %s", square);
         printf("Expected: \n");
-        BitboardPrint(moves);
+        BoardPrintBitboard(&board, moves);
         printf("Found: \n");
-        BitboardPrint(found);
-        BitboardPrint(found);
+        BoardPrintBitboard(&board, found);
         return false;
     }
 

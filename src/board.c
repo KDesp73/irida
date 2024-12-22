@@ -14,10 +14,15 @@
 #include <stdio.h>
 
 
-bool IsInCheck(const Board* board)
+bool IsInCheck(const Board *board)
 {
-    size_t offset = board->turn ? 6 : 0;
-    Bitboard enemyAttacks = GeneratePseudoLegalAttacks(board, !board->turn);
+    return IsInCheckColor(board, board->turn);
+}
+
+bool IsInCheckColor(const Board* board, Color color)
+{
+    size_t offset = color ? 6 : 0;
+    Bitboard enemyAttacks = GeneratePseudoLegalAttacks(board, !color);
 
     return IsKingInCheck(board->bitboards[offset + INDEX_BLACK_KING], enemyAttacks);
 }
@@ -39,6 +44,15 @@ Board BoardCopy(const Board* board)
 void BoardFree(Board* board)
 {
     FreeHashTable(&board->history.positions);
+}
+
+Board* BoardInitFenHeap(const char* fen)
+{
+    Board* board = malloc(sizeof(Board));
+    
+    BoardInitFen(board, fen);
+
+    return board;
 }
 
 /**
@@ -80,7 +94,7 @@ Square UpdateEnpassantSquare(Board* board, Move move)
 {
     Piece piece = PieceAt(board, GetFrom(move));
 
-    if(tolower(piece.type) != 'p') {
+    if(IS_PAWN(piece)) {
         goto no_enpassant;
     }
 

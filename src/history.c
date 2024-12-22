@@ -2,7 +2,6 @@
 #include "hashing.h"
 #include "move.h"
 #include "square.h"
-#include "zobrist.h"
 #include <stdio.h>
 
 bool HistoryAddUndo(History* history, const Board* board, uint32_t move)
@@ -39,4 +38,20 @@ void UndoPrint(Undo undo)
         printf("Enpassant: -\n");
     else
         SQUARE_PRINT(undo.enpassant);
+}
+
+Undo HistoryGetLast(History history)
+{
+    return history.moves[history.count-1];
+}
+
+Undo LoadLastUndo(Board* board)
+{
+    Undo undo = HistoryGetLast(board->history);
+
+    board->halfmove = undo.fiftyMove;
+    board->castling_rights = undo.castling;
+    board->enpassant_square = undo.enpassant;
+
+    return undo;
 }

@@ -31,7 +31,11 @@ static Bitboard HORIZONTAL_MASKS[64];
 static Bitboard VERTICAL_MASKS[64];
 
 static Bitboard PAWN_PUSH_MASKS[2][64];
+static Bitboard PAWN_DOUBLE_PUSH_MASKS[2][64];
 static Bitboard PAWN_ATTACK_MASKS[2][64];
+static Bitboard PAWN_PROMOTION_MASKS[2][64];
+static Bitboard PAWN_PROMOTION_ATTACK_MASKS[2][64];
+
 static Bitboard KNIGHT_MOVE_MASKS[64];
 static Bitboard BISHOP_MOVE_MASKS[64];
 static Bitboard ROOK_MOVE_MASKS[64];
@@ -62,6 +66,7 @@ Bitboard VerticalMask(Square square);
 
 /*** Piece Masks ***/
 Bitboard ComputePawnPushMask(Square square, Color color);
+Bitboard ComputePawnDoublePushMask(Square square, Color color);
 Bitboard ComputePawnPromotionMask(Square square, Color color);
 Bitboard ComputePawnPromotionAttackMask(Square square, Color color);
 Bitboard ComputePawnAttackMask(Square square, Color color);
@@ -72,6 +77,7 @@ Bitboard ComputeQueenMoveMask(Square square);
 Bitboard ComputeKingMoveMask(Square square);
 
 Bitboard PawnPushMask(Square square, Color color);
+Bitboard PawnDoublePushMask(Square square, Color color);
 Bitboard PawnPromotionMask(Square square, Color color);
 Bitboard PawnPromotionAttackMask(Square square, Color color);
 Bitboard PawnAttackMask(Square square, Color color);

@@ -6,6 +6,8 @@
 #define FAILF(fen, fmt, ...) \
     fprintf(stderr, ANSI_RED "FAILED: (%s) " fmt ANSI_RESET "\n", fen, ##__VA_ARGS__)
 
+#include "test_undo.h"
+int test_undo(const char* fen, Move move);
 
 // https://www.chessprogramming.org/Perft_Results
 #include "test_perft_5.h"

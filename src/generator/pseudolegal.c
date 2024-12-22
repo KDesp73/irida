@@ -2,8 +2,19 @@
 #include "board.h"
 #include "masks.h"
 #include "generator.h"
+#include "move.h"
 #include "square.h"
 #include <stdio.h>
+
+Bitboard GeneratePseudoLegalPawnMoves(Bitboard pawns, Bitboard empty, Color color)
+{
+    Bitboard result = 0ULL;
+    while(pawns) {
+        Square current = poplsb(&pawns);
+        result |= PawnPushes(current, empty, color);
+    }
+    return result;
+}
 
 Bitboard GeneratePseudoLegalPawnAttacks(Bitboard pawns, Bitboard enemy, Color color)
 {
@@ -172,85 +183,97 @@ Bitboard GenerateKingMoves(const Board* board, Square piece, Color color)
     Bitboard enemySquares = GetEnemyColor(board, color);
     Bitboard pseudoLegal = KingAttacks(piece, emptySquares, enemySquares);
 
-    // Castling Logic
-    if (!IsInCheck(board)) {
-        if (color == COLOR_WHITE) {
-            // White Kingside Castling: Squares e1 -> f1 -> g1 (4 -> 5 -> 6)
-            if (HasCastlingRights(board, CASTLE_WHITE_KINGSIDE)) {
-                if (IsSquareEmpty(board, 5) && IsSquareEmpty(board, 6)) {
-                    if (!IsSquareAttacked(board, 5, COLOR_BLACK) && !IsSquareAttacked(board, 6, COLOR_BLACK)) {
-                        on(&pseudoLegal, 6); // Add kingside castling move
-                    }
-                }
-            }
-            // White Queenside Castling: Squares e1 -> d1 -> c1 (4 -> 3 -> 2)
-            if (HasCastlingRights(board, CASTLE_WHITE_QUEENSIDE)) {
-                if (IsSquareEmpty(board, 3) && IsSquareEmpty(board, 2) && IsSquareEmpty(board, 1)) {
-                    if (!IsSquareAttacked(board, 3, COLOR_BLACK) && !IsSquareAttacked(board, 2, COLOR_BLACK)) {
-                        on(&pseudoLegal, 2); // Add queenside castling move
-                    }
-                }
-            }
-        } else {
-            // Black Kingside Castling: Squares e8 -> f8 -> g8 (60 -> 61 -> 62)
-            if (HasCastlingRights(board, CASTLE_BLACK_KINGSIDE)) {
-                if (IsSquareEmpty(board, 61) && IsSquareEmpty(board, 62)) {
-                    if (!IsSquareAttacked(board, 61, COLOR_WHITE) && !IsSquareAttacked(board, 62, COLOR_WHITE)) {
-                        on(&pseudoLegal, 62); // Add kingside castling move
-                    }
-                }
-            }
-            // Black Queenside Castling: Squares e8 -> d8 -> c8 (60 -> 59 -> 58)
-            if (HasCastlingRights(board, CASTLE_BLACK_QUEENSIDE)) {
-                if (IsSquareEmpty(board, 59) && IsSquareEmpty(board, 58) && IsSquareEmpty(board, 57)) {
-                    if (!IsSquareAttacked(board, 59, COLOR_WHITE) && !IsSquareAttacked(board, 58, COLOR_WHITE)) {
-                        on(&pseudoLegal, 58); // Add queenside castling move
-                    }
-                }
-            }
+    Bitboard castlingMoves = 0ULL;
+    if (color == COLOR_WHITE && piece == 4) {
+        // White Kingside Castling: Squares e1 -> f1 -> g1 (4 -> 5 -> 6)
+        if (HasCastlingRights(board, CASTLE_WHITE_KINGSIDE)
+            && IsSquareEmpty(board, 5)
+            && IsSquareEmpty(board, 6)
+            && !IsSquareAttacked(board, 5, COLOR_BLACK)
+            && !IsSquareAttacked(board, 6, COLOR_BLACK)
+        ) {
+            on(&castlingMoves, 6);
+        }
+        // White Queenside Castling: Squares e1 -> d1 -> c1 (4 -> 3 -> 2)
+        if (HasCastlingRights(board, CASTLE_WHITE_QUEENSIDE)
+            && IsSquareEmpty(board, 3)
+            && IsSquareEmpty(board, 2) 
+            && IsSquareEmpty(board, 1) 
+            && !IsSquareAttacked(board, 3, COLOR_BLACK)
+            && !IsSquareAttacked(board, 2, COLOR_BLACK)
+            && !IsSquareAttacked(board, 1, COLOR_BLACK)
+        ) {
+            on(&castlingMoves, 2);
+        }
+    } else if(color == COLOR_BLACK && piece == 60){
+        // Black Kingside Castling: Squares e8 -> f8 -> g8 (60 -> 61 -> 62)
+        if (HasCastlingRights(board, CASTLE_BLACK_KINGSIDE)
+            && IsSquareEmpty(board, 61)
+            && IsSquareEmpty(board, 62)
+            && !IsSquareAttacked(board, 61, COLOR_WHITE)
+            && !IsSquareAttacked(board, 62, COLOR_WHITE)
+        ) {
+            on(&castlingMoves, 62);
+        }
+        // Black Queenside Castling: Squares e8 -> d8 -> c8 (60 -> 59 -> 58)
+        if (HasCastlingRights(board, CASTLE_BLACK_QUEENSIDE)
+            && IsSquareEmpty(board, 59)
+            && IsSquareEmpty(board, 58)
+            && IsSquareEmpty(board, 57)
+            && !IsSquareAttacked(board, 59, COLOR_WHITE)
+            && !IsSquareAttacked(board, 58, COLOR_WHITE)
+            && !IsSquareAttacked(board, 57, COLOR_WHITE)
+        ) {
+            on(&castlingMoves, 58); // Queenside castling
         }
     }
 
+    pseudoLegal |= castlingMoves;
+
     return pseudoLegal;
+}
+
+Bitboard GeneratePseudoLegalMovesBitboard(const Board* board)
+{
+    return MovesToBitboard(GeneratePseudoLegalMoves(board));
 }
 
 Moves GeneratePseudoLegalMoves(const Board* board)
 {
     Moves moves = {0};
-    size_t start = board->turn ? 6 : 0;
     Color color = board->turn;
 
-    Bitboard pawnsBB = board->bitboards[start + INDEX_BLACK_PAWN];
+    Bitboard pawnsBB = board->bitboards[color*6 + INDEX_BLACK_PAWN];
     while(pawnsBB){
         Square current = poplsb(&pawnsBB);
         MovesAppendList(&moves, BitboardToMoves(GeneratePawnMoves(board, current, color), current));
     }
 
-    Bitboard knightsBB = board->bitboards[start + INDEX_BLACK_KNIGHT];
+    Bitboard knightsBB = board->bitboards[color*6 + INDEX_BLACK_KNIGHT];
     while(knightsBB){
         Square current = poplsb(&knightsBB);
         MovesAppendList(&moves, BitboardToMoves(GenerateKnightMoves(board, current, color), current));
     }
 
-    Bitboard bishopsBB = board->bitboards[start + INDEX_BLACK_BISHOP];
+    Bitboard bishopsBB = board->bitboards[color*6 + INDEX_BLACK_BISHOP];
     while(bishopsBB){
         Square current = poplsb(&bishopsBB);
         MovesAppendList(&moves, BitboardToMoves(GenerateBishopMoves(board, current, color), current));
     }
 
-    Bitboard rooksBB = board->bitboards[start + INDEX_BLACK_ROOK];
+    Bitboard rooksBB = board->bitboards[color*6 + INDEX_BLACK_ROOK];
     while(rooksBB){
         Square current = poplsb(&rooksBB);
         MovesAppendList(&moves, BitboardToMoves(GenerateRookMoves(board, current, color), current));
     }
 
-    Bitboard queensBB = board->bitboards[start + INDEX_BLACK_QUEEN];
+    Bitboard queensBB = board->bitboards[color*6 + INDEX_BLACK_QUEEN];
     while(queensBB){
         Square current = poplsb(&queensBB);
         MovesAppendList(&moves, BitboardToMoves(GenerateQueenMoves(board, current, color), current));
     }
 
-    Bitboard kingsBB = board->bitboards[start + INDEX_BLACK_KING];
+    Bitboard kingsBB = board->bitboards[color*6 + INDEX_BLACK_KING];
     while(kingsBB){
         Square current = poplsb(&kingsBB);
         MovesAppendList(&moves, BitboardToMoves(GenerateKingMoves(board, current, color), current));

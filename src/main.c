@@ -3,10 +3,19 @@
 #include "generator.h"
 #include "masks.h"
 #include "move.h"
+#include "notation.h"
 #include "perft.h"
+#include "square.h"
 #include "zobrist.h"
-#include <io/logging.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <string.h>
+
+#include <io/logging.h>
+#define ANSI_IMPLEMENTATION
+#include <io/ansi.h>
+#define MENU_IMPLEMENTATION
+#include <io/menu.h>
 
 void perft(int argc, char** argv)
 {
@@ -22,15 +31,107 @@ void perft(int argc, char** argv)
     BoardFree(&board);
 }
 
+int flush_input()
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) { }
+    return 0;
+}
+
+int move(Board* board)
+{
+    char move_input[6]; // +1 for \0, +1 for safety
+    printf("Enter move (e.g., e2e4): ");
+    if (scanf("%5s", move_input) != 1) {
+        flush_input(); // Clear input buffer
+        printf("Invalid input. Try again.\n");
+        return false;
+    }
+    flush_input(); // Clear any leftover input
+
+    if (strlen(move_input) != 4 && strlen(move_input) != 5) {
+        printf("Invalid move format. Use 4 or 5 characters (e.g., e2e4 or h7h8Q).\n");
+        return false;
+    }
+
+    char from[3], to[3], promotion = '\0';
+    strncpy(from, move_input, 2);
+    from[2] = '\0';
+    strncpy(to, move_input + 2, 2);
+    to[2] = '\0';
+    if (strlen(move_input) == 5) {
+        promotion = move_input[4];
+    }
+
+    Square src = SquareFromName(from);
+    Square dst = SquareFromName(to);
+    uint8_t prom = CharToPromotion(promotion);
+    Move move = MoveEncode(src, dst, prom, FLAG_NORMAL);
+
+    if (!MakeMove(board, move)) {
+        printf("Invalid move. Try again.\n");
+        return false;
+    }
+
+    ansi_clear_screen();
+    BoardPrintMove(board, move);
+    return true;
+}
+
+void BoardInfoPrint(const Board* board)
+{
+    printf("Turn: %s\n", board->turn ? "White" : "Black");
+    printf("Castling rights: %d\n", board->castling_rights);
+    char name[3] = "-";
+    if(board->enpassant_square != 64)
+        SquareToName(name, board->enpassant_square);
+    printf("Enpassant: %s\n", name);
+}
+#define BOARD_PRINT(board) \
+    do { \
+        BoardPrint(&board, 64); \
+        BoardInfoPrint(&board); \
+    } while(0)
+
+int game(const char* fen)
+{
+    Board board;
+    BoardInitFen(&board, fen);
+    ansi_clear_screen();
+    BOARD_PRINT(board);
+
+    while(1){
+        int option = menu("Options", 2, menu_arrow_print_option, "Move", "Legal", "Pseudo", "Exit", NULL);
+        ansi_clear_screen();
+        switch (option) {
+        case 0:
+            BOARD_PRINT(board);
+            move(&board);
+            break;
+        case 1:
+            BoardPrintBitboard(&board, GenerateLegalMovesBitboard(&board));
+            BoardInfoPrint(&board);
+            break;
+        case 2: 
+            BoardPrintBitboard(&board, GeneratePseudoLegalMovesBitboard(&board));
+            BoardInfoPrint(&board);
+            break;
+        case 3:
+            menu_enable_input_buffering();
+            exit(0);
+        }
+    }
+    return 0;
+}
+
+#define forrange(index, from, to) \
+    for(index = from; (from < to) ? i < to : i > to; (from < to) ? i++ : i--)
 
 int main(int argc, char** argv){
     InitZobrist();
     InitMasks();
 
-    Board board;
-    BoardInitFen(&board, "r3kbnr/ppNp1ppp/4b3/1B1Pp2q/4nP2/4P1P1/PPP4P/R1BQK1NR b kq - 0 1");
-
-    BoardPrintBitboard(&board, GeneratePseudoLegalAttacks(&board, COLOR_WHITE));
+    game(NULL);
 
     return 0;
 }

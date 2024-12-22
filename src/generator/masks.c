@@ -94,8 +94,15 @@ void InitMasks()
     for (int square = 0; square < 64; ++square) {
         PAWN_PUSH_MASKS[COLOR_WHITE][square] = ComputePawnPushMask(square, COLOR_WHITE);
         PAWN_PUSH_MASKS[COLOR_BLACK][square] = ComputePawnPushMask(square, COLOR_BLACK);
+        PAWN_DOUBLE_PUSH_MASKS[COLOR_WHITE][square] = ComputePawnDoublePushMask(square, COLOR_WHITE);
+        PAWN_DOUBLE_PUSH_MASKS[COLOR_BLACK][square] = ComputePawnDoublePushMask(square, COLOR_BLACK);
         PAWN_ATTACK_MASKS[COLOR_WHITE][square] = ComputePawnAttackMask(square, COLOR_WHITE);
         PAWN_ATTACK_MASKS[COLOR_BLACK][square] = ComputePawnAttackMask(square, COLOR_BLACK);
+        PAWN_PROMOTION_MASKS[COLOR_WHITE][square] = ComputePawnPromotionMask(square, COLOR_WHITE);
+        PAWN_PROMOTION_MASKS[COLOR_BLACK][square] = ComputePawnPromotionMask(square, COLOR_BLACK);
+        PAWN_PROMOTION_ATTACK_MASKS[COLOR_WHITE][square] = ComputePawnPromotionAttackMask(square, COLOR_WHITE);
+        PAWN_PROMOTION_ATTACK_MASKS[COLOR_BLACK][square] = ComputePawnPromotionAttackMask(square, COLOR_BLACK);
+
         KNIGHT_MOVE_MASKS[square] = ComputeKnightMoveMask(square);
         BISHOP_MOVE_MASKS[square] = ComputeBishopMoveMask(square);
         ROOK_MOVE_MASKS[square] = ComputeRookMoveMask(square);
@@ -121,16 +128,26 @@ Bitboard BlockerMasks(Bitboard slidingPiece, Bitboard occupancy)
 
 Bitboard ComputePawnPushMask(Square square, Color color)
 {
-    Bitboard bb = 1ULL << square, oneSquarePush, twoSquarePush;
+    Bitboard bb = 1ULL << square, oneSquarePush;
     if(color == COLOR_WHITE){
         oneSquarePush = (bb << 8);
-        twoSquarePush = (bb & RANK_2) << 8;
     } else {
         oneSquarePush = (bb >> 8);
-        twoSquarePush = (bb & RANK_7) >> 8;
     }
 
-    return oneSquarePush | twoSquarePush;
+    return oneSquarePush;
+}
+
+Bitboard ComputePawnDoublePushMask(Square square, Color color)
+{
+    Bitboard bb = 1ULL << square, twoSquarePush;
+    if(color == COLOR_WHITE){
+        twoSquarePush = (bb & RANK_2) << 16;
+    } else {
+        twoSquarePush = (bb & RANK_7) >> 16;
+    }
+
+    return twoSquarePush;
 }
 
 Bitboard ComputePawnAttackMask(Square square, Color color)
@@ -217,10 +234,23 @@ Bitboard PawnPushMask(Square square, Color color)
 {
     return PAWN_PUSH_MASKS[color][square];
 }
+Bitboard PawnDoublePushMask(Square square, Color color)
+{
+    return PAWN_DOUBLE_PUSH_MASKS[color][square];
+}
 Bitboard PawnAttackMask(Square square, Color color)
 {
     return PAWN_ATTACK_MASKS[color][square];
 }
+Bitboard PawnPromotionMask(Square square, Color color)
+{
+    return PAWN_PROMOTION_MASKS[color][square];
+}
+Bitboard PawnPromotionAttackMask(Square square, Color color)
+{
+    return PAWN_PROMOTION_ATTACK_MASKS[color][square];
+}
+
 Bitboard KnightMoveMask(Square square)
 {
     return KNIGHT_MOVE_MASKS[square];

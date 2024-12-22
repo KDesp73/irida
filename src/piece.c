@@ -16,3 +16,9 @@ Piece PieceAt(const Board* board, Square square)
     return result;
 }
 
+bool PieceCmp(Piece p1, Piece p2)
+{
+    return p1.type == p2.type
+        && p1.color == p2.color;
+}
+

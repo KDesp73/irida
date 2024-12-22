@@ -2,6 +2,7 @@
 #include "board.h"
 #include "move.h"
 #include "hashing.h"
+#include "history.h"
 #include "masks.h"
 #include "piece.h"
 #include "square.h"
@@ -51,6 +52,17 @@ Moves BitboardToMoves(Bitboard bitboard, Square from)
         moves.list[moves.count++] = MoveEncode(from, to, PROMOTION_NONE, FLAG_NORMAL);
     }
     return moves;
+}
+
+Bitboard MovesToBitboard(Moves moves)
+{
+    Bitboard bb = 0ULL;
+
+    for(size_t i = 0; i < moves.count; i++){
+        bb |= BB(GetTo(moves.list[i]));
+    }
+
+    return bb;
 }
 
 Move MoveEncodeNames(const char* from, const char* to, uint8_t promotion, uint8_t flag)
@@ -358,9 +370,6 @@ bool Enpassant(Board* board, Move move)
     board->bitboards[!color * 6 + INDEX_BLACK_PAWN] &= ~(1ULL << captured_square);
     board->grid[COORDS(captured_square)] = ' ';
 
-    // Clear the en passant target square (no en passant is possible now)
-    board->enpassant_square = 64;
-
     // Update the halfmove clock
     board->halfmove = 0;
 
@@ -422,11 +431,7 @@ bool MakeMove(Board* board, Move move)
 
 void UnmakeMove(Board* board)
 {
-    Undo undo = board->history.moves[board->history.count-1];
-
-    board->halfmove = undo.fiftyMove;
-    board->enpassant_square = undo.enpassant;
-    board->castling_rights = undo.castling;
+    Undo undo = LoadLastUndo(board);
 
     MOVE_DECODE(undo.move);
 

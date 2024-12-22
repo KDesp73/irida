@@ -4,85 +4,32 @@
 #include "square.h"
 #include <io/logging.h>
 #include <stdint.h>
+#include <stdlib.h>
 
-
-Bitboard whitePawnPushes(Square pawn, Bitboard emptySquares)
-{
-    Bitboard pawns = 1ULL << pawn;
-    Bitboard oneSquarePushes = (pawns << 8) & emptySquares;
-    Bitboard twoSquarePushes = (((pawns & RANK_2) << 8) & emptySquares) << 8 & emptySquares;
-
-    return oneSquarePushes | twoSquarePushes;
-}
-
-Bitboard blackPawnPushes(Square pawn, Bitboard emptySquares)
-{
-    Bitboard pawns = 1ULL << pawn;
-    Bitboard oneSquarePushes = (pawns >> 8) & emptySquares;
-    Bitboard twoSquarePushes = (((pawns & RANK_7) >> 8) & emptySquares) >> 8 & emptySquares;
-
-    return oneSquarePushes | twoSquarePushes;
-}
 
 Bitboard PawnPushes(Square pawn, Bitboard emptySquares, uint8_t color)
 {
-    return (color)
-        ? whitePawnPushes(pawn, emptySquares)
-        : blackPawnPushes(pawn, emptySquares);
+    Bitboard oneSquarePushes = PawnPushMask(pawn, color) & emptySquares;
+
+    Direction dir = color ? NORTH : SOUTH;
+
+    Bitboard twoSquarePushes = 0ULL;
+    if (oneSquarePushes != 0) {
+        twoSquarePushes = PawnDoublePushMask(pawn, color) & emptySquares & shift(oneSquarePushes, dir);
+    }
+
+    return oneSquarePushes | twoSquarePushes;
 }
 
-
-Bitboard whitePawnPromotions(Square pawn, Bitboard emptySquares)
-{
-    Bitboard pawns = 1ULL << pawn;
-    return (pawns << 8) & emptySquares & RANK_8;
-}
-
-Bitboard blackPawnPromotions(Square pawn, Bitboard emptySquares)
-{
-    Bitboard pawns = 1ULL << pawn;
-    return (pawns >> 8) & emptySquares & RANK_1;
-}
 Bitboard PawnPromotions(Square pawn, Bitboard emptySquares, uint8_t color)
 {
-    Bitboard pawns = 1ULL << pawn;
-    return (color)
-        ? whitePawnPromotions(pawns, emptySquares)
-        : blackPawnPromotions(pawns, emptySquares);
-}
-
-Bitboard whitePawnPromotionCaptures(Square pawn, Bitboard opponentPieces)
-{
-    Bitboard pawns = 1ULL << pawn;
-    // Capture to the left and promote
-    Bitboard leftCapture = (pawns << 7) & opponentPieces & ~FILE_H & RANK_8;
-
-    // Capture to the right and promote
-    Bitboard rightCapture = (pawns << 9) & opponentPieces & ~FILE_A & RANK_8;
-
-    return leftCapture | rightCapture;
-}
-
-Bitboard blackPawnPromotionCaptures(Square pawn, Bitboard opponentPieces)
-{
-    Bitboard pawns = 1ULL << pawn;
-    // Capture to the left and promote
-    Bitboard leftCapture = (pawns >> 9) & opponentPieces & ~FILE_H & RANK_1;
-
-    // Capture to the right and promote
-    Bitboard rightCapture = (pawns >> 7) & opponentPieces & ~FILE_A & RANK_1;
-
-    return leftCapture | rightCapture;
+    return PawnPromotionMask(pawn, color) & emptySquares;
 }
 
 Bitboard PawnPromotionCaptures(Square pawn, Bitboard opponentPieces, uint8_t color)
 {
-    Bitboard pawns = 1ULL << pawn;
-    return (color)
-        ? whitePawnPromotionCaptures(pawns, opponentPieces)
-        : blackPawnPromotionCaptures(pawns, opponentPieces);
+    return PawnPromotionAttackMask(pawn, color) & opponentPieces;
 }
-
 
 Bitboard PawnAttacks(Square pawn, Bitboard enemySquares, uint8_t color)
 {
