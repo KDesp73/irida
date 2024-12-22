@@ -122,55 +122,65 @@ uint8_t UpdateCastlingRights(Board* board, Move move)
     Square from = GetFrom(move);
     Square to = GetTo(move);
     Piece piece = PieceAt(board, from);
-    Piece toPiece = PieceAt(board, to);
+    Piece to_piece = PieceAt(board, to);
     int color = piece.color;
     uint8_t castling_rights = board->castling_rights;
 
     // Handle rook moves: disable relevant castling rights
     if (IS_ROOK(piece)) {
-        if (color == COLOR_WHITE) {
-            if (from == 0) {
-                castling_rights &= ~CASTLE_WHITE_QUEENSIDE;
+        switch (color) {
+        case WHITE:
+            switch (from) {
+                case 0: castling_rights &= ~CASTLE_WHITE_QUEENSIDE; break;
+                case 7: castling_rights &= ~CASTLE_WHITE_KINGSIDE; break;
+                default: break;
             }
-            if (from == 7) {
-                castling_rights &= ~CASTLE_WHITE_KINGSIDE;
+            break;
+        case BLACK:
+            switch (from) {
+                case 56: castling_rights &= ~CASTLE_BLACK_QUEENSIDE; break;
+                case 63: castling_rights &= ~CASTLE_BLACK_KINGSIDE; break;
+                default: break;
             }
-        } else if (color == COLOR_BLACK) {
-            if (from == 56) {
-                castling_rights &= ~CASTLE_BLACK_QUEENSIDE;
-            }
-            if (from == 63) {
-                castling_rights &= ~CASTLE_BLACK_KINGSIDE;
-            }
+            break;
+        case COLOR_NONE:
+            break;
         }
     }
 
-    // If rook is captured we can't castle there
-    if (IS_ROOK(toPiece)) {
-        if (color == COLOR_WHITE) {
-            if (to == 0) {
-                castling_rights &= ~CASTLE_WHITE_QUEENSIDE;
-            }
-            if (to == 7) {
-                castling_rights &= ~CASTLE_WHITE_KINGSIDE;
-            }
-        } else if (color == COLOR_BLACK) {
-            if (to == 56) {
-                castling_rights &= ~CASTLE_BLACK_QUEENSIDE;
-            }
-            if (to == 63) {
-                castling_rights &= ~CASTLE_BLACK_KINGSIDE;
-            }
-        }
-    }
-
+    // Handle king moves: disable all castling rights for that color
     if (IS_KING(piece)) {
-        if (color == COLOR_BLACK) {
-            castling_rights &= ~CASTLE_BLACK_KINGSIDE;
-            castling_rights &= ~CASTLE_BLACK_QUEENSIDE;
-        } else if (color == COLOR_WHITE) {
-            castling_rights &= ~CASTLE_WHITE_KINGSIDE;
-            castling_rights &= ~CASTLE_WHITE_QUEENSIDE;
+        switch (color) {
+            case WHITE:
+                castling_rights &= ~(CASTLE_WHITE_KINGSIDE | CASTLE_WHITE_QUEENSIDE);
+                break;
+            case BLACK:
+                castling_rights &= ~(CASTLE_BLACK_KINGSIDE | CASTLE_BLACK_QUEENSIDE);
+                break;
+            case COLOR_NONE:
+                break;
+        }
+    }
+
+    // Handle rook capture: disable castling rights for the opponent
+    if (IS_ROOK(to_piece) && to_piece.color != color) {
+        switch (to_piece.color) {
+            case WHITE:
+                switch (to) {
+                    case 0: castling_rights &= ~CASTLE_WHITE_QUEENSIDE; break;
+                    case 7: castling_rights &= ~CASTLE_WHITE_KINGSIDE; break;
+                    default: break;
+                }
+                break;
+            case BLACK:
+                switch (to) {
+                    case 56: castling_rights &= ~CASTLE_BLACK_QUEENSIDE; break;
+                    case 63: castling_rights &= ~CASTLE_BLACK_KINGSIDE; break;
+                    default: break;
+                }
+                break;
+            case COLOR_NONE:
+                break;
         }
     }
 
