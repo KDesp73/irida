@@ -26,7 +26,7 @@ Moves GenerateLegalPawnMoves(const Board *board, Bitboard pieces, Color color)
                     MovesAppend(&moves, move);
                 }
                 UnmakeMove(&temp);
-            }
+            } else continue;
 
             // Handle promotions
             if(PawnPromotionMask(current, color) || PawnPromotionAttackMask(current, color)) {
@@ -157,6 +157,15 @@ Moves GenerateLegalKingMoves(const Board* board, Bitboard pieces, Color color)
 Bitboard GenerateLegalMovesBitboard(const Board* board)
 {
     return MovesToBitboard(GenerateLegalMoves(board));
+}
+
+bool IsLegal(const Board* board, Move move)
+{
+    Moves moves = GenerateLegalMoves(board);
+    for(size_t i = 0; i < moves.count; i++){
+        if(MoveCmp(moves.list[i], move)) return true;
+    }
+    return false;
 }
 
 Moves GenerateLegalMoves(const Board* board)

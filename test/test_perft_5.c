@@ -7,7 +7,7 @@ int test_perft_5(int depth, u64 expected)
     Board board;
     BoardInitFen(&board, "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8  ");
 
-    u64 count = Perft(&board, depth);
+    u64 count = Perft(&board, depth, true);
     BoardFree(&board);
 
     if(count != expected){

@@ -26,7 +26,7 @@ void perft(int argc, char** argv)
 
     Board board;
     BoardInitFen(&board, NULL);
-    u64 count = Perft(&board, atoi(argv[1]));
+    u64 count = Perft(&board, atoi(argv[1]), true);
     INFO("count: %llu", count);
     BoardFree(&board);
 }
@@ -68,6 +68,11 @@ int move(Board* board)
     uint8_t prom = CharToPromotion(promotion);
     Move move = MoveEncode(src, dst, prom, FLAG_NORMAL);
 
+    if(!IsLegal(board, move)){
+        printf("Illegal Move\n");
+        return false;
+    }
+    
     if (!MakeMove(board, move)) {
         printf("Invalid move. Try again.\n");
         return false;
@@ -100,8 +105,9 @@ int game(const char* fen)
     ansi_clear_screen();
     BOARD_PRINT(board);
 
+    char fenExport[256];
     while(1){
-        int option = menu("Options", 2, menu_arrow_print_option, "Move", "Legal", "Pseudo", "Exit", NULL);
+        int option = menu("Options", 2, menu_arrow_print_option, "Move", "Undo", "Legal", "Pseudo", "Export Fen", "Exit", NULL);
         ansi_clear_screen();
         switch (option) {
         case 0:
@@ -109,14 +115,22 @@ int game(const char* fen)
             move(&board);
             break;
         case 1:
+            UnmakeMove(&board);
+            BOARD_PRINT(board);
+            break;
+        case 2:
             BoardPrintBitboard(&board, GenerateLegalMovesBitboard(&board));
             BoardInfoPrint(&board);
             break;
-        case 2: 
+        case 3: 
             BoardPrintBitboard(&board, GeneratePseudoLegalMovesBitboard(&board));
             BoardInfoPrint(&board);
             break;
-        case 3:
+        case 4:
+            FenExport(&board, fenExport);
+            printf("%s\n", fenExport);
+            break;
+        case 5:
             menu_enable_input_buffering();
             exit(0);
         }
@@ -131,7 +145,7 @@ int main(int argc, char** argv){
     InitZobrist();
     InitMasks();
 
-    game(NULL);
+    game(argv[1]);
 
     return 0;
 }

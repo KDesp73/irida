@@ -21,10 +21,9 @@ bool IsInCheck(const Board *board)
 
 bool IsInCheckColor(const Board* board, Color color)
 {
-    size_t offset = color ? 6 : 0;
     Bitboard enemyAttacks = GeneratePseudoLegalAttacks(board, !color);
 
-    return IsKingInCheck(board->bitboards[offset + INDEX_BLACK_KING], enemyAttacks);
+    return IsKingInCheck(board->bitboards[color*6 + INDEX_BLACK_KING], enemyAttacks);
 }
 
 Board BoardCopy(const Board* board)
@@ -94,7 +93,7 @@ Square UpdateEnpassantSquare(Board* board, Move move)
 {
     Piece piece = PieceAt(board, GetFrom(move));
 
-    if(IS_PAWN(piece)) {
+    if(!IS_PAWN(piece)) {
         goto no_enpassant;
     }
 
@@ -118,15 +117,17 @@ no_enpassant:
     return 64;
 }
 
-uint8_t UpdateCastlingRights(Board* board, Square from, Square to)
+uint8_t UpdateCastlingRights(Board* board, Move move)
 {
+    Square from = GetFrom(move);
+    Square to = GetTo(move);
     Piece piece = PieceAt(board, from);
     Piece toPiece = PieceAt(board, to);
     int color = piece.color;
     uint8_t castling_rights = board->castling_rights;
 
     // Handle rook moves: disable relevant castling rights
-    if (piece.type == 'r' || piece.type == 'R') {
+    if (IS_ROOK(piece)) {
         if (color == COLOR_WHITE) {
             if (from == 0) {
                 castling_rights &= ~CASTLE_WHITE_QUEENSIDE;
@@ -145,7 +146,7 @@ uint8_t UpdateCastlingRights(Board* board, Square from, Square to)
     }
 
     // If rook is captured we can't castle there
-    if (toPiece.type == 'r' || toPiece.type == 'R') {
+    if (IS_ROOK(toPiece)) {
         if (color == COLOR_WHITE) {
             if (to == 0) {
                 castling_rights &= ~CASTLE_WHITE_QUEENSIDE;
@@ -163,13 +164,11 @@ uint8_t UpdateCastlingRights(Board* board, Square from, Square to)
         }
     }
 
-    if (piece.type == 'k') {
+    if (IS_KING(piece)) {
         if (color == COLOR_BLACK) {
             castling_rights &= ~CASTLE_BLACK_KINGSIDE;
             castling_rights &= ~CASTLE_BLACK_QUEENSIDE;
-        }
-    } else if (piece.type == 'K') {
-        if (color == COLOR_WHITE) {
+        } else if (color == COLOR_WHITE) {
             castling_rights &= ~CASTLE_WHITE_KINGSIDE;
             castling_rights &= ~CASTLE_WHITE_QUEENSIDE;
         }

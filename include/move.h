@@ -95,11 +95,16 @@ bool Castle(Board* board, Move move);
 bool IsCastle(const Board* board, Move* move);
 bool Enpassant(Board* board, Move move);
 bool IsEnpassant(const Board* board, Move* move);
+bool IsDoublePawnPush(Board* board, Move move);
+bool IsPromotion(Board* board, Move* move);
 
 _Bool MoveMake(Board* board, Move move);
 void MoveFreely(Board* board, Move move, Color color);
 void MovePrint(Move move);
 void MoveToString(Move move, char* buffer);
+
+bool MoveCmp(Move m1, Move m2);
+bool MoveCmpStrict(Move m1, Move m2);
 
 Square GetFrom(Move move);
 Square GetTo(Move move);
@@ -108,7 +113,7 @@ uint8_t GetFlag(Move move);
 
 
 void UpdateHalfmove(Board* board, Move move, size_t piece_count_before, size_t piece_count_after, char piece);
-uint8_t UpdateCastlingRights(Board* board, Square from, Square to);
+uint8_t UpdateCastlingRights(Board* board, Move move);
 Square UpdateEnpassantSquare(Board* board, Move move);
 
 Moves BitboardToMoves(Bitboard bitboard, Square from);

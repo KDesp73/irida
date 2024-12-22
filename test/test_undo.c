@@ -1,7 +1,7 @@
 #include <io/test.h>
 #include "board.h"
-#include "square.h"
 #include "tests.h"
+#include "move.h"
 
 #define DEBUG
 #include <io/logging.h>

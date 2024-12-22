@@ -1,46 +1,33 @@
 #include "perft.h"
 #include "board.h"
 #include "generator.h"
+#include <stdio.h>
 
-u64 Perft(Board* board, int depth)
+u64 Perft(Board* board, int depth, bool root)
 {
-    int i;
-    int n_moves;
-    u64 nodes = 0;
-
-    Moves moves = GeneratePseudoLegalMoves(board);
-    n_moves = moves.count;
-
-    if (depth == 1) 
-        return (u64) moves.count;
-
-    for (i = 0; i < n_moves; i++) {
-        if(!MakeMove(board, moves.list[i])) continue;
-        if (!IsInCheck(board)) {
-            nodes += Perft(board, depth - 1);
-        }
-        UnmakeMove(board);
-    }
-
-    return nodes;
-}
-
-u64 PerftLegal(Board* board, int depth)
-{
-    int i;
-    int n_moves;
-    u64 nodes = 0;
+    uint64_t cnt = 0, nodes = 0;
+    bool leaf = (depth == 2);
 
     Moves moves = GenerateLegalMoves(board);
-    n_moves = moves.count;
+    for (int i = 0; i < moves.count; i++) {
+        Move move = moves.list[i];
 
-    if (depth == 1) 
-        return (u64) moves.count;
+        if (root && depth <= 1) {
+            cnt = 1;
+            nodes++;
+        } else {
+        if (!MakeMove(board, move)) continue;
+            cnt = leaf ? GenerateLegalMoves(board).count : Perft(board, depth - 1, false);
+            nodes += cnt;
 
-    for (i = 0; i < n_moves; i++) {
-        if(!MakeMove(board, moves.list[i])) continue;
-        nodes += Perft(board, depth - 1);
-        UnmakeMove(board);
+            UnmakeMove(board);
+        }
+
+        if (root) {
+            char moveStr[16];
+            MoveToString(move, moveStr);
+            printf("%s: %lu\n", moveStr, cnt);
+        }
     }
 
     return nodes;

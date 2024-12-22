@@ -28,6 +28,8 @@ Bitboard GenerateKingMoves(const Board* board, Square piece, Color color);
 
 /*** Legal Moves ***/
 
+bool IsLegal(const Board* board, Move move);
+
 Moves GenerateLegalMoves(const Board* board);
 Bitboard GenerateLegalMovesBitboard(const Board* board);
 

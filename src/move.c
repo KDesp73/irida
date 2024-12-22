@@ -15,6 +15,20 @@
 #include <stdlib.h>
 #include <stdlib.h>
 
+bool MoveCmpStrict(Move m1, Move m2)
+{
+    return MoveCmp(m1, m2) && GetFlag(m1) == GetFlag(m2);
+}
+
+
+bool MoveCmp(Move m1, Move m2)
+{
+    return (
+        GetFrom(m1) == GetFrom(m2) &&
+        GetTo(m1) == GetTo(m2) &&
+        GetPromotion(m1) == GetPromotion(m2));
+}
+
 void MoveSetFlag(Move* move, Flag flag)
 {
     *move &= ~(0x7 << 16);
@@ -178,7 +192,6 @@ _Bool MoveIsValid(const Board* board, Move move, Color color)
     uint8_t promotion, flags;
     MoveDecode(move, &from, &to, &promotion, &flags);
     uint64_t from_bb = 1ULL << from;
-    uint64_t to_bb = 1ULL << to;
 
     for (int piece = 0; piece < 6; piece++) {
         if (board->bitboards[color * 6 + piece] & from_bb) {
@@ -391,15 +404,30 @@ bool IsPromotion(Board* board, Move* move)
     return true;
 }
 
+bool IsDoublePawnPush(Board* board, Move move)
+{
+    Square from = GetFrom(move);
+    Piece piece = PieceAt(board, from);
+    if(!IS_PAWN(piece)) return false;
+
+    Bitboard doublePushes = PawnDoublePushMask(from, piece.color);
+
+    return doublePushes & BB(GetTo(move));
+}
+
 bool MakeMove(Board* board, Move move)
 {
-
     Piece piece = PieceAt(board, GetFrom(move));
     if(piece.color != board->turn) return false;
     if(piece.type == COLOR_NONE) return false;
 
-    Square enpassant = UpdateEnpassantSquare(board, move);
-    uint8_t castling = UpdateCastlingRights(board, GetFrom(move), GetTo(move));
+    uint8_t castling = UpdateCastlingRights(board, move);
+    Square enpassant;
+    if(IsDoublePawnPush(board, move)){
+        enpassant = GetFrom(move) + ((piece.color) ? 8 : -8);
+    } else {
+        enpassant = 64;
+    }
 
     bool succ = true;
     if(IsCastle(board, &move)){
@@ -410,13 +438,15 @@ bool MakeMove(Board* board, Move move)
 
     if(!succ) return false;
 
+
     IsPromotion(board, &move);
 
     HistoryAddUndo(&board->history, board, move);
 
     MoveFreely(board, move, board->turn);
-    board->enpassant_square = enpassant;
+
     board->castling_rights = castling;
+    board->enpassant_square = enpassant;
 
     if (board->turn == COLOR_BLACK) {
         board->fullmove++;

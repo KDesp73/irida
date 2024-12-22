@@ -24,6 +24,7 @@
 	test_is_in_check("5rk1/5p1p/8/8/8/8/8/B5RK b - - 0 1", 1), \
 	test_is_in_check("rnbqkb1r/p1P1pppp/1p6/3n4/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1", 0), \
 	test_is_in_check("rnbqkb1r/p1P1pppp/1p6/3n4/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1", 0), \
-	test_is_in_check("rnbRkb1r/p3pppp/1p6/3n4/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1", 1)
+	test_is_in_check("rnbRkb1r/p3pppp/1p6/3n4/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1", 1), \
+	test_is_in_check("rnbqkbnr/pppp2pp/5p2/4p2Q/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 0 1", 1)
 
 #endif

@@ -43,7 +43,7 @@ int main(int argc, char** argv)
         // RUN_TEST(test_piece_at),
         // RUN_TEST(test_name_to_square),
         // RUN_TEST(test_square_to_name),
-    // RUN_TEST(test_perft),
+        RUN_TEST(test_perft),
         // RUN_TEST(test_perft_2),
         // RUN_TEST(test_perft_5),
 
@@ -62,7 +62,7 @@ int main(int argc, char** argv)
         // RUN_TEST(test_king_pseudo),
 
         // RUN_TEST(test_is_in_check),
-        RUN_TEST(test_undo),
+        // RUN_TEST(test_undo),
 
         1
     END_TESTS

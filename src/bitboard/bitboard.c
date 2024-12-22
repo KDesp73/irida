@@ -4,7 +4,7 @@
 
 Square lsb(Bitboard b)
 {
-    assert(b);
+    if(!b) return 64;
 
 #if defined(__GNUC__)
     return (Square)(__builtin_ctzll(b));
