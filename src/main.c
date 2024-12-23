@@ -6,6 +6,7 @@
 #include "notation.h"
 #include "perft.h"
 #include "square.h"
+#include "uci.h"
 #include "zobrist.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -107,7 +108,7 @@ int game(const char* fen)
 
     char fenExport[256];
     while(1){
-        int option = menu("Options", 2, menu_arrow_print_option, "Move", "Undo", "Legal", "Pseudo", "Export Fen", "Exit", NULL);
+        int option = menu("Options", 3, menu_arrow_print_option, "Move", "Undo", "Legal", "Pseudo", "Export Fen", "Exit", NULL);
         ansi_clear_screen();
         switch (option) {
         case 0:
@@ -141,11 +142,28 @@ int game(const char* fen)
 #define forrange(index, from, to) \
     for(index = from; (from < to) ? i < to : i > to; (from < to) ? i++ : i--)
 
+void legal()
+{
+    Board board;
+    BoardInitFen(&board, "2kr2r1/ppp1bP1p/6P1/4q3/2p5/P2p4/RPP5/2BK2R1 b - - 0 8");
+
+    Moves moves = GenerateLegalMoves(&board);
+    size_t i;
+    forrange(i, 0, moves.count){
+        char moveStr[6];
+        MoveToString(moves.list[i], moveStr);
+        printf("%s\n", moveStr);
+    }
+}
+
+
 int main(int argc, char** argv){
     InitZobrist();
     InitMasks();
 
-    game(argv[1]);
+    UciMain(argc, argv);
 
+    // game(argv[1]);
+    
     return 0;
 }

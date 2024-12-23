@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdlib.h>
+#include <string.h>
 
 bool MoveCmpStrict(Move m1, Move m2)
 {
@@ -166,10 +167,26 @@ void MoveToString(Move move, char* buffer)
     Square from, to;
     uint8_t promotion, flag;
     MoveDecode(move, &from, &to, &promotion, &flag);
+
     char fromName[3], toName[3];
     SquareToName(fromName, from);
     SquareToName(toName, to);
-    sprintf(buffer, "%s%s", fromName, toName); 
+
+    char p[2] = "";
+    switch (promotion) {
+        case PROMOTION_QUEEN:
+            strcpy(p, "q"); break;
+        case PROMOTION_ROOK:
+            strcpy(p, "r"); break;
+        case PROMOTION_BISHOP:
+            strcpy(p, "b"); break;
+        case PROMOTION_KNIGHT:
+            strcpy(p, "n"); break;
+        case PROMOTION_NONE:
+            p[0] = '\0'; break; // Ensure it's an empty string
+    }
+
+    sprintf(buffer, "%s%s%s", fromName, toName, p); 
 }
 
 void MovePrint(Move move)
