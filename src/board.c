@@ -19,7 +19,7 @@ bool IsInCheck(const Board *board)
     return IsInCheckColor(board, board->turn);
 }
 
-bool IsInCheckColor(const Board* board, Color color)
+bool IsInCheckColor(const Board* board, PieceColor color)
 {
     Bitboard enemyAttacks = GeneratePseudoLegalAttacks(board, !color);
 
@@ -70,7 +70,7 @@ void BoardInitFen(Board *board, const char *fen)
 }
 
 
-bool IsSquareOccupiedBy(const Board* board, Square square, Color color)
+bool IsSquareOccupiedBy(const Board* board, Square square, PieceColor color)
 {
     uint64_t occupied = 0;
     for (int i = color * 6; i < (color + 1) * 6; ++i) {
@@ -190,7 +190,7 @@ uint8_t UpdateCastlingRights(Board* board, Move move)
 
 void UpdateHalfmove(Board* board, Move move, size_t piece_count_before, size_t piece_count_after, char piece)
 {
-    int color = PieceColor(piece);
+    int color = Color(piece);
     int direction = (color == COLOR_WHITE) ? 1 : -1;
     bool is_pawn = tolower(piece) == 'p';
     bool is_capture = (piece_count_after < piece_count_before);
@@ -209,7 +209,7 @@ void UpdateHalfmove(Board* board, Move move, size_t piece_count_before, size_t p
     }
 }
 
-size_t NumberOfPieces(const Board* board, Color color)
+size_t NumberOfPieces(const Board* board, PieceColor color)
 {
     size_t count = 0;
 
@@ -241,7 +241,7 @@ Bitboard GetBlack(const Board* board)
          | board->bitboards[INDEX_BLACK_KING];
 }
 
-Bitboard GetEnemyColor(const Board *board, Color us)
+Bitboard GetEnemyColor(const Board *board, PieceColor us)
 {
     return (us) 
         ? GetBlack(board)

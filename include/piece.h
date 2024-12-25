@@ -6,7 +6,7 @@
 #include <stdint.h>
 typedef struct {
     char type;
-    Color color;
+    PieceColor color;
 } Piece;
 
 #define PIECE_PRINT(piece)\
@@ -31,7 +31,7 @@ typedef struct {
     (piece.color == COLOR_BLACK)
 
 
-int PieceColor(char piece);
+int Color(char piece);
 Piece PieceAt(const Board* board, Square square);
 bool PieceCmp(Piece p1, Piece p2);
 

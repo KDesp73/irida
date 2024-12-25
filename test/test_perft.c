@@ -1,19 +1,9 @@
 #include "perft.h"
 #include "tests.h"
 #include <io/test.h>
+#include "test-perft.h"
 
 int test_perft(int depth, u64 expected)
 {
-    Board board;
-    BoardInitFen(&board, NULL);
-    u64 count = Perft(&board, depth, true);
-    BoardFree(&board);
-
-    if(count != expected){
-        FAIL("For depth %d. Expected %llu. Found %llu", depth, expected, count);
-        return 0;
-    }
-
-    SUCC("For depth %d", depth);
-    return 1;
+    PERFT_TEST(NULL, depth, expected);
 }

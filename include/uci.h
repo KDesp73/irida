@@ -2,12 +2,75 @@
 #define ENGINE_UCI_H
 
 #include "board.h"
+#include "perft.h"
+#include <io/logging.h>
+#include <stdbool.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #define INLINE static inline 
 
-#define ANSI_IMPLEMENTATION
-#include <io/ansi.h>
-#include <stdio.h>
-#include <string.h>
+typedef enum {
+    UCI_CHECK,   // Checkbox option (true/false)
+    UCI_SPIN,    // Integer spin (range of values)
+    UCI_COMBO,   // Dropdown menu of values
+    UCI_STRING   // Free-text input
+} UciOptionType;
+
+typedef struct {
+    char name[64];                 // Name of the option
+    UciOptionType type;            // Type of the option
+    union {
+        bool check;                // Value for UCI_CHECK
+        int spin;                  // Value for UCI_SPIN
+        char combo[64];            // Value for UCI_COMBO
+        char string[128];          // Value for UCI_STRING
+    } value;                       // Current value of the option
+    union {
+        struct { int min, max; };  // Range for UCI_SPIN
+        char combos[10][64];       // List of values for UCI_COMBO
+    } params;                      // Parameters for the option (if applicable)
+    char default_value[128];       // Default value (for resetting)
+} UciOption;
+
+void PrintUciOptions();
+void InitUciOptions();
+
+typedef struct {
+    char startPositionFen[128];    // The starting position in FEN notation
+    bool uciMode;                  // Whether the engine is currently running in UCI mode
+    bool debugMode;                // Debug mode
+    int depthLimit;                // Search depth limit for the engine
+    int timeLeft[2];               // Remaining time for each player (milliseconds) [0] = white, [1] = black
+    int increment[2];              // Increment per move for each player (milliseconds) [0] = white, [1] = black
+    int movesToGo;                 // Moves to the next time control, if applicable
+    bool ponderMode;               // Whether ponder mode is enabled
+    bool infiniteMode;             // Whether infinite search mode is enabled
+    bool stopRequested;            // Whether a stop command has been received
+
+    UciOption uciOptions[10];      // Array of UCI options
+    size_t uciOptionCount;         // Number of UCI options available
+    char lastCommand[128];         // Stores the last command received 
+    
+    Board board;
+} State;
+
+static State state = {0};
+
+INLINE void StateSetStartPos(const char* startpos)
+{
+    strncpy(state.startPositionFen, startpos, sizeof(state.startPositionFen) - 1);
+    state.startPositionFen[sizeof(state.startPositionFen) - 1] = '\0'; // Null-terminate
+    BoardInitFen(&state.board, state.startPositionFen);
+}
+
+INLINE void InitState()
+{
+    InitUciOptions();
+    memset(&state, 0, sizeof(state)); // Zero out state
+    StateSetStartPos(STARTING_FEN);
+}
 
 #define ENGINE_NAME "chess-engine"
 #define ENGINE_AUTHOR "KDesp73"
@@ -20,6 +83,8 @@
 #define COMMAND_GO "go"
 #define COMMAND_STOP "stop"
 #define COMMAND_QUIT "quit"
+#define COMMAND_DEBUG "debug"
+#define COMMAND_DISPLAY "d"
 
 #define FLUSH fflush(stdout)
 
@@ -27,82 +92,148 @@ int UciMain(int argc, char** argv);
 
 INLINE void uci()
 {
+    state.uciMode = true;
     printf("id name %s\n", ENGINE_NAME);
     printf("id author %s\n", ENGINE_AUTHOR);
-    printf("uciok\n");
-    FLUSH;
-}
+    printf("\n");
 
+    PrintUciOptions();
+    printf("uciok\n");
+}
 
 INLINE void isready()
 {
     printf("readyok\n");
-    FLUSH;
 }
 
 INLINE void ucinewgame()
 {
-    // TODO: reset engine state for a new game
+    // Reset engine state for a new game
+    InitState();
     printf("info New game started.\n");
-    FLUSH;
 }
 
 INLINE void position(const char* command)
 {
-    if(!strcmp(command, COMMAND_POSITION)) goto quit;
-    
-    char fen[128];
-    if (!strcmp(command, "startpos")){
+    char fen[128] = {0};
+
+    if (strncmp(command, "position startpos", 17) == 0) {
         strcpy(fen, STARTING_FEN);
-    } else if(!strcmp(command, "fen")){
-        strcpy(fen, command);
+    } else if (strncmp(command, "position fen ", 13) == 0) {
+        strncpy(fen, command + 13, sizeof(fen) - 1);
+        fen[sizeof(fen) - 1] = '\0'; // Ensure null-termination
     }
 
-quit:
-    FLUSH;
+    if (strlen(fen) > 0) {
+        StateSetStartPos(fen);
+    } else {
+        printf("info string Invalid position command\n");
+    }
+
 }
 
-INLINE void go()
+INLINE void go(const char* command)
 {
-    // TODO: Calculate best move
-    printf("bestmove e2e4\n");
-    FLUSH;
+    if (strncmp(command, "go perft ", 9) == 0) {
+        int depth = atoi(command + 9);
+        int nodes = Perft(&state.board, depth, true);
+        printf("\nNodes searched: %d\n", nodes);
+    } else {
+        // TODO: Calculate best move
+        printf("bestmove e2e4\n");
+    }
 }
 
 INLINE void stop()
 {
-    // TODO: handle stop command in case calculation is running
+    // TODO: Handle stop command if a calculation is running
+    state.stopRequested = true;
     printf("info Calculation stopped.\n");
-    FLUSH;
 }
 
 INLINE void quit()
 {
     printf("info Quitting...\n");
-    FLUSH;
     exit(0);
 }
 
+INLINE void setoption(const char *command)
+{
+    char option_name[64];
+    char option_value[128];
+
+    if (sscanf(command, "setoption name %63s value %127[^\n]", option_name, option_value) != 2) {
+        printf("info string Invalid setoption format\n");
+        return;
+    }
+
+    for (size_t i = 0; i < state.uciOptionCount; i++) {
+        if (strcmp(state.uciOptions[i].name, option_name) == 0) {
+            switch (state.uciOptions[i].type) {
+                case UCI_CHECK:
+                    state.uciOptions[i].value.check = (strcmp(option_value, "true") == 0);
+                    break;
+                case UCI_SPIN:
+                    state.uciOptions[i].value.spin = atoi(option_value);
+                    break;
+                case UCI_COMBO:
+                    strncpy(state.uciOptions[i].value.combo, option_value, sizeof(state.uciOptions[i].value.combo) - 1);
+                    break;
+                case UCI_STRING:
+                    strncpy(state.uciOptions[i].value.string, option_value, sizeof(state.uciOptions[i].value.string) - 1);
+                    break;
+                default:
+                    printf("info string Unknown option type\n");
+                    return;
+            }
+            printf("info string Option %s set to %s\n", option_name, option_value);
+            return;
+        }
+    }
+
+    printf("info string Unknown option: %s\n", option_name);
+}
+
+INLINE void debug(const char* command)
+{
+    state.debugMode = strcmp(command + strlen(COMMAND_DEBUG), "on") == 0;
+}
+
+INLINE void display()
+{
+    BoardPrint(&state.board, 64);
+}
+
+#define IS_COMMAND(command, check) \
+    (strncmp(command, check, strlen(check)) == 0 && \
+    (command[strlen(check)] == '\0' || command[strlen(check)] == ' '))
+
 INLINE void HandleCommand(const char *command)
 {
-    if (strcmp(command, COMMAND_UCI) == 0) {
+    if (IS_COMMAND(command, COMMAND_UCI)) {
         uci();
-    } else if (strcmp(command, COMMAND_ISREADY) == 0) {
+    } else if (IS_COMMAND(command, COMMAND_ISREADY)) {
         isready();
-    } else if (strcmp(command, COMMAND_UCINEWGAME) == 0) {
+    } else if (IS_COMMAND(command, COMMAND_UCINEWGAME)) {
         ucinewgame();
-    } else if (strncmp(command, COMMAND_POSITION, 8) == 0) {
+    } else if (IS_COMMAND(command, COMMAND_POSITION)) {
         position(command);
-    } else if (strcmp(command, COMMAND_GO) == 0) {
-        go();
-    } else if (strcmp(command, COMMAND_STOP) == 0) {
+    } else if (IS_COMMAND(command, COMMAND_GO)) {
+        go(command);
+    } else if (IS_COMMAND(command, COMMAND_STOP)) {
         stop();
-    } else if (strcmp(command, COMMAND_QUIT) == 0) {
+    } else if (IS_COMMAND(command, COMMAND_QUIT)) {
         quit();
+    } else if (IS_COMMAND(command, COMMAND_SETOPTION)) {
+        setoption(command);
+    } else if (IS_COMMAND(command, COMMAND_DEBUG)) {
+        debug(command);
+    } else if (IS_COMMAND(command, COMMAND_DISPLAY)) {
+        display();
     } else {
-        printf("Unknown command: %s\n", command);
-        fflush(stdout);
+        printf("info string Unknown command: %s\n", command);
     }
+    FLUSH;
 }
 
 #endif // ENGINE_UCI_H

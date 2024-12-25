@@ -1,6 +1,6 @@
-#include "bitboard.h"
 #include "board.h"
 #include "generator.h"
+#include "gui/gui.h"
 #include "masks.h"
 #include "move.h"
 #include "notation.h"
@@ -18,17 +18,13 @@
 #define MENU_IMPLEMENTATION
 #include <io/menu.h>
 
-void perft(int argc, char** argv)
+void perft(size_t depth, const char* fen)
 {
-    if(argc != 2) {
-        ERRO("Specify the depth");
-        return;
-    }
-
     Board board;
-    BoardInitFen(&board, NULL);
-    u64 count = Perft(&board, atoi(argv[1]), true);
-    INFO("count: %llu", count);
+    BoardInitFen(&board, fen);
+    u64 count = Perft(&board, depth, true);
+    printf("\n");
+    printf("%llu\n", count);
     BoardFree(&board);
 }
 
@@ -142,28 +138,29 @@ int game(const char* fen)
 #define forrange(index, from, to) \
     for(index = from; (from < to) ? i < to : i > to; (from < to) ? i++ : i--)
 
-void legal()
-{
-    Board board;
-    BoardInitFen(&board, "2kr2r1/ppp1bP1p/6P1/4q3/2p5/P2p4/RPP5/2BK2R1 b - - 0 8");
-
-    Moves moves = GenerateLegalMoves(&board);
-    size_t i;
-    forrange(i, 0, moves.count){
-        char moveStr[6];
-        MoveToString(moves.list[i], moveStr);
-        printf("%s\n", moveStr);
-    }
-}
-
-
 int main(int argc, char** argv){
     InitZobrist();
     InitMasks();
+    InitState();
+
+    if(argc >= 2){
+        if(!strcmp(argv[1], "game")){
+            game(argv[2]);
+        } else if(!strcmp(argv[1], "perft")){
+            if(argc < 3) {
+                WARN("Please provide the depth");
+                exit(1);
+            }
+            perft(atoi(argv[2]), argv[3]);
+        } else if(!strcmp(argv[1], "gui")){
+            gui(argv[2]);
+        }
+
+        exit(0);
+    }
 
     UciMain(argc, argv);
 
-    // game(argv[1]);
     
     return 0;
 }

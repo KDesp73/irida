@@ -59,7 +59,7 @@ bool IsKingInCheck(Bitboard kingPosition, Bitboard enemyAttacks)
     return (kingPosition & enemyAttacks) != 0;
 }
 
-bool IsSquareAttacked(const Board* board, Square square, Color attackerColor)
+bool IsSquareAttacked(const Board* board, Square square, PieceColor attackerColor)
 {
     Bitboard attacks = GeneratePseudoLegalAttacks(board, attackerColor);
     return attacks & (1ULL << square);

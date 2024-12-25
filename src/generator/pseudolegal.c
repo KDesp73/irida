@@ -6,7 +6,7 @@
 #include "square.h"
 #include <stdio.h>
 
-Bitboard GeneratePseudoLegalPawnMoves(Bitboard pawns, Bitboard empty, Color color)
+Bitboard GeneratePseudoLegalPawnMoves(Bitboard pawns, Bitboard empty, PieceColor color)
 {
     Bitboard result = 0ULL;
     while(pawns) {
@@ -16,7 +16,7 @@ Bitboard GeneratePseudoLegalPawnMoves(Bitboard pawns, Bitboard empty, Color colo
     return result;
 }
 
-Bitboard GeneratePseudoLegalPawnAttacks(Bitboard pawns, Bitboard enemy, Color color)
+Bitboard GeneratePseudoLegalPawnAttacks(Bitboard pawns, Bitboard enemy, PieceColor color)
 {
     Bitboard result = 0ULL;
     while(pawns){
@@ -77,7 +77,7 @@ Bitboard GeneratePseudoLegalKingAttacks(Bitboard kings, Bitboard empty, Bitboard
 }
 
 
-Bitboard GeneratePseudoLegalAttacks(const Board* board, Color attackerColor)
+Bitboard GeneratePseudoLegalAttacks(const Board* board, PieceColor attackerColor)
 {
     size_t start = (attackerColor) ? 6 : 0;
     Bitboard enemy = GetEnemyColor(board, attackerColor);
@@ -115,7 +115,7 @@ Bitboard GeneratePseudoLegalAttacks(const Board* board, Color attackerColor)
 }
 
 
-Bitboard GeneratePawnMoves(const Board* board, Square piece, Color color)
+Bitboard GeneratePawnMoves(const Board* board, Square piece, PieceColor color)
 {
     Bitboard pseudoLegal = 0ULL;
     Square enpassantSquare = board->enpassant_square;
@@ -133,35 +133,35 @@ Bitboard GeneratePawnMoves(const Board* board, Square piece, Color color)
     return pseudoLegal;
 }
 
-Bitboard GenerateKnightMoves(const Board* board, Square piece, Color color)
+Bitboard GenerateKnightMoves(const Board* board, Square piece, PieceColor color)
 {
     Bitboard emptySquares = GetEmpty(board);
     Bitboard enemySquares = GetEnemyColor(board, color);
     return KnightAttacks(piece, emptySquares, enemySquares);
 }
 
-Bitboard GenerateBishopMoves(const Board* board, Square piece, Color color)
+Bitboard GenerateBishopMoves(const Board* board, Square piece, PieceColor color)
 {
     Bitboard emptySquares = GetEmpty(board);
     Bitboard enemySquares = GetEnemyColor(board, color);
     return BishopAttacks(piece, emptySquares, enemySquares);
 }
 
-Bitboard GenerateRookMoves(const Board* board, Square piece, Color color)
+Bitboard GenerateRookMoves(const Board* board, Square piece, PieceColor color)
 {
     Bitboard emptySquares = GetEmpty(board);
     Bitboard enemySquares = GetEnemyColor(board, color);
     return RookAttacks(piece, emptySquares, enemySquares);
 }
 
-Bitboard GenerateQueenMoves(const Board* board, Square piece, Color color)
+Bitboard GenerateQueenMoves(const Board* board, Square piece, PieceColor color)
 {
     Bitboard emptySquares = GetEmpty(board);
     Bitboard enemySquares = GetEnemyColor(board, color);
     return QueenAttacks(piece, emptySquares, enemySquares);
 }
 
-Bitboard GenerateKingMoves(const Board* board, Square piece, Color color)
+Bitboard GenerateKingMoves(const Board* board, Square piece, PieceColor color)
 {
     Bitboard emptySquares = GetEmpty(board);
     Bitboard enemySquares = GetEnemyColor(board, color);
@@ -185,7 +185,6 @@ Bitboard GenerateKingMoves(const Board* board, Square piece, Color color)
             && IsSquareEmpty(board, 1) 
             && !IsSquareAttacked(board, 3, COLOR_BLACK)
             && !IsSquareAttacked(board, 2, COLOR_BLACK)
-            && !IsSquareAttacked(board, 1, COLOR_BLACK)
         ) {
             on(&castlingMoves, 2);
         }
@@ -206,7 +205,6 @@ Bitboard GenerateKingMoves(const Board* board, Square piece, Color color)
             && IsSquareEmpty(board, 57)
             && !IsSquareAttacked(board, 59, COLOR_WHITE)
             && !IsSquareAttacked(board, 58, COLOR_WHITE)
-            && !IsSquareAttacked(board, 57, COLOR_WHITE)
         ) {
             on(&castlingMoves, 58); // Queenside castling
         }
@@ -225,7 +223,7 @@ Bitboard GeneratePseudoLegalMovesBitboard(const Board* board)
 Moves GeneratePseudoLegalMoves(const Board* board)
 {
     Moves moves = {0};
-    Color color = board->turn;
+    PieceColor color = board->turn;
 
     Bitboard pawnsBB = board->bitboards[color*6 + INDEX_BLACK_PAWN];
     while(pawnsBB){

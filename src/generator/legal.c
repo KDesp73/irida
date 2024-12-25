@@ -7,7 +7,7 @@
 #include <io/logging.h>
 #include <stdio.h>
 
-Moves GenerateLegalPawnMoves(const Board *board, Bitboard pieces, Color color)
+Moves GenerateLegalPawnMoves(const Board *board, Bitboard pieces, PieceColor color)
 {
     Moves moves = {0};
     Board temp = *board;
@@ -21,32 +21,36 @@ Moves GenerateLegalPawnMoves(const Board *board, Bitboard pieces, Color color)
 
             // Handle normal moves
             Move move = MoveEncode(current, target, PROMOTION_NONE, FLAG_NORMAL);
-            if(MakeMove(&temp, move)){
-                if (!IsInCheckColor(&temp, !temp.turn)){
-                    MovesAppend(&moves, move);
-                }
-                UnmakeMove(&temp);
-            } else continue;
-
-            // Handle promotions
-            if(PawnPromotionMask(current, color) || PawnPromotionAttackMask(current, color)) {
-                Promotion promotions[] = {PROMOTION_QUEEN, PROMOTION_ROOK, PROMOTION_BISHOP, PROMOTION_KNIGHT};
-                for(size_t i = 0; i < 4; i++){
-                    Move promotion = MoveEncode(current, target, promotions[i], FLAG_PROMOTION);
-                    MakeMove(&temp, promotion);
-                    if (!IsInCheckColor(&temp, !temp.turn)) {
-                        MovesAppend(&moves, promotion);
+            Move* mp = &move;
+            if(!IsPromotion((Board*) board, mp)){
+                if(MakeMove(&temp, move)){
+                    if (!IsInCheckColor(&temp, !temp.turn)){
+                        MovesAppend(&moves, move);
                     }
                     UnmakeMove(&temp);
+                } else continue;
+            } else {
+                // Handle promotions
+                if(PawnPromotionMask(current, color) || PawnPromotionAttackMask(current, color)) {
+                    Promotion promotions[] = {PROMOTION_QUEEN, PROMOTION_ROOK, PROMOTION_BISHOP, PROMOTION_KNIGHT};
+                    for(size_t i = 0; i < 4; i++){
+                        Move promotion = MoveEncode(current, target, promotions[i], FLAG_PROMOTION);
+                        MakeMove(&temp, promotion);
+                        if (!IsInCheckColor(&temp, !temp.turn)) {
+                            MovesAppend(&moves, promotion);
+                        }
+                        UnmakeMove(&temp);
+                    }
                 }
             }
+
         }
     }
 
     return moves;
 }
 
-Moves GenerateLegalKnightMoves(const Board* board, Bitboard pieces, Color color)
+Moves GenerateLegalKnightMoves(const Board* board, Bitboard pieces, PieceColor color)
 {
     Moves moves = {0};
     Board temp = *board;
@@ -71,7 +75,7 @@ Moves GenerateLegalKnightMoves(const Board* board, Bitboard pieces, Color color)
     return moves;
 }
 
-Moves GenerateLegalBishopMoves(const Board* board, Bitboard pieces, Color color)
+Moves GenerateLegalBishopMoves(const Board* board, Bitboard pieces, PieceColor color)
 {
     Moves moves = {0};
     Board temp = *board;
@@ -96,7 +100,7 @@ Moves GenerateLegalBishopMoves(const Board* board, Bitboard pieces, Color color)
     return moves;
 }
 
-Moves GenerateLegalRookMoves(const Board* board, Bitboard pieces, Color color)
+Moves GenerateLegalRookMoves(const Board* board, Bitboard pieces, PieceColor color)
 {
     Moves moves = {0};
     Board temp = *board;
@@ -121,34 +125,45 @@ Moves GenerateLegalRookMoves(const Board* board, Bitboard pieces, Color color)
     return moves;
 }
 
-Moves GenerateLegalQueenMoves(const Board* board, Bitboard pieces, Color color)
+Moves GenerateLegalQueenMoves(const Board* board, Bitboard pieces, PieceColor color)
 {
     return MovesCombine(
             GenerateLegalBishopMoves(board, pieces, color),
             GenerateLegalRookMoves(board, pieces, color));
 }
 
-Moves GenerateLegalKingMoves(const Board* board, Bitboard pieces, Color color)
+Moves GenerateLegalKingMoves(const Board* board, Bitboard pieces, PieceColor color)
 {
     Moves moves = {0};
     Board temp = *board;
 
     Square king = lsb(pieces);
     Bitboard pseudoLegal = GenerateKingMoves(board, king, color);
-    size_t move_count = popcount(pseudoLegal);
+
+    Bitboard opponentAttacks = GeneratePseudoLegalAttacks(board, !color);
+    pseudoLegal &= ~opponentAttacks;
+
+    // Get the opposing king's position and generate its control zone
+    Bitboard opposingKing = board->bitboards[(!color)*6 + INDEX_BLACK_KING];
+    if (opposingKing) {
+        Square opposingKingSquare = lsb(opposingKing);
+        Bitboard opposingKingControl = GenerateKingMoves(board, opposingKingSquare, !color);
+
+        // Exclude squares controlled by the opposing king
+        pseudoLegal &= ~opposingKingControl;
+    }
 
     // Process pseudo-legal moves
-    while (pseudoLegal && move_count > 0) {
+    while (pseudoLegal) {
         Square target = poplsb(&pseudoLegal);
 
         Move move = MoveEncode(king, target, PROMOTION_NONE, FLAG_NORMAL);
-        if(MakeMove(&temp, move)){
+        if (MakeMove(&temp, move)) {
             if (!IsInCheckColor(&temp, !temp.turn)) {
                 MovesAppend(&moves, move);
             }
             UnmakeMove(&temp);
         }
-        move_count--;
     }
 
     return moves;
@@ -171,7 +186,7 @@ bool IsLegal(const Board* board, Move move)
 Moves GenerateLegalMoves(const Board* board)
 {
     Moves moves = {0};
-    Color color = board->turn;
+    PieceColor color = board->turn;
 
     moves = MovesCombine(
                 GenerateLegalPawnMoves(board, board->bitboards[color*6 + INDEX_BLACK_PAWN], color),
@@ -191,4 +206,17 @@ Moves GenerateLegalMoves(const Board* board)
             );
 
     return moves;
+}
+
+Moves GenerateLegalMovesSquare(const Board* board, Square square)
+{
+    Moves moves = GenerateLegalMoves(board);
+    Moves result = {0};
+    for(size_t i = 0; i < moves.count; i++){
+        if(GetFrom(moves.list[i]) == square){
+            MovesAppend(&result, moves.list[i]);
+        }
+    }
+
+    return result;
 }

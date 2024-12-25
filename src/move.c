@@ -119,7 +119,7 @@ uint8_t GetFlag(Move move)
 }
 
 
-void MoveFreely(Board* board, Move move, Color color)
+void MoveFreely(Board* board, Move move, PieceColor color)
 {
     Square from, to;
     uint8_t promotion, flags;
@@ -203,7 +203,7 @@ void MovePrint(Move move)
             promotion, flags);
 }
 
-_Bool MoveIsValid(const Board* board, Move move, Color color)
+_Bool MoveIsValid(const Board* board, Move move, PieceColor color)
 {
     Square from, to;
     uint8_t promotion, flags;
@@ -235,10 +235,10 @@ char PromotionToChar(uint8_t promotion)
 uint8_t CharToPromotion(char promotion)
 {
     switch (promotion) {
-    case 'Q': return PROMOTION_QUEEN;
-    case 'R': return PROMOTION_ROOK;
-    case 'B': return PROMOTION_BISHOP;
-    case 'N': return PROMOTION_KNIGHT;
+    case 'q': return PROMOTION_QUEEN;
+    case 'r': return PROMOTION_ROOK;
+    case 'b': return PROMOTION_BISHOP;
+    case 'n': return PROMOTION_KNIGHT;
     default:
           return PROMOTION_NONE;
     }
@@ -314,7 +314,7 @@ bool IsCastle(const Board* board, Move* move)
 bool Castle(Board* board, Move move)
 {
     MOVE_DECODE(move);
-    Color color = board->turn;
+    PieceColor color = board->turn;
 
     if(flag != FLAG_CASTLING) return false;
     Piece piece = PieceAt(board, src);
@@ -388,7 +388,7 @@ bool IsEnpassant(const Board* board, Move* move)
 bool Enpassant(Board* board, Move move)
 {
     MOVE_DECODE(move);
-    Color color = board->turn;
+    PieceColor color = board->turn;
 
     if (flag != FLAG_ENPASSANT) return false;
 
@@ -409,7 +409,7 @@ bool IsPromotion(Board* board, Move* move)
 {
     Square from = GetFrom(*move);
     Square to = GetTo(*move);
-    Color color = PieceAt(board, from).color;
+    PieceColor color = PieceAt(board, from).color;
 
     if(color && (Rank(from) != 6 || Rank(to) != 7)) return false;
     if(!color && (Rank(from) != 1 || Rank(to) != 0)) return false;

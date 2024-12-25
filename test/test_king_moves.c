@@ -28,7 +28,7 @@ int test_king_moves(const char* fen, const char* square, const char* first, ...)
         va_end(args);
     }
 
-    Color color = PieceAt(&board, from).color;
+    PieceColor color = PieceAt(&board, from).color;
     Bitboard found = MovesToBitboard(GenerateLegalKingMoves(&board, BB(from), color));
     if(found != moves){
         FAILF(fen, "For square %s", square);

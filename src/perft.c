@@ -3,6 +3,8 @@
 #include "generator.h"
 #include <stdio.h>
 
+#define PRINTALL true
+
 u64 Perft(Board* board, int depth, bool root)
 {
     uint64_t cnt = 0, nodes = 0;
@@ -17,7 +19,7 @@ u64 Perft(Board* board, int depth, bool root)
             nodes++;
         } else {
         if (!MakeMove(board, move)) continue;
-            cnt = leaf ? GenerateLegalMoves(board).count : Perft(board, depth - 1, false);
+            cnt = leaf ? GenerateLegalMoves(board).count : Perft(board, depth - 1, PRINTALL);
             nodes += cnt;
 
             UnmakeMove(board);

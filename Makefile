@@ -1,7 +1,8 @@
 # Compiler and flags
 CC = gcc
-CFLAGS = -Wall -Iinclude -fPIC
-LDFLAGS = 
+INCLUDE = -Iinclude -Ilib/raylib/include
+CFLAGS = -Wall $(INCLUDE) -fPIC 
+LDFLAGS = -L./lib/raylib/lib -l:libraylib.a -lm -lpthread -ldl
 
 # Directories
 SRC_DIR = src
@@ -65,6 +66,7 @@ $(BUILD_DIR): ## Create the build directory if it doesn't exist
 	mkdir -p $(BUILD_DIR)/bitboard
 	mkdir -p $(BUILD_DIR)/generator
 	mkdir -p $(BUILD_DIR)/notation
+	mkdir -p $(BUILD_DIR)/gui
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c ## Compile source files
 	$(eval counter=$(shell echo $$(($(counter)+1))))
@@ -79,13 +81,13 @@ $(BUILD_DIR)/%.o: $(TEST_DIR)/%.c ## Compile test files
 .PHONY: exec
 exec: $(BUILD_DIR) static ## Build executable using static library
 	@echo "[INFO] Building executable: $(EXEC)"
-	@$(CC) src/main.c -o $(EXEC) -L. -l:$(A_NAME) -Iinclude -lchess
+	@$(CC) src/main.c -o $(EXEC) -L. -l:$(A_NAME) -lchess $(LDFLAGS) $(INCLUDE)
 
 
 .PHONY: check
 check: $(BUILD_DIR) static ## Build the tests
 	@echo "[INFO] Building test executable: $(CHECK)"
-	@$(CC) $(TEST_FILES) -o $(CHECK) -L. -l:$(A_NAME) -Iinclude -lchess
+	@$(CC) $(TEST_FILES) -o $(CHECK) -L. -l:$(A_NAME) -lchess $(LDFLAGS) $(LDFLAGS) $(INCLUDE)
 
 .PHONY: test
 test: ## Build and run the tests

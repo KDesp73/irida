@@ -126,7 +126,7 @@ Bitboard BlockerMasks(Bitboard slidingPiece, Bitboard occupancy)
 }
 
 
-Bitboard ComputePawnPushMask(Square square, Color color)
+Bitboard ComputePawnPushMask(Square square, PieceColor color)
 {
     Bitboard bb = 1ULL << square, oneSquarePush;
     if(color == COLOR_WHITE){
@@ -138,7 +138,7 @@ Bitboard ComputePawnPushMask(Square square, Color color)
     return oneSquarePush;
 }
 
-Bitboard ComputePawnDoublePushMask(Square square, Color color)
+Bitboard ComputePawnDoublePushMask(Square square, PieceColor color)
 {
     Bitboard bb = 1ULL << square, twoSquarePush;
     if(color == COLOR_WHITE){
@@ -150,7 +150,7 @@ Bitboard ComputePawnDoublePushMask(Square square, Color color)
     return twoSquarePush;
 }
 
-Bitboard ComputePawnAttackMask(Square square, Color color)
+Bitboard ComputePawnAttackMask(Square square, PieceColor color)
 {
     Bitboard bb = 1ULL << square;
     Bitboard leftAttacks, rightAttacks;
@@ -166,13 +166,13 @@ Bitboard ComputePawnAttackMask(Square square, Color color)
     return leftAttacks | rightAttacks;
 }
 
-Bitboard ComputePawnPromotionMask(Square square, Color color)
+Bitboard ComputePawnPromotionMask(Square square, PieceColor color)
 {
     Bitboard bb = 1ULL << square;
     return (color) ? (bb << 8) & RANK_8 : (bb >> 8) & RANK_1;
 }
 
-Bitboard ComputePawnPromotionAttackMask(Square square, Color color)
+Bitboard ComputePawnPromotionAttackMask(Square square, PieceColor color)
 {
     Bitboard bb = 1ULL << square;
     Bitboard leftCapture, rightCapture;
@@ -230,23 +230,23 @@ Bitboard ComputeKingMoveMask(Square square)
          | ((bb >> 9) & ~FILE_H));
 }
 
-Bitboard PawnPushMask(Square square, Color color)
+Bitboard PawnPushMask(Square square, PieceColor color)
 {
     return PAWN_PUSH_MASKS[color][square];
 }
-Bitboard PawnDoublePushMask(Square square, Color color)
+Bitboard PawnDoublePushMask(Square square, PieceColor color)
 {
     return PAWN_DOUBLE_PUSH_MASKS[color][square];
 }
-Bitboard PawnAttackMask(Square square, Color color)
+Bitboard PawnAttackMask(Square square, PieceColor color)
 {
     return PAWN_ATTACK_MASKS[color][square];
 }
-Bitboard PawnPromotionMask(Square square, Color color)
+Bitboard PawnPromotionMask(Square square, PieceColor color)
 {
     return PAWN_PROMOTION_MASKS[color][square];
 }
-Bitboard PawnPromotionAttackMask(Square square, Color color)
+Bitboard PawnPromotionAttackMask(Square square, PieceColor color)
 {
     return PAWN_PROMOTION_ATTACK_MASKS[color][square];
 }

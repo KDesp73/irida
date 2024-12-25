@@ -27,7 +27,7 @@ int test_queen_pseudo(const char* fen, const char* square, const char* first, ..
         va_end(args);
     }
 
-    Color color = PieceAt(&board, from).color;
+    PieceColor color = PieceAt(&board, from).color;
     Bitboard found = GenerateQueenMoves(&board, from, color);
     if(found != moves){
         FAILF(fen, "For square %s", square);

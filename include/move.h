@@ -78,7 +78,7 @@ const static int KING_OFFSETS[] = {
     MoveDecode(move, &src, &dst, &promotion, &flag)
 
 
-_Bool MoveIsValid(const Board* board, Move move, Color color);
+_Bool MoveIsValid(const Board* board, Move move, PieceColor color);
 Move MoveEncode(Square from, Square to, uint8_t promotion, uint8_t flag);
 Move MoveEncodeNames(const char* from, const char* to, uint8_t promotion, uint8_t flag);
 void MoveDecode(Move move, Square* from, Square* to, uint8_t* promotion, uint8_t* flag);
@@ -99,7 +99,7 @@ bool IsDoublePawnPush(Board* board, Move move);
 bool IsPromotion(Board* board, Move* move);
 
 _Bool MoveMake(Board* board, Move move);
-void MoveFreely(Board* board, Move move, Color color);
+void MoveFreely(Board* board, Move move, PieceColor color);
 void MovePrint(Move move);
 void MoveToString(Move move, char* buffer);
 

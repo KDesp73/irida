@@ -6,6 +6,7 @@
 #include "square.h"
 #include <ctype.h>
 #include <io/logging.h>
+#define ANSI_IMPLEMENTATION
 #include <io/ansi.h>
 #include <stdint.h>
 #include <stdio.h>

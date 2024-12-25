@@ -1,4 +1,5 @@
 #include "uci.h"
+#include <io/ansi.h>
 
 int UciMain(int argc, char** argv)
 {

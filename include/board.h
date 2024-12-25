@@ -73,7 +73,7 @@ typedef enum {
     COLOR_NONE = -1,
     COLOR_BLACK = 0,
     COLOR_WHITE,
-} Color;
+} PieceColor;
 #define WHITE COLOR_WHITE
 #define BLACK COLOR_BLACK
 
@@ -86,24 +86,25 @@ void BoardFree(Board* board);
 
 Bitboard GetWhite(const Board* board);
 Bitboard GetBlack(const Board* board);
-Bitboard GetEnemyColor(const Board *board, Color us);
+Bitboard GetEnemyColor(const Board *board, PieceColor us);
 Bitboard GetEnemy(const Board* board);
 Bitboard GetEmpty(const Board* board);
 
 int HasCastlingRights(const Board* board, uint8_t castling_rights);
 void RevokeCastlingRights(Board* board, uint8_t castling_rights);
 
-bool IsSquareAttacked(const Board* board, Square square, Color color);
+bool IsSquareAttacked(const Board* board, Square square, PieceColor color);
 bool IsSquareEmpty(const Board* board, Square square);
-bool IsSquareOccupiedBy(const Board* board, Square square, Color color);
+bool IsSquareOccupiedBy(const Board* board, Square square, PieceColor color);
 
-size_t NumberOfPieces(const Board* board, Color color);
+size_t NumberOfPieces(const Board* board, PieceColor color);
 
+bool IsResult(Board* board);
 bool IsCheckmate(Board* board);
 bool IsStalemate(Board* board);
 bool IsInsufficientMaterial(Board* board);
 bool IsThreefoldRepetition(Board* board);
-bool IsInCheckColor(const Board* board, Color color);
+bool IsInCheckColor(const Board* board, PieceColor color);
 bool IsInCheck(const Board* board);
 
 

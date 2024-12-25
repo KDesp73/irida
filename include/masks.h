@@ -65,22 +65,22 @@ Bitboard HorizontalMask(Square square);
 Bitboard VerticalMask(Square square);
 
 /*** Piece Masks ***/
-Bitboard ComputePawnPushMask(Square square, Color color);
-Bitboard ComputePawnDoublePushMask(Square square, Color color);
-Bitboard ComputePawnPromotionMask(Square square, Color color);
-Bitboard ComputePawnPromotionAttackMask(Square square, Color color);
-Bitboard ComputePawnAttackMask(Square square, Color color);
+Bitboard ComputePawnPushMask(Square square, PieceColor color);
+Bitboard ComputePawnDoublePushMask(Square square, PieceColor color);
+Bitboard ComputePawnPromotionMask(Square square, PieceColor color);
+Bitboard ComputePawnPromotionAttackMask(Square square, PieceColor color);
+Bitboard ComputePawnAttackMask(Square square, PieceColor color);
 Bitboard ComputeKnightMoveMask(Square square);
 Bitboard ComputeBishopMoveMask(Square square);
 Bitboard ComputeRookMoveMask(Square square);
 Bitboard ComputeQueenMoveMask(Square square);
 Bitboard ComputeKingMoveMask(Square square);
 
-Bitboard PawnPushMask(Square square, Color color);
-Bitboard PawnDoublePushMask(Square square, Color color);
-Bitboard PawnPromotionMask(Square square, Color color);
-Bitboard PawnPromotionAttackMask(Square square, Color color);
-Bitboard PawnAttackMask(Square square, Color color);
+Bitboard PawnPushMask(Square square, PieceColor color);
+Bitboard PawnDoublePushMask(Square square, PieceColor color);
+Bitboard PawnPromotionMask(Square square, PieceColor color);
+Bitboard PawnPromotionAttackMask(Square square, PieceColor color);
+Bitboard PawnAttackMask(Square square, PieceColor color);
 Bitboard KnightMoveMask(Square square);
 Bitboard BishopMoveMask(Square square);
 Bitboard RookMoveMask(Square square);

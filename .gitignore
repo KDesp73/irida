@@ -8,3 +8,4 @@ engine
 .changelog
 .version-conf
 libengine.*
+tmp
