@@ -31,7 +31,7 @@ typedef struct {
     (piece.color == COLOR_BLACK)
 
 
-int Color(char piece);
+int GetPieceColor(char piece);
 Piece PieceAt(const Board* board, Square square);
 bool PieceCmp(Piece p1, Piece p2);
 

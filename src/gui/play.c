@@ -12,6 +12,7 @@
 #include "gui/utils.h"
 #include "move.h"
 #include "notation.h"
+#include "piece.h"
 #include "utils.h"
 
 char promotion_gui(Vector2 board_position, Texture2D textures[12], int turn)
@@ -56,10 +57,10 @@ char promotion_gui(Vector2 board_position, Texture2D textures[12], int turn)
             if (clicked_y == 0 && clicked_x >= 0 && clicked_x < 4) {
                 EndDrawing();
                 switch (clicked_x) {
-                    case 0: return 'Q'; // Queen
-                    case 1: return 'R'; // Rook
-                    case 2: return 'B'; // Bishop
-                    case 3: return 'N'; // Knight
+                    case 0: return 'q'; // Queen
+                    case 1: return 'r'; // Rook
+                    case 2: return 'b'; // Bishop
+                    case 3: return 'n'; // Knight
                 }
             }
         }
@@ -134,7 +135,7 @@ void gui(const char* fen)
                         to = move_square.y*8 + move_square.x;
 
                         Move move = MoveEncode(from, to, PROMOTION_NONE, FLAG_NORMAL);
-                        if (IsPromotion(&board, &move)) {
+                        if (IS_PAWN(PieceAt(&board, from)) && IsPromotion(&board, &move)) {
                             promotion = promotion_gui(board_position, textures, board.turn);
                         } else promotion = '\0';
 

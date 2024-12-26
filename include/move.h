@@ -41,7 +41,7 @@ enum {
 
 
 typedef uint32_t Move;
-#define NULL_MOVE ((Move) 0);
+#define NULL_MOVE ((Move) 0)
 
 #define MOVES_CAPACITY 256
 typedef struct {
@@ -101,6 +101,7 @@ bool IsPromotion(Board* board, Move* move);
 _Bool MoveMake(Board* board, Move move);
 void MoveFreely(Board* board, Move move, PieceColor color);
 void MovePrint(Move move);
+Move StringToMove(const char* str);
 void MoveToString(Move move, char* buffer);
 
 bool MoveCmp(Move m1, Move m2);

@@ -167,6 +167,8 @@ Bitboard GenerateKingMoves(const Board* board, Square piece, PieceColor color)
     Bitboard enemySquares = GetEnemyColor(board, color);
     Bitboard pseudoLegal = KingAttacks(piece, emptySquares, enemySquares);
 
+    if(IsInCheckColor(board, color)) return pseudoLegal;
+
     Bitboard castlingMoves = 0ULL;
     if (color == COLOR_WHITE && piece == 4) {
         // White Kingside Castling: Squares e1 -> f1 -> g1 (4 -> 5 -> 6)

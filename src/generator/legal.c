@@ -3,6 +3,7 @@
 #include "generator.h"
 #include "masks.h"
 #include "move.h"
+#include "piece.h"
 #include "square.h"
 #include <io/logging.h>
 #include <stdio.h>
@@ -138,16 +139,16 @@ Moves GenerateLegalKingMoves(const Board* board, Bitboard pieces, PieceColor col
     Board temp = *board;
 
     Square king = lsb(pieces);
-    Bitboard pseudoLegal = GenerateKingMoves(board, king, color);
+    Bitboard pseudoLegal = GenerateKingMoves(&temp, king, color);
 
-    Bitboard opponentAttacks = GeneratePseudoLegalAttacks(board, !color);
+    Bitboard opponentAttacks = GeneratePseudoLegalAttacks(&temp, !color);
     pseudoLegal &= ~opponentAttacks;
 
     // Get the opposing king's position and generate its control zone
-    Bitboard opposingKing = board->bitboards[(!color)*6 + INDEX_BLACK_KING];
+    Bitboard opposingKing = temp.bitboards[(!color)*6 + INDEX_BLACK_KING];
     if (opposingKing) {
         Square opposingKingSquare = lsb(opposingKing);
-        Bitboard opposingKingControl = GenerateKingMoves(board, opposingKingSquare, !color);
+        Bitboard opposingKingControl = KingMoveMask(opposingKingSquare);
 
         // Exclude squares controlled by the opposing king
         pseudoLegal &= ~opposingKingControl;
@@ -159,7 +160,8 @@ Moves GenerateLegalKingMoves(const Board* board, Bitboard pieces, PieceColor col
 
         Move move = MoveEncode(king, target, PROMOTION_NONE, FLAG_NORMAL);
         if (MakeMove(&temp, move)) {
-            if (!IsInCheckColor(&temp, !temp.turn)) {
+            bool isInCheck = IsInCheckColor(&temp, !temp.turn);
+            if (!isInCheck){
                 MovesAppend(&moves, move);
             }
             UnmakeMove(&temp);

@@ -118,46 +118,48 @@ uint8_t GetFlag(Move move)
     return (move >> 16) & 0x7;
 }
 
-
-void MoveFreely(Board* board, Move move, PieceColor color)
-{
+void MoveFreely(Board* board, Move move, PieceColor color) {
+    // Decode the move
     Square from, to;
     uint8_t promotion, flags;
     MoveDecode(move, &from, &to, &promotion, &flags);
 
-    if(promotion == PROMOTION_NONE){
-        board->grid[COORDS(to)] = board->grid[COORDS(from)];
+    // Update the 2D character array for the board
+    if (promotion == PROMOTION_NONE) {
+        board->grid[COORDS(to)] = board->grid[COORDS(from)]; // Move the piece
     } else {
-        char p = PromotionToChar(promotion);
-        board->grid[COORDS(to)] = (color) ? p : tolower(p);
+        char promotedPiece = PromotionToChar(promotion); // Get promoted piece character
+        board->grid[COORDS(to)] = (color == WHITE) ? toupper(promotedPiece) : tolower(promotedPiece);
     }
-    board->grid[COORDS(from)] = EMPTY_SQUARE;
+    board->grid[COORDS(from)] = EMPTY_SQUARE; // Clear the source square
 
+    // Bitboard updates
     uint64_t from_bb = 1ULL << from;
     uint64_t to_bb = 1ULL << to;
 
-    // Find the piece that moved
-    for (int piece = 0; piece < 6; piece++) {
-        if (board->bitboards[color * 6 + piece] & from_bb) {
-            // Move the piece
-            board->bitboards[color * 6 + piece] ^= from_bb; // Remove from source
-            if (promotion) {
-                // Add promoted piece
-                board->bitboards[color * 6 + promotion] |= to_bb;
+    // Identify and move the piece
+
+    int piece;
+    for (piece = 0; piece < 6; piece++) {
+        uint64_t* bb = &board->bitboards[color * 6 + piece];
+        if (*bb & from_bb) {
+            *bb ^= from_bb; // Remove from source
+            if (promotion != PROMOTION_NONE) {
+                board->bitboards[color * 6 + promotion] |= to_bb; // Add promoted piece
             } else {
-                // Move to destination
-                board->bitboards[color * 6 + piece] |= to_bb;
+                *bb |= to_bb; // Move to destination
             }
-            break;
+            break; // Break after moving the piece
         }
     }
 
-    // Handle captures
+    // Handle captures (if the destination square was occupied by an opponent piece)
     int opponent = 1 - color;
     for (int piece = 0; piece < 6; piece++) {
-        if (board->bitboards[opponent * 6 + piece] & to_bb) {
-            board->bitboards[opponent * 6 + piece] ^= to_bb;
-            break;
+        uint64_t* bb = &board->bitboards[opponent * 6 + piece];
+        if (*bb & to_bb) {
+            *bb ^= to_bb; // Remove the captured piece from the bitboard
+            break; // Break after processing the capture
         }
     }
 }
@@ -187,6 +189,31 @@ void MoveToString(Move move, char* buffer)
     }
 
     sprintf(buffer, "%s%s%s", fromName, toName, p); 
+}
+
+Move StringToMove(const char* str) {
+    if (!str || strlen(str) < 4) {
+        return NULL_MOVE;
+    }
+
+    Square from = SquareFromName(str);
+    Square to = SquareFromName(str + 2);
+
+    Promotion promotion = PROMOTION_NONE;
+
+    if (strlen(str) == 5) {
+        char promoChar = tolower(str[4]);
+        switch (promoChar) {
+            case 'q': promotion = PROMOTION_QUEEN; break;
+            case 'r': promotion = PROMOTION_ROOK; break;
+            case 'b': promotion = PROMOTION_BISHOP; break;
+            case 'n': promotion = PROMOTION_KNIGHT; break;
+            default:
+                return NULL_MOVE;
+        }
+    }
+
+    return MoveEncode(from, to, promotion, FLAG_NORMAL);
 }
 
 void MovePrint(Move move)
@@ -222,10 +249,10 @@ _Bool MoveIsValid(const Board* board, Move move, PieceColor color)
 char PromotionToChar(uint8_t promotion)
 {
     switch (promotion) {
-    case PROMOTION_QUEEN: return 'Q';
-    case PROMOTION_ROOK: return 'R';
-    case PROMOTION_BISHOP: return 'B';
-    case PROMOTION_KNIGHT: return 'N';
+    case PROMOTION_QUEEN: return 'q';
+    case PROMOTION_ROOK: return 'r';
+    case PROMOTION_BISHOP: return 'b';
+    case PROMOTION_KNIGHT: return 'n';
     case PROMOTION_NONE:
     default:
           return '\0';
@@ -409,6 +436,9 @@ bool IsPromotion(Board* board, Move* move)
 {
     Square from = GetFrom(*move);
     Square to = GetTo(*move);
+
+    if(!IS_PAWN(PieceAt(board, from))) return false;
+
     PieceColor color = PieceAt(board, from).color;
 
     if(color && (Rank(from) != 6 || Rank(to) != 7)) return false;
@@ -436,7 +466,7 @@ bool MakeMove(Board* board, Move move)
 {
     Piece piece = PieceAt(board, GetFrom(move));
     if(piece.color != board->turn) return false;
-    if(piece.type == COLOR_NONE) return false;
+    if(piece.type == EMPTY_SQUARE) return false;
 
     uint8_t castling = UpdateCastlingRights(board, move);
     Square enpassant;
@@ -455,7 +485,6 @@ bool MakeMove(Board* board, Move move)
 
     if(!succ) return false;
 
-
     IsPromotion(board, &move);
 
     HistoryAddUndo(&board->history, board, move);
@@ -468,7 +497,6 @@ bool MakeMove(Board* board, Move move)
     if (board->turn == COLOR_BLACK) {
         board->fullmove++;
     }
-
 
     UpdateHashTable(&board->history.positions, CalculateZobristHash(board));
     board->turn = !board->turn;

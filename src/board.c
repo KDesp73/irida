@@ -190,7 +190,7 @@ uint8_t UpdateCastlingRights(Board* board, Move move)
 
 void UpdateHalfmove(Board* board, Move move, size_t piece_count_before, size_t piece_count_after, char piece)
 {
-    int color = Color(piece);
+    int color = GetPieceColor(piece);
     int direction = (color == COLOR_WHITE) ? 1 : -1;
     bool is_pawn = tolower(piece) == 'p';
     bool is_capture = (piece_count_after < piece_count_before);

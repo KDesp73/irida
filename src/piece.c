@@ -1,7 +1,7 @@
 #include "piece.h"
 #include "board.h"
 
-int Color(char piece)
+int GetPieceColor(char piece)
 {
     if(piece == ' ') return COLOR_NONE;
 
@@ -12,7 +12,7 @@ Piece PieceAt(const Board* board, Square square)
 {
     Piece result = {0};
     result.type = board->grid[COORDS(square)];
-    result.color = Color(result.type);
+    result.color = GetPieceColor(result.type);
     return result;
 }
 

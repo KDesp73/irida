@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include <io/logging.h>
 #define ANSI_IMPLEMENTATION
@@ -18,13 +19,59 @@
 #define MENU_IMPLEMENTATION
 #include <io/menu.h>
 
-void perft(size_t depth, const char* fen)
-{
+#define forrange(index, from, to) \
+    for(index = from; (from < to) ? i < to : i > to; (from < to) ? i++ : i--)
+
+void perft(size_t depth, const char* fen, const char* first, ...) {
     Board board;
     BoardInitFen(&board, fen);
+
+    // A reasonable max size for the moves array (arbitrarily chosen)
+    Move moves[MAX_MOVES];
+    size_t nMoves = 0;
+
+    // Parse moves if provided
+    if (first != NULL) {
+        va_list args;
+        va_start(args, first);
+
+        const char* current = first;
+        while (current != NULL) {
+            Move move = StringToMove(current);
+            if (move != NULL_MOVE) {
+                if (nMoves < MAX_MOVES) {
+                    moves[nMoves++] = move;
+                } else {
+                    printf("Error: Too many moves provided!\n");
+                    va_end(args);
+                    BoardFree(&board);
+                    return;
+                }
+            } else {
+                printf("Warning: Ignoring invalid move '%s'\n", current);
+            }
+            current = va_arg(args, const char*);
+        }
+
+        va_end(args);
+    }
+
+    // Make the moves on the board
+    for (size_t i = 0; i < nMoves; i++) {
+        if (!MakeMove(&board, moves[i])) {
+            printf("Error: Illegal move sequence!\n");
+            BoardFree(&board);
+            return;
+        }
+    }
+
+    // Perform perft
     u64 count = Perft(&board, depth, true);
-    printf("\n");
-    printf("%llu\n", count);
+
+    // Print results
+    printf("\nPerft result: %llu\n", count);
+
+    // Free the board resources
     BoardFree(&board);
 }
 
@@ -135,13 +182,17 @@ int game(const char* fen)
     return 0;
 }
 
-#define forrange(index, from, to) \
-    for(index = from; (from < to) ? i < to : i > to; (from < to) ? i++ : i--)
-
 int main(int argc, char** argv){
     InitZobrist();
     InitMasks();
     InitState();
+
+    Board board;
+    BoardInitFen(&board,"rnbq1k1r/pp1Pbppp/2p5/8/2B5/2Nn4/PPP3PP/RNBQK2R w KQ - 1 10");
+    Moves moves = GenerateLegalKingMoves(&board, board.bitboards[INDEX_WHITE_KING], COLOR_WHITE);
+
+    BoardPrintBitboard(&board, MovesToBitboard(moves));
+    return 0;
 
     if(argc >= 2){
         if(!strcmp(argv[1], "game")){
@@ -151,7 +202,7 @@ int main(int argc, char** argv){
                 WARN("Please provide the depth");
                 exit(1);
             }
-            perft(atoi(argv[2]), argv[3]);
+            perft(atoi(argv[2]), argv[3], argv[4], argv[5], argv[6], argv[7], argv[8]);
         } else if(!strcmp(argv[1], "gui")){
             gui(argv[2]);
         }

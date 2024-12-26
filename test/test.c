@@ -49,11 +49,11 @@ int main(int argc, char** argv)
         // RUN_TEST(test_square_to_name),
         
         // RUN_TEST(test_perft), // PASSES
-        // RUN_TEST(test_perft_2),
-        RUN_TEST(test_perft_3), // FAILS at depth 5
-        // RUN_TEST(test_perft_4), // FAILS at depth 3
-        // RUN_TEST(test_perft_5), // FAILS at depth 3
-        // RUN_TEST(test_perft_6), // FAILS at depth 4
+        // RUN_TEST(test_perft_2), // FAILS at depth 3
+        // RUN_TEST(test_perft_3), // PASSES
+        RUN_TEST(test_perft_4), // FAILS at depth 3
+        // RUN_TEST(test_perft_5), // PASSES
+        // RUN_TEST(test_perft_6), // PASSES
 
         // RUN_TEST(test_pawn_moves),
         // RUN_TEST(test_knight_moves),
