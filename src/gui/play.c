@@ -19,7 +19,7 @@ char promotion_gui(Vector2 board_position, Texture2D textures[12], int turn)
 {
     while (true) { // Loop until a valid piece is selected
         BeginDrawing();
-        ClearBackground(RAYWHITE);
+        ClearBackground(GetColor(0x181818FF));
 
         // Calculate the position for the promotion GUI
         Vector2 position = place_center(
@@ -137,11 +137,12 @@ void gui(const char* fen)
                         Move move = MoveEncode(from, to, PROMOTION_NONE, FLAG_NORMAL);
                         if (IS_PAWN(PieceAt(&board, from)) && IsPromotion(&board, &move)) {
                             promotion = promotion_gui(board_position, textures, board.turn);
+                            MoveSetFlag(&move, FLAG_PROMOTION);
+                            MoveSetPromotion(&move, CharToPromotion(promotion));
                         } else promotion = '\0';
 
                         SanMove san;
                         Notate(&board, move, &san);
-
 
                         if(IsLegal(&board, move)){
                             if(MakeMove(&board, move)){
