@@ -1,9 +1,9 @@
 #include "perft.h"
 #include "board.h"
-#include "generator.h"
+#include "movegen.h"
 #include <stdio.h>
 
-#define PRINTALL true
+#define PRINTALL false
 
 u64 Perft(Board* board, int depth, bool root)
 {

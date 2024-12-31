@@ -1,7 +1,7 @@
 #include <io/test.h>
 #include "bitboard.h"
 #include "board.h"
-#include "generator.h"
+#include "movegen.h"
 #include "piece.h"
 #include "tests.h"
 

@@ -1,5 +1,5 @@
 #include "board.h"
-#include "generator.h"
+#include "movegen.h"
 #include "tests.h"
 #include <io/test.h>
 

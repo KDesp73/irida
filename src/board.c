@@ -5,7 +5,7 @@
 #include "notation.h"
 #include "piece.h"
 #include "square.h"
-#include "generator.h"
+#include "movegen.h"
 
 #include <ctype.h>
 #include <stdint.h>

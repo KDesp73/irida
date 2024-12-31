@@ -1,5 +1,5 @@
 #include "bitboard.h"
-#include "generator.h"
+#include "movegen.h"
 #include "board.h"
 #include "move.h"
 #include "piece.h"

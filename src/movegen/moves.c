@@ -2,7 +2,7 @@
 #include "board.h"
 #include "masks.h"
 #include "move.h"
-#include "generator.h"
+#include "movegen.h"
 #include "square.h"
 #include <io/logging.h>
 

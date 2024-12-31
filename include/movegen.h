@@ -1,5 +1,5 @@
-#ifndef ENGINE_GENERATOR_H
-#define  ENGINE_GENERATOR_H
+#ifndef ENGINE_MOVEGEN_H
+#define  ENGINE_MOVEGEN_H
 
 #include "bitboard.h"
 #include "board.h"
@@ -41,4 +41,4 @@ Moves GenerateLegalRookMoves(const Board* board, Bitboard pieces, PieceColor col
 Moves GenerateLegalQueenMoves(const Board* board, Bitboard pieces, PieceColor color);
 Moves GenerateLegalKingMoves(const Board* board, Bitboard pieces, PieceColor color);
 
-#endif //ENGINE_GENERATOR_H
+#endif //ENGINE_MOVEGEN_H

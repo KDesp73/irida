@@ -1,5 +1,5 @@
 #include "board.h"
-#include "generator.h"
+#include "movegen.h"
 #include "move.h"
 #include "notation.h"
 #include "piece.h"

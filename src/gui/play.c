@@ -1,5 +1,5 @@
 #include "board.h"
-#include "generator.h"
+#include "movegen.h"
 #include "gui/gui.h"
 #include "gui/colors.h"
 #include "gui/globals.h"

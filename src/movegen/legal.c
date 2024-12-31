@@ -1,6 +1,6 @@
 #include "bitboard.h"
 #include "board.h"
-#include "generator.h"
+#include "movegen.h"
 #include "masks.h"
 #include "move.h"
 #include "piece.h"
