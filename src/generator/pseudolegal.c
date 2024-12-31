@@ -16,12 +16,15 @@ Bitboard GeneratePseudoLegalPawnMoves(Bitboard pawns, Bitboard empty, PieceColor
     return result;
 }
 
-Bitboard GeneratePseudoLegalPawnAttacks(Bitboard pawns, Bitboard enemy, PieceColor color)
+Bitboard GeneratePseudoLegalPawnAttacks(Bitboard pawns, Bitboard enemy, PieceColor color, bool strict)
 {
     Bitboard result = 0ULL;
     while(pawns){
         Square current = poplsb(&pawns);
-        result |= PawnAttacks(current, enemy, color);
+        if(strict)
+            result |= PawnAttacks(current, enemy, color);
+        else
+            result |= PawnAttackMask(current, color);
     }
     return result;
 }
@@ -85,7 +88,7 @@ Bitboard GeneratePseudoLegalAttacks(const Board* board, PieceColor attackerColor
     Square enpassantSquare = board->enpassant_square;
 
     Bitboard attacks = 
-        GeneratePseudoLegalPawnAttacks(board->bitboards[start + INDEX_BLACK_PAWN], enemy, attackerColor)
+        GeneratePseudoLegalPawnAttacks(board->bitboards[start + INDEX_BLACK_PAWN], enemy, attackerColor, false)
         | GeneratePseudoLegalKnightAttacks(board->bitboards[start + INDEX_BLACK_KNIGHT], empty, enemy)
         | GeneratePseudoLegalBishopAttacks(board->bitboards[start + INDEX_BLACK_BISHOP], empty, enemy)
         | GeneratePseudoLegalRookAttacks(board->bitboards[start + INDEX_BLACK_ROOK], empty, enemy)

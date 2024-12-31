@@ -3,7 +3,7 @@
 #include "generator.h"
 #include <stdio.h>
 
-#define PRINTALL false
+#define PRINTALL true
 
 u64 Perft(Board* board, int depth, bool root)
 {

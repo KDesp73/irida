@@ -1,3 +1,4 @@
+#include "bitboard.h"
 #include "board.h"
 #include "generator.h"
 #include "gui/gui.h"
@@ -186,13 +187,6 @@ int main(int argc, char** argv){
     InitZobrist();
     InitMasks();
     InitState();
-
-    Board board;
-    BoardInitFen(&board,"rnbq1k1r/pp1Pbppp/2p5/8/2B5/2Nn4/PPP3PP/RNBQK2R w KQ - 1 10");
-    Moves moves = GenerateLegalKingMoves(&board, board.bitboards[INDEX_WHITE_KING], COLOR_WHITE);
-
-    BoardPrintBitboard(&board, MovesToBitboard(moves));
-    return 0;
 
     if(argc >= 2){
         if(!strcmp(argv[1], "game")){
