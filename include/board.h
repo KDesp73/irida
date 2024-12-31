@@ -1,11 +1,6 @@
 #ifndef ENGINE_BOARD_H
 #define ENGINE_BOARD_H
 
-
-/*-----------------------------------.
-| Representation of the chess board. |
-`-----------------------------------*/
-
 #include "history.h"
 #include "square.h"
 #include <stddef.h>
@@ -32,9 +27,14 @@
 
 #define BOARD_SIZE 8
 #define PIECE_TYPES 12
+
+/*---------------------------.
+| Hybrid Representation      |
+| `grid` is used for fast    |
+| piece lookup               |
+`--------------------------*/
+
 typedef struct {
-    // Hybrid Representation
-    // `grid` is used for fast piece lookup
     Bitboard bitboards[PIECE_TYPES];
     char grid[8][8];
 
@@ -74,6 +74,7 @@ typedef enum {
     COLOR_BLACK = 0,
     COLOR_WHITE,
 } PieceColor;
+
 #undef  WHITE
 #define WHITE COLOR_WHITE
 #undef  BLACK 
@@ -108,7 +109,6 @@ bool IsInsufficientMaterial(Board* board);
 bool IsThreefoldRepetition(Board* board);
 bool IsInCheckColor(const Board* board, PieceColor color);
 bool IsInCheck(const Board* board);
-
 
 void BoardPrintSquares(const Board* board, Square* squares, size_t count);
 void BoardPrintBitboard(const Board* board, Bitboard highlight);

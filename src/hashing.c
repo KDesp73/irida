@@ -44,6 +44,7 @@ void InitHashTable(HashTable* table, const char* starting_fen)
     Board board;
     FenImport(&board, (starting_fen) ? starting_fen : STARTING_FEN);
     UpdateHashTable(table, CalculateZobristHash(&board));
+    BoardFree(&board);
 }
 
 void FreeHashTable(HashTable* table)

@@ -153,7 +153,6 @@ INLINE void stop()
 
 INLINE void quit()
 {
-    printf("info Quitting...\n");
     exit(0);
 }
 

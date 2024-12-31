@@ -70,7 +70,7 @@ char promotion_gui(Vector2 board_position, Texture2D textures[12], int turn)
 }
 
 #define MoveToVector(move) \
-    V(GetTo(move) % 8, 7-(GetTo(move) / 8))
+    V((int)(GetTo(move) % 8), (int)(7-(GetTo(move) / 8)))
 
 void gui(const char* fen)
 {
@@ -90,6 +90,7 @@ void gui(const char* fen)
     GameInit(&game, NULL, TITLE, "Player 1", "Player 2", fen);
     Board board;
     BoardInitFen(&board, fen);
+
     Vector2 selected_square = VEMPTY;
     Vector2 move_square = VEMPTY;
 
@@ -97,6 +98,8 @@ void gui(const char* fen)
 
     Square from, to;
     char promotion = '\0';
+    bool isResult = false;
+    int turn = board.turn;
 
     while (!WindowShouldClose()) {
         display_size = (Vector2){ GetScreenWidth(), GetScreenHeight() };
@@ -120,7 +123,12 @@ void gui(const char* fen)
 
         draw_pieces(board.grid, textures, board_position);
 
-        if (!IsResult(&board)) {
+        if(board.turn != turn){
+            isResult = IsResult(&board);
+            turn = board.turn;
+        }
+
+        if (!isResult){
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 if (VCMP(selected_square, VEMPTY)) {
                     selected_square = square_clicked(board_position);
@@ -157,6 +165,10 @@ void gui(const char* fen)
                 }
             }
         } else {
+            if(IsCheckmate(&board)) printf("Checkmate\n");
+            else if(IsStalemate(&board)) printf("Stalemate\n");
+            else if(IsThreefoldRepetition(&board)) printf("Three-fold repetition\n");
+            else if(IsInsufficientMaterial(&board)) printf("Insufficient material\n");
             exit(0);
         }
 

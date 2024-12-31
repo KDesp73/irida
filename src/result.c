@@ -14,8 +14,8 @@ bool IsResult(Board* board)
             IsStalemate(board)
             ||
             IsInsufficientMaterial(board)
-            // ||
-            // IsThreefoldRepetition(board)
+            ||
+            IsThreefoldRepetition(board)
         );
 }
 

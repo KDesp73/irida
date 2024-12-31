@@ -3,6 +3,9 @@
 
 #define TEST_test_king_moves\
 	test_king_moves("rnb1kb1r/ppp1p1pp/5n2/3pPp2/7q/2N5/PPPP1PPP/R1BQKBNR w KQkq - 0 1", "e1", "e2", NULL), \
-	test_king_moves("r1bqk2r/pppp1ppp/2n2n2/4p3/2b1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 0 1", "e1", NULL)
+	test_king_moves("r1bqk2r/pppp1ppp/2n2n2/4p3/2b1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 0 1", "e1", NULL), \
+	test_king_moves("1R6/1P4k1/5p2/1r3K2/8/7P/6P1/8 w - - 5 55", "f5", "e6", "e4", "f4", "g4", NULL), \
+	test_king_moves("r1bqrbk1/2p2pp1/p1np1n1p/1p2p3/4P3/PBNP1N1P/1PPB1PP1/R2Q1RK1 w - - 3 12", "g1", "h1", "h2", NULL), \
+	test_king_moves("r1bqrbk1/2p2pp1/p1np1n1p/1p2p3/4P3/PBNP1N1P/1PPB1PP1/R2Q1RK1 b - - 3 12", "g8", "h8", "h7", NULL)
 
 #endif

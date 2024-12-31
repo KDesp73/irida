@@ -43,15 +43,7 @@ Bitboard QueenAttacks(Square queens, Bitboard emptySquares, Bitboard enemySquare
 
 /*** King Safety ***/
 bool IsKingInCheck(Bitboard kingPosition, Bitboard enemyAttacks);
-Bitboard PinnedPieces(Bitboard kingPosition, Bitboard slidingAttacks, Bitboard occupancy);
-
-/*** Special Moves ***/
-Bitboard GenerateCastlingMoves(Bitboard kingPosition, bool canCastleKingside, bool canCastleQueenside, Bitboard enemyAttacks);
-Bitboard GenerateEnPassantMoves(Bitboard pawns, Bitboard enPassantSquare, Bitboard enemyPieces);
-
-/*** Legal Move Validation ***/
-bool IsMoveLegal(Bitboard kingPosition, Bitboard move, Bitboard enemyAttacks);
-
+Bitboard _PinnedPieces(Bitboard kingPosition, Bitboard slidingAttacks, Bitboard occupancy);
 
 /*** Printing ***/
 void Uint32Print(uint32_t value);

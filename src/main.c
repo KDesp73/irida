@@ -49,7 +49,6 @@ void perft(size_t depth, const char* fen, const char* first, ...) {
                     return;
                 }
             } else {
-                printf("Warning: Ignoring invalid move '%s'\n", current);
             }
             current = va_arg(args, const char*);
         }
@@ -188,16 +187,16 @@ int main(int argc, char** argv){
     InitMasks();
     InitState();
 
-    if(argc >= 2){
-        if(!strcmp(argv[1], "game")){
+    if (argc >= 2) {
+        if (!strcmp(argv[1], "game")) {
             game(argv[2]);
-        } else if(!strcmp(argv[1], "perft")){
-            if(argc < 3) {
+        } else if (!strcmp(argv[1], "perft")) {
+            if (argc < 3) {
                 WARN("Please provide the depth");
                 exit(1);
             }
             perft(atoi(argv[2]), argv[3], argv[4], argv[5], argv[6], argv[7], argv[8]);
-        } else if(!strcmp(argv[1], "gui")){
+        } else if (!strcmp(argv[1], "gui")) {
             gui(argv[2]);
         }
 

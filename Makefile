@@ -1,7 +1,7 @@
 # Compiler and flags
 CC = gcc
 INCLUDE = -Iinclude -Ilib/raylib/include
-CFLAGS = -Wall $(INCLUDE) -fPIC 
+CFLAGS = -Wall $(INCLUDE) -fPIC -O3
 LDFLAGS = -L./lib/raylib/lib -l:libraylib.a -lm -lpthread -ldl
 
 # Directories
@@ -29,7 +29,7 @@ VERSION = $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 ifneq ($(type), RELEASE)
 	CFLAGS += -DDEBUG -ggdb
 else
-	CFLAGS += -O3
+	CFLAGS +=
 endif
 
 # Source and object files
