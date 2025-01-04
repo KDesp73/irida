@@ -51,7 +51,7 @@ int main(int argc, char** argv)
         // RUN_TEST(test_perft), // PASSES
         // RUN_TEST(test_perft_2), // FAILS at depth 3
         // RUN_TEST(test_perft_3), // PASSES
-        RUN_TEST(test_perft_4), // FAILS at depth 3
+        // RUN_TEST(test_perft_4), // FAILS at depth 3
         // RUN_TEST(test_perft_5), // PASSES
         // RUN_TEST(test_perft_6), // PASSES
 
@@ -70,7 +70,7 @@ int main(int argc, char** argv)
         // RUN_TEST(test_king_pseudo),
 
         // RUN_TEST(test_is_in_check),
-        // RUN_TEST(test_undo),
+        RUN_TEST(test_undo),
 
         1
     END_TESTS

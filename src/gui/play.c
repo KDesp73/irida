@@ -82,7 +82,7 @@ void gui(const char* fen)
     SetTargetFPS(60);
 
     Texture2D textures[12];
-    load_textures(textures, "wiki");
+    load_textures(textures, "merida");
 
     Vector2 display_size = { GetScreenWidth(), GetScreenHeight() };
 
