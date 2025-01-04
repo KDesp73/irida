@@ -191,21 +191,17 @@ Moves GenerateLegalMoves(const Board* board)
     PieceColor color = board->turn;
 
     moves = MovesCombine(
-                GenerateLegalPawnMoves(board, board->bitboards[color*6 + INDEX_BLACK_PAWN], color),
-                MovesCombine(
-                    GenerateLegalKnightMoves(board, board->bitboards[color*6 + INDEX_BLACK_KNIGHT], color),
-                    MovesCombine(
-                        GenerateLegalBishopMoves(board, board->bitboards[color*6 + INDEX_BLACK_BISHOP], color),
-                        MovesCombine(
-                            GenerateLegalRookMoves(board, board->bitboards[color*6 + INDEX_BLACK_ROOK], color),
-                            MovesCombine(
-                                GenerateLegalQueenMoves(board, board->bitboards[color*6 + INDEX_BLACK_QUEEN], color),
-                                GenerateLegalKingMoves(board, board->bitboards[color*6 + INDEX_BLACK_KING], color)
-                            )
-                        )
-                    )
-                )
-            );
+            GenerateLegalPawnMoves(board, board->bitboards[color*6 + INDEX_BLACK_PAWN], color),
+            MovesCombine(
+            GenerateLegalKnightMoves(board, board->bitboards[color*6 + INDEX_BLACK_KNIGHT], color),
+            MovesCombine(
+            GenerateLegalBishopMoves(board, board->bitboards[color*6 + INDEX_BLACK_BISHOP], color),
+            MovesCombine(
+            GenerateLegalRookMoves(board, board->bitboards[color*6 + INDEX_BLACK_ROOK], color),
+            MovesCombine(
+            GenerateLegalQueenMoves(board, board->bitboards[color*6 + INDEX_BLACK_QUEEN], color),
+            GenerateLegalKingMoves(board, board->bitboards[color*6 + INDEX_BLACK_KING], color
+            ))))));
 
     return moves;
 }

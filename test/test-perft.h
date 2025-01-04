@@ -4,7 +4,7 @@
 #define PERFT_TEST(fen, depth, expected) \
     Board board; \
     BoardInitFen(&board, fen); \
-    u64 count = Perft(&board, depth, true); \
+    u64 count = Perft(&board, depth, true, NULL); \
     BoardFree(&board); \
 \
     if(count != expected){ \

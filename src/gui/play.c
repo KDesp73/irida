@@ -123,6 +123,7 @@ void gui(const char* fen)
 
         draw_pieces(board.grid, textures, board_position);
 
+        // Check once every turn
         if(board.turn != turn){
             isResult = IsResult(&board);
             turn = board.turn;

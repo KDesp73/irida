@@ -271,7 +271,7 @@ uint8_t CharToPromotion(char promotion)
     }
 }
 
-size_t getBitboardIndexFromPiece(char piece)
+static size_t getBitboardIndexFromPiece(char piece)
 {
     switch (piece) {
         case 'p': return 0;
@@ -290,7 +290,7 @@ size_t getBitboardIndexFromPiece(char piece)
     }
 }
 
-size_t getBitboardIndexFromSquare(Board* board, Square square)
+static size_t getBitboardIndexFromSquare(Board* board, Square square)
 {
     Piece piece = PieceAt(board, square);
     return getBitboardIndexFromPiece(piece.type);
@@ -506,6 +506,8 @@ bool MakeMove(Board* board, Move move)
 
 void UnmakeMove(Board* board)
 {
+    if(board->history.count <= 0) return;
+
     Undo undo = LoadLastUndo(board);
 
     MOVE_DECODE(undo.move);

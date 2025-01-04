@@ -66,7 +66,7 @@ void perft(size_t depth, const char* fen, const char* first, ...) {
     }
 
     // Perform perft
-    u64 count = Perft(&board, depth, true);
+    u64 count = Perft(&board, depth, true, NULL);
 
     // Print results
     printf("\nPerft result: %llu\n", count);
@@ -94,7 +94,7 @@ int move(Board* board)
     flush_input(); // Clear any leftover input
 
     if (strlen(move_input) != 4 && strlen(move_input) != 5) {
-        printf("Invalid move format. Use 4 or 5 characters (e.g., e2e4 or h7h8Q).\n");
+        printf("Invalid move format. Use 4 or 5 characters (e.g., e2e4 or h7h8q).\n");
         return false;
     }
 
@@ -192,7 +192,7 @@ int main(int argc, char** argv){
             game(argv[2]);
         } else if (!strcmp(argv[1], "perft")) {
             if (argc < 3) {
-                WARN("Please provide the depth");
+                ERRO("Please provide the depth");
                 exit(1);
             }
             perft(atoi(argv[2]), argv[3], argv[4], argv[5], argv[6], argv[7], argv[8]);
@@ -205,6 +205,5 @@ int main(int argc, char** argv){
 
     UciMain(argc, argv);
 
-    
     return 0;
 }
