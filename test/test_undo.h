@@ -15,6 +15,20 @@
 	test_undo("rnbqkb1r/pp2pppp/8/1p6/3P4/2n2N2/P1P1QPPP/R1B1K2R w KQkq - 0 1", MoveEncodeNames("e2", "b5", PROMOTION_NONE, FLAG_NORMAL)), \
 	test_undo("rnbqkb1r/pp2pppp/8/1p6/3P4/2n2N2/P1P1QPPP/R1B1K2R w KQkq - 0 1", MoveEncodeNames("e1", "g1", PROMOTION_NONE, FLAG_CASTLING)), \
 	test_undo("rnbqkb1r/pp3ppp/8/1p1Pp3/8/2n2N2/P1P1QPPP/R1B1K2R w KQkq e6 0 1", MoveEncodeNames("d5", "e6", PROMOTION_NONE, FLAG_ENPASSANT)), \
-	test_undo("rnbqkb1r/p4ppp/1p2P3/1p6/8/2n2N2/P1P1QPPP/R1B1K2R w KQkq - 0 1", MoveEncodeNames("e6", "f7", PROMOTION_NONE, FLAG_NORMAL))
+	test_undo("rnbqkb1r/p4ppp/1p2P3/1p6/8/2n2N2/P1P1QPPP/R1B1K2R w KQkq - 0 1", MoveEncodeNames("e6", "f7", PROMOTION_NONE, FLAG_NORMAL)), \
+	test_undo("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", MoveEncodeNames("e2", "e4", PROMOTION_NONE, FLAG_NORMAL)), \
+	test_undo("r1bqkbnr/ppp2ppp/2n1P3/8/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1", MoveEncodeNames("e6", "f7", PROMOTION_NONE, FLAG_NORMAL)), \
+	test_undo("r1bqkbnr/ppp2ppp/2n1P3/8/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1", MoveEncodeNames("e6", "e7", PROMOTION_NONE, FLAG_NORMAL)), \
+	test_undo("r1bqkbnr/ppp3Pp/2n5/8/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1", MoveEncodeNames("g7", "f8", PROMOTION_QUEEN, FLAG_NORMAL)), \
+	test_undo("r1bqkbnr/ppp3Pp/2n5/8/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1", MoveEncodeNames("g7", "f8", PROMOTION_ROOK, FLAG_NORMAL)), \
+	test_undo("r1bqkbnr/ppp3Pp/2n5/8/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1", MoveEncodeNames("g7", "f8", PROMOTION_BISHOP, FLAG_NORMAL)), \
+	test_undo("r1bqkbnr/ppp3Pp/2n5/8/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1", MoveEncodeNames("g7", "f8", PROMOTION_KNIGHT, FLAG_NORMAL)), \
+	test_undo("r1bqkbnr/ppp3Pp/2n5/8/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1", MoveEncodeNames("g7", "h8", PROMOTION_QUEEN, FLAG_NORMAL)), \
+	test_undo("r1bqkbnr/ppp3Pp/2n5/8/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1", MoveEncodeNames("g7", "h8", PROMOTION_ROOK, FLAG_NORMAL)), \
+	test_undo("r1bqkbnr/ppp3Pp/2n5/8/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1", MoveEncodeNames("g7", "h8", PROMOTION_BISHOP, FLAG_NORMAL)), \
+	test_undo("r1bqkbnr/ppp3Pp/2n5/8/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1", MoveEncodeNames("g7", "h8", PROMOTION_KNIGHT, FLAG_NORMAL)), \
+	test_undo("r1b1kbnr/ppp3Pp/2n5/1B4B1/8/2NP1N2/PPP1qPPP/R3K2R w KQkq - 0 1", MoveEncodeNames("e1", "e2", PROMOTION_NONE, FLAG_NORMAL)), \
+	test_undo("r1b1kbnr/ppp3Pp/2n5/1B4B1/8/2NP1N2/PPP1qPPP/R3K2R w KQkq - 0 1", MoveEncodeNames("e1", "d1", PROMOTION_NONE, FLAG_NORMAL)), \
+	test_undo("r1b1kbnr/ppp3Pp/2n5/1B4B1/8/2NP1N2/PPP1qPPP/R3K2R w KQkq - 0 1", MoveEncodeNames("c3", "e2", PROMOTION_NONE, FLAG_NORMAL))
 
 #endif

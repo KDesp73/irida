@@ -465,25 +465,24 @@ bool IsDoublePawnPush(Board* board, Move move)
 bool MakeMove(Board* board, Move move)
 {
     Piece piece = PieceAt(board, GetFrom(move));
-    if(piece.color != board->turn) return false;
-    if(piece.type == EMPTY_SQUARE) return false;
+    if (piece.type == EMPTY_SQUARE) return false;
+    if (piece.color != board->turn) return false;
 
     uint8_t castling = UpdateCastlingRights(board, move);
-    Square enpassant;
-    if(IsDoublePawnPush(board, move)){
-        enpassant = GetFrom(move) + ((piece.color) ? 8 : -8);
-    } else {
-        enpassant = 64;
+    Square enpassant = 64;
+
+    if (IsDoublePawnPush(board, move)) {
+        enpassant = GetFrom(move) + ((piece.color == COLOR_WHITE) ? 8 : -8);
     }
 
     bool succ = true;
-    if(IsCastle(board, &move)){
+    if (IsCastle(board, &move)) {
         succ = Castle(board, move);
-    } else if(IsEnpassant(board, &move)){
+    } else if (IsEnpassant(board, &move)) {
         succ = Enpassant(board, move);
-    } 
+    }
 
-    if(!succ) return false;
+    if (!succ) return false;
 
     IsPromotion(board, &move);
 
@@ -494,11 +493,12 @@ bool MakeMove(Board* board, Move move)
     board->castling_rights = castling;
     board->enpassant_square = enpassant;
 
+    UpdateHashTable(&board->history.positions, CalculateZobristHash(board));
+
     if (board->turn == COLOR_BLACK) {
         board->fullmove++;
     }
 
-    UpdateHashTable(&board->history.positions, CalculateZobristHash(board));
     board->turn = !board->turn;
 
     return true;
@@ -506,19 +506,19 @@ bool MakeMove(Board* board, Move move)
 
 void UnmakeMove(Board* board)
 {
-    if(board->history.count <= 0) return;
+    if (board->history.count <= 0) return;
 
     Undo undo = LoadLastUndo(board);
-
     MOVE_DECODE(undo.move);
 
     Bitboard specialBB = UndoMove(&board->bitboards[getBitboardIndexFromSquare(board, dst)], undo.move);
     board->grid[COORDS(src)] = board->grid[COORDS(dst)];
     board->grid[COORDS(dst)] = EMPTY_SQUARE;
-    
+
     int color = !board->turn;
 
-    if(flag == FLAG_PROMOTION){
+    if (flag == FLAG_PROMOTION) {
+        // Remove promoted piece from bitboard
         switch (promotion) {
         case PROMOTION_QUEEN:
             board->bitboards[color*6 + INDEX_BLACK_QUEEN] &= ~specialBB;
@@ -533,35 +533,37 @@ void UnmakeMove(Board* board)
             board->bitboards[color*6 + INDEX_BLACK_KNIGHT] &= ~specialBB;
             break;
         }
-        board->bitboards[color*6 + INDEX_BLACK_PAWN] |= 1ULL << src;
+        // Restore the pawn
+        board->bitboards[color*6 + INDEX_BLACK_PAWN] |= (1ULL << src);
         board->grid[COORDS(src)] = (color) ? 'P' : 'p';
-    } else if(flag == FLAG_CASTLING){
-        if(File(dst) > File(src)){
-            board->grid[COORDS(dst+1)] = (color) ? 'R' : 'r';
-            board->grid[COORDS(dst-1)] = EMPTY_SQUARE;
-        } else {
-            board->grid[COORDS(dst+1)] = (color) ? 'R' : 'r';
-            board->grid[COORDS(dst-2)] = EMPTY_SQUARE;
-        }
-
-        board->bitboards[color*6 + INDEX_BLACK_ROOK] ^= specialBB;
-    } else if(flag == FLAG_ENPASSANT) {
-        board->bitboards[!color*6 + INDEX_BLACK_PAWN] |= specialBB;
-        board->grid[COORDS(dst + ((color) ? -8 : 8))] = (color) ? 'p' : 'P';
     } 
+    else if (flag == FLAG_CASTLING) {
+        if (File(dst) > File(src)) { // Kingside castling
+            board->grid[COORDS(src + 3)] = (color) ? 'R' : 'r';
+            board->grid[COORDS(dst - 1)] = EMPTY_SQUARE;
+        } else { // Queenside castling
+            board->grid[COORDS(src - 4)] = (color) ? 'R' : 'r';
+            board->grid[COORDS(dst + 1)] = EMPTY_SQUARE;
+        }
+        board->bitboards[color*6 + INDEX_BLACK_ROOK] ^= specialBB;
+    } 
+    else if (flag == FLAG_ENPASSANT) {
+        int capturedSquare = dst + ((color) ? -8 : 8);
+        board->bitboards[!color*6 + INDEX_BLACK_PAWN] |= (1ULL << capturedSquare);
+        board->grid[COORDS(capturedSquare)] = (color) ? 'p' : 'P';
+    }
 
     if (undo.captured != EMPTY_SQUARE) {
         int capturedPieceIndex = getBitboardIndexFromPiece(undo.captured);
-
         board->bitboards[capturedPieceIndex] |= (1ULL << dst);
         board->grid[COORDS(dst)] = undo.captured;
     }
 
-    if(board->turn == COLOR_WHITE){
+    if (board->turn == COLOR_WHITE) {
         board->fullmove--;
     }
 
-    HistoryRemove(&board->history);
+    HistoryRemove(&board->history); // Move before flipping turn
 
     board->turn = !board->turn;
 }

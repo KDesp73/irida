@@ -1,5 +1,6 @@
 #include <io/test.h>
 #include <stdint.h>
+#include <stdio.h>
 #include "board.h"
 #include "tests.h"
 #include "move.h"
@@ -15,7 +16,8 @@ int test_undo(const char* fen, Move move)
     Board originalBoard = board;
     uint64_t hash = CalculateZobristHash(&originalBoard);
     
-    if (!MakeMove(&board, move)) {
+    bool succ = MakeMove(&board, move);
+    if (!succ) {
         FAIL("MakeMove failed for move: ");
         MovePrint(move);
         return false;
@@ -59,6 +61,8 @@ int test_undo(const char* fen, Move move)
         FAILF(fen, "Hashes don't match");
         return 0;
     }
+
+    SUCC("Passed");
 
     return 1;
 }

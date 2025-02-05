@@ -121,5 +121,6 @@ Moves BitboardToMoves(Bitboard bitboard, Square from);
 Bitboard MovesToBitboard(Moves moves);
 
 void BoardPrintMove(const Board* board, Move move);
+#define MOVE_PRINT(move) MovePrint(move);
 
 #endif // ENGINE_MOVE_H
