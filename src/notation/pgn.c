@@ -3,6 +3,7 @@
 #include "move.h"
 #include "notation.h"
 #include "piece.h"
+#include "result.h"
 #include "square.h"
 #include <ctype.h>
 #include <io/logging.h>
@@ -385,7 +386,7 @@ void GameRun(Game game)
     int result = RESULT_NONE;
 
     for(size_t i = 0; i < game.move_count; i++) {
-        for(size_t j = 0; j < SCORE_COUNT; j++){
+        for(size_t j = 0; j < RESULT_COUNT; j++){
             if(!strcmp(game.moves[i].move, result_score[j])) {
                 result = j;
                 goto end;

@@ -8,41 +8,13 @@
 `-------------------------------*/
 
 #include "move.h"
+#include "result.h"
 
 void FenImport(Board* board, const char* fen);
 void FenExport(const Board* board, char fen[]);
 
 #define MAX_HEADER_LENGTH 256
 
-typedef enum {
-    RESULT_NONE,
-    RESULT_WHITE_WON,
-    RESULT_BLACK_WON,
-    RESULT_STALEMATE,
-    RESULT_DRAW_BY_REPETITION,
-    RESULT_DRAW_DUE_TO_INSUFFICIENT_MATERIAL,
-    RESULT_DRAW_DUE_TO_50_MOVE_RULE
-} result_t ;
-
-#define SCORE_COUNT 7
-static const char result_score[][8] = {
-    "*",
-    "1-0",
-    "0-1",
-    "1/2-1/2",
-    "1/2-1/2",
-    "1/2-1/2",
-    "1/2-1/2"
-};
-static const char result_message[][256] = {
-    "No result yet",
-    "White won",
-    "Black won",
-    "Stalemate",
-    "Draw by repetition",
-    "Draw due to insufficient material",
-    "Draw due to 50 move rule"
-};
 
 typedef struct {
     char move[16];  // For example, "e4", "Nf3"

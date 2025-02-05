@@ -66,7 +66,7 @@ void perft(size_t depth, const char* fen, const char* first, ...) {
     }
 
     // Perform perft
-    u64 count = Perft(&board, depth, true, NULL);
+    u64 count = Perft(&board, depth, true);
 
     // Print results
     printf("\nPerft result: %llu\n", count);

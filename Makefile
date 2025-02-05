@@ -91,8 +91,7 @@ check: $(BUILD_DIR) static ## Build the tests
 
 .PHONY: test
 test: ## Build and run the tests
-	make clean
-	make all
+	make all -B
 	clear
 	./$(CHECK) load
 	make all

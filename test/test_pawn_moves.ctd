@@ -16,3 +16,12 @@
 "r1bqk2r/pppp1ppp/2n2n2/4p3/2b1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 0 1", "f7", NULL
 "rnb1kb1r/ppp1p1pp/5n2/3pPp2/7q/2N5/PPPP1PPP/R1BQKBNR w KQkq d6 0 1", "e5", "d6", "e6", "f6", NULL
 "rnb1kb1r/ppp1p1pp/5n2/3pPp2/7q/2N5/PPPP1PPP/R1BQKBNR w KQkq d6 0 1", "f2", NULL
+"rnbqkbnr/ppp1pppp/8/1B1P4/8/8/PPPP1PPP/RNBQK1NR b KQkq - 0 1", "c7", "c6", NULL
+"rnbqkbnr/ppp1pppp/8/1B1P4/8/8/PPPP1PPP/RNBQK1NR b KQkq - 0 1", "b7", NULL
+"rnbqkbnr/ppp1pppp/8/1B1P4/8/8/PPPP1PPP/RNBQK1NR b KQkq - 0 1", "a7", NULL
+"rnbqkbnr/ppp1pppp/8/1B1P4/8/8/PPPP1PPP/RNBQK1NR b KQkq - 0 1", "e7", NULL
+"rnbqkbnr/ppp1pppp/8/1B1P4/8/8/PPPP1PPP/RNBQK1NR b KQkq - 0 1", "f7", NULL
+"rnbqkbnr/ppp1pppp/8/1B1P4/8/8/PPPP1PPP/RNBQK1NR b KQkq - 0 1", "g7", NULL
+"rnbqkbnr/ppp1pppp/8/1B1P4/8/8/PPPP1PPP/RNBQK1NR b KQkq - 0 1", "h7", NULL
+"rnbq1bnr/ppp1kppp/4p3/3P4/1B6/8/PPPP1PPP/RNBQK1NR b KQha - 0 1", "c7", "c5", NULL
+"rnbq1bnr/ppp1kppp/4p3/1B1P4/8/8/PPPP1PPP/RNBQK1NR w KQ - 0 1", "d5", "d6", "e6", NULL

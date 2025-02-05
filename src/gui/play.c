@@ -13,6 +13,7 @@
 #include "move.h"
 #include "notation.h"
 #include "piece.h"
+#include "result.h"
 #include "utils.h"
 
 char promotion_gui(Vector2 board_position, Texture2D textures[12], int turn)
@@ -98,7 +99,7 @@ void gui(const char* fen)
 
     Square from, to;
     char promotion = '\0';
-    bool isResult = false;
+    Result result = RESULT_NONE;
     int turn = board.turn;
 
     while (!WindowShouldClose()) {
@@ -125,11 +126,11 @@ void gui(const char* fen)
 
         // Check once every turn
         if(board.turn != turn){
-            isResult = IsResult(&board);
+            result = IsResult(&board);
             turn = board.turn;
         }
 
-        if (!isResult){
+        if (result == RESULT_NONE){
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 if (VCMP(selected_square, VEMPTY)) {
                     selected_square = square_clicked(board_position);
@@ -166,10 +167,15 @@ void gui(const char* fen)
                 }
             }
         } else {
-            if(IsCheckmate(&board)) printf("Checkmate\n");
-            else if(IsStalemate(&board)) printf("Stalemate\n");
-            else if(IsThreefoldRepetition(&board)) printf("Three-fold repetition\n");
-            else if(IsInsufficientMaterial(&board)) printf("Insufficient material\n");
+            switch (result) {
+                case RESULT_WHITE_WON: printf("White won\n"); break;
+                case RESULT_BLACK_WON: printf("Black won\n"); break;
+                case RESULT_STALEMATE: printf("Stalemate\n"); break;
+                case RESULT_DRAW_BY_REPETITION: printf("Draw by repetition\n"); break;
+                case RESULT_DRAW_DUE_TO_INSUFFICIENT_MATERIAL: printf("Draw due to insufficient material\n"); break;
+                case RESULT_DRAW_DUE_TO_50_MOVE_RULE: printf("Draw due to 50 move rule\n"); break;
+                default: break;
+            }
             exit(0);
         }
 

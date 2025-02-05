@@ -61,7 +61,7 @@ void go(const char* command)
     if (strncmp(command, "go perft ", 9) == 0) {
         int depth = atoi(command + 9);
         printf("depth: %d\n", depth);
-        int nodes = Perft(&state.board, depth, true, NULL);
+        int nodes = Perft(&state.board, depth, true);
         printf("\nNodes searched: %d\n", nodes);
     } else {
         // TODO: Calculate best move

@@ -60,7 +60,7 @@ int main(int argc, char** argv)
         // RUN_TEST(test_bishop_moves),
         // RUN_TEST(test_rook_moves),
         // RUN_TEST(test_queen_moves),
-        // RUN_TEST(test_king_moves),
+        RUN_TEST(test_king_moves),
 
         // RUN_TEST(test_pawn_pseudo),
         // RUN_TEST(test_knight_pseudo),
@@ -70,7 +70,7 @@ int main(int argc, char** argv)
         // RUN_TEST(test_king_pseudo),
 
         // RUN_TEST(test_is_in_check),
-        RUN_TEST(test_undo),
+        // RUN_TEST(test_undo),
 
         1
     END_TESTS

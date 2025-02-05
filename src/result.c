@@ -4,19 +4,21 @@
 #include "move.h"
 #include "piece.h"
 #include "zobrist.h"
+#include "result.h"
 #include <ctype.h>
 
-bool IsResult(Board* board)
+Result IsResult(Board* board)
 {
-    return (
-            IsCheckmate(board)
-            ||
-            IsStalemate(board)
-            ||
-            IsInsufficientMaterial(board)
-            ||
-            IsThreefoldRepetition(board)
-        );
+    if(IsCheckmate(board))
+        return board->turn == WHITE ? RESULT_BLACK_WON : RESULT_WHITE_WON;
+    if(IsStalemate(board)) 
+        return RESULT_STALEMATE;
+    if(IsInsufficientMaterial(board)) 
+        return RESULT_DRAW_DUE_TO_INSUFFICIENT_MATERIAL;
+    if(IsThreefoldRepetition(board)) 
+        return RESULT_DRAW_BY_REPETITION;
+
+    return RESULT_NONE;
 }
 
 bool IsCheckmate(Board* board)

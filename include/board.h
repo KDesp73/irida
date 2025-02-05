@@ -75,6 +75,7 @@ typedef enum {
     COLOR_WHITE,
 } PieceColor;
 
+
 #undef  WHITE
 #define WHITE COLOR_WHITE
 #undef  BLACK 
@@ -102,11 +103,6 @@ bool IsSquareOccupiedBy(const Board* board, Square square, PieceColor color);
 
 size_t NumberOfPieces(const Board* board, PieceColor color);
 
-bool IsResult(Board* board);
-bool IsCheckmate(Board* board);
-bool IsStalemate(Board* board);
-bool IsInsufficientMaterial(Board* board);
-bool IsThreefoldRepetition(Board* board);
 bool IsInCheckColor(const Board* board, PieceColor color);
 bool IsInCheck(const Board* board);
 
