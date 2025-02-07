@@ -93,7 +93,6 @@ Bitboard BishopAttacks(Square bishop, Bitboard emptySquares, Bitboard enemySquar
 Bitboard calculateRookAttacks(int square, Bitboard occupancy) {
     Bitboard attacks = 0;
     int rank = square / 8;
-    int file = square % 8;
 
     for (int d = 0; d < 4; ++d) {
         int direction = ROOK_OFFSETS[d];

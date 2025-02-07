@@ -7,7 +7,6 @@
 #include "square.h"
 #include <ctype.h>
 #include <io/logging.h>
-#define ANSI_IMPLEMENTATION
 #include <io/ansi.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -46,7 +45,6 @@ void PgnExport(Game* game, char* pgn)
 // TODO: has issues with moves
 void PgnImport(Game* game, const char* pgn)
 {
-    char line[1024];
     int move_count = 0;
 
     memset(game, 0, sizeof(Game));
@@ -139,7 +137,6 @@ void Notate(Board* board, Move move, SanMove* san)
     MOVE_DECODE(move);
 
     Piece piece = PieceAt(board, src);
-    int color = piece.color;
     char target_square[3];
     SquareToName(target_square, dst);
 

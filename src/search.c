@@ -3,7 +3,7 @@
 #include "move.h"
 #include "movegen.h"
 #include "result.h"
-#include <math.h>
+#include <limits.h>
 
 static int max(int a, int b) 
 {
@@ -19,7 +19,7 @@ int Minimax(Board* board, int depth, bool isMaximizing)
     if(depth == 0 || IsResult(board))
         return Evaluation(board);
 
-    int bestScore = isMaximizing ? -INFINITY : INFINITY;
+    int bestScore = isMaximizing ? INT_MIN : INT_MAX;
     Moves moves = GenerateLegalMoves(board);
 
     for(size_t i = 0; i < moves.count; i++){
@@ -39,8 +39,8 @@ int Minimax(Board* board, int depth, bool isMaximizing)
 
 Move FindBest(Board* board, int depth)
 {
-    int bestScore = -INFINITY;
-    Move bestMove;
+    int bestScore = INT_MIN;
+    Move bestMove = NULL_MOVE;
     Moves moves = GenerateLegalMoves(board);
 
     for (size_t i = 0; i < moves.count; i++) {

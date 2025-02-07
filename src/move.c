@@ -129,7 +129,7 @@ void MoveFreely(Board* board, Move move, PieceColor color) {
         board->grid[COORDS(to)] = board->grid[COORDS(from)]; // Move the piece
     } else {
         char promotedPiece = PromotionToChar(promotion); // Get promoted piece character
-        board->grid[COORDS(to)] = (color == WHITE) ? toupper(promotedPiece) : tolower(promotedPiece);
+        board->grid[COORDS(to)] = (color == COLOR_WHITE) ? toupper(promotedPiece) : tolower(promotedPiece);
     }
     board->grid[COORDS(from)] = EMPTY_SQUARE; // Clear the source square
 

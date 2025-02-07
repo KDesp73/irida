@@ -129,14 +129,14 @@ uint8_t UpdateCastlingRights(Board* board, Move move)
     // Handle rook moves: disable relevant castling rights
     if (IS_ROOK(piece)) {
         switch (color) {
-        case WHITE:
+        case COLOR_WHITE:
             switch (from) {
                 case 0: castling_rights &= ~CASTLE_WHITE_QUEENSIDE; break;
                 case 7: castling_rights &= ~CASTLE_WHITE_KINGSIDE; break;
                 default: break;
             }
             break;
-        case BLACK:
+        case COLOR_BLACK:
             switch (from) {
                 case 56: castling_rights &= ~CASTLE_BLACK_QUEENSIDE; break;
                 case 63: castling_rights &= ~CASTLE_BLACK_KINGSIDE; break;
@@ -151,10 +151,10 @@ uint8_t UpdateCastlingRights(Board* board, Move move)
     // Handle king moves: disable all castling rights for that color
     if (IS_KING(piece)) {
         switch (color) {
-            case WHITE:
+            case COLOR_WHITE:
                 castling_rights &= ~(CASTLE_WHITE_KINGSIDE | CASTLE_WHITE_QUEENSIDE);
                 break;
-            case BLACK:
+            case COLOR_BLACK:
                 castling_rights &= ~(CASTLE_BLACK_KINGSIDE | CASTLE_BLACK_QUEENSIDE);
                 break;
             case COLOR_NONE:
@@ -165,14 +165,14 @@ uint8_t UpdateCastlingRights(Board* board, Move move)
     // Handle rook capture: disable castling rights for the opponent
     if (IS_ROOK(to_piece) && to_piece.color != color) {
         switch (to_piece.color) {
-            case WHITE:
+            case COLOR_WHITE:
                 switch (to) {
                     case 0: castling_rights &= ~CASTLE_WHITE_QUEENSIDE; break;
                     case 7: castling_rights &= ~CASTLE_WHITE_KINGSIDE; break;
                     default: break;
                 }
                 break;
-            case BLACK:
+            case COLOR_BLACK:
                 switch (to) {
                     case 56: castling_rights &= ~CASTLE_BLACK_QUEENSIDE; break;
                     case 63: castling_rights &= ~CASTLE_BLACK_KINGSIDE; break;

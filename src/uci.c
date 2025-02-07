@@ -42,10 +42,10 @@ void setoption(const char *command)
                     state.uciOptions[i].value.spin = atoi(option_value);
                     break;
                 case UCI_COMBO:
-                    strncpy(state.uciOptions[i].value.combo, option_value, sizeof(state.uciOptions[i].value.combo) - 1);
+                    snprintf(state.uciOptions[i].value.combo, sizeof(state.uciOptions[i].value.combo), "%s", option_value);
                     break;
                 case UCI_STRING:
-                    strncpy(state.uciOptions[i].value.string, option_value, sizeof(state.uciOptions[i].value.string) - 1);
+                    snprintf(state.uciOptions[i].value.string, sizeof(state.uciOptions[i].value.string), "%s", option_value);
                     break;
                 default:
                     printf("info string Unknown option type\n");

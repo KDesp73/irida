@@ -75,12 +75,6 @@ typedef enum {
     COLOR_WHITE,
 } PieceColor;
 
-
-#undef  WHITE
-#define WHITE COLOR_WHITE
-#undef  BLACK 
-#define BLACK COLOR_BLACK
-
 char PromotionToChar(uint8_t promotion);
 uint8_t CharToPromotion(char promotion);
 

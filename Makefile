@@ -1,7 +1,7 @@
 # Compiler and flags
 CC = gcc
 INCLUDE = -Iinclude -Ilib/raylib/include
-CFLAGS = -Wall $(INCLUDE) -fPIC -O3
+CFLAGS = -Wall -Werror $(INCLUDE) -fPIC -O3
 LDFLAGS = -L./lib/raylib/lib -l:libraylib.a -lm -lpthread -ldl
 
 # Directories

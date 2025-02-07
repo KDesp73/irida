@@ -25,22 +25,22 @@ typedef uint64_t Bitboard;
 #define RANK_7  0x00FF000000000000ULL  // Rank 7 (a7-h7)
 #define RANK_8  0xFF00000000000000ULL  // Rank 8 (a8-h8)
 
-static Bitboard DIAGONAL_MASKS[64];
-static Bitboard ANTI_DIAGONAL_MASKS[64];
-static Bitboard HORIZONTAL_MASKS[64];
-static Bitboard VERTICAL_MASKS[64];
+static Bitboard DIAGONAL_MASKS[64] __attribute__((unused));
+static Bitboard ANTI_DIAGONAL_MASKS[64] __attribute__((unused));
+static Bitboard HORIZONTAL_MASKS[64] __attribute__((unused));
+static Bitboard VERTICAL_MASKS[64] __attribute__((unused));
 
-static Bitboard PAWN_PUSH_MASKS[2][64];
-static Bitboard PAWN_DOUBLE_PUSH_MASKS[2][64];
-static Bitboard PAWN_ATTACK_MASKS[2][64];
-static Bitboard PAWN_PROMOTION_MASKS[2][64];
-static Bitboard PAWN_PROMOTION_ATTACK_MASKS[2][64];
+static Bitboard PAWN_PUSH_MASKS[2][64] __attribute__((unused));
+static Bitboard PAWN_DOUBLE_PUSH_MASKS[2][64] __attribute__((unused));
+static Bitboard PAWN_ATTACK_MASKS[2][64] __attribute__((unused));
+static Bitboard PAWN_PROMOTION_MASKS[2][64] __attribute__((unused));
+static Bitboard PAWN_PROMOTION_ATTACK_MASKS[2][64] __attribute__((unused));
 
-static Bitboard KNIGHT_MOVE_MASKS[64];
-static Bitboard BISHOP_MOVE_MASKS[64];
-static Bitboard ROOK_MOVE_MASKS[64];
-static Bitboard QUEEN_MOVE_MASKS[64];
-static Bitboard KING_MOVE_MASKS[64];
+static Bitboard KNIGHT_MOVE_MASKS[64] __attribute__((unused));
+static Bitboard BISHOP_MOVE_MASKS[64] __attribute__((unused));
+static Bitboard ROOK_MOVE_MASKS[64] __attribute__((unused));
+static Bitboard QUEEN_MOVE_MASKS[64] __attribute__((unused));
+static Bitboard KING_MOVE_MASKS[64] __attribute__((unused));
 
 typedef enum {
     DIAGONAL,

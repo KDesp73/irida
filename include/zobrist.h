@@ -6,10 +6,10 @@
 
 #define CASTLING_OPTIONS 4
 
-static uint64_t zobrist_table[PIECE_TYPES][BOARD_SIZE][BOARD_SIZE];
-static uint64_t zobrist_castling[CASTLING_OPTIONS];
-static uint64_t zobrist_en_passant[BOARD_SIZE];
-static uint64_t zobrist_black_to_move;
+static uint64_t zobrist_table[PIECE_TYPES][BOARD_SIZE][BOARD_SIZE] __attribute__((unused));
+static uint64_t zobrist_castling[CASTLING_OPTIONS]                 __attribute__((unused));
+static uint64_t zobrist_en_passant[BOARD_SIZE]                     __attribute__((unused));
+static uint64_t zobrist_black_to_move                              __attribute__((unused));
 
 void InitZobrist();
 

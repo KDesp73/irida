@@ -129,8 +129,8 @@ Bitboard GeneratePawnMoves(const Board* board, Square piece, PieceColor color)
     pseudoLegal = PawnAttacks(piece, enemySquares, color)
         | PawnPushes(piece, emptySquares, color);
 
-    if((color == WHITE && enpassantBB & RANK_6) ||
-        (color == BLACK && enpassantBB & RANK_3))
+    if((color == COLOR_WHITE && enpassantBB & RANK_6) ||
+        (color == COLOR_BLACK && enpassantBB & RANK_3))
         pseudoLegal |= (PawnAttackMask(piece, color) & enpassantBB);
 
     return pseudoLegal;

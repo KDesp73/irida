@@ -24,7 +24,7 @@ typedef struct {
     union {
         bool check;                // Value for UCI_CHECK
         int spin;                  // Value for UCI_SPIN
-        char combo[64];            // Value for UCI_COMBO
+        char combo[128];           // Value for UCI_COMBO
         char string[128];          // Value for UCI_STRING
     } value;                       // Current value of the option
     union {

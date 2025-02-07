@@ -8,9 +8,6 @@
 
 void BoardPrintGrid(const Board* board)
 {
-    const char* yellow_bg = "\033[48;5;214m"; // Background yellow color
-    const char* reset = "\033[0m";            // Reset color formatting
-
     const char* padding = "   ";
 
     printf("%s┌───┬───┬───┬───┬───┬───┬───┬───┐\n", padding);
@@ -19,8 +16,6 @@ void BoardPrintGrid(const Board* board)
         printf(" %d ", rank + 1);
 
         for (int file = 0; file <= 7; ++file) {
-            int highlighted = 0;
-
             printf("│");
 
             printf(" %c ", board->grid[rank][file]);

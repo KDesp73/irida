@@ -10,7 +10,7 @@
 Result IsResult(Board* board)
 {
     if(IsCheckmate(board))
-        return board->turn == WHITE ? RESULT_BLACK_WON : RESULT_WHITE_WON;
+        return board->turn == COLOR_WHITE ? RESULT_BLACK_WON : RESULT_WHITE_WON;
     if(IsStalemate(board)) 
         return RESULT_STALEMATE;
     if(IsInsufficientMaterial(board)) 
@@ -59,7 +59,7 @@ bool IsInsufficientMaterial(Board* board)
                     return 0;
 
                 case 'b':
-                    if (color == WHITE) {
+                    if (color == COLOR_WHITE) {
                         white_bishops++;
                     } else {
                         black_bishops++;
@@ -67,7 +67,7 @@ bool IsInsufficientMaterial(Board* board)
                     break;
 
                 case 'n':
-                    if (color == WHITE) {
+                    if (color == COLOR_WHITE) {
                         white_knights++;
                     } else {
                         black_knights++;
@@ -76,7 +76,7 @@ bool IsInsufficientMaterial(Board* board)
 
                 default:
                     // Count kings or invalid pieces
-                    if (color == WHITE) {
+                    if (color == COLOR_WHITE) {
                         white_pieces++;
                     } else {
                         black_pieces++;
