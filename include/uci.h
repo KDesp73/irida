@@ -70,6 +70,7 @@ INLINE void InitState()
     InitUciOptions();
     memset(&state, 0, sizeof(state)); // Zero out state
     StateSetStartPos(STARTING_FEN);
+    state.depthLimit = 10;
 }
 
 #define ENGINE_NAME "chess-engine"

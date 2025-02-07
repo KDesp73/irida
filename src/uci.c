@@ -1,5 +1,8 @@
 #include "uci.h"
+#include "move.h"
+#include "search.h"
 #include <io/ansi.h>
+#include <io/logging.h>
 
 int UciMain(int argc, char** argv)
 {
@@ -64,8 +67,9 @@ void go(const char* command)
         int nodes = Perft(&state.board, depth, true);
         printf("\nNodes searched: %d\n", nodes);
     } else {
-        // TODO: Calculate best move
-        char* bestmove = "e2e4";
+        char bestmove[16];
+        Move move = FindBest(&state.board, state.depthLimit);
+        MoveToString(move, bestmove);
         printf("bestmove %s\n", bestmove);
     }
 }
@@ -74,7 +78,7 @@ void position(const char* command)
 {
     char fen[128] = "";
 
-    if (strncmp(command, "position startpos", 17) == 0) {
+    if (strcmp(command, "position startpos") == 0) {
         strcpy(fen, STARTING_FEN);
     } else if (strncmp(command, "position fen ", 13) == 0) {
         strncpy(fen, command + 13, sizeof(fen) - 1);
