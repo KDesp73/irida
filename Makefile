@@ -1,7 +1,7 @@
 # Compiler and flags
 CC = gcc
 INCLUDE = -Iinclude -Ilib/raylib/include
-CFLAGS = -Wall -Werror $(INCLUDE) -fPIC -O3
+CFLAGS = -Wall -Werror $(INCLUDE) -fPIC -O3 
 LDFLAGS = -L./lib/raylib/lib -l:libraylib.a -lm -lpthread -ldl
 
 # Directories
@@ -19,17 +19,13 @@ A_NAME = $(LIBRARY_NAME).a
 EXEC = engine
 CHECK = $(BUILD_DIR)/bin/check
 
-version_file = include/version.h
-VERSION_MAJOR = $(shell sed -n -e 's/\#define VERSION_MAJOR \([0-9]*\)/\1/p' $(version_file))
-VERSION_MINOR = $(shell sed -n -e 's/\#define VERSION_MINOR \([0-9]*\)/\1/p' $(version_file))
-VERSION_PATCH = $(shell sed -n -e 's/\#define VERSION_PATCH \([0-9]*\)/\1/p' $(version_file))
-VERSION = $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
-
 # Determine the build type
 ifneq ($(type), RELEASE)
 	CFLAGS += -DDEBUG -ggdb
 else
-	CFLAGS +=
+	SANITIZERS = -fsanitize=address,leak
+	CFLAGS += $(SANITIZERS)
+	LDFLAGS += $(SANITIZERS)
 endif
 
 # Source and object files
@@ -130,9 +126,9 @@ distclean: clean ## Perform a full clean, including backup and temporary files
 
 .PHONY: dist
 dist: $(SRC_FILES) ## Create a tarball of the project
-	@echo "[INFO] Creating a tarball for version $(VERSION)"
+	@echo "[INFO] Creating a tarball"
 	mkdir -p $(DIST_DIR)
-	tar -czvf $(DIST_DIR)/$(TARGET)-$(VERSION).tar.gz $(SRC_DIR) $(INCLUDE_DIR) Makefile README.md
+	tar -czvf $(DIST_DIR)/$(TARGET).tar.gz $(SRC_DIR) $(INCLUDE_DIR) Makefile README.md
 
 ## Generate compile_commands.json
 .PHONY: compile_commands.json
