@@ -65,7 +65,8 @@ void go(const char* command)
         printf("\nNodes searched: %d\n", nodes);
     } else {
         // TODO: Calculate best move
-        printf("bestmove e2e4\n");
+        char* bestmove = "e2e4";
+        printf("bestmove %s\n", bestmove);
     }
 }
 

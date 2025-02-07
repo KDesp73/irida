@@ -1,4 +1,4 @@
-#include "bitboard.h"
+#include "evaluation.h"
 #include "board.h"
 #include "movegen.h"
 #include "gui/gui.h"
@@ -81,6 +81,24 @@ int flush_input()
     while ((c = getchar()) != '\n' && c != EOF) { }
     return 0;
 }
+void BoardInfoPrint(const Board* board)
+{
+    printf("Turn: %s\n", board->turn ? "White" : "Black");
+    printf("Castling rights: %d\n", board->castling_rights);
+    char name[3] = "-";
+    if(board->enpassant_square != 64)
+        SquareToName(name, board->enpassant_square);
+    printf("Enpassant: %s\n", name);
+
+    int eval = Evaluation(board);
+    printf("Evaluation: %d\n", eval);
+}
+#define BOARD_PRINT(board) \
+    do { \
+        ansi_clear_screen(); \
+        BoardPrint(&board, 64); \
+        BoardInfoPrint(&board); \
+    } while(0)
 
 int move(Board* board)
 {
@@ -124,29 +142,15 @@ int move(Board* board)
 
     ansi_clear_screen();
     BoardPrintMove(board, move);
+    BoardInfoPrint(board);
     return true;
 }
 
-void BoardInfoPrint(const Board* board)
-{
-    printf("Turn: %s\n", board->turn ? "White" : "Black");
-    printf("Castling rights: %d\n", board->castling_rights);
-    char name[3] = "-";
-    if(board->enpassant_square != 64)
-        SquareToName(name, board->enpassant_square);
-    printf("Enpassant: %s\n", name);
-}
-#define BOARD_PRINT(board) \
-    do { \
-        BoardPrint(&board, 64); \
-        BoardInfoPrint(&board); \
-    } while(0)
 
 int game(const char* fen)
 {
     Board board;
     BoardInitFen(&board, fen);
-    ansi_clear_screen();
     BOARD_PRINT(board);
 
     char fenExport[256];
@@ -159,8 +163,8 @@ int game(const char* fen)
             move(&board);
             break;
         case 1:
-            UnmakeMove(&board);
             BOARD_PRINT(board);
+            UnmakeMove(&board);
             break;
         case 2:
             BoardPrintBitboard(&board, GenerateLegalMovesBitboard(&board));
@@ -202,7 +206,7 @@ int main(int argc, char** argv){
 
         exit(0);
     }
-
+    
     UciMain(argc, argv);
 
     return 0;
