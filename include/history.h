@@ -6,7 +6,7 @@
 #include <stdint.h>
 
 
-#define MAX_MOVES 2048
+#define MAX_MOVES 2 * 1024
 typedef struct {
     uint32_t move;
     uint8_t castling;
@@ -15,6 +15,8 @@ typedef struct {
     char captured;
 } Undo;
 
+#define NULL_UNDO (Undo){.move = NULL_MOVE}
+
 void UndoPrint(Undo undo);
 
 typedef struct {
@@ -22,6 +24,9 @@ typedef struct {
     Undo moves[MAX_MOVES];
     size_t count;
 } History;
+
+void HistoryRemove(History* history);
+Undo HistoryGetLast(History history);
 
 #endif // ENGINE_HISTORY_H
 

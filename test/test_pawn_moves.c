@@ -36,9 +36,14 @@ int test_pawn_moves(const char* fen, const char* square, const char* first, ...)
         BoardPrintBitboard(&board, moves);
         printf("Found: \n");
         BoardPrintBitboard(&board, found);
-        return false;
+        goto fail;
     }
 
+    BoardFree(&board);
     SUCC("Passed");
-    return true;;
+    return true;
+
+fail:
+    BoardFree(&board);
+    return false;
 }

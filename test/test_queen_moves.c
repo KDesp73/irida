@@ -36,9 +36,11 @@ int test_queen_moves(const char* fen, const char* square, const char* first, ...
         BoardPrintBitboard(&board, moves);
         printf("Found: \n");
         BoardPrintBitboard(&board, found);
+        BoardFree(&board);
         return false;
     }
 
+    BoardFree(&board);
     SUCC("Passed");
     return true;
 }

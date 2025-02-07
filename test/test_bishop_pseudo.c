@@ -33,9 +33,14 @@ int test_bishop_pseudo(const char* fen, const char* square, const char* first, .
         BitboardPrint(moves);
         printf("Found: \n");
         BitboardPrint(found);
-        return false;
+        goto fail;
     }
 
+    BoardFree(&board);
     SUCC("Passed");
     return true;
+
+fail:
+    BoardFree(&board);
+    return false;
 }

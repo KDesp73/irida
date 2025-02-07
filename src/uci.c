@@ -1,8 +1,8 @@
 #include "uci.h"
 #include "move.h"
+#include "perft.h"
 #include "search.h"
 #include "extern/ansi.h"
-#include "extern/logging.h"
 
 int UciMain(int argc, char** argv)
 {

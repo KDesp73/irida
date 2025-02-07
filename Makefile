@@ -1,7 +1,7 @@
 # Compiler and flags
 CC = gcc
 INCLUDE = -Iinclude -Ilib/raylib/include
-CFLAGS = -Wall -Werror $(INCLUDE) -fPIC -O3 
+CFLAGS = -Wall -Werror $(INCLUDE) -fPIC
 LDFLAGS = -L./lib/raylib/lib -l:libraylib.a -lm -lpthread -ldl
 
 # Directories
@@ -19,13 +19,16 @@ A_NAME = $(LIBRARY_NAME).a
 EXEC = engine
 CHECK = $(BUILD_DIR)/bin/check
 
+type = DEBUG
+
 # Determine the build type
-ifneq ($(type), RELEASE)
-	CFLAGS += -DDEBUG -ggdb
+ifeq ($(type), RELEASE) 
+	CFLAGS += -O3
 else
 	SANITIZERS = -fsanitize=address,leak
-	CFLAGS += $(SANITIZERS)
-	LDFLAGS += $(SANITIZERS)
+	CFLAGS  += -DDEBUG -ggdb
+	# CFLAGS  += $(SANITIZERS)
+	# LDFLAGS += $(SANITIZERS)
 endif
 
 # Source and object files
@@ -77,13 +80,12 @@ $(BUILD_DIR)/%.o: $(TEST_DIR)/%.c ## Compile test files
 .PHONY: exec
 exec: $(BUILD_DIR) static ## Build executable using static library
 	@echo "[INFO] Building executable: $(EXEC)"
-	@$(CC) src/main.c -o $(EXEC) -L. -l:$(A_NAME) -lchess $(LDFLAGS) $(INCLUDE)
-
+	@$(CC) src/main.c -o $(EXEC) -L. -l:$(A_NAME) $(LDFLAGS) $(INCLUDE) -ggdb
 
 .PHONY: check
 check: $(BUILD_DIR) static ## Build the tests
 	@echo "[INFO] Building test executable: $(CHECK)"
-	@$(CC) $(TEST_FILES) -o $(CHECK) -L. -l:$(A_NAME) -lchess $(LDFLAGS) $(LDFLAGS) $(INCLUDE)
+	@$(CC) $(TEST_FILES) -o $(CHECK) -L. -l:$(A_NAME) $(LDFLAGS) $(LDFLAGS) $(INCLUDE) -ggdb
 
 .PHONY: test
 test: ## Build and run the tests

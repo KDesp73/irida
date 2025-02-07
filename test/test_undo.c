@@ -20,7 +20,7 @@ int test_undo(const char* fen, Move move)
     if (!succ) {
         FAIL("MakeMove failed for move: ");
         MovePrint(move);
-        return false;
+        goto fail;
     }
 
     UnmakeMove(&board);
@@ -28,41 +28,45 @@ int test_undo(const char* fen, Move move)
     for(size_t i = 0; i < PIECE_TYPES; i++){
         if(originalBoard.bitboards[i] != board.bitboards[i]) {
             FAILF(fen, "Mismatch in bitboard index %zu", i);
-            return 0;
+            goto fail;
         }
     }
 
     if(board.enpassant_square != originalBoard.enpassant_square){
         FAILF(fen, "Mismatch in enpassant square. Expected %d. Found %d", originalBoard.enpassant_square, board.enpassant_square);
-        return 0;
+        goto fail;
     }
 
     if(board.castling_rights != originalBoard.castling_rights){
         FAILF(fen, "Mismatch in castling rights");
-        return 0;
+        goto fail;
     }
 
     if(board.turn != originalBoard.turn) {
         FAILF(fen, "Mismatch in turn");
-        return 0;
+        goto fail;
     }
 
     if(board.fullmove != originalBoard.fullmove) {
         FAILF(fen, "Mismatch in fullmove");
-        return 0;
+        goto fail;
     }
 
     if(board.halfmove != originalBoard.halfmove) {
         FAILF(fen, "Mismatch in halfmove");
-        return 0;
+        goto fail;
     }
 
     if(CalculateZobristHash(&board) != hash){
         FAILF(fen, "Hashes don't match");
-        return 0;
+        goto fail;
     }
 
+    BoardFree(&board);
     SUCC("Passed");
-
     return 1;
+
+fail:
+    BoardFree(&board);
+    return false;
 }

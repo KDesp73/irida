@@ -35,9 +35,11 @@ int test_king_pseudo(const char* fen, const char* square, const char* first, ...
         BitboardPrint(moves);
         printf("Found: \n");
         BitboardPrint(found);
+        BoardFree(&board);
         return false;
     }
 
+    BoardFree(&board);
     SUCC("Passed");
     return true;
 }

@@ -13,9 +13,14 @@ int test_is_in_check(const char* fen, bool expected)
     if(expected != found){
         BoardPrintBitboard(&board, attacks);
         FAILF(fen, "Expected %d. Found %d", expected, found);
-        return 0;
+        goto fail;
     }
 
+    BoardFree(&board);
     SUCC("Passed");
-    return 1;
+    return true;
+
+fail:
+    BoardFree(&board);
+    return false;
 }

@@ -30,6 +30,10 @@ Bitboard UndoMove(Bitboard* current, Move move)
 {
     MOVE_DECODE(move);
 
+    if (dst < 0 || dst > 63 || src < 0 || src > 63) {
+        return 0;
+    }
+
     *current &= ~(1ULL << dst);
 
     *current |= (1ULL << src);
@@ -38,15 +42,21 @@ Bitboard UndoMove(Bitboard* current, Move move)
         *current &= ~(1ULL << src);
         return 1ULL << dst;
     }
-    if(flag == FLAG_CASTLING) {
-        if(File(dst) > File(src))
-            return 1ULL << (dst+1) | 1ULL << (dst-1);
-        else 
-            return 1ULL << (dst+1) | 1ULL << (dst-2);
+    if (flag == FLAG_CASTLING) {
+        // Ensure dst + 1 and dst - 1 are within bounds
+        if (File(dst) > File(src)) {
+            if (dst + 1 < 64 && dst - 1 >= 0)
+                return 1ULL << (dst+1) | 1ULL << (dst-1);
+        } else {
+            if (dst + 1 < 64 && dst - 2 >= 0)
+                return 1ULL << (dst+1) | 1ULL << (dst-2);
+        }
     }
-    if(flag == FLAG_ENPASSANT) {
+    if (flag == FLAG_ENPASSANT) {
         int color = (Rank(dst) > Rank(src));
-        return 1ULL << (dst + ((color) ? -8 : 8));
+        int target = dst + ((color) ? -8 : 8);
+        if (target >= 0 && target < 64)
+            return 1ULL << target;
     }
 
     return 0;

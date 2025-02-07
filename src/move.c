@@ -485,7 +485,7 @@ bool MakeMove(Board* board, Move move)
 
     IsPromotion(board, &move);
 
-    HistoryAddUndo(&board->history, board, move);
+    AddUndo(board, move);
 
     MoveFreely(board, move, board->turn);
 

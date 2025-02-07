@@ -48,9 +48,7 @@ typedef struct {
     History history;
 } Board;
 
-bool HistoryAddUndo(History* history, const Board* board, uint32_t move);
-void HistoryRemove(History* history);
-Undo HistoryGetLast(History history);
+bool AddUndo(Board* board, uint32_t move);
 Undo LoadLastUndo(Board* board);
 
 #define PIECES "pnbrqkPNBRQK"

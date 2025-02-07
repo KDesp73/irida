@@ -38,8 +38,10 @@ void load()
 int main(int argc, char** argv)
 {
     InitMasks();
-    if(argc == 2 && !strcmp(argv[1], "load")){
-        load();
+    if(argc == 2) {
+        if(!strcmp(argv[1], "load")){
+            load();
+        }
         return 0;
     }
 

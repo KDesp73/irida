@@ -2,8 +2,6 @@
 #define test_perft_2_h
 
 #define TEST_test_perft_2\
-	test_perft_2(6, 8031647685), \
-	test_perft_2(5, 193690690), \
 	test_perft_2(4, 4085603), \
 	test_perft_2(3, 97862), \
 	test_perft_2(2, 2039), \

@@ -1,14 +1,17 @@
 #include "history.h"
+#include "extern/logging.h"
 #include "hashing.h"
 #include "move.h"
 #include "square.h"
 #include <stdio.h>
 
-bool HistoryAddUndo(History* history, const Board* board, uint32_t move)
+bool AddUndo(Board* board, uint32_t move)
 {
-    if (history->count >= MAX_MOVES) return false;
+    if (board->history.count >= MAX_MOVES) {
+        return false;
+    }
 
-    history->moves[history->count++] = MakeUndo(board, move);
+    board->history.moves[(board->history.count)++] = MakeUndo(board, move);
 
     return true;
 }
@@ -42,12 +45,17 @@ void UndoPrint(Undo undo)
 
 Undo HistoryGetLast(History history)
 {
+    if(history.count <= 0) {
+        ERRO("No more moves");
+        return NULL_UNDO;
+    }
     return history.moves[history.count-1];
 }
 
 Undo LoadLastUndo(Board* board)
 {
     Undo undo = HistoryGetLast(board->history);
+    if(undo.move == NULL_MOVE) return undo;
 
     board->halfmove = undo.fiftyMove;
     board->castling_rights = undo.castling;

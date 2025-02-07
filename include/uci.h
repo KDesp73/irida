@@ -2,8 +2,6 @@
 #define ENGINE_UCI_H
 
 #include "board.h"
-#include "perft.h"
-#include "extern/logging.h"
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
