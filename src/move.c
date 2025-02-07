@@ -9,7 +9,6 @@
 #include "zobrist.h"
 
 #include <ctype.h>
-#include <io/logging.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>

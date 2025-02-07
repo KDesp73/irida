@@ -1,7 +1,6 @@
 #include "board.h"
 #include "square.h"
 #include <inttypes.h>
-#include <io/logging.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>

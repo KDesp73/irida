@@ -1,4 +1,4 @@
-#include <io/test.h>
+#include "extern/test.h"
 #include <stdint.h>
 #include <stdio.h>
 #include "board.h"
@@ -7,7 +7,7 @@
 #include "zobrist.h"
 
 #define DEBUG
-#include <io/logging.h>
+#include "extern/logging.h"
 
 int test_undo(const char* fen, Move move)
 {

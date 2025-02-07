@@ -14,11 +14,12 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include <io/logging.h>
+#define LOGGING_IMPLEMENTATION 
+#include "extern/logging.h"
 #define ANSI_IMPLEMENTATION
-#include <io/ansi.h>
+#include "extern/ansi.h"
 #define MENU_IMPLEMENTATION
-#include <io/menu.h>
+#include "extern/menu.h"
 
 #define forrange(index, from, to) \
     for(index = from; (from < to) ? i < to : i > to; (from < to) ? i++ : i--)

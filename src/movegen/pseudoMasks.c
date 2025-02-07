@@ -2,7 +2,6 @@
 #include "masks.h"
 #include "move.h"
 #include "square.h"
-#include <io/logging.h>
 #include <stdint.h>
 #include <stdlib.h>
 

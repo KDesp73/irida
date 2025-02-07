@@ -3,9 +3,7 @@
 #include "movegen.h"
 #include "masks.h"
 #include "move.h"
-#include "piece.h"
 #include "square.h"
-#include <io/logging.h>
 #include <stdio.h>
 
 Moves GenerateLegalPawnMoves(const Board *board, Bitboard pieces, PieceColor color)

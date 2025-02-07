@@ -1,6 +1,6 @@
 #include "square.h"
 #include <string.h>
-#include <io/test.h>
+#include "extern/test.h"
 
 int test_square_to_name(Square square, const char* expected)
 {

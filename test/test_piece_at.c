@@ -2,7 +2,7 @@
 #include "piece.h"
 #include "square.h"
 #include "tests.h"
-#include <io/test.h>
+#include "extern/test.h"
 
 int test_piece_at(const char* fen, Square square, char expected)
 {

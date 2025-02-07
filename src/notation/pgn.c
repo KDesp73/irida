@@ -6,8 +6,8 @@
 #include "result.h"
 #include "square.h"
 #include <ctype.h>
-#include <io/logging.h>
-#include <io/ansi.h>
+#include "extern/logging.h"
+#include "extern/ansi.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>

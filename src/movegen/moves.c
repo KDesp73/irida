@@ -4,7 +4,6 @@
 #include "move.h"
 #include "movegen.h"
 #include "square.h"
-#include <io/logging.h>
 
 Bitboard DoMove(Bitboard* current, Move move)
 {

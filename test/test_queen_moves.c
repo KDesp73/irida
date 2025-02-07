@@ -6,7 +6,7 @@
 #include "square.h"
 #include "tests.h"
 #include <stdarg.h>
-#include <io/test.h>
+#include "extern/test.h"
 
 int test_queen_moves(const char* fen, const char* square, const char* first, ...)
 {

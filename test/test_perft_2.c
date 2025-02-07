@@ -1,7 +1,6 @@
 #include "perft.h"
 #include "test-perft.h"
 #include "tests.h"
-#include <io/test.h>
 
 int test_perft_2(int depth, u64 expected)
 {

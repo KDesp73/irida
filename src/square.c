@@ -1,7 +1,6 @@
 #include "square.h"
 #include "board.h"
 #include <assert.h>
-#include <io/logging.h>
 #include <string.h>
 
 Square SquareFromCoords(size_t y, size_t x)

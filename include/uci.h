@@ -3,7 +3,7 @@
 
 #include "board.h"
 #include "perft.h"
-#include <io/logging.h>
+#include "extern/logging.h"
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>

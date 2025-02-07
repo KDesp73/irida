@@ -1,4 +1,3 @@
-#include <io/test.h>
 #include "tests.h"
 #include "test-perft.h"
 

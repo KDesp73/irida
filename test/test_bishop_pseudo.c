@@ -1,4 +1,4 @@
-#include <io/test.h>
+#include "extern/test.h"
 #include "bitboard.h"
 #include "board.h"
 #include "movegen.h"

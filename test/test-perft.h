@@ -1,6 +1,7 @@
 #ifndef TEST_PERFT_MACRO_H
 #define TEST_PERFT_MACRO_H
 
+#include "extern/test.h"
 #define PERFT_TEST(fen, depth, expected) \
     Board board; \
     BoardInitFen(&board, fen); \

@@ -1,7 +1,7 @@
 #include "masks.h"
 #include <string.h>
 #define TEST_IMPLEMENTATION
-#include <io/test.h>
+#include "extern/test.h"
 #include "tests.h"
 
 void load()
