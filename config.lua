@@ -1,7 +1,14 @@
+-- config.lua
+--
+-- Configuration for the UCI interface and more
+--
+-- written by KDesp73
+
+
 require("scripts.utils")
 
 local config = {
-    startpos = "Hello World",
+    startpos = "",
     uciMode = true,
     debugMode = true,
     ponderMode = false,
@@ -25,19 +32,13 @@ local config = {
             value = false,
             default = "false"
         },
-        {
-            name = "Skill Level",
-            type = UCI_COMBO,
-            value = "Intermediate",
-            params = { "Beginner", "Intermediate", "Advanced", "Master" },
-            default = "Intermediate"
-        },
-        {
-            name = "Engine Name",
-            type = UCI_STRING,
-            value = "MyChessEngine",
-            default = "MyChessEngine"
-        }
+        -- {
+        --     name = "Skill Level",
+        --     type = UCI_COMBO,
+        --     value = "Intermediate",
+        --     params = { "Beginner", "Intermediate", "Advanced", "Master" },
+        --     default = "Intermediate"
+        -- }
     }
 }
 

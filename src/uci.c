@@ -14,7 +14,7 @@ int UciMain(int argc, char** argv)
     State state = {0};
     InitState(&state);
     LoadUciConfig(&state);
-    StatePrint(&state);
+    // StatePrint(&state);
 
     printf("Welcome to %s%s%s by %s%s%s\n", ANSI_RED, ENGINE_NAME, ANSI_RESET, ANSI_BLUE, ENGINE_AUTHOR, ANSI_RESET);
     FLUSH;
@@ -180,7 +180,6 @@ void LoadUciConfig(State* state)
     }
 
     const char* fen = LMGetString(&lua, "startpos", VAR_LOCAL);
-    printf("fen: %s\n", fen);
     if (fen != NULL && strcmp(fen, "") != 0) {
         snprintf(state->startPositionFen, sizeof(state->startPositionFen), "%s", fen);
     }

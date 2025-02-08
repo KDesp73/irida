@@ -1,6 +1,7 @@
 TODO: performance optimization
 TODO: store additional bitboards instead of generating them each time
-TODO: full engine gui using raylib + clay
+TODO: search function iterations
+TODO: evaluation function iterations
 DONE: tests
 DONE: move generation
 DONE: perft testing
