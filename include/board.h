@@ -37,6 +37,7 @@
 typedef struct {
     Bitboard bitboards[PIECE_TYPES];
     char grid[8][8];
+    Bitboard empty;
 
     // State
     Square enpassant_square;
@@ -80,10 +81,15 @@ void BoardInitFen(Board* board, const char* fen);
 Board* BoardInitFenHeap(const char* fen);
 void BoardFree(Board* board);
 
+// TODO: store in seperate bitboard instead of calculating
 Bitboard GetWhite(const Board* board);
+// TODO: store in seperate bitboard instead of calculating
 Bitboard GetBlack(const Board* board);
+// TODO: store in seperate bitboard instead of calculating
 Bitboard GetEnemyColor(const Board *board, PieceColor us);
+// TODO: store in seperate bitboard instead of calculating
 Bitboard GetEnemy(const Board* board);
+// TODO: store in seperate bitboard instead of calculating
 Bitboard GetEmpty(const Board* board);
 
 int HasCastlingRights(const Board* board, uint8_t castling_rights);

@@ -10,6 +10,7 @@ static const int ROOK_VALUE = 500;
 static const int QUEEN_VALUE = 900;
 static const int KING_VALUE = 20000;
 
+// https://www.chessprogramming.org/Evaluation
 
 // default evaluation function
 #define Evaluation EvaluateMaterial

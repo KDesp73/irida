@@ -37,7 +37,7 @@ int Minimax(Board* board, int depth, bool isMaximizing)
     return bestScore;
 }
 
-Move FindBest(Board* board, int depth)
+Move FindBest(Board* board, int depth, int* score)
 {
     int bestScore = INT_MIN;
     Move bestMove = NULL_MOVE;
@@ -54,6 +54,7 @@ Move FindBest(Board* board, int depth)
             bestMove = move;
         }
     }
+    *score = bestScore;
     return bestMove;
 }
 

@@ -14,6 +14,7 @@
 #include <string.h>
 #include <stdarg.h>
 
+#include "extern/bench.h"
 #define LOGGING_IMPLEMENTATION 
 #include "extern/logging.h"
 #define ANSI_IMPLEMENTATION
@@ -149,7 +150,6 @@ int game(const char* fen)
 int main(int argc, char** argv){
     InitZobrist();
     InitMasks();
-    InitState();
 
     if (argc >= 2) {
         if (!strcmp(argv[1], "game")) {
@@ -162,6 +162,15 @@ int main(int argc, char** argv){
             perft(atoi(argv[2]), argv[3]);
         } else if (!strcmp(argv[1], "gui")) {
             gui(argv[2]);
+        } else if(!strcmp(argv[1], "eval")) {
+            if (argc < 3) {
+                ERRO("Please provide the fen");
+                exit(1);
+            }
+            Board board;
+            BoardInitFen(&board, argv[2]);
+            float eval = (float) Evaluation(&board) / 100;
+            printf("%s%.2f\n", (eval > 0) ? "+" : "", eval);
         }
 
         exit(0);

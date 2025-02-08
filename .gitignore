@@ -9,4 +9,4 @@ engine
 .version-conf
 libengine.*
 tmp
-.log
+*.log

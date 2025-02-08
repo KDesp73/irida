@@ -32,9 +32,8 @@ typedef struct {
     char default_value[128];       // Default value (for resetting)
 } UciOption;
 
-void PrintUciOptions();
-void InitUciOptions();
 
+#define MAX_UCI_OPTIONS 10
 typedef struct {
     char startPositionFen[128];    // The starting position in FEN notation
     bool uciMode;                  // Whether the engine is currently running in UCI mode
@@ -47,28 +46,28 @@ typedef struct {
     bool infiniteMode;             // Whether infinite search mode is enabled
     bool stopRequested;            // Whether a stop command has been received
 
-    UciOption uciOptions[10];      // Array of UCI options
+    UciOption uciOptions[MAX_UCI_OPTIONS];      // Array of UCI options
     size_t uciOptionCount;         // Number of UCI options available
     char lastCommand[128];         // Stores the last command received 
     
     Board board;
 } State;
 
-static State state = {0};
+#define UCI_CONFIG_SCRIPT "config.lua"
+void LoadUciConfig(State* state);
+void PrintUciOptions(State* state);
+void StatePrint(const State* state);
 
-INLINE void StateSetStartPos(const char* startpos)
+INLINE void StateSetStartPos(State* state, const char* startpos)
 {
-    strncpy(state.startPositionFen, startpos, sizeof(state.startPositionFen) - 1);
-    state.startPositionFen[sizeof(state.startPositionFen) - 1] = '\0'; // Null-terminate
-    BoardInitFen(&state.board, state.startPositionFen);
+    strncpy(state->startPositionFen, startpos, sizeof(state->startPositionFen) - 1);
+    state->startPositionFen[sizeof(state->startPositionFen) - 1] = '\0'; // Null-terminate
+    BoardInitFen(&state->board, state->startPositionFen);
 }
 
-INLINE void InitState()
+INLINE void InitState(State* state)
 {
-    InitUciOptions();
-    memset(&state, 0, sizeof(state)); // Zero out state
-    StateSetStartPos(STARTING_FEN);
-    state.depthLimit = 10;
+    StateSetStartPos(state, STARTING_FEN);
 }
 
 #define ENGINE_NAME "chess-engine"
@@ -89,82 +88,82 @@ INLINE void InitState()
 
 int UciMain(int argc, char** argv);
 
-void setoption(const char *command);
-void go(const char* command);
-void position(const char* command);
+void setoption(State* state, const char *command);
+void go(State* state, const char* command);
+void position(State* state, const char* command);
 
-INLINE void uci()
+INLINE void uci(State* state)
 {
-    state.uciMode = true;
+    state->uciMode = true;
     printf("id name %s\n", ENGINE_NAME);
     printf("id author %s\n", ENGINE_AUTHOR);
 
     printf("\n");
 
-    PrintUciOptions();
+    PrintUciOptions(state);
     printf("uciok\n");
 }
 
-INLINE void isready()
+INLINE void isready(State* state)
 {
     printf("readyok\n");
 }
 
-INLINE void ucinewgame()
+INLINE void ucinewgame(State* state)
 {
-    InitState();
+    InitState(state);
     printf("info New game started.\n");
 }
 
-INLINE void stop()
+INLINE void stop(State* state)
 {
     // TODO: Handle stop command if a calculation is running
-    state.stopRequested = true;
+    state->stopRequested = true;
     printf("info Calculation stopped.\n");
 }
 
-INLINE void quit()
+INLINE void quit(State* state)
 {
-    BoardFree(&state.board);
+    BoardFree(&state->board);
     exit(0);
 }
 
-INLINE void debug(const char* command)
+INLINE void debug(State* state, const char* command)
 {
-    state.debugMode = strcmp(command + strlen(COMMAND_DEBUG), "on") == 0;
+    state->debugMode = strcmp(command + strlen(COMMAND_DEBUG), "on") == 0;
 }
 
-INLINE void display()
+INLINE void display(State* state)
 {
-    BoardPrint(&state.board, 64);
+    BoardPrint(&state->board, 64);
 }
 
 #define IS_COMMAND(command, check) \
     (strncmp(command, check, strlen(check)) == 0 && \
     (command[strlen(check)] == '\0' || command[strlen(check)] == ' '))
 
-INLINE void HandleCommand(const char *command)
+INLINE void HandleCommand(State* state, const char *command)
 {
     if (IS_COMMAND(command, COMMAND_UCI)) {
-        uci();
+        uci(state);
     } else if (IS_COMMAND(command, COMMAND_ISREADY)) {
-        isready();
+        isready(state);
     } else if (IS_COMMAND(command, COMMAND_UCINEWGAME)) {
-        ucinewgame();
+        ucinewgame(state);
     } else if (IS_COMMAND(command, COMMAND_POSITION)) {
-        position(command);
+        position(state, command);
     } else if (IS_COMMAND(command, COMMAND_GO)) {
-        go(command);
+        go(state, command);
     } else if (IS_COMMAND(command, COMMAND_STOP)) {
-        stop();
+        stop(state);
     } else if (IS_COMMAND(command, COMMAND_QUIT)) {
-        quit();
+        quit(state);
     } else if (IS_COMMAND(command, COMMAND_SETOPTION)) {
-        setoption(command);
+        setoption(state, command);
     } else if (IS_COMMAND(command, COMMAND_DEBUG)) {
-        debug(command);
+        debug(state, command);
     } else if (IS_COMMAND(command, COMMAND_DISPLAY)) {
-        display();
+        display(state);
     } else {
         printf("info string Unknown command: %s\n", command);
     }

@@ -126,6 +126,21 @@ uint8_t UpdateCastlingRights(Board* board, Move move)
     int color = piece.color;
     uint8_t castling_rights = board->castling_rights;
 
+
+    // Handle king moves: disable all castling rights for that color
+    if (IS_KING(piece)) {
+        switch (color) {
+            case COLOR_WHITE:
+                castling_rights &= ~(CASTLE_WHITE_KINGSIDE | CASTLE_WHITE_QUEENSIDE);
+                break;
+            case COLOR_BLACK:
+                castling_rights &= ~(CASTLE_BLACK_KINGSIDE | CASTLE_BLACK_QUEENSIDE);
+                break;
+            case COLOR_NONE:
+                break;
+        }
+    }
+
     // Handle rook moves: disable relevant castling rights
     if (IS_ROOK(piece)) {
         switch (color) {
@@ -145,20 +160,6 @@ uint8_t UpdateCastlingRights(Board* board, Move move)
             break;
         case COLOR_NONE:
             break;
-        }
-    }
-
-    // Handle king moves: disable all castling rights for that color
-    if (IS_KING(piece)) {
-        switch (color) {
-            case COLOR_WHITE:
-                castling_rights &= ~(CASTLE_WHITE_KINGSIDE | CASTLE_WHITE_QUEENSIDE);
-                break;
-            case COLOR_BLACK:
-                castling_rights &= ~(CASTLE_BLACK_KINGSIDE | CASTLE_BLACK_QUEENSIDE);
-                break;
-            case COLOR_NONE:
-                break;
         }
     }
 

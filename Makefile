@@ -1,8 +1,8 @@
 # Compiler and flags
 CC = gcc
-INCLUDE = -Iinclude -Ilib/raylib/include
+INCLUDE = -Iinclude -Ilib/raylib/include -Ilib/lua/include
 CFLAGS = -Wall -Werror $(INCLUDE) -fPIC
-LDFLAGS = -L./lib/raylib/lib -l:libraylib.a -lm -lpthread -ldl
+LDFLAGS = -L./lib/raylib/lib -l:libraylib.a -lm -lpthread -ldl -L./lib/lua/lib -l:liblua.a
 
 # Directories
 SRC_DIR = src
