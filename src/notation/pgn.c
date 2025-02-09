@@ -122,7 +122,7 @@ void removeChars(char* str, const char* chars_to_remove)
 
 Move SanToMove(Board *board, SanMove san)
 {
-    Moves moves = GenerateLegalMoves(board);
+    Moves moves = GenerateMoves(board, MOVE_LEGAL);
     for(size_t i = 0; i < moves.count; i++){
         SanMove s = {0};
         Notate(board, moves.list[i], &s);

@@ -42,13 +42,14 @@ int main(int argc, char** argv)
         if(!strcmp(argv[1], "load")){
             load();
         } else if(!strcmp(argv[1], "perft")){
+            // All perft tests pass
             START_TESTS
-                RUN_TEST(test_perft),   // PASSES
-                RUN_TEST(test_perft_2), // PASSES
-                RUN_TEST(test_perft_3), // PASSES
-                RUN_TEST(test_perft_4), // PASSES
-                RUN_TEST(test_perft_5), // PASSES
-                RUN_TEST(test_perft_6)  // PASSES
+                RUN_TEST(test_perft),
+                RUN_TEST(test_perft_2),
+                RUN_TEST(test_perft_3),
+                RUN_TEST(test_perft_4),
+                RUN_TEST(test_perft_5),
+                RUN_TEST(test_perft_6)
             END_TESTS
         }
         return 0;

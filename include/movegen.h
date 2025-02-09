@@ -18,12 +18,10 @@ typedef enum {
     MOVE_ILLEGAL       // An invalid move (used for error handling)
 } MoveType;
 
-Moves GenerateMoves(const Board* board, MoveType type);
-
 /*** Pseudo-Legal Moves ***/
 
-Moves GeneratePseudoLegalMoves(const Board* board);
-Bitboard GeneratePseudoLegalMovesBitboard(const Board* board);
+Moves GeneratePseudoLegalMoves(const Board* board, MoveType type);
+Bitboard GeneratePseudoLegalMovesBitboard(const Board* board, MoveType type);
 
 Bitboard GeneratePseudoLegalPawnMoves(Bitboard pawns, Bitboard enemy, PieceColor color);
 Bitboard GeneratePseudoLegalPawnAttacks(Bitboard pawns, Bitboard enemy, PieceColor color, bool strict);
@@ -34,26 +32,32 @@ Bitboard GeneratePseudoLegalQueenAttacks(Bitboard queens, Bitboard empty, Bitboa
 Bitboard GeneratePseudoLegalKingAttacks(Bitboard kings, Bitboard empty, Bitboard enemy);
 Bitboard GeneratePseudoLegalAttacks(const Board* board, PieceColor color);
 
-Bitboard GeneratePawnMoves(const Board* board, Square piece, PieceColor color);
-Bitboard GenerateKnightMoves(const Board* board, Square piece, PieceColor color);
-Bitboard GenerateBishopMoves(const Board* board, Square piece, PieceColor color);
-Bitboard GenerateRookMoves(const Board* board, Square piece, PieceColor color);
-Bitboard GenerateQueenMoves(const Board* board, Square piece, PieceColor color);
-Bitboard GenerateKingMoves(const Board* board, Square piece, PieceColor color);
+Bitboard GeneratePawnMoves(const Board* board, Square piece, PieceColor color, MoveType type);
+Bitboard GenerateKnightMoves(const Board* board, Square piece, PieceColor color, MoveType type);
+Bitboard GenerateBishopMoves(const Board* board, Square piece, PieceColor color, MoveType type);
+Bitboard GenerateRookMoves(const Board* board, Square piece, PieceColor color, MoveType type);
+Bitboard GenerateQueenMoves(const Board* board, Square piece, PieceColor color, MoveType type);
+Bitboard GenerateKingMoves(const Board* board, Square piece, PieceColor color, MoveType type);
 
 /*** Legal Moves ***/
 
 bool IsLegal(const Board* board, Move move);
 
-Moves GenerateLegalMoves(const Board* board);
-Moves GenerateLegalMovesSquare(const Board* board, Square square);
-Bitboard GenerateLegalMovesBitboard(const Board* board);
+Moves GenerateMoves(const Board* board, MoveType type);
+Moves GenerateMovesSquare(const Board* board, Square square, MoveType type);
+Bitboard GenerateMovesBitboard(const Board* board, MoveType type);
 
-Moves GenerateLegalPawnMoves(const Board* board, Bitboard pieces, PieceColor color);
-Moves GenerateLegalKnightMoves(const Board* board, Bitboard pieces, PieceColor color);
-Moves GenerateLegalBishopMoves(const Board* board, Bitboard pieces, PieceColor color);
-Moves GenerateLegalRookMoves(const Board* board, Bitboard pieces, PieceColor color);
-Moves GenerateLegalQueenMoves(const Board* board, Bitboard pieces, PieceColor color);
-Moves GenerateLegalKingMoves(const Board* board, Bitboard pieces, PieceColor color);
+Moves GenerateLegalPawnMoves(const Board* board, Bitboard pieces, PieceColor color, MoveType type);
+Moves GenerateLegalKnightMoves(const Board* board, Bitboard pieces, PieceColor color, MoveType type);
+Moves GenerateLegalBishopMoves(const Board* board, Bitboard pieces, PieceColor color, MoveType type);
+Moves GenerateLegalRookMoves(const Board* board, Bitboard pieces, PieceColor color, MoveType type);
+Moves GenerateLegalQueenMoves(const Board* board, Bitboard pieces, PieceColor color, MoveType type);
+Moves GenerateLegalKingMoves(const Board* board, Bitboard pieces, PieceColor color, MoveType type);
+
+#define TYPE_ERROR(type) \
+    do { \
+        fprintf(stderr, "You can't generate " #type " moves from this function %s:%d\n", __FILE__, __LINE__); \
+        exit(1); \
+    } while(0) \
 
 #endif //ENGINE_MOVEGEN_H

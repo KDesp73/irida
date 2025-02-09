@@ -20,7 +20,7 @@ int Minimax(Board* board, int depth, bool isMaximizing)
         return Evaluation(board);
 
     int bestScore = isMaximizing ? INT_MIN : INT_MAX;
-    Moves moves = GenerateLegalMoves(board);
+    Moves moves = GenerateMoves(board, MOVE_LEGAL);
 
     for(size_t i = 0; i < moves.count; i++){
         Move move = moves.list[i];
@@ -41,7 +41,7 @@ Move FindBest(Board* board, int depth, int* score)
 {
     int bestScore = INT_MIN;
     Move bestMove = NULL_MOVE;
-    Moves moves = GenerateLegalMoves(board);
+    Moves moves = GenerateMoves(board, MOVE_LEGAL);
 
     for (size_t i = 0; i < moves.count; i++) {
         Move move  = moves.list[i];

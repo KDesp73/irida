@@ -128,11 +128,11 @@ int game(const char* fen)
             UnmakeMove(&board);
             break;
         case 2:
-            BoardPrintBitboard(&board, GenerateLegalMovesBitboard(&board));
+            BoardPrintBitboard(&board, GenerateMovesBitboard(&board, MOVE_LEGAL));
             BoardInfoPrint(&board);
             break;
         case 3: 
-            BoardPrintBitboard(&board, GeneratePseudoLegalMovesBitboard(&board));
+            BoardPrintBitboard(&board, GenerateMovesBitboard(&board, MOVE_PSEUDO));
             BoardInfoPrint(&board);
             break;
         case 4:

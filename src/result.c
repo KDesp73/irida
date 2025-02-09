@@ -21,23 +21,23 @@ Result IsResult(Board* board)
     return RESULT_NONE;
 }
 
-bool IsCheckmate(Board* board)
+bool IsCheckmate(const Board* board)
 {
-    Moves moves = GenerateLegalMoves(board);
+    Moves moves = GenerateMoves(board, MOVE_LEGAL);
     if(moves.count != 0) return false;
 
     return IsInCheck(board);
 }
 
-bool IsStalemate(Board* board)
+bool IsStalemate(const Board* board)
 {
-    Moves moves = GenerateLegalMoves(board);
+    Moves moves = GenerateMoves(board, MOVE_LEGAL);
     if(moves.count != 0) return false;
 
     return !IsInCheck(board);
 }
 
-bool IsInsufficientMaterial(Board* board)
+bool IsInsufficientMaterial(const Board* board)
 {
     int white_bishops = 0, black_bishops = 0;
     int white_knights = 0, black_knights = 0;

@@ -48,6 +48,7 @@ typedef struct {
     Move list[MOVES_CAPACITY];
     size_t count;
 } Moves;
+#define NO_MOVES ((Moves){.count = 0})
 void MovesAppend(Moves* moves, Move move);
 void MovesAppendList(Moves* dest, Moves src);
 Moves MovesCombine(Moves m1, Moves m2);

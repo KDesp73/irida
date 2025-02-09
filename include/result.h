@@ -35,9 +35,9 @@ static const char result_message[][256] = {
 };
 
 Result IsResult(Board* board);
-bool IsCheckmate(Board* board);
-bool IsStalemate(Board* board);
-bool IsInsufficientMaterial(Board* board);
+bool IsCheckmate(const Board* board);
+bool IsStalemate(const Board* board);
+bool IsInsufficientMaterial(const Board* board);
 bool IsThreefoldRepetition(Board* board);
 
 #endif // ENGINE_RESULT_H

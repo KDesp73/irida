@@ -118,4 +118,6 @@ Square SquareFromName(const char* name);
 #define G8 62
 #define H8 63
 
+#define SQUARE_NONE 64
+
 #endif // ENGINE_SQUARE_H
