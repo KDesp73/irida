@@ -2,9 +2,11 @@
 #include "move.h"
 #include "perft.h"
 #include "search.h"
-#include "extern/ansi.h"
+
 #include <stdio.h>
 #include <string.h>
+
+#include "extern/ansi.h"
 #define LUAMAN_IMPLEMENTATION
 #include "extern/luaman.h"
 
@@ -77,7 +79,7 @@ void go(State* state, const char* command)
     } else {
         char bestmove[16];
         int score = 0;
-        Move move = FindBest(&state->board, 1, &score);
+        Move move = FindBest(&state->board, state->depthLimit, &score);
         MoveToString(move, bestmove);
         printf("bestmove %s", bestmove);
 #ifndef RELEASE
