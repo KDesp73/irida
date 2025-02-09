@@ -179,8 +179,8 @@ int main(int argc, char** argv){
     // UciMain(argc, argv);
 
     Board b;
-    BoardInitFen(&b, NULL);
-    int n = Perft(&b, 4, MOVE_CAPTURES, true);
+    BoardInitFen(&b, "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+    int n = Perft(&b, 2, MOVE_CAPTURES, true);
     printf("Captures: %d\n", n);
 
     return 0;

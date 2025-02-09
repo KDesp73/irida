@@ -1,4 +1,5 @@
 #include "move.h"
+#include "movegen.h"
 #include "perft.h"
 #include "search.h"
 #include "uci.h"
@@ -45,7 +46,7 @@ void go(State* state, const char* command)
     if (strncmp(command, "go perft ", 9) == 0) {
         int depth = atoi(command + 9);
         printf("depth: %d\n", depth);
-        int nodes = Perft(&state->board, depth, true);
+        int nodes = Perft(&state->board, depth, MOVE_LEGAL, true);
         printf("\nNodes searched: %d\n", nodes);
     } else {
         char bestmove[16];

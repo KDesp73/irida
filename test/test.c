@@ -17,6 +17,11 @@ void load()
     LOAD_TEST("test_perft_5");
     LOAD_TEST("test_perft_6");
 
+    LOAD_TEST("test_perft_captures");
+    LOAD_TEST("test_perft_captures_2");
+    LOAD_TEST("test_perft_captures_3");
+    LOAD_TEST("test_perft_captures_4");
+
     LOAD_TEST("test_pawn_moves");
     LOAD_TEST("test_knight_moves");
     LOAD_TEST("test_bishop_moves");
@@ -38,19 +43,30 @@ void load()
 int main(int argc, char** argv)
 {
     InitMasks();
-    if(argc == 2) {
+    if(argc >= 2) {
         if(!strcmp(argv[1], "load")){
             load();
         } else if(!strcmp(argv[1], "perft")){
-            // All perft tests pass
-            START_TESTS
-                RUN_TEST(test_perft),
-                RUN_TEST(test_perft_2),
-                RUN_TEST(test_perft_3),
-                RUN_TEST(test_perft_4),
-                RUN_TEST(test_perft_5),
-                RUN_TEST(test_perft_6)
-            END_TESTS
+            if(argc == 2){
+                // All perft tests pass
+                START_TESTS
+                    RUN_TEST(test_perft),
+                    RUN_TEST(test_perft_2),
+                    RUN_TEST(test_perft_3),
+                    RUN_TEST(test_perft_4),
+                    RUN_TEST(test_perft_5),
+                    RUN_TEST(test_perft_6)
+                END_TESTS
+            } else {
+                if(!strcmp(argv[2], "captures")){
+                    START_TESTS
+                        RUN_TEST(test_perft_captures),
+                        RUN_TEST(test_perft_captures_2),
+                        RUN_TEST(test_perft_captures_3),
+                        RUN_TEST(test_perft_captures_4)
+                    END_TESTS
+                }
+            }
         }
         return 0;
     }
