@@ -1,3 +1,4 @@
+#include "extern/bench.h"
 #include "move.h"
 #include <string.h>
 
@@ -19,14 +20,26 @@ void MovesAppendList(Moves* dest, Moves src)
 
 Moves MovesCombine(Moves m1, Moves m2)
 {
-    Moves result = {0};
-
-    memcpy(result.list, m1.list, m1.count * sizeof(Move));
+#ifndef RELEASE
+    BENCH_START();
+#endif // RELEASE
+    Moves result;
     result.count = m1.count;
 
-    for (size_t i = 0; i < m2.count && result.count < MOVES_CAPACITY; i++) {
-        result.list[result.count++] = m2.list[i];
-    }
+    // Copy the first list in one go
+    memcpy(result.list, m1.list, m1.count * sizeof(Move));
 
+    // Compute the remaining space available
+    size_t remaining = MOVES_CAPACITY - result.count;
+    size_t to_copy = (m2.count < remaining) ? m2.count : remaining;
+
+    // Copy the second list in one go
+    memcpy(result.list + result.count, m2.list, to_copy * sizeof(Move));
+    result.count += to_copy;
+
+#ifndef RELEASE
+    BENCH_END();
+    BENCH_LOG("MovesCombine");
+#endif // RELEASE
     return result;
 }

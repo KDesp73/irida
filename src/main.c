@@ -175,7 +175,7 @@ int main(int argc, char** argv){
 
         exit(0);
     }
-    
+
     UciMain(argc, argv);
 
     return 0;

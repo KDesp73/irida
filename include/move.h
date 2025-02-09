@@ -52,6 +52,7 @@ void MovesAppend(Moves* moves, Move move);
 void MovesAppendList(Moves* dest, Moves src);
 Moves MovesCombine(Moves m1, Moves m2);
 
+
 Undo MakeUndo(const Board* board, Move move);
 
 #define KNIGHT_OFFSETS_COUNT 8
