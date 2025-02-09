@@ -1,24 +1,24 @@
-#include "evaluation.h"
 #include "board.h"
-#include "movegen.h"
+#include "evaluation.h"
 #include "gui/gui.h"
 #include "masks.h"
 #include "move.h"
+#include "movegen.h"
 #include "notation.h"
 #include "perft.h"
 #include "square.h"
 #include "uci.h"
 #include "zobrist.h"
+
+#include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdarg.h>
 
-#include "extern/bench.h"
-#define LOGGING_IMPLEMENTATION 
-#include "extern/logging.h"
 #define ANSI_IMPLEMENTATION
 #include "extern/ansi.h"
+#define LOGGING_IMPLEMENTATION 
+#include "extern/logging.h"
 #define MENU_IMPLEMENTATION
 #include "extern/menu.h"
 

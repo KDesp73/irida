@@ -5,7 +5,6 @@
 	test_perft_6(4, 3894594), \
 	test_perft_6(3, 89890), \
 	test_perft_6(2, 2079), \
-	test_perft_6(1, 46), \
-	test_perft_6(0, 1)
+	test_perft_6(1, 46)
 
 #endif

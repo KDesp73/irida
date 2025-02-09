@@ -2,7 +2,6 @@
 #include "bitboard.h"
 #include "board.h"
 #include "square.h"
-#include <stdio.h>
 
 Bitboard GeneralOccupancy(Bitboard whitePieces, Bitboard blackPieces)
 {

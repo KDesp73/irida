@@ -1,6 +1,5 @@
 #include "bitboard.h"
 #include "board.h"
-#include "extern/bench.h"
 #include "movegen.h"
 #include "masks.h"
 #include "move.h"
@@ -186,9 +185,6 @@ bool IsLegal(const Board* board, Move move)
 
 Moves GenerateLegalMoves(const Board* board)
 {
-#ifndef RELEASE
-    BENCH_START();
-#endif // RELEASE
     Moves moves = {0};
     PieceColor color = board->turn;
 
@@ -205,10 +201,6 @@ Moves GenerateLegalMoves(const Board* board)
             GenerateLegalKingMoves(board, board->bitboards[color*6 + INDEX_BLACK_KING], color
             ))))));
 
-#ifndef RELEASE
-    BENCH_END();
-    BENCH_LOG("GenerateLegalMoves");
-#endif // RELEASE
     return moves;
 }
 

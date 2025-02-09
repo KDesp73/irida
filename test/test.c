@@ -41,18 +41,20 @@ int main(int argc, char** argv)
     if(argc == 2) {
         if(!strcmp(argv[1], "load")){
             load();
+        } else if(!strcmp(argv[1], "perft")){
+            START_TESTS
+                RUN_TEST(test_perft),   // PASSES
+                RUN_TEST(test_perft_2), // PASSES
+                RUN_TEST(test_perft_3), // PASSES
+                RUN_TEST(test_perft_4), // PASSES
+                RUN_TEST(test_perft_5), // PASSES
+                RUN_TEST(test_perft_6)  // PASSES
+            END_TESTS
         }
         return 0;
     }
 
     START_TESTS
-        // RUN_TEST(test_perft),   // PASSES
-        // RUN_TEST(test_perft_2), // PASSES
-        // RUN_TEST(test_perft_3), // PASSES
-        // RUN_TEST(test_perft_4), // PASSES
-        // RUN_TEST(test_perft_5), // PASSES
-        // RUN_TEST(test_perft_6), // PASSES
-        
         RUN_TEST(test_piece_at),
         RUN_TEST(test_name_to_square),
         RUN_TEST(test_square_to_name),
@@ -72,8 +74,6 @@ int main(int argc, char** argv)
         RUN_TEST(test_king_pseudo),
 
         RUN_TEST(test_is_in_check),
-        RUN_TEST(test_undo),
-
-        1
+        RUN_TEST(test_undo)
     END_TESTS
 }

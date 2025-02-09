@@ -1,4 +1,3 @@
-#include "extern/bench.h"
 #include "move.h"
 #include <string.h>
 
@@ -20,9 +19,6 @@ void MovesAppendList(Moves* dest, Moves src)
 
 Moves MovesCombine(Moves m1, Moves m2)
 {
-#ifndef RELEASE
-    BENCH_START();
-#endif // RELEASE
     Moves result;
     result.count = m1.count;
 
@@ -37,9 +33,5 @@ Moves MovesCombine(Moves m1, Moves m2)
     memcpy(result.list + result.count, m2.list, to_copy * sizeof(Move));
     result.count += to_copy;
 
-#ifndef RELEASE
-    BENCH_END();
-    BENCH_LOG("MovesCombine");
-#endif // RELEASE
     return result;
 }

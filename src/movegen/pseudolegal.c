@@ -5,6 +5,7 @@
 #include "move.h"
 #include "square.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 Bitboard GeneratePseudoLegalPawnMoves(Bitboard pawns, Bitboard empty, PieceColor color)
 {
@@ -164,61 +165,43 @@ Bitboard GenerateQueenMoves(const Board* board, Square piece, PieceColor color)
     return QueenAttacks(piece, emptySquares, enemySquares);
 }
 
-Bitboard GenerateKingMoves(const Board* board, Square piece, PieceColor color)
+Bitboard GenerateKingMoves(const Board* board, Square square, PieceColor color)
 {
-    Bitboard emptySquares = GetEmpty(board);
-    Bitboard enemySquares = GetEnemyColor(board, color);
-    Bitboard pseudoLegal = KingAttacks(piece, emptySquares, enemySquares);
-
-    if(IsInCheckColor(board, color)) return pseudoLegal;
-
-    // TODO: replace the logic below with bitmasks
+    Bitboard emptySquares  = GetEmpty(board);
+    Bitboard enemySquares  = GetEnemyColor(board, color);
+    Bitboard pseudoLegal   = KingAttacks(square, emptySquares, enemySquares);
+    Bitboard attacksWhite  = GeneratePseudoLegalAttacks(board, COLOR_WHITE);
+    Bitboard attacksBlack  = GeneratePseudoLegalAttacks(board, COLOR_BLACK);
     Bitboard castlingMoves = 0ULL;
-    if (color == COLOR_WHITE && piece == 4) {
+
+    if (color == COLOR_WHITE && square == E1) {
         // White Kingside Castling: Squares e1 -> f1 -> g1 (4 -> 5 -> 6)
-        if (HasCastlingRights(board, CASTLE_WHITE_KINGSIDE)
-            && IsSquareEmpty(board, 5)
-            && IsSquareEmpty(board, 6)
-            && !IsSquareAttacked(board, 5, COLOR_BLACK)
-            && !IsSquareAttacked(board, 6, COLOR_BLACK)
-        ) {
-            on(&castlingMoves, 6);
-        }
+        if(HasCastlingRights(board, CASTLE_WHITE_KINGSIDE)
+            && BB_ALL_MATCH(WHITE_KINGSIDE_CASTLE_EMPTY, emptySquares)
+            && BB_NO_MATCH(WHITE_KINGSIDE_ATTACKS, attacksBlack)
+        ) on(&castlingMoves, G1);
+
         // White Queenside Castling: Squares e1 -> d1 -> c1 (4 -> 3 -> 2)
-        if (HasCastlingRights(board, CASTLE_WHITE_QUEENSIDE)
-            && IsSquareEmpty(board, 3)
-            && IsSquareEmpty(board, 2) 
-            && IsSquareEmpty(board, 1) 
-            && !IsSquareAttacked(board, 3, COLOR_BLACK)
-            && !IsSquareAttacked(board, 2, COLOR_BLACK)
-        ) {
-            on(&castlingMoves, 2);
-        }
-    } else if(color == COLOR_BLACK && piece == 60){
+        if(HasCastlingRights(board, CASTLE_WHITE_QUEENSIDE)
+            && BB_ALL_MATCH(WHITE_QUEENSIDE_CASTLE_EMPTY, emptySquares)
+            && BB_NO_MATCH(WHITE_QUEENSIDE_ATTACKS, attacksBlack)
+        ) on(&castlingMoves, C1);
+    } 
+    else if (color == COLOR_BLACK && square == E8) {
         // Black Kingside Castling: Squares e8 -> f8 -> g8 (60 -> 61 -> 62)
-        if (HasCastlingRights(board, CASTLE_BLACK_KINGSIDE)
-            && IsSquareEmpty(board, 61)
-            && IsSquareEmpty(board, 62)
-            && !IsSquareAttacked(board, 61, COLOR_WHITE)
-            && !IsSquareAttacked(board, 62, COLOR_WHITE)
-        ) {
-            on(&castlingMoves, 62);
-        }
+        if(HasCastlingRights(board, CASTLE_BLACK_KINGSIDE)
+            && BB_ALL_MATCH(BLACK_KINGSIDE_CASTLE_EMPTY, emptySquares)
+            && BB_NO_MATCH(BLACK_KINGSIDE_ATTACKS, attacksWhite)
+        ) on(&castlingMoves, G8);
+
         // Black Queenside Castling: Squares e8 -> d8 -> c8 (60 -> 59 -> 58)
-        if (HasCastlingRights(board, CASTLE_BLACK_QUEENSIDE)
-            && IsSquareEmpty(board, 59)
-            && IsSquareEmpty(board, 58)
-            && IsSquareEmpty(board, 57)
-            && !IsSquareAttacked(board, 59, COLOR_WHITE)
-            && !IsSquareAttacked(board, 58, COLOR_WHITE)
-        ) {
-            on(&castlingMoves, 58); // Queenside castling
-        }
+        if(HasCastlingRights(board, CASTLE_BLACK_QUEENSIDE)
+            && BB_ALL_MATCH(BLACK_QUEENSIDE_CASTLE_EMPTY, emptySquares)
+            && BB_NO_MATCH(BLACK_QUEENSIDE_ATTACKS, attacksWhite)
+        ) on(&castlingMoves, C8);
     }
 
-    pseudoLegal |= castlingMoves;
-
-    return pseudoLegal;
+    return pseudoLegal |= castlingMoves;
 }
 
 Bitboard GeneratePseudoLegalMovesBitboard(const Board* board)

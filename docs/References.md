@@ -7,3 +7,4 @@
 - [UCI Protocol](https://www.wbec-ridderkerk.nl/html/UCIProtocol.html)
 - [UCI Protocol](https://ucichessengine.wordpress.com/2011/03/16/description-of-uci-protocol/)
 - [Random Position Generator](https://chesspositiongenerator.com/)
+- [Bitboard Editor](https://bitboard-editor.vercel.app/)
