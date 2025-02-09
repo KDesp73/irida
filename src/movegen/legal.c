@@ -22,8 +22,7 @@ Moves GenerateLegalPawnMoves(const Board *board, Bitboard pieces, PieceColor col
     while (pieces) {
         Square current = poplsb(&pieces);
         Bitboard pseudoLegal = GeneratePawnMoves(board, current, color, type);
-        if(MOVE_PSEUDO)
-            pseudo = MovesCombine(pseudo, BitboardToMoves(pseudoLegal, current));
+        pseudo = MovesCombine(pseudo, BitboardToMoves(pseudoLegal, current));
 
         while (pseudoLegal) {
             Square target = poplsb(&pseudoLegal);
@@ -112,8 +111,7 @@ Moves GenerateLegalKnightMoves(const Board* board, Bitboard pieces, PieceColor c
     while (pieces) {
         Square current = poplsb(&pieces);
         Bitboard pseudoLegal = GenerateKnightMoves(board, current, color, type);
-        if(MOVE_PSEUDO)
-            pseudo = MovesCombine(pseudo, BitboardToMoves(pseudoLegal, current));
+        pseudo = MovesCombine(pseudo, BitboardToMoves(pseudoLegal, current));
 
         while (pseudoLegal) {
             Square target = poplsb(&pseudoLegal);
@@ -171,8 +169,7 @@ Moves GenerateLegalBishopMoves(const Board* board, Bitboard pieces, PieceColor c
     while (pieces) {
         Square current = poplsb(&pieces);
         Bitboard pseudoLegal = GenerateBishopMoves(board, current, color, type);
-        if(MOVE_PSEUDO)
-            pseudo = MovesCombine(pseudo, BitboardToMoves(pseudoLegal, current));
+        pseudo = MovesCombine(pseudo, BitboardToMoves(pseudoLegal, current));
 
         while (pseudoLegal) {
             Square target = poplsb(&pseudoLegal);
@@ -231,8 +228,7 @@ Moves GenerateLegalRookMoves(const Board* board, Bitboard pieces, PieceColor col
     while (pieces) {
         Square current = poplsb(&pieces);
         Bitboard pseudoLegal = GenerateRookMoves(board, current, color, type);
-        if(MOVE_PSEUDO)
-            pseudo = MovesCombine(pseudo, BitboardToMoves(pseudoLegal, current));
+        pseudo = MovesCombine(pseudo, BitboardToMoves(pseudoLegal, current));
 
         while (pseudoLegal) {
             Square target = poplsb(&pseudoLegal);
@@ -297,8 +293,7 @@ Moves GenerateLegalKingMoves(const Board* board, Bitboard pieces, PieceColor col
 
     Square king = lsb(pieces);
     Bitboard pseudoLegal = GenerateKingMoves(&temp, king, color, type);
-    if(MOVE_PSEUDO)
-        pseudo = MovesCombine(pseudo, BitboardToMoves(pseudoLegal, king));
+    pseudo = MovesCombine(pseudo, BitboardToMoves(pseudoLegal, king));
 
     Bitboard opponentAttacks = GeneratePseudoLegalAttacks(&temp, !color);
     pseudoLegal &= ~opponentAttacks;

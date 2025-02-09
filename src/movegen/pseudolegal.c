@@ -140,7 +140,6 @@ Bitboard GeneratePawnMoves(const Board* board, Square piece, PieceColor color, M
         pseudoAttacks |= enpassantBB;
     }
 
-    // Determine which type of moves to return
     switch (type) {
         case MOVE_PSEUDO:
         case MOVE_LEGAL:

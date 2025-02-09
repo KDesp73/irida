@@ -29,7 +29,7 @@ void perft(size_t depth, const char* fen) {
     Board board;
     BoardInitFen(&board, fen);
 
-    u64 count = Perft(&board, depth, true);
+    u64 count = Perft(&board, depth, MOVE_LEGAL, true);
 
     printf("Nodes reached: %llu\n", count);
 
@@ -176,7 +176,12 @@ int main(int argc, char** argv){
         exit(0);
     }
 
-    UciMain(argc, argv);
+    // UciMain(argc, argv);
+
+    Board b;
+    BoardInitFen(&b, NULL);
+    int n = Perft(&b, 4, MOVE_CAPTURES, true);
+    printf("Captures: %d\n", n);
 
     return 0;
 }

@@ -3,9 +3,10 @@
 
 
 #include "board.h"
+#include "movegen.h"
 typedef unsigned long long u64;
 
 // https://www.chessprogramming.org/Perft
-u64 Perft(Board* board, int depth, bool root);
+u64 Perft(Board* board, int depth, MoveType type, bool root);
 
 #endif // ENGINE_PERFT_H
