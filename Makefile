@@ -66,6 +66,7 @@ $(BUILD_DIR): ## Create the build directory if it doesn't exist
 	mkdir -p $(BUILD_DIR)/movegen
 	mkdir -p $(BUILD_DIR)/notation
 	mkdir -p $(BUILD_DIR)/gui
+	mkdir -p $(BUILD_DIR)/uci
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c ## Compile source files
 	$(eval counter=$(shell echo $$(($(counter)+1))))
