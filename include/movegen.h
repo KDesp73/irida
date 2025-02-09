@@ -5,6 +5,21 @@
 #include "board.h"
 #include "move.h"
 
+typedef enum {
+    MOVE_LEGAL,        // A fully legal move after legality checks
+    MOVE_PSEUDO,       // A pseudo-legal move (ignores check legality)
+    MOVE_CAPTURES,     // A move that captures an opponent’s piece
+    MOVE_QUIET,        // A non-capturing, non-promoting move
+    MOVE_CHECK,        // A move that puts the opponent in check
+    MOVE_CHECKMATE,    // A move that delivers checkmate
+    MOVE_CASTLING,     // A king-side or queen-side castling move
+    MOVE_EN_PASSANT,   // A special pawn capture move
+    MOVE_PROMOTION,    // A pawn promotion move
+    MOVE_ILLEGAL       // An invalid move (used for error handling)
+} MoveType;
+
+Moves GenerateMoves(const Board* board, MoveType type);
+
 /*** Pseudo-Legal Moves ***/
 
 Moves GeneratePseudoLegalMoves(const Board* board);

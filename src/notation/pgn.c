@@ -42,7 +42,7 @@ void PgnExport(Game* game, char* pgn)
     sprintf(pgn + strlen(pgn), "\n");
 }
 
-// TODO: has issues with moves
+// FIX: has issues with moves
 void PgnImport(Game* game, const char* pgn)
 {
     int move_count = 0;
