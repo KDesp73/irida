@@ -134,8 +134,10 @@ Bitboard GeneratePawnMoves(const Board* board, Square piece, PieceColor color, M
     pseudoQuiet = PawnPushes(piece, emptySquares, color);
     Bitboard pseudoAttacks = PawnAttacks(piece, enemySquares, color);
 
-    if((color == COLOR_WHITE && enpassantBB & RANK_6) ||
-            (color == COLOR_BLACK && enpassantBB & RANK_3)) {
+    if(
+        (color == COLOR_WHITE && enpassantBB & RANK_6) ||
+        (color == COLOR_BLACK && enpassantBB & RANK_3)
+    ){
         enpassantBB = (PawnAttackMask(piece, color) & enpassantBB);
         pseudoAttacks |= enpassantBB;
     }
@@ -151,7 +153,7 @@ Bitboard GeneratePawnMoves(const Board* board, Square piece, PieceColor color, M
             
         case MOVE_CAPTURES:
             // Only return pawn captures (including en passant)
-            return pseudoAttacks;
+            return (pseudoAttacks & enemySquares) | enpassantBB;
 
         case MOVE_QUIET:
             // Only return quiet moves (no attacks)

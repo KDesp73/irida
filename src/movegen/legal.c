@@ -50,7 +50,8 @@ Moves GenerateLegalPawnMoves(const Board *board, Bitboard pieces, PieceColor col
                         Move promotion = MoveEncode(current, target, promotions[i], FLAG_PROMOTION);
                         if(MakeMove(&temp, promotion)){
                             if (!IsInCheckColor(&temp, !temp.turn)) {
-                                MovesAppend(&moves, promotion);
+                                if(type != MOVE_QUIET)
+                                    MovesAppend(&moves, promotion);
                                 if(type == MOVE_PSEUDO)
                                     MovesAppend(&pseudo, promotion);
                                 else if(type == MOVE_PROMOTION)
@@ -73,10 +74,10 @@ Moves GenerateLegalPawnMoves(const Board *board, Bitboard pieces, PieceColor col
     }
 
     switch (type) {
-    case MOVE_QUIET:
     case MOVE_LEGAL:
     case MOVE_CHECK:
     case MOVE_EN_PASSANT:
+    case MOVE_QUIET:
     case MOVE_CAPTURES:
         return moves;
     case MOVE_PROMOTION:
