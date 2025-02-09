@@ -12,11 +12,27 @@ static const int KING_VALUE = 20000;
 
 // https://www.chessprogramming.org/Evaluation
 
-// default evaluation function
-#define Evaluation EvaluateMaterial
-
 int EvaluateMaterial(const Board* board);
-// TODO: better evaluation methods
+int EvaluatePieceSquareTables(const Board* board);
+int EvaluateMobility(const Board* board, PieceColor color);
+
+int EvaluateKingSafety(const Board* board); // TODO: Implement
+// TODO: EvaluatePawnStructure
+// TODO: EvaluateThreats
+// TODO: Fine-Tuning
+
+
+static inline int Evaluation(const Board* board)
+{
+    int score = 0;
+
+    score += EvaluateMaterial(board);
+    score += EvaluatePieceSquareTables(board);
+    score += EvaluateKingSafety(board);
+    score += EvaluateMobility(board, board->turn);
+
+    return score;
+}
 
 #endif // ENGINE_EVALUATION_H
 
