@@ -99,6 +99,7 @@ test: ## Build and run the tests
 	make all
 	clear
 	./$(CHECK)
+	fastchess --compliance ./$(EXEC)
 
 .PHONY: shared
 shared: $(BUILD_DIR) $(OBJ_FILES) ## Build shared library
