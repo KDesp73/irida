@@ -8,10 +8,7 @@
 
 void InitHashTableHash(HashTable* table, uint64_t starting_hash)
 {
-    if (!table) {
-        ERRO("hash_table_t pointer is NULL.\n");
-        exit(EXIT_FAILURE);
-    }
+    assert(table);
 
     table->entries = calloc(MAX_MOVES, sizeof(HashEntry));
     if (!table->entries) {
@@ -27,10 +24,7 @@ void InitHashTableHash(HashTable* table, uint64_t starting_hash)
 
 void InitHashTable(HashTable* table, const char* starting_fen)
 {
-    if (!table) {
-        ERRO("hash_table_t pointer is NULL.\n");
-        exit(EXIT_FAILURE);
-    }
+    assert(table);
 
     table->entries = calloc(MAX_MOVES, sizeof(HashEntry));
     if (!table->entries) {
