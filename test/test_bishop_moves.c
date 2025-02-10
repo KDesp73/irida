@@ -29,7 +29,7 @@ int test_bishop_moves(const char* fen, const char* square, const char* first, ..
     }
 
     PieceColor color = PieceAt(&board, from).color;
-    Bitboard found = MovesToBitboard(GenerateLegalBishopMoves(&board, BB(from), color, MOVE_LEGAL));
+    Bitboard found = MovesToBitboard(GenerateLegalBishopMoves(&board, BB(from), color));
     if(found != moves){
         FAILF(fen, "For square %s", square);
         printf("Expected: \n");

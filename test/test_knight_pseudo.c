@@ -28,7 +28,7 @@ int test_knight_pseudo(const char* fen, const char* square, const char* first, .
     }
 
     PieceColor color = PieceAt(&board, from).color;
-    Bitboard found = GenerateKnightMoves(&board, from, color, MOVE_PSEUDO);
+    Bitboard found = GenerateKnightMoves(&board, from, color);
     if(found != moves){
         FAILF(fen, "For square %s", square);
         printf("Expected: \n");

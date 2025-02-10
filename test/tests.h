@@ -25,15 +25,6 @@ int test_perft_5(int depth, u64 expected);
 #include "test_perft_6.h"
 int test_perft_6(int depth, u64 expected);
 
-#include "test_perft_captures.h"
-int test_perft_captures(int depth, u64 expected);
-#include "test_perft_captures_2.h"
-int test_perft_captures_2(int depth, u64 expected);
-#include "test_perft_captures_3.h"
-int test_perft_captures_3(int depth, u64 expected);
-#include "test_perft_captures_4.h"
-int test_perft_captures_4(int depth, u64 expected);
-
 #include "test_piece_at.h"
 int test_piece_at(const char* fen, Square square, char expected);
 

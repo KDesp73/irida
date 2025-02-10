@@ -30,7 +30,7 @@ void perft(size_t depth, const char* fen) {
     Board board;
     BoardInitFen(&board, fen);
 
-    u64 count = Perft(&board, depth, MOVE_LEGAL, true);
+    u64 count = Perft(&board, depth, true);
 
     printf("Nodes reached: %llu\n", count);
 
@@ -129,11 +129,11 @@ int game(const char* fen)
             UnmakeMove(&board);
             break;
         case 2:
-            BoardPrintBitboard(&board, GenerateMovesBitboard(&board, MOVE_LEGAL));
+            BoardPrintBitboard(&board, GenerateLegalMovesBitboard(&board));
             BoardInfoPrint(&board);
             break;
         case 3: 
-            BoardPrintBitboard(&board, GenerateMovesBitboard(&board, MOVE_PSEUDO));
+            BoardPrintBitboard(&board, GenerateLegalMovesBitboard(&board));
             BoardInfoPrint(&board);
             break;
         case 4:

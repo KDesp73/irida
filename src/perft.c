@@ -4,12 +4,12 @@
 #include "movegen.h"
 #include <stdio.h>
 
-u64 Perft(Board* board, int depth, MoveType type, bool root)
+u64 Perft(Board* board, int depth, bool root)
 {
     uint64_t cnt = 0, nodes = 0;
     bool leaf = (depth == 2);
 
-    Moves moves = GenerateMoves(board, type);
+    Moves moves = GenerateMoves(board, MOVE_LEGAL);
     for (int i = 0; i < moves.count; i++) {
         Move move = moves.list[i];
 
@@ -18,7 +18,7 @@ u64 Perft(Board* board, int depth, MoveType type, bool root)
             nodes++;
         } else {
         if (!MakeMove(board, move)) continue;
-            cnt = leaf ? GenerateMoves(board, type).count : Perft(board, depth - 1, type, false);
+            cnt = leaf ? GenerateMoves(board, MOVE_LEGAL).count : Perft(board, depth - 1, false);
             nodes += cnt;
 
             UnmakeMove(board);

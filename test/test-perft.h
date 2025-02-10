@@ -2,10 +2,10 @@
 #define TEST_PERFT_MACRO_H
 
 #include "extern/test.h"
-#define PERFT_TEST(fen, depth, type, expected) \
+#define PERFT_TEST(fen, depth, expected) \
     Board board; \
     BoardInitFen(&board, fen); \
-    u64 count = Perft(&board, depth, type, true); \
+    u64 count = Perft(&board, depth, true); \
     BoardFree(&board); \
 \
     if(count != expected){ \

@@ -119,12 +119,8 @@ Bitboard GeneratePseudoLegalAttacks(const Board* board, PieceColor attackerColor
 }
 
 
-Bitboard GeneratePawnMoves(const Board* board, Square piece, PieceColor color, MoveType type)
+Bitboard GeneratePawnMoves(const Board* board, Square piece, PieceColor color)
 {
-    if (type == MOVE_CASTLING) {
-        return 0ULL;  // Pawns cannot castle
-    }
-
     Bitboard pseudoQuiet = 0ULL;
     Square enpassantSquare = board->enpassant_square;
     Bitboard enemySquares = GetEnemy(board);
@@ -142,189 +138,47 @@ Bitboard GeneratePawnMoves(const Board* board, Square piece, PieceColor color, M
         pseudoAttacks |= enpassantBB;
     }
 
-    switch (type) {
-        case MOVE_PSEUDO:
-        case MOVE_LEGAL:
-        case MOVE_ILLEGAL:
-        case MOVE_CHECKMATE:
-        case MOVE_PROMOTION:
-            // Default case to return all pseudo-legal moves (quiet + attacks)
-            return pseudoQuiet | pseudoAttacks;
-            
-        case MOVE_CAPTURES:
-            // Only return pawn captures (including en passant)
-            return (pseudoAttacks & enemySquares) | enpassantBB;
-
-        case MOVE_QUIET:
-            // Only return quiet moves (no attacks)
-            return pseudoQuiet;
-
-        case MOVE_CHECK:
-            // Return only the attacks that threaten the enemy king
-            return pseudoAttacks & board->bitboards[(!color * 6) + INDEX_KING];
-
-        case MOVE_EN_PASSANT:
-            // Return only the en passant attacks
-            return enpassantBB;
-        case MOVE_CASTLING:
-            return 0ULL;
-        }
-
-    // Default return for combined moves (quiet + attacks)
     return pseudoQuiet | pseudoAttacks;
 }
 
-Bitboard GenerateKnightMoves(const Board* board, Square piece, PieceColor color, MoveType type)
+Bitboard GenerateKnightMoves(const Board* board, Square piece, PieceColor color)
 {
-    if (
-        type == MOVE_PROMOTION ||
-        type == MOVE_CASTLING ||
-        type == MOVE_EN_PASSANT
-    ) {
-        return 0ULL;
-    }
-
     Bitboard emptySquares = GetEmpty(board);
     Bitboard enemySquares = GetEnemyColor(board, color);
     Bitboard attacks = KnightAttacks(piece, emptySquares, enemySquares);
 
-    switch (type) {
-        case MOVE_LEGAL:
-        case MOVE_PSEUDO:
-        case MOVE_CHECKMATE:
-        case MOVE_ILLEGAL:
-            break;
-        case MOVE_CAPTURES:
-            return attacks & enemySquares;
-        case MOVE_QUIET:
-            return attacks & emptySquares;
-        case MOVE_CHECK:
-            return attacks & board->bitboards[(!color * 6) + INDEX_KING];
-        case MOVE_PROMOTION:
-        case MOVE_CASTLING:
-        case MOVE_EN_PASSANT:
-            // These cases are handled above, but also kept here for completeness (invalid for knights)
-            return 0ULL;
-    }
-
     return attacks;
 }
 
-Bitboard GenerateBishopMoves(const Board* board, Square piece, PieceColor color, MoveType type)
+Bitboard GenerateBishopMoves(const Board* board, Square piece, PieceColor color)
 {
-    if(
-        type == MOVE_PROMOTION ||
-        type == MOVE_CASTLING ||
-        type == MOVE_EN_PASSANT
-    ) {
-        return 0ULL;
-    }
-
     Bitboard emptySquares = GetEmpty(board);
     Bitboard enemySquares = GetEnemyColor(board, color);
     Bitboard attacks = BishopAttacks(piece, emptySquares, enemySquares);
 
-    switch (type) {
-    case MOVE_LEGAL:
-    case MOVE_PSEUDO:
-    case MOVE_CHECKMATE:
-    case MOVE_ILLEGAL:
-        break;
-    case MOVE_CAPTURES:
-        return attacks & enemySquares;
-    case MOVE_QUIET:
-        return attacks & emptySquares;
-    case MOVE_CHECK:
-        return attacks & board->bitboards[(!color * 6) + INDEX_KING];
-    case MOVE_CASTLING:
-    case MOVE_PROMOTION:
-    case MOVE_EN_PASSANT:
-        // These cases are handled above, but also kept here for completeness (invalid for knights)
-        return 0ULL;
-    }
-
     return attacks;
 }
 
-Bitboard GenerateRookMoves(const Board* board, Square piece, PieceColor color, MoveType type)
+Bitboard GenerateRookMoves(const Board* board, Square piece, PieceColor color)
 {
-    if(
-        type == MOVE_PROMOTION ||
-        type == MOVE_CASTLING ||
-        type == MOVE_EN_PASSANT
-    ) {
-        return 0ULL;
-    }
-
     Bitboard emptySquares = GetEmpty(board);
     Bitboard enemySquares = GetEnemyColor(board, color);
     Bitboard attacks = RookAttacks(piece, emptySquares, enemySquares);
 
-    switch (type) {
-    case MOVE_LEGAL:
-    case MOVE_PSEUDO:
-    case MOVE_CHECKMATE:
-    case MOVE_ILLEGAL:
-        break;
-    case MOVE_CAPTURES:
-        return attacks & enemySquares;
-    case MOVE_QUIET:
-        return attacks & emptySquares;
-    case MOVE_CHECK:
-        return attacks & board->bitboards[(!color * 6) + INDEX_KING];
-    case MOVE_CASTLING:
-    case MOVE_EN_PASSANT:
-    case MOVE_PROMOTION:
-        // These cases are handled above, but also kept here for completeness (invalid for knights)
-        return 0ULL;
-    }
-
     return attacks;
 }
 
-Bitboard GenerateQueenMoves(const Board* board, Square piece, PieceColor color, MoveType type)
+Bitboard GenerateQueenMoves(const Board* board, Square piece, PieceColor color)
 {
-    if(
-        type == MOVE_PROMOTION ||
-        type == MOVE_CASTLING ||
-        type == MOVE_EN_PASSANT
-    ) {
-        return 0ULL;
-    }
-
     Bitboard emptySquares = GetEmpty(board);
     Bitboard enemySquares = GetEnemyColor(board, color);
     Bitboard attacks = QueenAttacks(piece, emptySquares, enemySquares);
 
-    switch (type) {
-    case MOVE_LEGAL:
-    case MOVE_PSEUDO:
-    case MOVE_CHECKMATE:
-    case MOVE_ILLEGAL:
-        break;
-    case MOVE_CAPTURES:
-        return attacks & enemySquares;
-    case MOVE_QUIET:
-        return attacks & emptySquares;
-    case MOVE_CHECK:
-        return attacks & board->bitboards[(!color * 6) + INDEX_KING];
-    case MOVE_CASTLING:
-    case MOVE_EN_PASSANT:
-    case MOVE_PROMOTION:
-        // These cases are handled above, but also kept here for completeness (invalid for knights)
-        return 0ULL;
-    }
-
     return attacks;
 }
 
-Bitboard GenerateKingMoves(const Board* board, Square square, PieceColor color, MoveType type)
+Bitboard GenerateKingMoves(const Board* board, Square square, PieceColor color)
 {
-    if(
-        type == MOVE_EN_PASSANT ||
-        type == MOVE_PROMOTION
-    ) return 0ULL;
-
     Bitboard emptySquares  = GetEmpty(board);
     Bitboard enemySquares  = GetEnemyColor(board, color);
     Bitboard pseudoLegal   = KingAttacks(square, emptySquares, enemySquares);
@@ -359,34 +213,15 @@ Bitboard GenerateKingMoves(const Board* board, Square square, PieceColor color, 
         ) on(&castlingMoves, C8);
     }
 
-    switch (type) {
-    case MOVE_LEGAL:
-    case MOVE_PSEUDO:
-    case MOVE_CHECKMATE:
-    case MOVE_ILLEGAL:
-    case MOVE_CHECK:
-        break;
-    case MOVE_CAPTURES:
-        return pseudoLegal & enemySquares;
-    case MOVE_QUIET:
-        return (pseudoLegal | castlingMoves) & emptySquares;
-    case MOVE_CASTLING:
-        return castlingMoves;
-    case MOVE_EN_PASSANT:
-    case MOVE_PROMOTION:
-        // These cases are handled above, but also kept here for completeness (invalid for knights)
-        return 0ULL;
-    }
-
     return pseudoLegal | castlingMoves;
 }
 
-Bitboard GeneratePseudoLegalMovesBitboard(const Board* board, MoveType type)
+Bitboard GeneratePseudoLegalMovesBitboard(const Board* board)
 {
-    return MovesToBitboard(GeneratePseudoLegalMoves(board, type));
+    return MovesToBitboard(GeneratePseudoLegalMoves(board));
 }
 
-Moves GeneratePseudoLegalMoves(const Board* board, MoveType type)
+Moves GeneratePseudoLegalMoves(const Board* board)
 {
     Moves moves = {0};
     PieceColor color = board->turn;
@@ -394,37 +229,37 @@ Moves GeneratePseudoLegalMoves(const Board* board, MoveType type)
     Bitboard pawnsBB = board->bitboards[color*6 + INDEX_BLACK_PAWN];
     while(pawnsBB){
         Square current = poplsb(&pawnsBB);
-        MovesAppendList(&moves, BitboardToMoves(GeneratePawnMoves(board, current, color, type), current));
+        MovesAppendList(&moves, BitboardToMoves(GeneratePawnMoves(board, current, color), current));
     }
 
     Bitboard knightsBB = board->bitboards[color*6 + INDEX_BLACK_KNIGHT];
     while(knightsBB){
         Square current = poplsb(&knightsBB);
-        MovesAppendList(&moves, BitboardToMoves(GenerateKnightMoves(board, current, color, type), current));
+        MovesAppendList(&moves, BitboardToMoves(GenerateKnightMoves(board, current, color), current));
     }
 
     Bitboard bishopsBB = board->bitboards[color*6 + INDEX_BLACK_BISHOP];
     while(bishopsBB){
         Square current = poplsb(&bishopsBB);
-        MovesAppendList(&moves, BitboardToMoves(GenerateBishopMoves(board, current, color, type), current));
+        MovesAppendList(&moves, BitboardToMoves(GenerateBishopMoves(board, current, color), current));
     }
 
     Bitboard rooksBB = board->bitboards[color*6 + INDEX_BLACK_ROOK];
     while(rooksBB){
         Square current = poplsb(&rooksBB);
-        MovesAppendList(&moves, BitboardToMoves(GenerateRookMoves(board, current, color, type), current));
+        MovesAppendList(&moves, BitboardToMoves(GenerateRookMoves(board, current, color), current));
     }
 
     Bitboard queensBB = board->bitboards[color*6 + INDEX_BLACK_QUEEN];
     while(queensBB){
         Square current = poplsb(&queensBB);
-        MovesAppendList(&moves, BitboardToMoves(GenerateQueenMoves(board, current, color, type), current));
+        MovesAppendList(&moves, BitboardToMoves(GenerateQueenMoves(board, current, color), current));
     }
 
     Bitboard kingsBB = board->bitboards[color*6 + INDEX_BLACK_KING];
     while(kingsBB){
         Square current = poplsb(&kingsBB);
-        MovesAppendList(&moves, BitboardToMoves(GenerateKingMoves(board, current, color, type), current));
+        MovesAppendList(&moves, BitboardToMoves(GenerateKingMoves(board, current, color), current));
     }
 
     return moves;

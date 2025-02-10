@@ -17,11 +17,6 @@ void load()
     LOAD_TEST("test_perft_5");
     LOAD_TEST("test_perft_6");
 
-    LOAD_TEST("test_perft_captures");
-    LOAD_TEST("test_perft_captures_2");
-    LOAD_TEST("test_perft_captures_3");
-    LOAD_TEST("test_perft_captures_4");
-
     LOAD_TEST("test_pawn_moves");
     LOAD_TEST("test_knight_moves");
     LOAD_TEST("test_bishop_moves");
@@ -57,15 +52,6 @@ int main(int argc, char** argv)
                     RUN_TEST(test_perft_5),
                     RUN_TEST(test_perft_6)
                 END_TESTS
-            } else {
-                if(!strcmp(argv[2], "captures")){
-                    START_TESTS
-                        RUN_TEST(test_perft_captures),
-                        RUN_TEST(test_perft_captures_2),
-                        RUN_TEST(test_perft_captures_3),
-                        RUN_TEST(test_perft_captures_4)
-                    END_TESTS
-                }
             }
         }
         return 0;

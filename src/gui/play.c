@@ -136,7 +136,7 @@ void gui(const char* fen)
                     selected_square = square_clicked(board_position);
                     if (!VCMP(selected_square, VEMPTY)) {
                         Square square = selected_square.y*8 + selected_square.x;
-                        moves = GenerateMovesSquare(&board, square, MOVE_LEGAL);
+                        moves = GenerateLegalMovesSquare(&board, square);
                     }
                 } else {
                     move_square = square_clicked(board_position);
