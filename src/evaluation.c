@@ -1,5 +1,7 @@
+#include "bitboard.h"
 #include "board.h"
 #include "evaluation.h"
+#include "masks.h"
 #include "movegen.h"
 #include "heatmaps.h"
 #include "piece.h"
@@ -55,28 +57,29 @@ int EvaluatePieceSquareTables(const Board* board, const Tuning* tuning)
         Piece piece = PieceAt(board, square);
         PieceColor color = piece.color;
 
+        int val = 0;
         if (tolower(piece.type) == 'p') {
-            int val = PawnTableValue(board, tuning, square);
+            val = PawnTableValue(board, tuning, square);
             score += (color == COLOR_WHITE) ? val : -val;
         }
         else if (tolower(piece.type) == 'n') {
-            int val = KnightTableValue(board, tuning, square);
+            val = KnightTableValue(board, tuning, square);
             score += (color == COLOR_WHITE) ? val : -val;
         }
         else if (tolower(piece.type) == 'b') {
-            int val = BishopTableValue(board, tuning, square);
+            val = BishopTableValue(board, tuning, square);
             score += (color == COLOR_WHITE) ? val : -val;
         }
         else if (tolower(piece.type) == 'r') {
-            int val = RookTableValue(board, tuning, square);
+            val = RookTableValue(board, tuning, square);
             score += (color == COLOR_WHITE) ? val : -val;
         }
         else if (tolower(piece.type) == 'q') {
-            int val = QueenTableValue(board, tuning, square);
+            val = QueenTableValue(board, tuning, square);
             score += (color == COLOR_WHITE) ? val : -val;
         }
         else if (tolower(piece.type) == 'k') {
-            int val = KingTableValue(board, tuning, square);
+            val = KingTableValue(board, tuning, square);
             score += (color == COLOR_WHITE) ? val : -val;
         }
     }
@@ -88,15 +91,16 @@ int EvaluateKingSafety(const Board* board, const Tuning* tuning)
 {
     int score = 0;
 
-    // // Pseudo-code
-    // Square kingSquare = GetKingPosition(board);
-    // 
-    // // Check surrounding squares for opponent pieces
-    // for (int square = 0; square < 8; square++) {
-    //     if (IsOpponentPiece(board, square, GetPieceColorAt(board, kingSquare))) {
-    //         score -= 1;  // Penalize king for being attacked
-    //     }
-    // }
+    PieceColor color = board->turn;
+    Bitboard kingBB = board->bitboards[color*6 + INDEX_KING];
+    Bitboard opponent = GetEnemyColor(board, color);
+
+    // TODO: enlarge the area below by one square
+    Bitboard kingSurroundings = KingMoveMask(lsb(kingBB));
+    Bitboard enemies = kingSurroundings & opponent;
+
+    // Penalize king for being attacked
+    score += -(popcount(enemies));
 
     return score;
 }

@@ -9,11 +9,10 @@
 int EvaluateMaterial(const Board* board, const Tuning* tuning);
 int EvaluatePieceSquareTables(const Board* board, const Tuning* tuning);
 int EvaluateMobility(const Board* board, const Tuning* tuning, PieceColor color);
+int EvaluateKingSafety(const Board* board, const Tuning* tuning);
 
-int EvaluateKingSafety(const Board* board, const Tuning* tuning); // TODO: Implement
-// TODO: EvaluatePawnStructure
-// TODO: EvaluateThreats
-// TODO: Fine-Tuning
+// TODO: EvaluatePawnStructure(const Board* board, const Tuning* tuning);
+// TODO: EvaluateThreats(const Board* board, const Tuning* tuning);
 
 
 static inline int Evaluation(const Board* board)
