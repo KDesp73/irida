@@ -26,10 +26,12 @@ ifeq ($(type), RELEASE)
 	CFLAGS += -O3
 else
 	SANITIZERS = -fsanitize=address,leak
-	CFLAGS  += -DDEBUG -ggdb
+	CFLAGS  += -ggdb -Og
 	CFLAGS  += $(SANITIZERS)
 	LDFLAGS += $(SANITIZERS)
 endif
+CFLAGS += -D$(type)
+
 
 # Source and object files
 SRC_FILES := $(shell find $(SRC_DIR) -name '*.c' ! -name 'main.c')

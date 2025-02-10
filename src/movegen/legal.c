@@ -1,11 +1,14 @@
 #include "bitboard.h"
 #include "board.h"
-#include "extern/bench.h"
 #include "movegen.h"
 #include "masks.h"
 #include "move.h"
 #include "square.h"
 #include <stdio.h>
+
+#ifndef RELEASE
+#include "extern/bench.h"
+#endif // RELEASE
 
 Moves GenerateLegalPawnMoves(const Board *board, Bitboard pieces, PieceColor color)
 {

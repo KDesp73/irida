@@ -5,7 +5,7 @@
 ```bash
 $ git clone https://github.com/KDesp73/chess-engine
 $ cd chess-engine
-$ make all
+$ make type=RELEASE all
 ```
 
 ## Testing
