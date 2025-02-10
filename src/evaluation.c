@@ -1,13 +1,12 @@
 #include "board.h"
 #include "evaluation.h"
 #include "movegen.h"
-#include "piece-tables.h"
+#include "heatmaps.h"
 #include "piece.h"
 #include "tuning.h"
 #include <ctype.h>
 
-// TODO: use tuning values
-int EvaluateMaterial(const Board* board)
+int EvaluateMaterial(const Board* board, const Tuning* tuning)
 {
     int score = 0;
     for (size_t i = 0; i < PIECE_TYPES; i++) {
@@ -19,27 +18,27 @@ int EvaluateMaterial(const Board* board)
             switch (piece.type) {
             case 'p':
             case 'P':
-                value = PAWN_VALUE;
+                value = THIS_OR(tuning->pieces.pawn, PAWN_VALUE);
                 break;
             case 'n':
             case 'N':
-                value = KNIGHT_VALUE;
+                value = THIS_OR(tuning->pieces.knight, KNIGHT_VALUE);
                 break;
             case 'b':
             case 'B':
-                value = BISHOP_VALUE;
+                value = THIS_OR(tuning->pieces.bishop, BISHOP_VALUE);
                 break;
             case 'r':
             case 'R':
-                value = ROOK_VALUE;
+                value = THIS_OR(tuning->pieces.rook, ROOK_VALUE);
                 break;
             case 'q':
             case 'Q':
-                value = QUEEN_VALUE;
+                value = THIS_OR(tuning->pieces.queen, QUEEN_VALUE);
                 break;
             case 'k':
             case 'K':
-                value = KING_VALUE;
+                value = THIS_OR(tuning->pieces.king, KING_VALUE);
                 break;
             }
             score += IS_WHITE(piece) ? value : -value;
@@ -48,7 +47,7 @@ int EvaluateMaterial(const Board* board)
     return score;
 }
 
-int EvaluatePieceSquareTables(const Board* board)
+int EvaluatePieceSquareTables(const Board* board, const Tuning* tuning)
 {
     int score = 0;
 
@@ -57,29 +56,35 @@ int EvaluatePieceSquareTables(const Board* board)
         PieceColor color = piece.color;
 
         if (tolower(piece.type) == 'p') {
-            score += (color == COLOR_WHITE) ? PawnTable[square] : -PawnTable[square];
+            int val = PawnTableValue(board, tuning, square);
+            score += (color == COLOR_WHITE) ? val : -val;
         }
         else if (tolower(piece.type) == 'n') {
-            score += (color == COLOR_WHITE) ? KnightTable[square] : -KnightTable[square];
+            int val = KnightTableValue(board, tuning, square);
+            score += (color == COLOR_WHITE) ? val : -val;
         }
         else if (tolower(piece.type) == 'b') {
-            score += (color == COLOR_WHITE) ? BishopTable[square] : -BishopTable[square];
+            int val = BishopTableValue(board, tuning, square);
+            score += (color == COLOR_WHITE) ? val : -val;
         }
         else if (tolower(piece.type) == 'r') {
-            score += (color == COLOR_WHITE) ? RookTable[square] : -RookTable[square];
+            int val = RookTableValue(board, tuning, square);
+            score += (color == COLOR_WHITE) ? val : -val;
         }
         else if (tolower(piece.type) == 'q') {
-            score += (color == COLOR_WHITE) ? QueenTable[square] : -QueenTable[square];
+            int val = QueenTableValue(board, tuning, square);
+            score += (color == COLOR_WHITE) ? val : -val;
         }
         else if (tolower(piece.type) == 'k') {
-            score += (color == COLOR_WHITE) ? KingTable[square] : -KingTable[square];
+            int val = KingTableValue(board, tuning, square);
+            score += (color == COLOR_WHITE) ? val : -val;
         }
     }
 
     return score;
 }
 
-int EvaluateKingSafety(const Board* board) 
+int EvaluateKingSafety(const Board* board, const Tuning* tuning)
 {
     int score = 0;
 
@@ -96,7 +101,7 @@ int EvaluateKingSafety(const Board* board)
     return score;
 }
 
-int EvaluateMobility(const Board* board, PieceColor color)
+int EvaluateMobility(const Board* board, const Tuning* tuning, PieceColor color)
 {
     int mobility = 0;
     

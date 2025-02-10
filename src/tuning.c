@@ -2,6 +2,7 @@
 #include "extern/luaman.h"
 #include "lua.h"
 #include <limits.h>
+#include <stdio.h>
 
 void PrintTuning(const Tuning* tuning)
 {
@@ -61,6 +62,26 @@ void LoadTuning(Tuning* tuning)
     // Load endgame values
     tuning->thresholds.endgameMoves  = LMGetTableFieldNumber(&lua, "endgame", "moves", VAR_LOCAL);
     tuning->thresholds.endgamePieces = LMGetTableFieldNumber(&lua, "endgame", "pieces", VAR_LOCAL);
+
+    if(tuning->thresholds.middlegamePieces <= tuning->thresholds.endgamePieces){
+        fprintf(stderr, "Threshold: Middlegame pieces (%zu) must be greater than endgame pieces (%zu)\n", tuning->thresholds.middlegamePieces, tuning->thresholds.endgamePieces);
+
+        lua_pop(lua.state, 1);  // Pop 'thresholds' table
+        LMClose(&lua);
+
+        fprintf(stderr, "Aborting...\n");
+        exit(1);
+    }
+
+    if(tuning->thresholds.middlegameMoves >= tuning->thresholds.endgameMoves){
+        fprintf(stderr, "Threshold: Middlegame moves (%zu) must be less than endgame moves (%zu)\n", tuning->thresholds.middlegameMoves, tuning->thresholds.endgameMoves);
+
+        lua_pop(lua.state, 1);  // Pop 'thresholds' table
+        LMClose(&lua);
+
+        fprintf(stderr, "Aborting...\n");
+        exit(1);
+    }
 
     lua_pop(lua.state, 1);  // Pop 'thresholds' table
 

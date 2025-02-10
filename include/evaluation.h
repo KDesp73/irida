@@ -2,14 +2,15 @@
 #define ENGINE_EVALUATION_H
 
 #include "board.h"
+#include "tuning.h"
 
 // https://www.chessprogramming.org/Evaluation
 
-int EvaluateMaterial(const Board* board);
-int EvaluatePieceSquareTables(const Board* board);
-int EvaluateMobility(const Board* board, PieceColor color);
+int EvaluateMaterial(const Board* board, const Tuning* tuning);
+int EvaluatePieceSquareTables(const Board* board, const Tuning* tuning);
+int EvaluateMobility(const Board* board, const Tuning* tuning, PieceColor color);
 
-int EvaluateKingSafety(const Board* board); // TODO: Implement
+int EvaluateKingSafety(const Board* board, const Tuning* tuning); // TODO: Implement
 // TODO: EvaluatePawnStructure
 // TODO: EvaluateThreats
 // TODO: Fine-Tuning
@@ -17,12 +18,16 @@ int EvaluateKingSafety(const Board* board); // TODO: Implement
 
 static inline int Evaluation(const Board* board)
 {
+    // FIXME: Temporary solution. Define tuning outside
+    Tuning tuning = {0};
+    LoadTuning(&tuning);
+
     int score = 0;
 
-    score += EvaluateMaterial(board);
-    score += EvaluatePieceSquareTables(board);
-    score += EvaluateKingSafety(board);
-    score += EvaluateMobility(board, board->turn);
+    score += EvaluateMaterial(board, &tuning);
+    score += EvaluatePieceSquareTables(board, &tuning);
+    score += EvaluateKingSafety(board, &tuning);
+    score += EvaluateMobility(board, &tuning, board->turn);
 
     return score;
 }

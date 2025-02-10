@@ -34,4 +34,7 @@ void PrintTuning(const Tuning* tuning);
 void LoadTuning(Tuning* tuning);
 #define TUNING_SCRIPT "tuning.lua"
 
+#define IS_SET(x) ((x) != 0)
+#define THIS_OR(x, y) IS_SET(x) ? x : y
+
 #endif // ENGINE_TUNING_H
