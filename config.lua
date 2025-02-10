@@ -32,13 +32,48 @@ local config = {
             value = false,
             default = "false"
         },
-        -- {
-        --     name = "Skill Level",
-        --     type = UCI_COMBO,
-        --     value = "Intermediate",
-        --     params = { "Beginner", "Intermediate", "Advanced", "Master" },
-        --     default = "Intermediate"
-        -- }
+        {
+            name = "Skill Level",
+            type = UCI_SPIN,
+            value = 20,
+            params = {
+                min = 0,
+                max = 20,
+            },
+            default = "20"
+        },
+        {
+            name = "SyzygyPath",
+            type = UCI_STRING,
+            value = "",
+            default = ""
+        },
+        {
+            name = "SyzygyProbeDepth",
+            type = UCI_SPIN,
+            value = 1,
+            params = {
+                min = 1,
+                max = 100
+            },
+            default = "1"
+        },
+        {
+            name = "Syzygy50MoveRule",
+            type = UCI_CHECK,
+            value = true,
+            default = "true"
+        },
+        {
+            name = "SyzygyProbeLimit",
+            type = UCI_SPIN,
+            value = 7,
+            params = {
+                min = 0,
+                max = 7
+            },
+            default = "7"
+        }
     }
 }
 

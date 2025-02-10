@@ -152,10 +152,6 @@ int main(int argc, char** argv){
     InitZobrist();
     InitMasks();
 
-    Tuning tuning = {0};
-    LoadTuning(&tuning);
-    PrintTuning(&tuning);
-
     if (argc >= 2) {
         if (!strcmp(argv[1], "game")) {
             game(argv[2]);

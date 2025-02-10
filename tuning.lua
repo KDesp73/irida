@@ -6,20 +6,20 @@
 
 return {
     pieces = {
-        pawn = 100,
-        knight = 300,
-        bishop = 330,
-        rook = 500,
-        queen = 900,
+        pawn = 1,
+        knight = 3,
+        bishop = 3.3,
+        rook = 5,
+        queen = 9,
         king = inf
     },
     thresholds = {
         middlegame = {
-            moves = 15,
+            moves = 20,
             pieces = 20
         },
         endgame = {
-            moves = 70,
+            moves = 60,
             pieces = 12
         }
     }

@@ -2,11 +2,11 @@
 #define ENGINE_TUNING_H
 
 #include <stddef.h>
-#define PAWN_VALUE   100
-#define KNIGHT_VALUE 310
-#define BISHOP_VALUE 330
-#define ROOK_VALUE   500
-#define QUEEN_VALUE  900
+#define PAWN_VALUE   1
+#define KNIGHT_VALUE 3.1
+#define BISHOP_VALUE 3.3
+#define ROOK_VALUE   5
+#define QUEEN_VALUE  9
 #define KING_VALUE   20000
 
 typedef struct {

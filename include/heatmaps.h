@@ -1,8 +1,6 @@
 #ifndef ENGINE_PIECE_TABLES_H
 #define ENGINE_PIECE_TABLES_H
 
-// TODO: use different tables depending on the stage of the game
-
 #include "board.h"
 #include "square.h"
 #include "tuning.h"
@@ -16,8 +14,8 @@ static const int PawnTable[64] = {
     10, 5,  0,  0,  0,  0,  5,  10,
     0,  0,  0,  0,  0,  0,  0,  0
 };
-static const int PawnTableMiddlegame[64] ={}; // TODO: define the table
-static const int PawnTableEndgame[64] ={}; // TODO: define the table
+static const int PawnTableMiddlegame[64] = {0}; // TODO: define the table
+static const int PawnTableEndgame[64] = {0}; // TODO: define the table
 int PawnTableValue(const Board* board, const Tuning* tuning, Square square);
 
 static const int KnightTable[64] = {
@@ -30,8 +28,8 @@ static const int KnightTable[64] = {
     -40, -20, 0, 5, 5, 0, -20, -40,
     -50, -40, -30, -30, -30, -30, -40, -50
 };
-static const int KnightTableMiddlegame[64] ={}; // TODO: define the table
-static const int KnightTableEndgame[64] ={}; // TODO: define the table
+static const int KnightTableMiddlegame[64] = {0}; // TODO: define the table
+static const int KnightTableEndgame[64] = {0}; // TODO: define the table
 int KnightTableValue(const Board* board, const Tuning* tuning, Square square);
 
 static const int BishopTable[64] = {
@@ -44,8 +42,8 @@ static const int BishopTable[64] = {
     -10, 5, 10, 10, 10, 10, 5, -10,
     -20, -10, -10, -10, -10, -10, -10, -20
 };
-static const int BishopTableMiddlegame[64] ={}; // TODO: define the table
-static const int BishopTableEndgame[64] ={}; // TODO: define the table
+static const int BishopTableMiddlegame[64] = {0}; // TODO: define the table
+static const int BishopTableEndgame[64] = {0}; // TODO: define the table
 int BishopTableValue(const Board* board, const Tuning* tuning, Square square);
 
 static const int RookTable[64] = {
@@ -58,8 +56,8 @@ static const int RookTable[64] = {
     0, 0, 5, 10, 10, 5, 0, 0,
     0, 0, 0, 5, 5, 0, 0, 0
 };
-static const int RookTableMiddlegame[64] ={}; // TODO: define the table
-static const int RookTableEndgame[64] ={}; // TODO: define the table
+static const int RookTableMiddlegame[64] = {0}; // TODO: define the table
+static const int RookTableEndgame[64] = {0}; // TODO: define the table
 int RookTableValue(const Board* board, const Tuning* tuning, Square square);
 
 static const int QueenTable[64] = {
@@ -72,8 +70,8 @@ static const int QueenTable[64] = {
     -10, 0, 5, 10, 10, 5, 0, -10,
     -20, -10, -10, -5, -5, -10, -10, -20
 };
-static const int QueenTableMiddlegame[64] ={}; // TODO: define the table
-static const int QueenTableEndgame[64] ={}; // TODO: define the table
+static const int QueenTableMiddlegame[64] = {0}; // TODO: define the table
+static const int QueenTableEndgame[64] = {0}; // TODO: define the table
 int QueenTableValue(const Board* board, const Tuning* tuning, Square square);
 
 static const int KingTable[64] = {
@@ -86,8 +84,8 @@ static const int KingTable[64] = {
     -40, -50, -60, -70, -70, -60, -50, -40,
     -30, -40, -50, -60, -60, -50, -40, -30
 };
-static const int KingTableMiddlegame[64] ={}; // TODO: define the table
-static const int KingTableEndgame[64] ={}; // TODO: define the table
+static const int KingTableMiddlegame[64] = {0}; // TODO: define the table
+static const int KingTableEndgame[64] = {0}; // TODO: define the table
 int KingTableValue(const Board* board, const Tuning* tuning, Square square);
 
 static inline bool isMiddlegame(const Board* board, const Tuning* tuning)
