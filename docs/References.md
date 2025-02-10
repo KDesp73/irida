@@ -8,3 +8,5 @@
 - [UCI Protocol](https://ucichessengine.wordpress.com/2011/03/16/description-of-uci-protocol/)
 - [Random Position Generator](https://chesspositiongenerator.com/)
 - [Bitboard Editor](https://bitboard-editor.vercel.app/)
+- [Banksia GUI](https://banksiagui.com)
+- [PolyGlot](https://github.com/ddugovic/polyglot)

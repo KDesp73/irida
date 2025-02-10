@@ -4,6 +4,7 @@ TODO: search function iterations
 TODO: evaluation function iterations
 TODO: syzygy tablebase
 TODO: book moves database
+TODO: replace Zobrist hashing keys with polyglot's predefined ones
 DONE: tests
 DONE: move generation
 DONE: perft testing
