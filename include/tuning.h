@@ -1,13 +1,13 @@
 #ifndef ENGINE_TUNING_H
 #define ENGINE_TUNING_H
 
+#include <stddef.h>
 #define PAWN_VALUE   100
 #define KNIGHT_VALUE 310
 #define BISHOP_VALUE 330
 #define ROOK_VALUE   500
 #define QUEEN_VALUE  900
 #define KING_VALUE   20000
-
 
 typedef struct {
     int pawn;
@@ -19,7 +19,15 @@ typedef struct {
 } PieceValues;
 
 typedef struct {
+    size_t middlegameMoves;
+    size_t middlegamePieces;
+    size_t endgameMoves;
+    size_t endgamePieces;
+} Thresholds;
+
+typedef struct {
     PieceValues pieces;
+    Thresholds thresholds;
 } Tuning;
 
 void PrintTuning(const Tuning* tuning);

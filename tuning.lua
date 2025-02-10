@@ -12,5 +12,15 @@ return {
         rook = 500,
         queen = 900,
         king = inf
+    },
+    thresholds = {
+        middlegame = {
+            moves = 15,
+            pieces = 20
+        },
+        endgame = {
+            moves = 70,
+            pieces = 12
+        }
     }
 }

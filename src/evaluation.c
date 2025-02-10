@@ -1,11 +1,12 @@
-#include "evaluation.h"
 #include "board.h"
+#include "evaluation.h"
 #include "movegen.h"
 #include "piece-tables.h"
 #include "piece.h"
-#include <ctype.h>
 #include "tuning.h"
+#include <ctype.h>
 
+// TODO: use tuning values
 int EvaluateMaterial(const Board* board)
 {
     int score = 0;
