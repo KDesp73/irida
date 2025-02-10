@@ -27,8 +27,8 @@ ifeq ($(type), RELEASE)
 else
 	SANITIZERS = -fsanitize=address,leak
 	CFLAGS  += -DDEBUG -ggdb
-	# CFLAGS  += $(SANITIZERS)
-	# LDFLAGS += $(SANITIZERS)
+	CFLAGS  += $(SANITIZERS)
+	LDFLAGS += $(SANITIZERS)
 endif
 
 # Source and object files

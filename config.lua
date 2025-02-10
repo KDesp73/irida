@@ -13,7 +13,7 @@ local config = {
     debugMode = true,
     ponderMode = false,
     infiniteMode = false,
-    depthLimit = 4,
+    depthLimit = 2,
 
     options = {
         {

@@ -36,25 +36,25 @@ int UciMain(int argc, char** argv)
 void HandleCommand(State* state, const char *command)
 {
     if (IS_COMMAND(command, COMMAND_UCI)) {
-        uci(state);
+        uci_uci(state);
     } else if (IS_COMMAND(command, COMMAND_ISREADY)) {
-        isready(state);
+        uci_isready(state);
     } else if (IS_COMMAND(command, COMMAND_UCINEWGAME)) {
-        ucinewgame(state);
+        uci_ucinewgame(state);
     } else if (IS_COMMAND(command, COMMAND_POSITION)) {
-        position(state, command);
+        uci_position(state, command);
     } else if (IS_COMMAND(command, COMMAND_GO)) {
-        go(state, command);
+        uci_go(state, command);
     } else if (IS_COMMAND(command, COMMAND_STOP)) {
-        stop(state);
+        uci_stop(state);
     } else if (IS_COMMAND(command, COMMAND_QUIT)) {
-        quit(state);
+        uci_quit(state);
     } else if (IS_COMMAND(command, COMMAND_SETOPTION)) {
-        setoption(state, command);
+        uci_setoption(state, command);
     } else if (IS_COMMAND(command, COMMAND_DEBUG)) {
-        debug(state, command);
+        uci_debug(state, command);
     } else if (IS_COMMAND(command, COMMAND_DISPLAY)) {
-        display(state);
+        uci_display(state);
     } else {
         printf("info string Unknown command: %s\n", command);
     }

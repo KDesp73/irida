@@ -4,6 +4,7 @@ TODO: search function iterations
 TODO: evaluation function iterations
 TODO: syzygy tablebase
 TODO: book moves database
+TODO: revert back to the old way of generating moves
 DONE: tests
 DONE: move generation
 DONE: perft testing

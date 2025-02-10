@@ -88,17 +88,16 @@ void StatePrint(const State* state);
 int UciMain(int argc, char** argv);
 void HandleCommand(State* state, const char *command);
 
-void debug(State* state, const char* command);
-void display(State* state);
-void display(State* state);
-void go(State* state, const char* command);
-void isready(State* state);
-void position(State* state, const char* command);
-void quit(State* state);
-void setoption(State* state, const char *command);
-void stop(State* state);
-void uci(State* state);
-void ucinewgame(State* state);
+void uci_debug(State* state, const char* command);
+void uci_display(State* state);
+void uci_go(State* state, const char* command);
+void uci_isready(State* state);
+void uci_position(State* state, const char* command);
+void uci_quit(State* state);
+void uci_setoption(State* state, const char *command);
+void uci_stop(State* state);
+void uci_uci(State* state);
+void uci_ucinewgame(State* state);
 
 static inline void StateSetStartPos(State* state, const char* startpos)
 {

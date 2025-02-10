@@ -3,8 +3,9 @@
 #include "perft.h"
 #include "search.h"
 #include "uci.h"
+#include <stdio.h>
 
-void setoption(State* state, const char *command)
+void uci_setoption(State* state, const char *command)
 {
     char option_name[64];
     char option_value[128];
@@ -41,7 +42,7 @@ void setoption(State* state, const char *command)
     printf("info string Unknown option: %s\n", option_name);
 }
 
-void go(State* state, const char* command)
+void uci_go(State* state, const char* command)
 {
     if (strncmp(command, "go perft ", 9) == 0) {
         int depth = atoi(command + 9);
@@ -49,6 +50,10 @@ void go(State* state, const char* command)
         int nodes = Perft(&state->board, depth, MOVE_LEGAL, true);
         printf("\nNodes searched: %d\n", nodes);
     } else {
+#ifndef RELEASE
+        printf("Depth: %d. Searching...\n", state->depthLimit);
+#endif // RELEASE
+        
         char bestmove[16];
         int score = 0;
         Move move = FindBest(&state->board, state->depthLimit, &score);
@@ -61,7 +66,7 @@ void go(State* state, const char* command)
     }
 }
 
-void position(State* state, const char* command)
+void uci_position(State* state, const char* command)
 {
     char fen[128] = "";
 
@@ -80,7 +85,7 @@ void position(State* state, const char* command)
 
 }
 
-void uci(State* state)
+void uci_uci(State* state)
 {
     state->uciMode = true;
     printf("id name %s\n", ENGINE_NAME);
@@ -92,36 +97,36 @@ void uci(State* state)
     printf("uciok\n");
 }
 
-void isready(State* state)
+void uci_isready(State* state)
 {
     printf("readyok\n");
 }
 
-void ucinewgame(State* state)
+void uci_ucinewgame(State* state)
 {
     InitState(state);
     printf("info New game started.\n");
 }
 
-void stop(State* state)
+void uci_stop(State* state)
 {
     // TODO: Handle stop command if a calculation is running
     state->stopRequested = true;
     printf("info Calculation stopped.\n");
 }
 
-void quit(State* state)
+void uci_quit(State* state)
 {
     BoardFree(&state->board);
     exit(0);
 }
 
-void debug(State* state, const char* command)
+void uci_debug(State* state, const char* command)
 {
     state->debugMode = strcmp(command + strlen(COMMAND_DEBUG), "on") == 0;
 }
 
-void display(State* state)
+void uci_display(State* state)
 {
     BoardPrint(&state->board, 64);
 }
