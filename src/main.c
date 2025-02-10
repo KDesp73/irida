@@ -7,6 +7,7 @@
 #include "notation.h"
 #include "perft.h"
 #include "square.h"
+#include "tuning.h"
 #include "uci.h"
 #include "zobrist.h"
 
@@ -150,6 +151,10 @@ int game(const char* fen)
 int main(int argc, char** argv){
     InitZobrist();
     InitMasks();
+
+    Tuning tuning = {0};
+    LoadTuning(&tuning);
+    PrintTuning(&tuning);
 
     if (argc >= 2) {
         if (!strcmp(argv[1], "game")) {

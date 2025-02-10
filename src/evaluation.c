@@ -4,6 +4,7 @@
 #include "piece-tables.h"
 #include "piece.h"
 #include <ctype.h>
+#include "tuning.h"
 
 int EvaluateMaterial(const Board* board)
 {

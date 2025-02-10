@@ -11,6 +11,6 @@ return {
         bishop = 330,
         rook = 500,
         queen = 900,
-        king = math.huge
+        king = inf
     }
 }
