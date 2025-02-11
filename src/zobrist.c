@@ -1,9 +1,28 @@
 #include "zobrist.h"
+#include "bitboard.h"
 #include "board.h"
 #include <stdio.h>
 #include "move.h"
+#include "polyglot.h"
 
+uint64_t zobrist_table[PIECE_TYPES][BOARD_SIZE][BOARD_SIZE];
+uint64_t zobrist_castling[CASTLING_OPTIONS];
+uint64_t zobrist_en_passant[BOARD_SIZE];
+uint64_t zobrist_black_to_move;
 
+// https://vigna.di.unimi.it/ftp/papers/xorshift.pdf > page 20
+uint64_t rand64()
+{
+    static uint64_t seed = 270803ULL;
+
+    seed ^= seed >> 12;
+    seed ^= seed << 25;
+    seed ^= seed >> 27;
+
+    return seed * 2685821657736338717ULL;
+}
+
+/*
 void InitZobrist()
 {
     srand(12345);  // Fixed seed for reproducibility
@@ -32,6 +51,32 @@ void InitZobrist()
 
     zobrist_black_to_move = ((uint64_t)rand() << 32) | rand();
 }
+*/
+
+void InitZobrist()
+{
+    // Initialize zobrist_table
+    for (int piece = 0; piece < PIECE_TYPES; piece++) {
+        for (int rank = 0; rank < BOARD_SIZE; rank++) {
+            for (int file = 0; file < BOARD_SIZE; file++) {
+                zobrist_table[piece][rank][file] = rand64();
+            }
+        }
+    }
+
+    // Initialize castling rights
+    for (int i = 0; i < CASTLING_OPTIONS; i++) {
+        zobrist_castling[i] = rand64();
+    }
+
+    // Initialize en passant files
+    for (int file = 0; file < BOARD_SIZE; file++) {
+        zobrist_en_passant[file] = rand64();
+    }
+
+    zobrist_black_to_move = rand64();
+}
+
 
 int PieceToIndex(char piece)
 {
@@ -52,6 +97,7 @@ int PieceToIndex(char piece)
     }
 }
 
+/*
 uint64_t CalculateZobristHash(const Board* board)
 {
     uint64_t hash = 0;
@@ -99,3 +145,44 @@ uint64_t CalculateZobristHash(const Board* board)
 
     return hash;
 }
+*/
+
+static int remap(int a)
+{
+    return (a % 6) * 2 + (a / 6);
+}
+
+uint64_t CalculateZobristHash(const Board* board)
+{
+    uint64_t hash = 0;
+
+    for (int pieceIndex = 0; pieceIndex < 12; pieceIndex++) {
+        int remappedIndex = remap(pieceIndex);
+
+        uint64_t bitboard = board->bitboards[pieceIndex];
+        
+        while (bitboard) {
+            int square = poplsb(&bitboard);
+            
+            hash ^= Random64[remappedIndex * 64 + square];  
+        }
+    }
+
+    if (board->turn == 1) {
+        hash ^= Random64[768];
+    }
+
+    if (board->castling_rights & 0b0001) hash ^= Random64[769];  // White Kingside
+    if (board->castling_rights & 0b0010) hash ^= Random64[770];  // White Queenside
+    if (board->castling_rights & 0b0100) hash ^= Random64[771];  // Black Kingside
+    if (board->castling_rights & 0b1000) hash ^= Random64[772];  // Black Queenside
+
+    // TODO: Handle enpassant exclusively when it's possible, not unconditionally
+    // as stated in http://hgm.nubati.net/book_format.html
+    if (board->enpassant_square != 64) {
+        hash ^= Random64[773 + File(board->enpassant_square)];  
+    }
+
+    return hash;
+}
+
