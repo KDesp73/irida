@@ -2,7 +2,6 @@
 #define ENGINE_MOVE_H
 
 /*--------------------------------------.
-| Bitboard move representation.         |
 | Moves are 32-bit integers             |
 | where bits:                           |
 | - 0-5 represent the source            |

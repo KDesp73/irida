@@ -1,5 +1,6 @@
 #ifndef ENGINE_POLYGLOT_H
 #define ENGINE_POLYGLOT_H
+#include "move.h"
 #include <stdio.h>
 #include <stdint.h>
 
@@ -12,16 +13,13 @@ typedef struct {
 
 #define BOOK_PATH "assets/book.bin"
 
-// TODO: translate 16bit move to 32bits
-// TODO: use polyglot's zobrist hashing defaults
-
 // See: http://hgm.nubati.net/book_format.html
 #ifdef _MSC_VER
 #  define U64(u) (u##ui64)
 #else
 #  define U64(u) (u##ULL)
 #endif
-const uint64_t Random64[781] = {
+static const uint64_t Random64[781] = {
    U64(0x9D39247E33776D41), U64(0x2AF7398005AAA5C7), U64(0x44DB015024623547), U64(0x9C15F73E62A76AE2),
    U64(0x75834465489C0C89), U64(0x3290AC3A203001BF), U64(0x0FBBAD1F61042279), U64(0xE83A908FF2FB60CA),
    U64(0x0D7E765D58755C10), U64(0x1A083822CEAFE02D), U64(0x9605D5F0E25EC3B0), U64(0xD021FF5CD13A2ED5),
@@ -220,7 +218,48 @@ const uint64_t Random64[781] = {
    U64(0xF8D626AAAF278509),
 };
 
-static inline uint16_t LookupBookMove(uint64_t position_hash, const char* book_path)
+
+/*
+   "move" is a bit field with the following meaning (bit 0 is the least significant bit)
+
+   bits                meaning
+   ===================================
+   0,1,2               to file
+   3,4,5               to row
+   6,7,8               from file
+   9,10,11             from row
+   12,13,14            promotion piece
+
+   "promotion piece" is encoded as follows
+
+   none       0
+   knight     1
+   bishop     2
+   rook       3
+   queen      4
+
+   If the move is "0" (a1a1) then it should simply be ignored. 
+   It seems to me that in that case one might as well delete the entry from the book. 
+*/
+
+
+/**
+ * Converts polyglot's 16bit format to my 32bit one
+ */
+static inline Move ConvertMove(uint16_t polyglotMove) {
+    int to_file = (polyglotMove >> 0) & 0b111;  // Bits 0-2
+    int to_rank = (polyglotMove >> 3) & 0b111;  // Bits 3-5
+    int from_file = (polyglotMove >> 6) & 0b111; // Bits 6-8
+    int from_rank = (polyglotMove >> 9) & 0b111; // Bits 9-11
+    int promotion = (polyglotMove >> 12) & 0b111; // Bits 12-14
+
+    int from_square = (from_rank * 8) + from_file;
+    int to_square = (to_rank * 8) + to_file;
+
+    return (from_square) | (to_square << 6) | (promotion << 12) | FLAG_NORMAL;
+}
+
+static inline Move LookupBookMove(uint64_t position_hash, const char* book_path)
 {
     FILE* book = fopen(book_path, "rb");
     if (!book) return 0;
@@ -229,12 +268,12 @@ static inline uint16_t LookupBookMove(uint64_t position_hash, const char* book_p
     while (fread(&entry, sizeof(PolyglotEntry), 1, book)) {
         if (__builtin_bswap64(entry.zobrist_hash) == position_hash) {
             fclose(book);
-            return __builtin_bswap16(entry.move);
+            return ConvertMove(__builtin_bswap16(entry.move));
         }
     }
 
     fclose(book);
-    return 0; // No book move found
+    return NULL_MOVE;
 }
 
 #endif // ENGINE_POLYGLOT_H

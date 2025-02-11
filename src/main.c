@@ -6,6 +6,7 @@
 #include "movegen.h"
 #include "notation.h"
 #include "perft.h"
+#include "polyglot.h"
 #include "square.h"
 #include "tuning.h"
 #include "uci.h"
