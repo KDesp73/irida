@@ -1,9 +1,12 @@
 #include "zobrist.h"
 #include "bitboard.h"
 #include "board.h"
+#include <ctype.h>
 #include <stdio.h>
 #include "move.h"
+#include "piece.h"
 #include "polyglot.h"
+#include "square.h"
 
 uint64_t zobrist_table[PIECE_TYPES][BOARD_SIZE][BOARD_SIZE];
 uint64_t zobrist_castling[CASTLING_OPTIONS];
@@ -158,7 +161,6 @@ uint64_t CalculateZobristHash(const Board* board)
 
     for (int pieceIndex = 0; pieceIndex < 12; pieceIndex++) {
         int remappedIndex = remap(pieceIndex);
-
         uint64_t bitboard = board->bitboards[pieceIndex];
         
         while (bitboard) {
@@ -168,19 +170,54 @@ uint64_t CalculateZobristHash(const Board* board)
         }
     }
 
-    if (board->turn == 1) {
-        hash ^= Random64[768];
-    }
-
-    if (board->castling_rights & 0b0001) hash ^= Random64[769];  // White Kingside
-    if (board->castling_rights & 0b0010) hash ^= Random64[770];  // White Queenside
-    if (board->castling_rights & 0b0100) hash ^= Random64[771];  // Black Kingside
-    if (board->castling_rights & 0b1000) hash ^= Random64[772];  // Black Queenside
+    if (board->castling_rights & CASTLE_WHITE_KINGSIDE) hash ^= Random64[768];  // White Kingside
+    if (board->castling_rights & CASTLE_WHITE_QUEENSIDE) hash ^= Random64[769];  // White Queenside
+    if (board->castling_rights & CASTLE_BLACK_KINGSIDE) hash ^= Random64[770];  // Black Kingside
+    if (board->castling_rights & CASTLE_BLACK_QUEENSIDE) hash ^= Random64[771];  // Black Queenside
 
     // TODO: Handle enpassant exclusively when it's possible, not unconditionally
-    // as stated in http://hgm.nubati.net/book_format.html
-    if (board->enpassant_square != 64) {
-        hash ^= Random64[773 + File(board->enpassant_square)];  
+    /*
+       If the opponent has performed a double pawn push and there is now a 
+       pawn next to it belonging to the player to move then "enpassant" is 
+       the entry from RandomEnPassant whose offset is the file of the 
+       pushed pawn (counted from 0(=a) to 7(=h)). If this does not apply 
+       then enpassant=0.
+
+       Note that this is different from the FEN standard. In the FEN standard 
+       the presence of an "en passant target square" after a double pawn push 
+       is unconditional.
+
+       Also note that it is irrelevant if the potential en passant capturing 
+       move is legal or not (examples where it would not be legal are when 
+       the capturing pawn is pinned or when the double pawn push was a 
+       discovered check).  
+    */
+
+    Square ep = board->enpassant_square;
+    if (ep != SQUARE_NONE) {
+        Square pawn = ep + ((!board->turn) ? NORTH : SOUTH);
+        if (pawn < 0 || pawn >= 64) return 0;
+
+        Square possibleAttackers[] = { pawn + 1, pawn - 1 };
+        bool includeEP = false;
+
+        for (size_t i = 0; i < 2; i++) {
+            if (possibleAttackers[i] < 0 || possibleAttackers[i] >= 64) continue;
+
+            Piece piece = PieceAt(board, possibleAttackers[i]);
+            if (piece.type != ' ' && piece.color == board->turn && tolower(piece.type) == 'p') {
+                includeEP = true;
+                break;
+            }
+        }
+
+        if (includeEP) {
+            hash ^= Random64[772 + File(ep)];
+        }
+    }
+
+    if (board->turn == 1) {
+        hash ^= Random64[780];
     }
 
     return hash;

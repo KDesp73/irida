@@ -177,10 +177,7 @@ int main(int argc, char** argv){
         exit(0);
     }
 
-    // UciMain(argc, argv);
-
-    uint64_t hash = CalculateZobristHashFen(NULL);
-    printf("Hash: 0x%lx\n", hash);
+    UciMain(argc, argv);
 
     return 0;
 }
