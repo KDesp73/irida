@@ -50,19 +50,11 @@ void uci_go(State* state, const char* command)
         int nodes = Perft(&state->board, depth, true);
         printf("\nNodes searched: %d\n", nodes);
     } else {
-#ifndef RELEASE
-        printf("Depth: %d. Searching...\n", state->depthLimit);
-#endif // RELEASE
-        
         char bestmove[16];
         int score = 0;
         Move move = FindBest(&state->board, state->depthLimit, &score);
         MoveToString(move, bestmove);
-        printf("bestmove %s", bestmove);
-#ifndef RELEASE
-        printf(" (%d)", score);
-#endif // RELEASE
-        printf("\n");
+        printf("bestmove %s\n", bestmove);
     }
 }
 

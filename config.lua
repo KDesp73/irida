@@ -14,6 +14,7 @@ local config = {
     ponderMode = false,
     infiniteMode = false,
     depthLimit = 2,
+    maxBookmoves = 10,
 
     options = {
         {

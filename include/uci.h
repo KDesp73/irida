@@ -51,6 +51,7 @@ typedef struct {
     int depthLimit;                // Search depth limit for the engine
     int timeLeft[2];               // Remaining time for each player (milliseconds) [0] = white, [1] = black
     int increment[2];              // Increment per move for each player (milliseconds) [0] = white, [1] = black
+    int maxBookmoves;              // Max number of bookmoves to play
     int movesToGo;                 // Moves to the next time control, if applicable
     bool ponderMode;               // Whether ponder mode is enabled
     bool infiniteMode;             // Whether infinite search mode is enabled
