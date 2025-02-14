@@ -72,18 +72,18 @@ void LoadUciConfig(State* state);
 void PrintUciOptions(State* state);
 void StatePrint(const State* state);
 
-#define ENGINE_NAME "chess-engine"
+#define ENGINE_NAME   "chess-engine"
 #define ENGINE_AUTHOR "KDesp73"
 
-#define COMMAND_DEBUG "debug"
-#define COMMAND_DISPLAY "d"
-#define COMMAND_GO "go"
-#define COMMAND_ISREADY "isready"
-#define COMMAND_POSITION "position"
-#define COMMAND_QUIT "quit"
-#define COMMAND_SETOPTION "setoption"
-#define COMMAND_STOP "stop"
-#define COMMAND_UCI "uci"
+#define COMMAND_DEBUG      "debug"
+#define COMMAND_DISPLAY    "d"
+#define COMMAND_GO         "go"
+#define COMMAND_ISREADY    "isready"
+#define COMMAND_POSITION   "position"
+#define COMMAND_QUIT       "quit"
+#define COMMAND_SETOPTION  "setoption"
+#define COMMAND_STOP       "stop"
+#define COMMAND_UCI        "uci"
 #define COMMAND_UCINEWGAME "ucinewgame"
 
 int UciMain(int argc, char** argv);

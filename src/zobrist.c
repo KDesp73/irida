@@ -1,12 +1,13 @@
 #include "zobrist.h"
+#include "polyglot.h"
 #include "bitboard.h"
 #include "board.h"
-#include <ctype.h>
-#include <stdio.h>
 #include "move.h"
 #include "piece.h"
-#include "polyglot.h"
 #include "square.h"
+
+#include <ctype.h>
+#include <stdio.h>
 
 uint64_t zobrist_table[PIECE_TYPES][BOARD_SIZE][BOARD_SIZE];
 uint64_t zobrist_castling[CASTLING_OPTIONS];

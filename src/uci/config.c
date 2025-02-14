@@ -15,12 +15,14 @@ void LoadUciConfig(State* state)
 
     if (!LMRunFile(&lua, UCI_CONFIG_SCRIPT)) {
         fprintf(stderr, "Could not run %s (%s)\n", UCI_CONFIG_SCRIPT, lua_tostring(lua.state, -1));
+        LMClose(&lua);
         exit(1);
     }
 
     LMGetScriptReturn(&lua);
     if (!lua_istable(lua.state, -1)) {
         fprintf(stderr, "Expected a table from Lua, but got %s\n", luaL_typename(lua.state, -1));
+        LMClose(&lua);
         exit(1);
     }
 
@@ -99,6 +101,7 @@ void LoadUciConfig(State* state)
                 default:
                     fprintf(stderr, "Incorrect type value: %d\n", opt->type);
                     lua_pop(lua.state, 1);  // Pop the current value and exit
+                    LMClose(&lua);
                     exit(1);
             }
 

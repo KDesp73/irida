@@ -10,6 +10,8 @@
 | - 16-21 represent the flags           |
 `--------------------------------------*/
 
+// TODO: Make Move 16bits if an application is not found for the flags
+
 #include "board.h"
 #include "square.h"
 

@@ -11,6 +11,7 @@ extern uint64_t zobrist_castling[CASTLING_OPTIONS]                 __attribute__
 extern uint64_t zobrist_en_passant[BOARD_SIZE]                     __attribute__((unused));
 extern uint64_t zobrist_black_to_move                              __attribute__((unused));
 
+// NOTE: Not used since we are using polyglot's standard 781 "random" values
 void InitZobrist();
 
 uint64_t CalculateZobristHash(const Board* board);

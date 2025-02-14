@@ -48,6 +48,7 @@ void FreeHashTable(HashTable* table)
 
 _Bool UpdateHashTable(HashTable* table, uint64_t hash)
 {
+    // TODO: Faster search. HashMap maybe
     for (size_t i = 0; i < table->count; i++) {
         if (table->entries[i].hash == hash) {
             table->entries[i].count++;

@@ -29,12 +29,14 @@ void LoadTuning(Tuning* tuning)
 
     if (!LMRunFile(&lua, TUNING_SCRIPT)) {
         fprintf(stderr, "Could not run %s (%s)\n", TUNING_SCRIPT, lua_tostring(lua.state, -1));
+        LMClose(&lua);
         exit(1);
     }
 
     LMGetScriptReturn(&lua);
     if (!lua_istable(lua.state, -1)) {
         fprintf(stderr, "Expected a table from Lua, but got %s\n", luaL_typename(lua.state, -1));
+        LMClose(&lua);
         exit(1);
     }
     

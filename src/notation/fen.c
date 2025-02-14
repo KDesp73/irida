@@ -9,7 +9,8 @@
  * Maps a piece character to its corresponding bitboard index.
  * Uppercase characters are white pieces, lowercase are black.
  */
-int char_to_piece_index(char c) {
+int charToPieceIndex(char c) 
+{
     switch (c) {
         case 'P': return INDEX_WHITE_PAWN;
         case 'N': return INDEX_WHITE_KNIGHT;
@@ -47,7 +48,7 @@ void FenImport(Board *board, const char *fen)
                 file++;
             }
         } else {
-            int piece_index = char_to_piece_index(*ptr);
+            int piece_index = charToPieceIndex(*ptr);
             if (piece_index == -1) {
                 return; // Invalid piece character
             }
@@ -92,7 +93,6 @@ void FenImport(Board *board, const char *fen)
         if (file_char < 'a' || file_char > 'h' || rank_char < '1' || rank_char > '8') {
             return; // Invalid FEN
         }
-        // Convert 'a1'-'h8' to 0-63 (bitboard index)
         board->enpassant_square = (rank_char - '1') * 8 + (file_char - 'a');
         ptr += 2;
     }

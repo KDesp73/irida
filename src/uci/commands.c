@@ -109,6 +109,7 @@ void uci_stop(State* state)
 
 void uci_quit(State* state)
 {
+    uci_stop(state);
     BoardFree(&state->board);
     exit(0);
 }

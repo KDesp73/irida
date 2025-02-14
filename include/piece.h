@@ -4,6 +4,7 @@
 #include "board.h"
 #include "square.h"
 #include <stdint.h>
+
 typedef struct {
     char type;
     PieceColor color;
