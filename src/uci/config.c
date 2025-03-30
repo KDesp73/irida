@@ -1,4 +1,5 @@
 #include "uci.h"
+#include <stdlib.h>
 
 #define LUAMAN_IMPLEMENTATION
 #include "extern/luaman.h"
@@ -26,10 +27,11 @@ void LoadUciConfig(State* state)
         exit(1);
     }
 
-    const char* fen = LMGetString(&lua, "startpos", VAR_LOCAL);
+    char* fen = LMGetString(&lua, "startpos", VAR_LOCAL);
     if (fen != NULL && strcmp(fen, "") != 0) {
         snprintf(state->startPositionFen, sizeof(state->startPositionFen), "%s", fen);
     }
+    free(fen);
 
     state->uciMode      = LMGetBoolean(&lua, "uciMode", VAR_LOCAL);
     state->debugMode    = LMGetBoolean(&lua, "debugMode", VAR_LOCAL);
@@ -51,7 +53,7 @@ void LoadUciConfig(State* state)
             UciOption* opt = &state->uciOptions[state->uciOptionCount];
 
             // Accessing the 'name' field safely
-            const char* name = LMGetString(&lua, "name", VAR_LOCAL);
+            char* name = LMGetString(&lua, "name", VAR_LOCAL);
             if (name) {
                 strncpy(opt->name, name, sizeof(opt->name) - 1);
                 opt->name[sizeof(opt->name) - 1] = '\0';
@@ -60,8 +62,11 @@ void LoadUciConfig(State* state)
                 lua_pop(lua.state, 1);  // Pop the current value and continue
                 continue;
             }
+            free(name);
 
             // Accessing 'type' field and processing options accordingly
+
+            char* value = NULL; 
             opt->type = (int)LMGetNumber(&lua, "type", VAR_LOCAL);
             switch (opt->type) {
                 case UCI_SPIN:
@@ -73,7 +78,8 @@ void LoadUciConfig(State* state)
                     opt->value.check = LMGetBoolean(&lua, "value", VAR_LOCAL);
                     break;
                 case UCI_COMBO:
-                    strncpy(opt->value.combo, LMGetString(&lua, "value", VAR_LOCAL), sizeof(opt->value.combo) - 1);
+                    value = LMGetString(&lua, "value", VAR_LOCAL);
+                    strncpy(opt->value.combo, value, sizeof(opt->value.combo) - 1);
                     opt->value.combo[sizeof(opt->value.combo) - 1] = '\0';
 
                     // Handling combo options (params as a table)
@@ -95,7 +101,8 @@ void LoadUciConfig(State* state)
                     lua_pop(lua.state, 1);  // Pop 'params' table
                     break;
                 case UCI_STRING:
-                    strncpy(opt->value.string, LMGetString(&lua, "value", VAR_LOCAL), sizeof(opt->value.string) - 1);
+                    value = LMGetString(&lua, "value", VAR_LOCAL);
+                    strncpy(opt->value.string, value, sizeof(opt->value.string) - 1);
                     opt->value.string[sizeof(opt->value.string) - 1] = '\0';
                     break;
                 default:
@@ -104,12 +111,14 @@ void LoadUciConfig(State* state)
                     LMClose(&lua);
                     exit(1);
             }
+            if(value) free(value);
 
-            const char* default_value = LMGetString(&lua, "default", VAR_LOCAL);
+            char* default_value = LMGetString(&lua, "default", VAR_LOCAL);
             if (default_value) {
                 strncpy(opt->default_value, default_value, sizeof(opt->default_value) - 1);
                 opt->default_value[sizeof(opt->default_value) - 1] = '\0';
             }
+            free(default_value);
 
             state->uciOptionCount++;
 
