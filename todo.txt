@@ -3,11 +3,11 @@ TODO: store additional bitboards instead of generating them each time
 TODO: search function iterations
 TODO: evaluation function iterations
 TODO: syzygy tablebase
-TODO: book moves database
-TODO: replace Zobrist hashing keys with polyglot's predefined ones
 TODO: pick a license
 DONE: tests
 DONE: move generation
 DONE: perft testing
 DONE: write other move type generators
 DONE: revert back to the old way of generating moves
+DONE: replace Zobrist hashing keys with polyglot's predefined ones
+DONE: book moves database
