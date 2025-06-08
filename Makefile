@@ -1,4 +1,3 @@
-include common.mk
 .DEFAULT_GOAL := help
 
 SUBDIRS := movegen engine
@@ -30,11 +29,11 @@ compile_commands.json: ## Generate compile_commands.json for every project
 test: ## Build and run the tests
 	make all -B
 	clear
-	./$(CHECK) load
+	build/bin/check load
 	make all
 	clear
-	./$(CHECK)
-	fastchess --compliance ./engine/engine
+	build/bin/check
+	fastchess --compliance build/bin/engine
 
 .PHONY: help
 help: ## Show this help message

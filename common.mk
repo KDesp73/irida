@@ -3,7 +3,13 @@ CC = gcc
 # Directories
 SRC_DIR = src
 INCLUDE_DIR = include
-BUILD_DIR = build
+BUILD_DIR = ../build
 DIST_DIR = dist
+BIN_DIR = $(BUILD_DIR)/bin
 
-CHECK = $(BUILD_DIR)/bin/check
+# Binaries
+ENGINE = $(BIN_DIR)/engine
+CHECK  = $(BIN_DIR)/check
+
+# Sanitizers
+SANITIZERS = -fsanitize=address,undefined

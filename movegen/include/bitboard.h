@@ -19,7 +19,7 @@ typedef enum {
     SOUTH_WEST = -9
 } Direction;
 
-#define BB(square) (1ULL << (square))
+#define BB(square) ((square == 64) ? 0ULL : 1ULL << (square))
 
 Square lsb(Bitboard b);
 Square msb(Bitboard b);

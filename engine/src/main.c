@@ -15,9 +15,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define ANSI_IMPLEMENTATION
 #include "io/ansi.h"
-#define LOGGING_IMPLEMENTATION 
 #include "io/logging.h"
 #define MENU_IMPLEMENTATION
 #include "io/menu.h"
