@@ -11,3 +11,4 @@ DONE: write other move type generators
 DONE: revert back to the old way of generating moves
 DONE: replace Zobrist hashing keys with polyglot's predefined ones
 DONE: book moves database
+DONE: refactor move generation into its own library

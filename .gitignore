@@ -4,7 +4,6 @@ compile_commands.json
 
 *.o
 
-engine
 .changelog
 .version-conf
 libengine.*
