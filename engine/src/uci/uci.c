@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "io/ansi.h"
+#include "IncludeOnly/ansi.h"
 
 int UciMain(int argc, char** argv)
 {

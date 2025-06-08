@@ -1,5 +1,5 @@
 #include "history.h"
-#include "io/logging.h"
+#include "IncludeOnly/logging.h"
 #include "hashing.h"
 #include "move.h"
 #include "square.h"

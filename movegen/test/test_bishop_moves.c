@@ -6,7 +6,7 @@
 #include "square.h"
 #include "tests.h"
 #include <stdarg.h>
-#include "io/test.h"
+#include "IncludeOnly/test.h"
 
 int test_bishop_moves(const char* fen, const char* square, const char* first, ...)
 {

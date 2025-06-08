@@ -2,7 +2,7 @@
 #include "board.h"
 #include "notation.h"
 #include "zobrist.h"
-#include "io/logging.h"
+#include "IncludeOnly/logging.h"
 #include <stdio.h>
 #include <stdlib.h>
 

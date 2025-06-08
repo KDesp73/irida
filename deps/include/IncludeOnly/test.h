@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define TEST_VERSION "0.0.2"
+#define TEST_VERSION "0.0.3"
 
 #ifndef TESTAPI
     #define TESTAPI static
@@ -48,6 +48,8 @@ TESTAPI void load_test(const char* name);
 #define RUN_TEST(test) \
     TEST_##test
 
+extern char* TEST_DIRECTORY;
+
 #ifdef TEST_IMPLEMENTATION
 #define STRAPPEND(buffer, fmt, ...) \
     snprintf(buffer + strlen(buffer), sizeof(buffer), fmt "\n", ##__VA_ARGS__)
@@ -55,7 +57,7 @@ TESTAPI void load_test(const char* name);
 TESTAPI void load_test(const char* name)
 {
     char input_path[128];
-    snprintf(input_path, sizeof(input_path), "test/%s.ctd", name);
+    snprintf(input_path, sizeof(input_path), "%s/%s.ctd", TEST_DIRECTORY, name);
     FILE* input_file = fopen(input_path, "r");
     if (input_file == NULL) {
         FILE* write = fopen(input_path, "w");
@@ -69,7 +71,7 @@ TESTAPI void load_test(const char* name)
     }
 
     char output_path[128];
-    snprintf(output_path, sizeof(output_path), "test/%s.h", name);
+    snprintf(output_path, sizeof(output_path), "%s/%s.h", TEST_DIRECTORY, name);
 
     FILE* output_file = fopen(output_path, "w");
     if (output_file == NULL) {

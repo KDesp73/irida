@@ -1,5 +1,5 @@
 #include "square.h"
-#include "io/test.h"
+#include "IncludeOnly/test.h"
 #include "tests.h"
 
 int test_name_to_square(const char name[3], int expected)

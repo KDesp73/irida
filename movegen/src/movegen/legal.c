@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 #ifndef RELEASE
-#include "io/bench.h"
+#include "IncludeOnly/bench.h"
 #endif // RELEASE
 
 Moves GenerateLegalPawnMoves(const Board *board, Bitboard pieces, PieceColor color)

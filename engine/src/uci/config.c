@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #define LUAMAN_IMPLEMENTATION
-#include "io/luaman.h"
+#include "IncludeOnly/luaman.h"
 
 void LoadUciConfig(State* state)
 {

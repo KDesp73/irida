@@ -7,9 +7,9 @@
 #include "square.h"
 #include <ctype.h>
 #define LOGGING_IMPLEMENTATION
-#include "io/logging.h"
+#include "IncludeOnly/logging.h"
 #define ANSI_IMPLEMENTATION
-#include "io/ansi.h"
+#include "IncludeOnly/ansi.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>

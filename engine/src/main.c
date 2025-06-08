@@ -15,10 +15,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "io/ansi.h"
-#include "io/logging.h"
+#include "IncludeOnly/ansi.h"
+#include "IncludeOnly/logging.h"
 #define MENU_IMPLEMENTATION
-#include "io/menu.h"
+#include "IncludeOnly/menu.h"
 
 #define forrange(index, from, to) \
     for(index = from; (from < to) ? i < to : i > to; (from < to) ? i++ : i--)

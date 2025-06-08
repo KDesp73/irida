@@ -1,8 +1,10 @@
 #include "masks.h"
 #include <string.h>
 #define TEST_IMPLEMENTATION
-#include "io/test.h"
+#include "IncludeOnly/test.h"
 #include "tests.h"
+
+char* TEST_DIRECTORY = "movegen/test";
 
 void load()
 {

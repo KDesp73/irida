@@ -1,7 +1,7 @@
 #include "board.h"
 #include "movegen.h"
 #include "tests.h"
-#include "io/test.h"
+#include "IncludeOnly/test.h"
 
 int test_is_in_check(const char* fen, bool expected)
 {
