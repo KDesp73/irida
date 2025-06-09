@@ -26,10 +26,12 @@ typedef struct {
     (tolower(piece.type) == 'q')
 #define IS_KING(piece) \
     (tolower(piece.type) == 'k')
+#define IS_COLOR(piece, c) \
+    (piece.color == c)
 #define IS_WHITE(piece) \
-    (piece.color == COLOR_WHITE)
+    IS_COLOR(piece, COLOR_WHITE)
 #define IS_BLACK(piece) \
-    (piece.color == COLOR_BLACK)
+    IS_COLOR(piece, COLOR_BLACK)
 
 
 int GetPieceColor(char piece);

@@ -100,6 +100,8 @@ bool Enpassant(Board* board, Move move);
 bool IsEnpassant(const Board* board, Move* move);
 bool IsDoublePawnPush(Board* board, Move move);
 bool IsPromotion(Board* board, Move* move);
+bool IsCapture(const Board* board, Move move);
+bool IsInCheckAfterMove(Board *board, Move move);
 
 _Bool MoveMake(Board* board, Move move);
 void MoveFreely(Board* board, Move move, PieceColor color);

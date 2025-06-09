@@ -106,8 +106,8 @@ static inline bool isEndgame(const Board* board, const Tuning* tuning)
     size_t movesPlayed = board->halfmove;
 
     return (
-            piecesCount <= tuning->thresholds.endgamePieces ||
-            movesPlayed >= tuning->thresholds.endgameMoves
+        piecesCount <= tuning->thresholds.endgamePieces ||
+        movesPlayed >= tuning->thresholds.endgameMoves
     );
 
 }

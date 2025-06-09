@@ -4,6 +4,7 @@ TODO: search function iterations
 TODO: evaluation function iterations
 TODO: syzygy tablebase
 TODO: pick a license
+TODO: move ordering
 DONE: tests
 DONE: move generation
 DONE: perft testing

@@ -32,4 +32,3 @@ static inline int Evaluation(const Board* board)
 }
 
 #endif // ENGINE_EVALUATION_H
-

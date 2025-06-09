@@ -450,6 +450,30 @@ bool IsPromotion(Board* board, Move* move)
     return true;
 }
 
+bool IsCapture(const Board* board, Move move)
+{
+    Square to = GetTo(move);
+    Piece target = PieceAt(board, to);
+    bool enemy_color = !board->turn;
+    return IS_COLOR(target, enemy_color);
+}
+
+bool IsInCheckAfterMove(Board* board, Move move)
+{
+    PieceColor color = board->turn ? COLOR_WHITE : COLOR_BLACK;
+
+    if (!MakeMove(board, move)) {
+        return false;
+    }
+
+    bool in_check = IsInCheckColor(board, color);
+
+    UnmakeMove(board);
+
+    return in_check;
+}
+
+
 bool IsDoublePawnPush(Board* board, Move move)
 {
     Square from = GetFrom(move);
