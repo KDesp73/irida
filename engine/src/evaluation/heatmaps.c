@@ -1,44 +1,53 @@
 #include "heatmaps.h"
 
-int PawnTableValue(const Board* board, const Tuning* tuning, Square square)
-{
-    if(isEndgame(board, tuning)) return PawnTableEndgame[square];
-    if(isMiddlegame(board, tuning)) return PawnTableMiddlegame[square];
-    return PawnTable[square];
+static inline int flipSquare(Square square) {
+    return (square ^ 56); // Flip rank
 }
 
-int KnightTableValue(const Board* board, const Tuning* tuning, Square square)
+int PawnTableValue(const Board* board, const Tuning* tuning, Square square, bool isWhite)
 {
-    if(isEndgame(board, tuning)) return KnightTableEndgame[square];
-    if(isMiddlegame(board, tuning)) return KnightTableMiddlegame[square];
-    return KnightTable[square];
+    int index = isWhite ? square : flipSquare(square);
+    if (isEndgame(board, tuning)) return PawnTableEndgame[index];
+    if (isMiddlegame(board, tuning)) return PawnTableMiddlegame[index];
+    return PawnTable[index];
 }
 
-int BishopTableValue(const Board* board, const Tuning* tuning, Square square)
+int KnightTableValue(const Board* board, const Tuning* tuning, Square square, bool isWhite)
 {
-    if(isEndgame(board, tuning)) return BishopTableEndgame[square];
-    if(isMiddlegame(board, tuning)) return BishopTableMiddlegame[square];
-    return BishopTable[square];
+    int index = isWhite ? square : flipSquare(square);
+    if (isEndgame(board, tuning)) return KnightTableEndgame[index];
+    if (isMiddlegame(board, tuning)) return KnightTableMiddlegame[index];
+    return KnightTable[index];
 }
 
-int RookTableValue(const Board* board, const Tuning* tuning, Square square)
+int BishopTableValue(const Board* board, const Tuning* tuning, Square square, bool isWhite)
 {
-    if(isEndgame(board, tuning)) return RookTableEndgame[square];
-    if(isMiddlegame(board, tuning)) return RookTableMiddlegame[square];
-    return RookTable[square];
+    int index = isWhite ? square : flipSquare(square);
+    if (isEndgame(board, tuning)) return BishopTableEndgame[index];
+    if (isMiddlegame(board, tuning)) return BishopTableMiddlegame[index];
+    return BishopTable[index];
 }
 
-int QueenTableValue(const Board* board, const Tuning* tuning, Square square)
+int RookTableValue(const Board* board, const Tuning* tuning, Square square, bool isWhite)
 {
-    if(isEndgame(board, tuning)) return QueenTableEndgame[square];
-    if(isMiddlegame(board, tuning)) return QueenTableMiddlegame[square];
-    return QueenTable[square];
+    int index = isWhite ? square : flipSquare(square);
+    if (isEndgame(board, tuning)) return RookTableEndgame[index];
+    if (isMiddlegame(board, tuning)) return RookTableMiddlegame[index];
+    return RookTable[index];
 }
 
-int KingTableValue(const Board* board, const Tuning* tuning, Square square)
+int QueenTableValue(const Board* board, const Tuning* tuning, Square square, bool isWhite)
 {
-    if(isEndgame(board, tuning)) return KingTableEndgame[square];
-    if(isMiddlegame(board, tuning)) return KingTableMiddlegame[square];
-    return KingTable[square];
+    int index = isWhite ? square : flipSquare(square);
+    if (isEndgame(board, tuning)) return QueenTableEndgame[index];
+    if (isMiddlegame(board, tuning)) return QueenTableMiddlegame[index];
+    return QueenTable[index];
 }
 
+int KingTableValue(const Board* board, const Tuning* tuning, Square square, bool isWhite)
+{
+    int index = isWhite ? square : flipSquare(square);
+    if (isEndgame(board, tuning)) return KingTableEndgame[index];
+    if (isMiddlegame(board, tuning)) return KingTableMiddlegame[index];
+    return KingTable[index];
+}

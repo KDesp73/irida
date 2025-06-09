@@ -4,6 +4,7 @@
 #include "board.h"
 #include "move.h"
 #include "tuning.h"
+
 static const int PIECE_VALUES[] = {
     PAWN_VALUE,
     KNIGHT_VALUE,
@@ -13,6 +14,7 @@ static const int PIECE_VALUES[] = {
     KING_VALUE
 };
 
+// See: https://www.chessprogramming.org/MVV-LVA
 int MVV_LVA_SCORES[12][12];
 
 static inline void InitMVVLVA() {
@@ -24,12 +26,9 @@ static inline void InitMVVLVA() {
     }
 }
 
+// TODO: Killer moves
+// TODO: History heuristics
 int ScoreMove(Board* board, Move move);
-
-typedef struct {
-    Move move;
-    int score;
-} ScoredMove;
 
 void SortMoves(Board* board, Moves* moves);
 

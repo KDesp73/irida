@@ -59,27 +59,27 @@ int EvaluatePieceSquareTables(const Board* board, const Tuning* tuning)
 
         int val = 0;
         if (tolower(piece.type) == 'p') {
-            val = PawnTableValue(board, tuning, square);
+            val = PawnTableValue(board, tuning, square, color);
             score += (color == COLOR_WHITE) ? val : -val;
         }
         else if (tolower(piece.type) == 'n') {
-            val = KnightTableValue(board, tuning, square);
+            val = KnightTableValue(board, tuning, square, color);
             score += (color == COLOR_WHITE) ? val : -val;
         }
         else if (tolower(piece.type) == 'b') {
-            val = BishopTableValue(board, tuning, square);
+            val = BishopTableValue(board, tuning, square, color);
             score += (color == COLOR_WHITE) ? val : -val;
         }
         else if (tolower(piece.type) == 'r') {
-            val = RookTableValue(board, tuning, square);
+            val = RookTableValue(board, tuning, square, color);
             score += (color == COLOR_WHITE) ? val : -val;
         }
         else if (tolower(piece.type) == 'q') {
-            val = QueenTableValue(board, tuning, square);
+            val = QueenTableValue(board, tuning, square, color);
             score += (color == COLOR_WHITE) ? val : -val;
         }
         else if (tolower(piece.type) == 'k') {
-            val = KingTableValue(board, tuning, square);
+            val = KingTableValue(board, tuning, square, color);
             score += (color == COLOR_WHITE) ? val : -val;
         }
     }

@@ -33,6 +33,11 @@ int ScoreMove(Board* board, Move move) {
     return score;
 }
 
+typedef struct {
+    Move move;
+    int score;
+} ScoredMove;
+
 static int CompareScoredMoves(const void* a, const void* b)
 {
     return ((ScoredMove*)b)->score - ((ScoredMove*)a)->score;
