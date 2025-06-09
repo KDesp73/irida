@@ -5,24 +5,24 @@ SUBDIRS := movegen engine
 .PHONY: all
 all: ## Build every project
 	@for dir in $(SUBDIRS); do \
-		echo "Building $$dir..."; \
+		printf "\n[INFO] Building $$dir...\n"; \
 		$(MAKE) -C $$dir all || exit 1; \
 	done
 
 .PHONY: clean
 clean: ## Clean every project
 	@for dir in $(SUBDIRS); do \
-		echo "Cleaning $$dir..."; \
+		echo "[INFO] Cleaning $$dir..."; \
 		$(MAKE) -C $$dir clean || exit 1; \
 	done
 
 .PHONY: compile_commands.json
 compile_commands.json: ## Generate compile_commands.json for every project
 	@for dir in $(SUBDIRS); do \
-		echo "Generating compile_commands.json for $$dir..."; \
+		echo "[INFO] Generating compile_commands.json for $$dir..."; \
 		rm -f "$$dir/compile_commands.json"; \
 		$(MAKE) -C "$$dir" compile_commands.json || exit 1; \
-		echo "Done with $$dir."; \
+		echo "[INFO] Done with $$dir."; \
 	done
 
 .PHONY: test

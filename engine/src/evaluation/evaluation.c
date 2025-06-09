@@ -16,7 +16,7 @@ int EvaluateMaterial(const Board* board, const Tuning* tuning)
         while (pieces) {
             Square square = poplsb(&pieces);
             Piece piece = PieceAt(board, square);
-            int value = 0;
+            double value = 0;
             switch (piece.type) {
             case 'p':
             case 'P':
