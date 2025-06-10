@@ -43,7 +43,7 @@ typedef struct {
 } UciOption;
 
 
-#define MAX_UCI_OPTIONS 10
+#define MAX_UCI_OPTIONS 32
 typedef struct {
     char startPositionFen[128];    // The starting position in FEN notation
     bool uciMode;                  // Whether the engine is currently running in UCI mode

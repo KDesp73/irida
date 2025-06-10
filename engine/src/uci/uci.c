@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "IncludeOnly/ansi.h"
-
 int UciMain(int argc, char** argv)
 {
     char input[1024];
@@ -13,7 +11,7 @@ int UciMain(int argc, char** argv)
     LoadUciConfig(&state);
     // StatePrint(&state);
 
-    printf("Welcome to %s%s%s by %s%s%s\n", ANSI_RED, ENGINE_NAME, ANSI_RESET, ANSI_BLUE, ENGINE_AUTHOR, ANSI_RESET);
+    printf("Welcome to %s by %s\n", ENGINE_NAME, ENGINE_AUTHOR);
     fflush(stdout);
     
     for(;;) {
