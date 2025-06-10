@@ -1,6 +1,5 @@
 #include "board.h"
 #include "evaluation.h"
-#include "gui/gui.h"
 #include "masks.h"
 #include "move.h"
 #include "movegen.h"
@@ -159,8 +158,6 @@ int main(int argc, char** argv)
                 exit(1);
             }
             perft(atoi(argv[2]), argv[3]);
-        } else if (!strcmp(argv[1], "gui")) {
-            gui(argv[2]);
         } else if(!strcmp(argv[1], "eval")) {
             if (argc < 3) {
                 ERRO("Please provide the fen");
