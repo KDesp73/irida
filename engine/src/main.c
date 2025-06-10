@@ -49,7 +49,7 @@ void BoardInfoPrint(const Board* board)
         SquareToName(name, board->enpassant_square);
     printf("Enpassant: %s\n", name);
 
-    int eval = Evaluation(board);
+    int eval = Evaluation(board).total;
     printf("Evaluation: %d\n", eval);
 }
 #define BOARD_PRINT(board) \
@@ -168,7 +168,7 @@ int main(int argc, char** argv)
             }
             Board board;
             BoardInitFen(&board, argv[2]);
-            float eval = (float) Evaluation(&board) / 100;
+            float eval = (float) Evaluation(&board).total / 100;
             printf("%s%.2f\n", (eval > 0) ? "+" : "", eval);
         }
 

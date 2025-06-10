@@ -53,8 +53,8 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c ## Compile .c to .o
 
 .PHONY: check
 check: $(BUILD_DIR) static ## Build test binary
-	@echo "[INFO] Building test executable: $(CHECK)"
-	@$(CC) $(TEST_FILES) -o $(CHECK) $(INCLUDE) -L. -l:$(A_NAME) -ggdb $(SANITIZERS)
+	@echo "[INFO] Building test executable: $(TEST_MOVEGEN)"
+	@$(CC) $(TEST_FILES) -o $(TEST_MOVEGEN) $(INCLUDE) -L. -l:$(A_NAME) -ggdb $(SANITIZERS)
 
 .PHONY: shared
 shared: $(OBJ_FILES) ## Build shared library
@@ -69,7 +69,7 @@ static: $(OBJ_FILES) ## Build static library
 .PHONY: clean
 clean: ## Remove all build files
 	@echo "[INFO] Cleaning build artifacts"
-	rm -rf $(BUILD_DIR) $(SO_NAME) $(A_NAME) $(CHECK)
+	rm -rf $(BUILD_DIR) $(SO_NAME) $(A_NAME)
 
 .PHONY: compile_commands.json
 compile_commands.json: $(SRC_FILES) ## Generate compile_commands.json with Bear

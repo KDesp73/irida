@@ -9,7 +9,8 @@ BIN_DIR = $(BUILD_DIR)/bin
 
 # Binaries
 ENGINE = $(BIN_DIR)/engine
-CHECK  = $(BIN_DIR)/check
+TEST_MOVEGEN = $(BIN_DIR)/test_movegen
+TEST_ENGINE = $(BIN_DIR)/test_engine
 
 # Sanitizers
 SANITIZERS = -fsanitize=address,undefined

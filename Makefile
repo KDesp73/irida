@@ -25,15 +25,24 @@ compile_commands.json: ## Generate compile_commands.json for every project
 		echo "[INFO] Done with $$dir."; \
 	done
 
-.PHONY: test
-test: ## Build and run the tests
-	make all -B
+.PHONY: test_movegen
+test_movegen: ## Build and run the tests
+	make -C movegen all -B
 	clear
-	build/bin/check load
-	make all
+	build/bin/test_movegen load
+	make -C movegen all
 	clear
 	bin/fastchess --compliance build/bin/engine
-	build/bin/check
+	build/bin/test_movegen
+
+.PHONY: test_engine
+test_engine: ## Build and run the tests
+	make -C engine all -B
+	clear
+	build/bin/test_engine load
+	make -C engine all
+	clear
+	build/bin/test_engine
 
 .PHONY: help
 help: ## Show this help message

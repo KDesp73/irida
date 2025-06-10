@@ -6,9 +6,11 @@ LIBRARY_NAME = libengine
 SO_NAME      = $(LIBRARY_NAME).so
 A_NAME       = $(LIBRARY_NAME).a
 
+TEST_DIR = test
+
 INCLUDE  = -Iinclude -I../deps/include -I../movegen/include
 CFLAGS   = -Wall -Werror $(INCLUDE) -fPIC
-LDLIBS   = -l:liblua.a -l:libraylib.a -l:libmovegen.a -lm -lpthread -ldl
+LDLIBS   = -l:libraylib.a -l:libmovegen.a -lm -lpthread -ldl
 LDFLAGS  = -L../deps/lib -L../movegen $(LDLIBS)
 
 ifeq ($(type), RELEASE)
@@ -20,8 +22,9 @@ endif
 
 CFLAGS += -D$(type)
 
-SRC_FILES := $(shell find $(SRC_DIR) -name '*.c' ! -name 'main.c')
-OBJ_FILES  = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRC_FILES))
+SRC_FILES   := $(shell find $(SRC_DIR) -name '*.c' ! -name 'main.c')
+OBJ_FILES    = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRC_FILES))
+TEST_FILES  := $(shell find $(TEST_DIR) -name '*.c')
 TOTAL_FILES := $(words $(SRC_FILES))
 
 .DEFAULT_GOAL := help
@@ -29,7 +32,7 @@ TOTAL_FILES := $(words $(SRC_FILES))
 # Targets
 
 .PHONY: all
-all: $(BUILD_DIR) shared static exec ## Build all
+all: $(BUILD_DIR) shared static exec check ## Build all
 	@echo "[INFO] Build complete."
 
 $(BUILD_DIR): ## Create build directories
@@ -56,15 +59,10 @@ static: $(OBJ_FILES) ## Build static library
 	@echo "[INFO] Building static library: $(A_NAME)"
 	@$(AR) rcs $(A_NAME) $(OBJ_FILES)
 
-.PHONY: install
-install: all ## Install binary to /usr/bin
-	@echo "[INFO] Installing to /usr/bin/$(TARGET)"
-	cp $(ENGINE) /usr/bin/$(TARGET)
-
-.PHONY: uninstall
-uninstall: ## Uninstall binary from /usr/bin
-	@echo "[INFO] Uninstalling from /usr/bin/$(TARGET)"
-	rm -f /usr/bin/$(TARGET)
+.PHONY: check
+check: $(BUILD_DIR) static ## Build test binary
+	@echo "[INFO] Building test executable: $(TEST_ENGINE)"
+	@$(CC) $(TEST_FILES) -o $(TEST_ENGINE) $(INCLUDE) -L. -l:$(A_NAME) $(LDFLAGS) -ggdb $(SANITIZERS)
 
 .PHONY: clean
 clean: ## Clean all generated files

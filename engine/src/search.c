@@ -21,7 +21,7 @@ int Minimax(Board* board, int depth, bool isMaximizing)
 {
     nodes++;
     if(depth == 0 || IsResult(board))
-        return Evaluation(board);
+        return Evaluation(board).total;
 
     int bestScore = isMaximizing ? INT_MIN : INT_MAX;
     Moves moves = GenerateMoves(board, MOVE_LEGAL);

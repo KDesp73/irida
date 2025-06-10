@@ -4,6 +4,16 @@
 #include "board.h"
 #include "tuning.h"
 
+typedef struct {
+    int material;
+    int mobility;
+    int king_safety;
+    int piece_tables;
+    int tempo_bonus;
+    int bishop_bonus;
+    int total;
+} Eval;
+
 // https://www.chessprogramming.org/Evaluation
 
 int EvaluateMaterial(const Board* board, const Tuning* tuning);
@@ -15,32 +25,38 @@ int EvaluateKingSafety(const Board* board, const Tuning* tuning, PieceColor colo
 // TODO: EvaluateThreats(const Board* board, const Tuning* tuning, PieceColor);
 
 
-static inline int Evaluation(const Board* board)
+static inline Eval Evaluation(const Board* board)
 {
     Tuning tuning = {0};
     LoadTuning(&tuning);
 
-    int score = 0;
+    Eval eval = {0};
 
-    score += EvaluateMaterial(board, &tuning);
-    score += EvaluatePieceSquareTables(board, &tuning);
+    eval.material += EvaluateMaterial(board, &tuning);
+    eval.piece_tables += EvaluatePieceSquareTables(board, &tuning);
     
-    score += EvaluateKingSafety(board, &tuning, COLOR_WHITE);
-    score -= EvaluateKingSafety(board, &tuning, COLOR_BLACK);
+    eval.king_safety += EvaluateKingSafety(board, &tuning, COLOR_WHITE);
+    eval.king_safety -= EvaluateKingSafety(board, &tuning, COLOR_BLACK);
 
-    score += EvaluateMobility(board, &tuning, COLOR_WHITE);
-    score -= EvaluateMobility(board, &tuning, COLOR_BLACK);
+    eval.mobility += EvaluateMobility(board, &tuning, COLOR_WHITE);
+    eval.mobility -= EvaluateMobility(board, &tuning, COLOR_BLACK);
 
-    // Tempo bonus
-    score += (board->turn == COLOR_WHITE ? +10 : -10);
+    eval.tempo_bonus += (board->turn == COLOR_WHITE ? +10 : -10);
 
-    // Bishop pair bonus
     if (popcount(board->bitboards[COLOR_WHITE * 6 + INDEX_BISHOP]) >= 2)
-        score += 30;
+        eval.bishop_bonus += 30;
     if (popcount(board->bitboards[COLOR_BLACK * 6 + INDEX_BISHOP]) >= 2)
-        score -= 30;
+        eval.bishop_bonus -= 30;
 
-    return score;
+    eval.total = 
+        eval.material
+        + eval.piece_tables
+        + eval.king_safety
+        + eval.mobility
+        + eval.tempo_bonus
+        + eval.bishop_bonus;
+
+    return eval;
 }
 
 #endif // ENGINE_EVALUATION_H
