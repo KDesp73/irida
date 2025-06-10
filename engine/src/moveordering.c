@@ -2,6 +2,8 @@
 #include "square.h"
 #include <string.h>
 
+int MVV_LVA_SCORES[12][12];
+
 int ScoreMove(Board* board, Move move) {
     Square from = GetFrom(move);
     Square to = GetTo(move);

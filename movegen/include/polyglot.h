@@ -11,7 +11,7 @@ typedef struct {
     uint32_t learn;
 } PolyglotEntry;
 
-#define BOOK_PATH "assets/book.bin"
+#define BOOK_PATH "bin/book.bin"
 
 // See: http://hgm.nubati.net/book_format.html
 #ifdef _MSC_VER

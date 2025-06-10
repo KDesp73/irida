@@ -11,41 +11,28 @@
 int EvaluateMaterial(const Board* board, const Tuning* tuning)
 {
     int score = 0;
-    for (size_t i = 0; i < PIECE_TYPES; i++) {
-        Bitboard pieces = board->bitboards[i];
-        while (pieces) {
-            Square square = poplsb(&pieces);
-            Piece piece = PieceAt(board, square);
+
+    for (int color = 0; color < 2; color++) {
+        for (int type = 0; type < 6; type++) {
+            Bitboard pieces = board->bitboards[color * 6 + type];
+
             double value = 0;
-            switch (piece.type) {
-            case 'p':
-            case 'P':
-                value = THIS_OR(tuning->pieces.pawn, PAWN_VALUE);
-                break;
-            case 'n':
-            case 'N':
-                value = THIS_OR(tuning->pieces.knight, KNIGHT_VALUE);
-                break;
-            case 'b':
-            case 'B':
-                value = THIS_OR(tuning->pieces.bishop, BISHOP_VALUE);
-                break;
-            case 'r':
-            case 'R':
-                value = THIS_OR(tuning->pieces.rook, ROOK_VALUE);
-                break;
-            case 'q':
-            case 'Q':
-                value = THIS_OR(tuning->pieces.queen, QUEEN_VALUE);
-                break;
-            case 'k':
-            case 'K':
-                value = THIS_OR(tuning->pieces.king, KING_VALUE);
-                break;
+            switch (type) {
+                case INDEX_PAWN:   value = THIS_OR(tuning->pieces.pawn, PAWN_VALUE); break;
+                case INDEX_KNIGHT: value = THIS_OR(tuning->pieces.knight, KNIGHT_VALUE); break;
+                case INDEX_BISHOP: value = THIS_OR(tuning->pieces.bishop, BISHOP_VALUE); break;
+                case INDEX_ROOK:   value = THIS_OR(tuning->pieces.rook, ROOK_VALUE); break;
+                case INDEX_QUEEN:  value = THIS_OR(tuning->pieces.queen, QUEEN_VALUE); break;
+                case INDEX_KING:   value = THIS_OR(tuning->pieces.king, KING_VALUE); break;
             }
-            score += IS_WHITE(piece) ? value : -value;
+
+            while (pieces) {
+                poplsb(&pieces);
+                score += (color == COLOR_WHITE) ? value : -value;
+            }
         }
     }
+
     return score;
 }
 
@@ -55,43 +42,30 @@ int EvaluatePieceSquareTables(const Board* board, const Tuning* tuning)
 
     for (int square = 0; square < 64; square++) {
         Piece piece = PieceAt(board, square);
-        PieceColor color = piece.color;
+        if (piece.type == 0) continue;
 
+        bool isWhite = piece.color == COLOR_WHITE;
         int val = 0;
-        if (tolower(piece.type) == 'p') {
-            val = PawnTableValue(board, tuning, square, color);
-            score += (color == COLOR_WHITE) ? val : -val;
+
+        switch (tolower(piece.type)) {
+            case 'p': val = PawnTableValue(board, tuning, square, isWhite); break;
+            case 'n': val = KnightTableValue(board, tuning, square, isWhite); break;
+            case 'b': val = BishopTableValue(board, tuning, square, isWhite); break;
+            case 'r': val = RookTableValue(board, tuning, square, isWhite); break;
+            case 'q': val = QueenTableValue(board, tuning, square, isWhite); break;
+            case 'k': val = KingTableValue(board, tuning, square, isWhite); break;
         }
-        else if (tolower(piece.type) == 'n') {
-            val = KnightTableValue(board, tuning, square, color);
-            score += (color == COLOR_WHITE) ? val : -val;
-        }
-        else if (tolower(piece.type) == 'b') {
-            val = BishopTableValue(board, tuning, square, color);
-            score += (color == COLOR_WHITE) ? val : -val;
-        }
-        else if (tolower(piece.type) == 'r') {
-            val = RookTableValue(board, tuning, square, color);
-            score += (color == COLOR_WHITE) ? val : -val;
-        }
-        else if (tolower(piece.type) == 'q') {
-            val = QueenTableValue(board, tuning, square, color);
-            score += (color == COLOR_WHITE) ? val : -val;
-        }
-        else if (tolower(piece.type) == 'k') {
-            val = KingTableValue(board, tuning, square, color);
-            score += (color == COLOR_WHITE) ? val : -val;
-        }
+
+        score += isWhite ? val : -val;
     }
 
     return score;
 }
 
-int EvaluateKingSafety(const Board* board, const Tuning* tuning)
+int EvaluateKingSafety(const Board* board, const Tuning* tuning, PieceColor color)
 {
     int score = 0;
 
-    PieceColor color = board->turn;
     Bitboard kingBB = board->bitboards[color*6 + INDEX_KING];
     Bitboard opponent = GetEnemyColor(board, color);
 
@@ -107,15 +81,11 @@ int EvaluateKingSafety(const Board* board, const Tuning* tuning)
 
 int EvaluateMobility(const Board* board, const Tuning* tuning, PieceColor color)
 {
-    int mobility = 0;
+    Board copy = *board;
+    copy.turn = color;
     
-    for (int square = 0; square < 64; square++) {
-        Piece piece = PieceAt(board, square);
-        if (piece.color == color) {
-            mobility += GenerateMoves(board, MOVE_LEGAL).count;
-        }
-    }
+    Moves list = GenerateMoves(&copy, MOVE_LEGAL);
 
-    return mobility;
+    return list.count;
 }
 

@@ -15,7 +15,7 @@ static const int PIECE_VALUES[] = {
 };
 
 // See: https://www.chessprogramming.org/MVV-LVA
-int MVV_LVA_SCORES[12][12];
+extern int MVV_LVA_SCORES[12][12];
 
 static inline void InitMVVLVA() {
     for (int attacker = 0; attacker < 12; attacker++) {

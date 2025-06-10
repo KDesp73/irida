@@ -32,8 +32,8 @@ test: ## Build and run the tests
 	build/bin/check load
 	make all
 	clear
+	bin/fastchess --compliance build/bin/engine
 	build/bin/check
-	fastchess --compliance build/bin/engine
 
 .PHONY: help
 help: ## Show this help message
