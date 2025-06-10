@@ -30,7 +30,6 @@ void SquareToName(char buffer[3], Square square)
 _Bool squareIsValid(const char* name)
 {
     if(name == NULL) return 0;
-    if(strlen(name) != 2) return 0;
     if(name[0] < 'a' || name[0] > 'h') return 0;
     if(name[1] < '1' || name[1] > '8') return 0;
     

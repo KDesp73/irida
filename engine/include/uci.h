@@ -71,6 +71,12 @@ typedef struct {
 void LoadUciConfig(State* state);
 void PrintUciOptions(State* state);
 void StatePrint(const State* state);
+bool GetUciOption(const State* state, char* name, UciOption* opt);
+
+extern FILE* debug_file;
+extern FILE* original_stdout;
+void LogPrintf(const char* format, ...);
+
 
 #define ENGINE_NAME   "chess-engine"
 #define ENGINE_AUTHOR "KDesp73"
@@ -87,7 +93,7 @@ void StatePrint(const State* state);
 #define COMMAND_UCINEWGAME "ucinewgame"
 
 int UciMain(int argc, char** argv);
-void HandleCommand(State* state, const char *command);
+bool HandleCommand(State* state, const char *command);
 
 void uci_debug(State* state, const char* command);
 void uci_display(State* state);

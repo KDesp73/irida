@@ -1,27 +1,55 @@
 #include "uci.h"
 
+#include <signal.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+#include "IncludeOnly/logging.h"
+
+FILE* debug_file = NULL;
+FILE* original_stdout = NULL;
+static State state = {0};
+
+static void sigint_handler(int sig)
+{
+    if(debug_file) fclose(debug_file);
+    if(original_stdout) fclose(original_stdout);
+    uci_quit(&state);
+}
 
 int UciMain(int argc, char** argv)
 {
+    signal(SIGINT, sigint_handler);
     char input[1024];
-    State state = {0};
     InitState(&state);
     LoadUciConfig(&state);
-    // StatePrint(&state);
 
-    printf("Welcome to %s by %s\n", ENGINE_NAME, ENGINE_AUTHOR);
+    int saved_stdout_fd = dup(fileno(stdout));
+    original_stdout = fdopen(saved_stdout_fd, "w");
+
+    UciOption debug;
+    if(GetUciOption(&state, "DebugLogFile", &debug)){
+        debug_file = fopen(debug.value.string, "w");
+        
+    }
+
+    FILE* tty = fopen("/dev/pts/2", "w");
+    if (tty)
+        dup2(fileno(tty), fileno(stdout));
+
+    LogPrintf("Welcome to %s by %s\n", ENGINE_NAME, ENGINE_AUTHOR);
     fflush(stdout);
+
     
     for(;;) {
         if(fgets(input, sizeof(input), stdin) == NULL) continue; 
 
         input[strcspn(input, "\n")] = 0;
+        if(debug_file)
+            fprintf(debug_file, "%s\n", input); 
 
         HandleCommand(&state, input);
     }
-
     return 0;
 }
 
@@ -29,7 +57,7 @@ int UciMain(int argc, char** argv)
     (strncmp(command, check, strlen(check)) == 0 && \
     (command[strlen(check)] == '\0' || command[strlen(check)] == ' '))
 
-void HandleCommand(State* state, const char *command)
+bool HandleCommand(State* state, const char *command)
 {
     if (IS_COMMAND(command, COMMAND_UCI)) {
         uci_uci(state);
@@ -44,6 +72,7 @@ void HandleCommand(State* state, const char *command)
     } else if (IS_COMMAND(command, COMMAND_STOP)) {
         uci_stop(state);
     } else if (IS_COMMAND(command, COMMAND_QUIT)) {
+        if(debug_file) fclose(debug_file);
         uci_quit(state);
     } else if (IS_COMMAND(command, COMMAND_SETOPTION)) {
         uci_setoption(state, command);
@@ -53,8 +82,10 @@ void HandleCommand(State* state, const char *command)
         uci_display(state);
     } else {
         printf("info string Unknown command: %s\n", command);
+        return false;
     }
     fflush(stdout);
+    return true;
 }
 
 

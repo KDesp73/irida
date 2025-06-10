@@ -1,6 +1,17 @@
 #include "board.h"
 #include "uci.h"
 
+bool GetUciOption(const State* state, char* name, UciOption* opt)
+{
+    for(size_t i = 0; i < state->uciOptionCount; i++){
+        if(!strcmp(name, state->uciOptions[i].name)){
+            *opt = state->uciOptions[i];
+            return true;
+        }
+    }
+    return false;
+}
+
 void LoadUciConfig(State* state)
 {
     strncpy(state->startPositionFen, STARTING_FEN, sizeof(state->startPositionFen));
@@ -8,7 +19,7 @@ void LoadUciConfig(State* state)
     state->debugMode = true;
     state->ponderMode = false;
     state->infiniteMode = false;
-    state->depthLimit = 2;
+    state->depthLimit = 3;
     state->maxBookmoves = 10;
 
     if(state->uciOptionCount >= MAX_UCI_OPTIONS) return;
@@ -81,6 +92,14 @@ void LoadUciConfig(State* state)
             .max = 7
         },
         .default_value = "7"
+    };
+
+    if(state->uciOptionCount >= MAX_UCI_OPTIONS) return;
+    state->uciOptions[state->uciOptionCount++] = (UciOption) {
+        .name = "DebugLogFile",
+        .type = UCI_STRING,
+        .value.string = "/tmp/engine.log",
+        .default_value = "/tmp/engine.log"
     };
 }
 

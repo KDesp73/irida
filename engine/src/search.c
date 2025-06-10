@@ -7,69 +7,93 @@
 #include <limits.h>
 #include <stdio.h>
 
-static int max(int a, int b) 
-{
-    return (a < b) ? b : a;
-}
-static int min(int a, int b) 
-{
-    return (a < b) ? a : b;
-}
-
 static int nodes = 0;
-int Minimax(Board* board, int depth, bool isMaximizing)
+
+int Negamax(Board* board, int depth, int alpha, int beta)
 {
     nodes++;
-    if(depth == 0 || IsResult(board))
+
+    if (depth == 0 || IsResult(board))
         return Evaluation(board).total;
 
-    int bestScore = isMaximizing ? INT_MIN : INT_MAX;
     Moves moves = GenerateMoves(board, MOVE_LEGAL);
     SortMoves(board, &moves);
 
-    for(size_t i = 0; i < moves.count; i++){
+    int bestScore = INT_MIN;
+
+    for (size_t i = 0; i < moves.count; i++) {
         Move move = moves.list[i];
-        
         MakeMove(board, move);
-        int score = Minimax(board, depth - 1, !isMaximizing);
+        int score = -Negamax(board, depth - 1, -beta, -alpha);
         UnmakeMove(board);
 
-        if(isMaximizing)
-            bestScore = max(bestScore, score);
-        else
-            bestScore = min(bestScore, score);
+        if (score > bestScore)
+            bestScore = score;
+
+        if (bestScore > alpha)
+            alpha = bestScore;
+
+        if (alpha >= beta)
+            break;  // Beta cutoff
     }
+
     return bestScore;
 }
 
-Move FindBest(Board* board, int depth, int* score)
+Move FindBest(Board* board, int depth, int* outScore)
 {
     nodes = 0;
+    int alpha = INT_MIN + 1;
+    int beta = INT_MAX;
     int bestScore = INT_MIN;
     Move bestMove = NULL_MOVE;
+
     Moves moves = GenerateMoves(board, MOVE_LEGAL);
     SortMoves(board, &moves);
 
     for (size_t i = 0; i < moves.count; i++) {
-        Move move  = moves.list[i];
+        Move move = moves.list[i];
         MakeMove(board, move);
-        int moveScore = Minimax(board, depth - 1, false);
+        int score = -Negamax(board, depth - 1, -beta, -alpha);
         UnmakeMove(board);
 
-        if (moveScore > bestScore) {
-            bestScore = moveScore;
+        if (score > bestScore) {
+            bestScore = score;
             bestMove = move;
 
-            // Print UCI "info" line
+            // Print UCI info line
             char mStr[16];
             MoveToString(bestMove, mStr);
-            printf("info depth %d score cp %d nodes %d pv %s\n", 
+            printf("info depth %d score cp %d nodes %d pv %s\n",
                    depth, bestScore, nodes, mStr);
             fflush(stdout);
         }
+
+        if (bestScore > alpha)
+            alpha = bestScore;
     }
 
-    *score = bestScore;
+    *outScore = bestScore;
     return bestMove;
 }
 
+Move FindBestIterative(Board* board, int maxDepth, int *outScore)
+{
+    Move bestMove = NULL_MOVE;
+    int bestScore = INT_MIN;
+
+    for (int depth = 1; depth <= maxDepth; depth++) {
+        int score;
+        nodes = 0;
+
+        Move mv = FindBest(board, depth, &score);
+
+        if (mv != NULL_MOVE) {
+            bestMove = mv;
+            bestScore = score;
+        }
+    }
+
+    *outScore = bestScore;
+    return bestMove;
+}

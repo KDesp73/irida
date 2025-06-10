@@ -1,5 +1,5 @@
-#ifndef LOGGING_H
-#define LOGGING_H
+#ifndef IO_LOGGING_H
+#define IO_LOGGING_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -115,5 +115,5 @@ LOGAPI void logging_log(log_level_t log_level, char* format, ...)
 
 #endif // LOGGING_IMPLEMENTATION
 
-#endif // LOGGING_H
+#endif // IO_LOGGING_H
 

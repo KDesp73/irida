@@ -190,15 +190,19 @@ void MoveToString(Move move, char* buffer)
     sprintf(buffer, "%s%s%s", fromName, toName, p); 
 }
 
-Move StringToMove(const char* str) {
-    if (!str || strlen(str) < 4) {
+Move StringToMove(const char* str) 
+{
+    if (!str || strlen(str) < 4 || strlen(str) > 5)
         return NULL_MOVE;
-    }
 
     Square from = SquareFromName(str);
     Square to = SquareFromName(str + 2);
 
+    if (!IsSquareValid(from) || !IsSquareValid(to))
+        return NULL_MOVE;
+
     Promotion promotion = PROMOTION_NONE;
+    Flag flag = FLAG_NORMAL;
 
     if (strlen(str) == 5) {
         char promoChar = tolower(str[4]);
@@ -207,12 +211,12 @@ Move StringToMove(const char* str) {
             case 'r': promotion = PROMOTION_ROOK; break;
             case 'b': promotion = PROMOTION_BISHOP; break;
             case 'n': promotion = PROMOTION_KNIGHT; break;
-            default:
-                return NULL_MOVE;
+            default: return NULL_MOVE;
         }
+        flag = FLAG_PROMOTION;
     }
 
-    return MoveEncode(from, to, promotion, FLAG_NORMAL);
+    return MoveEncode(from, to, promotion, flag);
 }
 
 void MovePrint(Move move)
