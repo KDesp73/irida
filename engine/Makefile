@@ -37,7 +37,7 @@ all: $(BUILD_DIR) shared static exec check ## Build all
 
 $(BUILD_DIR): ## Create build directories
 	@echo "[INFO] Creating build directories"
-	mkdir -p $(BUILD_DIR) $(BUILD_DIR)/bin $(BUILD_DIR)/gui $(BUILD_DIR)/uci $(BUILD_DIR)/evaluation
+	mkdir -p $(BUILD_DIR) $(BUILD_DIR)/bin $(BUILD_DIR)/uci $(BUILD_DIR)/evaluation
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c ## Compile .c to .o
 	@echo "[ CC ] $< -> $@"

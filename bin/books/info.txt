@@ -1,0 +1,13 @@
+// Books taken from: https://github.com/peteschaefer/jose
+
+Books by Dann Corbit:
+ book_small.bin
+ book.bin
+ DCbool_large.bin
+
+Books by Marc Lacrosse:
+ Performance.bin
+ Varied.bin
+
+See http://mlweb.info/chessbazaar/fruitbooks/
+for more information.
