@@ -4,18 +4,22 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include "IncludeOnly/logging.h"
+#include "version.h"
 
-FILE* debug_file = NULL;
+FILE* in_debug_file = NULL;
+FILE* out_debug_file = NULL;
 FILE* original_stdout = NULL;
 static State state = {0};
 
 static void sigint_handler(int sig)
 {
-    if(debug_file) fclose(debug_file);
+    if(in_debug_file) fclose(in_debug_file);
+    if(out_debug_file) fclose(out_debug_file);
     if(original_stdout) fclose(original_stdout);
     uci_quit(&state);
 }
+
+// #define NEW_TTY
 
 int UciMain(int argc, char** argv)
 {
@@ -24,29 +28,35 @@ int UciMain(int argc, char** argv)
     InitState(&state);
     LoadUciConfig(&state);
 
+#ifdef NEW_TTY
     int saved_stdout_fd = dup(fileno(stdout));
     original_stdout = fdopen(saved_stdout_fd, "w");
+#endif
 
-    UciOption debug;
-    if(GetUciOption(&state, "DebugLogFile", &debug)){
-        debug_file = fopen(debug.value.string, "w");
-        
+    UciOption input_debug_opt;
+    if(GetUciOption(&state, "DebugInputLogFile", &input_debug_opt)){
+        in_debug_file = fopen(input_debug_opt.value.string, "w");
+    }
+    UciOption output_debug_opt;
+    if(GetUciOption(&state, "DebugOutputLogFile", &output_debug_opt)){
+        out_debug_file = fopen(output_debug_opt.value.string, "w");
     }
 
+#ifdef NEW_TTY
     FILE* tty = fopen("/dev/pts/2", "w");
     if (tty)
         dup2(fileno(tty), fileno(stdout));
+#endif
 
-    LogPrintf("Welcome to %s by %s\n", ENGINE_NAME, ENGINE_AUTHOR);
+    LogPrintf("%s v%s by %s\n", ENGINE_NAME, VERSION, ENGINE_AUTHOR);
     fflush(stdout);
 
-    
     for(;;) {
         if(fgets(input, sizeof(input), stdin) == NULL) continue; 
 
         input[strcspn(input, "\n")] = 0;
-        if(debug_file)
-            fprintf(debug_file, "%s\n", input); 
+        if(in_debug_file)
+            fprintf(in_debug_file, "%s\n", input); 
 
         HandleCommand(&state, input);
     }
@@ -72,7 +82,7 @@ bool HandleCommand(State* state, const char *command)
     } else if (IS_COMMAND(command, COMMAND_STOP)) {
         uci_stop(state);
     } else if (IS_COMMAND(command, COMMAND_QUIT)) {
-        if(debug_file) fclose(debug_file);
+        if(in_debug_file) fclose(in_debug_file);
         uci_quit(state);
     } else if (IS_COMMAND(command, COMMAND_SETOPTION)) {
         uci_setoption(state, command);

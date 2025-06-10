@@ -4,6 +4,7 @@
 #include "movegen.h"
 #include "moveordering.h"
 #include "result.h"
+#include "uci.h"
 #include <limits.h>
 #include <stdio.h>
 
@@ -64,7 +65,7 @@ Move FindBest(Board* board, int depth, int* outScore)
             // Print UCI info line
             char mStr[16];
             MoveToString(bestMove, mStr);
-            printf("info depth %d score cp %d nodes %d pv %s\n",
+            LogPrintf("info depth %d score cp %d nodes %d pv %s\n",
                    depth, bestScore, nodes, mStr);
             fflush(stdout);
         }

@@ -96,10 +96,18 @@ void LoadUciConfig(State* state)
 
     if(state->uciOptionCount >= MAX_UCI_OPTIONS) return;
     state->uciOptions[state->uciOptionCount++] = (UciOption) {
-        .name = "DebugLogFile",
+        .name = "DebugInputLogFile",
         .type = UCI_STRING,
-        .value.string = "/tmp/engine.log",
-        .default_value = "/tmp/engine.log"
+        .value.string = "/tmp/in.engine.log",
+        .default_value = "/tmp/in.engine.log"
+    };
+
+    if(state->uciOptionCount >= MAX_UCI_OPTIONS) return;
+    state->uciOptions[state->uciOptionCount++] = (UciOption) {
+        .name = "DebugOutputLogFile",
+        .type = UCI_STRING,
+        .value.string = "/tmp/out.engine.log",
+        .default_value = "/tmp/out.engine.log"
     };
 }
 

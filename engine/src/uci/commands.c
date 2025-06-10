@@ -104,7 +104,6 @@ void uci_position(State* state, const char* command)
             while (*ptr && isspace(*ptr)) ptr++; // Skip whitespace
 
             Move move = StringToMove(move_str);
-            MovePrint(move);
             if (!MakeMove(&state->board, move)) {
                 LogPrintf("info string Illegal move in position: %s\n", move_str);
                 break;

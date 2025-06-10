@@ -21,16 +21,16 @@ void LogPrintf(const char* format, ...)
     }
 
     // Print to debug_file if available
-    // if (debug_file) {
-    //     va_list copy3;
-    //     va_copy(copy3, args);
-    //     vfprintf(debug_file, format, copy3);
-    //     va_end(copy3);
-    // }
+    if (out_debug_file) {
+        va_list copy3;
+        va_copy(copy3, args);
+        vfprintf(out_debug_file, format, copy3);
+        va_end(copy3);
+    }
 
     va_end(args);
 
     fflush(stdout);
     if (original_stdout) fflush(original_stdout);
-    if (debug_file) fflush(debug_file);
+    if (in_debug_file) fflush(in_debug_file);
 }

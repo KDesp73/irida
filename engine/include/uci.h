@@ -73,7 +73,8 @@ void PrintUciOptions(State* state);
 void StatePrint(const State* state);
 bool GetUciOption(const State* state, char* name, UciOption* opt);
 
-extern FILE* debug_file;
+extern FILE* in_debug_file;
+extern FILE* out_debug_file;
 extern FILE* original_stdout;
 void LogPrintf(const char* format, ...);
 
