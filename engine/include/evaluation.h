@@ -23,7 +23,14 @@ int EvaluatePieceSquareTables(const Board* board, const Tuning* tuning);
 int EvaluateMobility(const Board* board, const Tuning* tuning, PieceColor color);
 int EvaluateKingSafety(const Board* board, const Tuning* tuning, PieceColor color);
 int EvaluatePawnStructure(const Board* board, const Tuning* tuning, PieceColor color);
+
+// TODO: 
 int EvaluateThreats(const Board* board, const Tuning* tuning, PieceColor);
+
+// TODO: 
+// 1. Evaluate checkmate threats
+// 2. Evaluate forced checkmates
+// 3. Insentivize checks and force the king to the edge of the board
 
 
 static inline Eval Evaluation(const Board* board)

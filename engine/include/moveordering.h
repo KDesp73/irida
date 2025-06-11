@@ -26,10 +26,12 @@ static inline void InitMVVLVA() {
     }
 }
 
-// TODO: Killer moves
-// TODO: History heuristics
 int ScoreMove(Board* board, Move move);
-
 void SortMoves(Board* board, Moves* moves);
+
+// TODO: 
+// 1. Killer moves
+// 2. History heuristics
+// 3. Static Exchange Evaluation
 
 #endif // MOVE_ORDERING_H

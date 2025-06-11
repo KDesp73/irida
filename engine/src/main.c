@@ -167,6 +167,7 @@ int main(int argc, char** argv)
             BoardInitFen(&board, argv[2]);
             float eval = (float) Evaluation(&board).total / 100;
             printf("%s%.2f\n", (eval > 0) ? "+" : "", eval);
+            BoardFree(&board);
         }
 
         exit(0);

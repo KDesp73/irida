@@ -19,7 +19,7 @@ void LoadUciConfig(State* state)
     state->debugMode = true;
     state->ponderMode = false;
     state->infiniteMode = false;
-    state->depthLimit = 3;
+    state->depthLimit = 4;
     state->maxBookmoves = 10;
 
     if(state->uciOptionCount >= MAX_UCI_OPTIONS) return;
