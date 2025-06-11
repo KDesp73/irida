@@ -89,3 +89,64 @@ int EvaluateMobility(const Board* board, const Tuning* tuning, PieceColor color)
     return list.count;
 }
 
+#define FILE_MASK(file) (0x0101010101010101ULL << (file))
+int EvaluatePawnStructure(const Board* board, const Tuning* tuning, PieceColor color)
+{
+    int score = 0;
+    Bitboard pawns = board->bitboards[color*6 + INDEX_BLACK_PAWN];
+
+    while (pawns) {
+        Square sq = poplsb(&pawns);
+        int file = sq % 8;
+        int rank = sq / 8;
+
+        // Isolated pawn (no friendly pawns on adjacent files)
+        Bitboard fileMask = FILE_MASK(file);
+        Bitboard adjFiles = 0;
+        if (file > 0) adjFiles |= FILE_MASK(file - 1);
+        if (file < 7) adjFiles |= FILE_MASK(file + 1);
+        Bitboard neighbors = board->bitboards[color*6 + INDEX_BLACK_PAWN] & adjFiles;
+        if (neighbors == 0)
+            score -= tuning->isolatedPawnPenalty;
+
+        // Doubled pawn (more than one pawn on the same file)
+        Bitboard sameFile = board->bitboards[color*6 + INDEX_BLACK_PAWN] & fileMask;
+        if (popcount(sameFile) > 1)
+            score -= tuning->doubledPawnPenalty;
+
+        // Passed pawn (no opposing pawns in front or on adjacent files)
+        Bitboard oppPawns = board->bitboards[!color*6 + INDEX_BLACK_PAWN];
+
+        Bitboard passedMask = fileMask;
+        if (file > 0)
+            passedMask |= 0x0101010101010101ULL << (file - 1);
+        if (file < 7)
+            passedMask |= 0x0101010101010101ULL << (file + 1);
+
+        if ((oppPawns & passedMask) == 0)
+            score += tuning->passedPawnBonus[rank];
+    }
+
+    return score;
+}
+
+int EvaluateThreats(const Board* board, const Tuning* tuning, PieceColor color)
+{
+    int score = 0;
+
+    // board->knights[color], board->bishops[color], etc.
+    // and a function: Bitboard AttacksFrom(PieceType type, Square sq, const Board* board)
+
+    // Loop through attackers (e.g., knights as an example)
+    // Bitboard knights = board->knights[color];
+    // while (knights) {
+    //     Square from = poplsb(&knights);
+    //     Bitboard attacks = KnightAttacks(from) & board->occupied[!color];
+    //
+    //     score += popcount(attacks) * tuning->knightThreatBonus;
+    // }
+
+    // You would do the same for other pieces like bishops, rooks, queens
+
+    return score;
+}

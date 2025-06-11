@@ -11,6 +11,8 @@ typedef struct {
     int piece_tables;
     int tempo_bonus;
     int bishop_bonus;
+    int pawn_structure;
+    int threats;
     int total;
 } Eval;
 
@@ -20,9 +22,8 @@ int EvaluateMaterial(const Board* board, const Tuning* tuning);
 int EvaluatePieceSquareTables(const Board* board, const Tuning* tuning);
 int EvaluateMobility(const Board* board, const Tuning* tuning, PieceColor color);
 int EvaluateKingSafety(const Board* board, const Tuning* tuning, PieceColor color);
-
-// TODO: EvaluatePawnStructure(const Board* board, const Tuning* tuning, PieceColor color);
-// TODO: EvaluateThreats(const Board* board, const Tuning* tuning, PieceColor);
+int EvaluatePawnStructure(const Board* board, const Tuning* tuning, PieceColor color);
+int EvaluateThreats(const Board* board, const Tuning* tuning, PieceColor);
 
 
 static inline Eval Evaluation(const Board* board)
@@ -48,13 +49,17 @@ static inline Eval Evaluation(const Board* board)
     if (popcount(board->bitboards[COLOR_BLACK * 6 + INDEX_BISHOP]) >= 2)
         eval.bishop_bonus -= 30;
 
-    eval.total = 
-        eval.material
+    eval.pawn_structure += EvaluatePawnStructure(board, &tuning, COLOR_WHITE);
+    eval.pawn_structure -= EvaluatePawnStructure(board, &tuning, COLOR_BLACK);
+
+    eval.total = eval.material
         + eval.piece_tables
         + eval.king_safety
         + eval.mobility
         + eval.tempo_bonus
-        + eval.bishop_bonus;
+        + eval.bishop_bonus
+        + eval.pawn_structure
+        ;
 
     return eval;
 }
