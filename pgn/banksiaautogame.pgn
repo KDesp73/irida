@@ -1,0 +1,18 @@
+[Event "*"]
+[Site "*"]
+[Date "2025.02.10"]
+[Time "17:31:47"]
+[Round "*"]
+[White "hm::Human"]
+[Black "Stockfish 15"]
+[Result "*"]
+[ECO "C29"]
+[Opening "Vienna gambit"]
+[TimeControl "40/300+1"]
+[PlyCount "14"]
+
+1.e4 e5 2.Nc3 Nf6
+3.f4 d5 4.exd5 {C29: Vienna gambit}  Nxd5 {-0.5/26 9000 5849755} 
+5.fxe5 Nxc3 {-0.2/28 5646 3876457}  6.bxc3 Qh4+ {-0.3/29 5804 3947205} 
+7.g3 Qe4+ {-3.6/24 6372 4231877} 
+

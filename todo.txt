@@ -1,9 +1,9 @@
 TODO: performance optimization
-TODO: store additional bitboards instead of generating them each time
 TODO: search function iterations
 TODO: evaluation function iterations
 TODO: syzygy tablebase
 TODO: pick a license
+TODO: movegen documentation
 DONE: tests
 DONE: move generation
 DONE: perft testing
