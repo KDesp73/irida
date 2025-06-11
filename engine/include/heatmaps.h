@@ -4,6 +4,8 @@
 #include "board.h"
 #include "square.h"
 #include "tuning.h"
+#include "evaluation.h"
+
 static const int PawnTable[64] = {
     0,  0,  0,  0,  0,  0,  0,  0,
     50, 50, 50, 50, 50, 50, 50, 50,
@@ -196,30 +198,18 @@ static const int KingTableEndgame[64] = {
 };
 int KingTableValue(const Board* board, const Tuning* tuning, Square square, bool isWhite);
 
-// TODO: Compute the current phase of the game
-
 static inline bool isMiddlegame(const Board* board, const Tuning* tuning)
 {
-    size_t piecesCount = NumberOfPieces(board, COLOR_WHITE) + NumberOfPieces(board, COLOR_BLACK);
-    size_t movesPlayed = board->halfmove;
-
-    return (
-            (piecesCount > tuning->thresholds.endgamePieces && piecesCount <= tuning->thresholds.middlegamePieces) ||
-            (movesPlayed < tuning->thresholds.endgameMoves  && movesPlayed >= tuning->thresholds.middlegameMoves)
-    );
-
+    int phase = ComputeGamePhase(board, tuning);
+    // Arbitrarily define middlegame as phase between 8 and 20
+    return phase >= 8 && phase <= 20;
 }
 
 static inline bool isEndgame(const Board* board, const Tuning* tuning)
 {
-    size_t piecesCount = NumberOfPieces(board, COLOR_WHITE) + NumberOfPieces(board, COLOR_BLACK);
-    size_t movesPlayed = board->halfmove;
-
-    return (
-        piecesCount <= tuning->thresholds.endgamePieces ||
-        movesPlayed >= tuning->thresholds.endgameMoves
-    );
-
+    int phase = ComputeGamePhase(board, tuning);
+    // Consider endgame when phase is small
+    return phase <= 8;
 }
 
 #endif // ENGINE_PIECE_TABLES_H

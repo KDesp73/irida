@@ -21,15 +21,7 @@ typedef struct {
 } PieceValues;
 
 typedef struct {
-    size_t middlegameMoves;
-    size_t middlegamePieces;
-    size_t endgameMoves;
-    size_t endgamePieces;
-} Thresholds;
-
-typedef struct {
     PieceValues pieces;
-    Thresholds thresholds;
 
     // Pawn structure
     int doubledPawnPenalty;

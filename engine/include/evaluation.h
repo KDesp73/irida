@@ -16,7 +16,11 @@ typedef struct {
     int total;
 } Eval;
 
+void EvalPrint(Eval eval);
+
 // https://www.chessprogramming.org/Evaluation
+
+int ComputeGamePhase(const Board* board, const Tuning* tuning);
 
 int EvaluateMaterial(const Board* board, const Tuning* tuning);
 int EvaluatePieceSquareTables(const Board* board, const Tuning* tuning);
@@ -49,12 +53,12 @@ static inline Eval Evaluation(const Board* board)
     eval.mobility += EvaluateMobility(board, &tuning, COLOR_WHITE);
     eval.mobility -= EvaluateMobility(board, &tuning, COLOR_BLACK);
 
-    eval.tempo_bonus += (board->turn == COLOR_WHITE ? +10 : -10);
+    // eval.tempo_bonus += (board->turn == COLOR_WHITE ? +tuning.tempoBonus : -tuning.tempoBonus);
 
     if (popcount(board->bitboards[COLOR_WHITE * 6 + INDEX_BISHOP]) >= 2)
-        eval.bishop_bonus += 30;
+        eval.bishop_bonus += tuning.bishopPairBonus;
     if (popcount(board->bitboards[COLOR_BLACK * 6 + INDEX_BISHOP]) >= 2)
-        eval.bishop_bonus -= 30;
+        eval.bishop_bonus -= tuning.bishopPairBonus;
 
     eval.pawn_structure += EvaluatePawnStructure(board, &tuning, COLOR_WHITE);
     eval.pawn_structure -= EvaluatePawnStructure(board, &tuning, COLOR_BLACK);

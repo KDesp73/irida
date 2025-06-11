@@ -21,6 +21,15 @@
 #define WHITE_QUEEN 'Q'
 #define WHITE_PAWN 'P'
 
+typedef enum {
+    PAWN,
+    KNIGHT,
+    BISHOP,
+    ROOK,
+    QUEEN,
+    KING
+} PieceType;
+
 #define EMPTY_SQUARE ' '
 
 #define STARTING_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
@@ -93,6 +102,7 @@ Bitboard GetBlack(const Board* board);
 Bitboard GetEnemyColor(const Board *board, PieceColor us);
 Bitboard GetEnemy(const Board* board);
 Bitboard GetEmpty(const Board* board);
+int CountPieces(const Board* board, PieceColor, PieceType);
 
 int HasCastlingRights(const Board* board, uint8_t castling_rights);
 void RevokeCastlingRights(Board* board, uint8_t castling_rights);

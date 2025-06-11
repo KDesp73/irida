@@ -270,4 +270,9 @@ void RevokeCastlingRights(Board* board, uint8_t castling_rights)
     board->castling_rights &= ~castling_rights;
 }
 
+int CountPieces(const Board* board, PieceColor color, PieceType type)
+{
+    Bitboard bb = board->bitboards[color * 6 + type];
+    return popcount(bb);
+}
 

@@ -231,42 +231,52 @@ Bitboard ComputeKingMoveMask(Square square)
 
 Bitboard PawnPushMask(Square square, PieceColor color)
 {
+    if (square == 64) return 0ULL;
     return PAWN_PUSH_MASKS[color][square];
 }
 Bitboard PawnDoublePushMask(Square square, PieceColor color)
 {
+    if (square == 64) return 0ULL;
     return PAWN_DOUBLE_PUSH_MASKS[color][square];
 }
 Bitboard PawnAttackMask(Square square, PieceColor color)
 {
+    if (square == 64) return 0ULL;
     return PAWN_ATTACK_MASKS[color][square];
 }
 Bitboard PawnPromotionMask(Square square, PieceColor color)
 {
+    if (square == 64) return 0ULL;
     return PAWN_PROMOTION_MASKS[color][square];
 }
 Bitboard PawnPromotionAttackMask(Square square, PieceColor color)
 {
+    if (square == 64) return 0ULL;
     return PAWN_PROMOTION_ATTACK_MASKS[color][square];
 }
 
 Bitboard KnightMoveMask(Square square)
 {
+    if (square == 64) return 0ULL;
     return KNIGHT_MOVE_MASKS[square];
 }
 Bitboard BishopMoveMask(Square square)
 {
+    if (square == 64) return 0ULL;
     return BISHOP_MOVE_MASKS[square];
 }
 Bitboard RookMoveMask(Square square)
 {
+    if (square == 64) return 0ULL;
     return ROOK_MOVE_MASKS[square];
 }
 Bitboard QueenMoveMask(Square square)
 {
+    if (square == 64) return 0ULL;
     return QUEEN_MOVE_MASKS[square];
 }
 Bitboard KingMoveMask(Square square)
 {
+    if (square == 64) return 0ULL;
     return KING_MOVE_MASKS[square];
 }

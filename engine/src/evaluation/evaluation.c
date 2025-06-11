@@ -5,8 +5,24 @@
 #include "movegen.h"
 #include "heatmaps.h"
 #include "piece.h"
+#include "result.h"
 #include "tuning.h"
+#include <stdio.h>
 #include <ctype.h>
+
+void EvalPrint(Eval eval)
+{
+    printf("Total: %d\n", eval.total);
+    printf("\tMaterial: %d\n", eval.material);
+    printf("\tPiece Tables: %d\n", eval.piece_tables);
+    printf("\tMobility: %d\n", eval.mobility);
+    printf("\tPawn Structure: %d\n", eval.pawn_structure);
+    printf("\tKing Safety: %d\n", eval.king_safety);
+    printf("\tThreats: %d\n", eval.threats);
+    printf("\tTempo Bonus: %d\n", eval.tempo_bonus);
+    printf("\tBishop Pair Bonus: %d\n", eval.bishop_bonus);
+}
+
 
 int EvaluateMaterial(const Board* board, const Tuning* tuning)
 {
@@ -40,6 +56,8 @@ int EvaluatePieceSquareTables(const Board* board, const Tuning* tuning)
 {
     int score = 0;
 
+    if(IsInsufficientMaterial(board)) return score;
+
     for (int square = 0; square < 64; square++) {
         Piece piece = PieceAt(board, square);
         if (piece.type == 0) continue;
@@ -65,6 +83,7 @@ int EvaluatePieceSquareTables(const Board* board, const Tuning* tuning)
 int EvaluateKingSafety(const Board* board, const Tuning* tuning, PieceColor color)
 {
     int score = 0;
+    if(IsInsufficientMaterial(board)) return score;
 
     Bitboard kingBB = board->bitboards[color*6 + INDEX_KING];
     Bitboard opponent = GetEnemyColor(board, color);
@@ -74,13 +93,14 @@ int EvaluateKingSafety(const Board* board, const Tuning* tuning, PieceColor colo
     Bitboard enemies = kingSurroundings & opponent;
 
     // Penalize king for being attacked
-    score += -(popcount(enemies));
+    score += -popcount(enemies);
 
     return score;
 }
 
 int EvaluateMobility(const Board* board, const Tuning* tuning, PieceColor color)
 {
+    if(IsInsufficientMaterial(board)) return 0;
     Board copy = *board;
     copy.turn = color;
     
@@ -107,12 +127,12 @@ int EvaluatePawnStructure(const Board* board, const Tuning* tuning, PieceColor c
         if (file < 7) adjFiles |= FILE_MASK(file + 1);
         Bitboard neighbors = board->bitboards[color*6 + INDEX_BLACK_PAWN] & adjFiles;
         if (neighbors == 0)
-            score -= tuning->isolatedPawnPenalty;
+            score -= abs(tuning->isolatedPawnPenalty);
 
         // Doubled pawn (more than one pawn on the same file)
         Bitboard sameFile = board->bitboards[color*6 + INDEX_BLACK_PAWN] & fileMask;
         if (popcount(sameFile) > 1)
-            score -= tuning->doubledPawnPenalty;
+            score -= abs(tuning->doubledPawnPenalty);
 
         // Passed pawn (no opposing pawns in front or on adjacent files)
         Bitboard oppPawns = board->bitboards[!color*6 + INDEX_BLACK_PAWN];
