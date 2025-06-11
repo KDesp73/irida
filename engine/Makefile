@@ -10,7 +10,7 @@ TEST_DIR = test
 
 INCLUDE  = -Iinclude -I../deps/include -I../movegen/include
 CFLAGS   = -Wall -Werror $(INCLUDE) -fPIC
-LDLIBS   = -l:libraylib.a -l:libmovegen.a -lm -lpthread -ldl
+LDLIBS   = -l:libmovegen.a -lm -lpthread -ldl
 LDFLAGS  = -L../deps/lib -L../movegen $(LDLIBS)
 
 ifeq ($(type), RELEASE)
