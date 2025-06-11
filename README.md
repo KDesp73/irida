@@ -1,7 +1,5 @@
 # ⚔️ Chess Engine Project
 
-This is a modular, high-performance chess engine written in **C**. The project is structured into separate components for move generation, game logic, evaluation, and a user interface. It is designed with maintainability, testability, and extensibility in mind.
-
 ## 📁 Project Structure
 
 ```
@@ -11,6 +9,7 @@ chess-engine/
 ├── movegen/          # Modular and tested move generation library
 ├── deps/             # External dependencies (Lua, Raylib)
 ├── build/            # Build artifacts (created automatically)
+├── Makefile          # Central Makefile managing the modules
 ├── common.mk         # Shared Makefile configuration
 └── README.md         # This file
 
@@ -23,8 +22,6 @@ chess-engine/
 - `gcc` with support for `-fsanitize`
 - `make`
 - `bear` (optional, for generating `compile_commands.json`)
-- `raylib`
-- `lua`
 - Linux (tested), but should be portable with adjustments
 
 ### 🛠 Building the Project
@@ -32,16 +29,8 @@ chess-engine/
 To build everything (engine, libraries, and tests):
 
 ```bash
-make -C movegen all
-make -C engine all
+make all -j3
 ````
-
-You can also build from the top-level directory:
-
-```bash
-make -C movegen
-make -C engine
-```
 
 ### ⚙️ Build Types
 
@@ -56,12 +45,14 @@ Defaults to `DEBUG` if unspecified.
 
 ### 🧪 Running Tests
 
-To run unit tests for the move generator:
+To run tests for each module:
 
 ```bash
-make -C movegen check
-./build/bin/check
+make test_*
 ```
+> [!NOTE]
+> Data-driven testing handled by
+> [IncludeOnly/test.h](https://github.com/KDesp73/IncludeOnly/blob/main/libs/test.h).
 
 ## 🧠 Features
 
@@ -69,29 +60,7 @@ make -C movegen check
 * ⚙️ **Modular Architecture** — `movegen` is a standalone library
 * 🧪 **Testable Components** — every module is independently testable
 * 🧠 **Evaluation** — early-stage evaluation with potential for learning-based scoring
-* 📦 **Lua Config Support** — integrates Lua for flexible runtime logic
-* 🎨 **Raylib GUI** — visual debugging and gameplay (optional)
 * 📦 **Static/Shared Libraries** — both are supported for reuse and embedding
-
-## 🧰 Development Tools
-
-Generate a `compile_commands.json` file for editor/IDE integration:
-
-```bash
-make -C engine compile_commands.json
-make -C movegen compile_commands.json
-```
-
-## 🧹 Cleaning Build Artifacts
-
-```bash
-make -C movegen clean
-make -C engine clean
-```
-
-## 🧾 License
-
-This project is open-source and available under the MIT License.
 
 ---
 
