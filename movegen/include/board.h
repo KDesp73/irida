@@ -56,6 +56,7 @@ typedef struct {
     size_t fullmove;
 
     History history;
+    uint64_t hash;
 } Board;
 
 bool AddUndo(Board* board, uint32_t move);

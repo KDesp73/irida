@@ -527,6 +527,7 @@ bool MakeMove(Board* board, Move move)
     }
 
     board->turn = !board->turn;
+    board->hash = CalculateZobristHash(board);
 
     return true;
 }
@@ -593,5 +594,37 @@ void UnmakeMove(Board* board)
     HistoryRemove(&board->history); // Move before flipping turn
 
     board->turn = !board->turn;
+    board->hash = CalculateZobristHash(board);
 }
+
+NullMoveState nullState = {0};
+
+void MakeNullMove(Board* board)
+{
+    nullState.turn = board->turn;
+    nullState.halfmoveClock = board->halfmove;
+    nullState.fullmoveNumber = board->fullmove;
+    nullState.epSquare = board->enpassant_square;
+
+    board->turn = (board->turn == COLOR_WHITE) ? COLOR_BLACK : COLOR_WHITE;
+
+    board->halfmove++;
+    if (board->turn == COLOR_WHITE) {
+        board->fullmove++;
+    }
+
+    // Remove en passant rights
+    board->enpassant_square = SQUARE_NONE;
+    board->hash = CalculateZobristHash(board);
+}
+void UnmakeNullMove(Board* board)
+{
+    board->turn = nullState.turn;
+    board->halfmove= nullState.halfmoveClock;
+    board->fullmove = nullState.fullmoveNumber;
+    board->enpassant_square = nullState.epSquare;
+    board->hash = CalculateZobristHash(board);
+}
+
+// TODO: Don't recalculate the whole zobrist hash each time. Modify only what's changed
 

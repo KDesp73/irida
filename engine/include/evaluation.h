@@ -20,6 +20,9 @@ void EvalPrint(Eval eval);
 
 // https://www.chessprogramming.org/Evaluation
 
+#define MAX_EVAL 100000 
+#define MATE_SCORE (MAX_EVAL + MAX_DEPTH)
+
 int ComputeGamePhase(const Board* board, const Tuning* tuning);
 
 int EvaluateMaterial(const Board* board, const Tuning* tuning);

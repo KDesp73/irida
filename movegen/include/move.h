@@ -40,6 +40,14 @@ enum {
     CASTLE_BLACK_QUEENSIDE = 0b1000,
 };
 
+typedef struct {
+    PieceColor turn;
+    int halfmoveClock;
+    int fullmoveNumber;
+    Square epSquare;
+} NullMoveState;
+
+extern NullMoveState nullState;
 
 typedef uint32_t Move;
 #define NULL_MOVE ((Move) 0)
@@ -94,6 +102,10 @@ Bitboard UndoMove(Bitboard* current, Move move);
 
 bool MakeMove(Board* board, Move move);
 void UnmakeMove(Board* board);
+
+void MakeNullMove(Board* board);
+void UnmakeNullMove(Board* board);
+
 bool Castle(Board* board, Move move);
 bool IsCastle(const Board* board, Move* move);
 bool Enpassant(Board* board, Move move);

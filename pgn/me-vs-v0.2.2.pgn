@@ -1,0 +1,24 @@
+[Event "?"]
+[Site "?"]
+[Date "2025.06.12"]
+[Round "?"]
+[White "White"]
+[Black "Black"]
+[Result "1-0"]
+
+1. e4 e6 2. Nc3 Bb4 {EV: 71.9%} 3. d4 Qh4 {EV: 86.9%} 4. Qf3 Qf6 {EV: 85.5%} 5.
+Qxf6 Bxc3+ {EV: 83.9%} 6. bxc3 gxf6 {EV: 67.6%} 7. Nf3 Kd8 {EV: 55.9%} 8. e5
+fxe5 {EV: 64.5%} 9. Nxe5 Ke8 {EV: 68.5%} 10. Bc4 d5 {EV: 63.1%} 11. Bb3 Nf6 {EV:
+57.3%} 12. Bg5 Ne4 {EV: 57.3%} 13. Bd2 Nd7 {EV: 70.5%} 14. Nxd7 Nxd2 {EV: 56.2%}
+15. Nf6+ Ke7 {EV: 59.1%} 16. Kxd2 Kxf6 {EV: 56.2%} 17. Rae1 Rg8 {EV: 72.1%} 18.
+g3 Rg4 {EV: 71.6%} 19. f3 Rg5 {EV: 77.6%} 20. c4 Rxg3 {EV: 78.5%} 21. hxg3 dxc4
+{EV: 62.9%} 22. Bxc4 Kg7 {EV: 33.6%} 23. d5 exd5 {EV: 44.7%} 24. Bxd5 Bf5 {EV:
+41.0%} 25. Re7 Rd8 {EV: 25.5%} 26. Rxf7+ Kg6 {EV: 19.2%} 27. c4 Rxd5+ {EV:
+81.6%} 28. cxd5 Kxf7 {EV: 80.1%} 29. g4 Bxg4 {EV: 94.1%} 30. fxg4 Kg7 {EV:
+66.0%} 31. Re1 Kf7 {EV: 68.1%} 32. Kd3 Kg8 {EV: 56.6%} 33. Re7 Kf8 {EV: 68.1%}
+34. Rxc7 Kg8 {EV: 25.3%} 35. Rxb7 Kf8 {EV: 6.5%} 36. Rxa7 Kg8 {EV: 1.3%} 37. d6
+Kf8 {EV: 1.3%} 38. a4 Kg8 {EV: 2.5%} 39. a5 Kf8 {EV: 2.8%} 40. a6 Kg8 {EV: 2.7%}
+41. d7 Kf7 {EV: 3.0%} 42. d8=Q+ Kg6 {EV: 0.1%} 43. Qd6+ Kg5 {EV: 0.1%} 44. Rg7+
+Kh4 {EV: 0.1%} 45. Qh6+ Kg3 {EV: 0.1%} 46. Qxh7 Kf4 {EV: 0.1%} 47. Qf5+ Kg3 {EV:
+0.1%} 48. g5 Kg2 {EV: 0.1%} 49. g6 Kg3 {EV: 0.1%} 50. Rf7 Kg2 {EV: 0.1%} 51. g7
+Kg3 {EV: 0.1%} 52. g8=Q+ Kh2 {EV: 0.1%} 53. Rh7# 1-0
