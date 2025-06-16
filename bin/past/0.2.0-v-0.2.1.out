@@ -1,0 +1,28 @@
+Started game 1 of 20 (chess-engine vs chess-engine)
+Started game 2 of 20 (chess-engine vs chess-engine)
+Started game 4 of 20 (chess-engine vs chess-engine)
+Started game 3 of 20 (chess-engine vs chess-engine)
+Terminating process of engine chess-engine(4)
+Terminating process of engine chess-engine(3)
+Terminating process of engine chess-engine(6)
+Terminating process of engine chess-engine(2)
+Finished game 2 (chess-engine vs chess-engine): * {No result}
+Score of chess-engine vs chess-engine: 0 - 0 - 0  [nan] 0
+Terminating process of engine chess-engine(5)
+Finished game 3 (chess-engine vs chess-engine): * {No result}
+Score of chess-engine vs chess-engine: 0 - 0 - 0  [nan] 0
+Terminating process of engine chess-engine(0)
+Terminating process of engine chess-engine(1)
+Finished game 1 (chess-engine vs chess-engine): * {No result}
+Score of chess-engine vs chess-engine: 0 - 0 - 0  [nan] 0
+Terminating process of engine chess-engine(7)
+Finished game 4 (chess-engine vs chess-engine): * {No result}
+Score of chess-engine vs chess-engine: 0 - 0 - 0  [nan] 0
+Elo difference: nan +/- nan, LOS: nan %, DrawRatio: nan %
+SPRT: llr 0 (0.0%), lbound -inf, ubound inf
+
+Player: chess-engine
+   "No result": 4
+Player: chess-engine
+   "No result": 4
+Finished match

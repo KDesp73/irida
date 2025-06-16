@@ -3,6 +3,7 @@
 #include "perft.h"
 #include "search.h"
 #include "uci.h"
+#include "version.h"
 #include <ctype.h>
 #include <stdio.h>
 
@@ -115,7 +116,7 @@ void uci_position(State* state, const char* command)
 void uci_uci(State* state)
 {
     state->uciMode = true;
-    LogPrintf("id name %s\n", ENGINE_NAME);
+    LogPrintf("id name %s-v%s\n", ENGINE_NAME, VERSION);
     LogPrintf("id author %s\n", ENGINE_AUTHOR);
 
     LogPrintf("\n");
