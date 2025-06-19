@@ -14,3 +14,4 @@
 - [Tuning Paper](https://github.com/AndyGrant/Ethereal/blob/master/Tuning.pdf)
 - [xorshift generators](https://vigna.di.unimi.it/ftp/papers/xorshift.pdf)
 - [Nibbler](https://github.com/rooklift/nibbler)
+- [NNUE](https://github.com/official-stockfish/nnue-pytorch/blob/master/docs/nnue.md)
