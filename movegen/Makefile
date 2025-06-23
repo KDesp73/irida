@@ -1,6 +1,6 @@
 include ../common.mk
 
-type ?= DEBUG
+type ?= RELEASE
 
 LIBRARY_NAME = movegen
 SO_NAME      = lib$(LIBRARY_NAME).so

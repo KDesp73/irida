@@ -19,7 +19,7 @@ static void sigint_handler(int sig)
     uci_quit(&state);
 }
 
-#define NEW_TTY
+// #define NEW_TTY
 
 int UciMain(int argc, char** argv)
 {
