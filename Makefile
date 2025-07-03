@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-SUBDIRS := movegen engine
+SUBDIRS := movegen engine zig-engine
 
 .PHONY: all
 all: ## Build every project

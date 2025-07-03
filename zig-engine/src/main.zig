@@ -1,19 +1,19 @@
 const std = @import("std");
 
-// Import the C header
 const castro = @cImport({
     @cInclude("castro.h");
 });
 
 pub fn main() void {
-    var board: castro.Board = undefined;
-    std.debug.print("Starting fen: {s}\n", .{castro.STARTING_FEN});
+    castro.InitMasks();
+    castro.InitZobrist();
+
+    var board: castro.Board = .{};
+
     castro.BoardInitFen(&board, castro.STARTING_FEN);
 
-    castro.BoardPrint(&board, 64);
+    castro.BoardPrint(&board, castro.SQUARE_NONE);
 
     const moves = castro.GenerateMoves(&board, castro.MOVE_LEGAL);
-
     std.debug.print("Legal moves count: {}\n", .{moves.count});
 }
-
