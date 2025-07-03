@@ -133,3 +133,11 @@ uint64_t CalculateZobristHash(const Board* board)
     return hash;
 }
 
+uint64_t CalculateZobristHashFen(const char* fen)
+{
+    Board b;
+    BoardInitFen(&b, fen);
+    uint64_t hash = CalculateZobristHash(&b);
+    BoardFree(&b);
+    return hash;
+}

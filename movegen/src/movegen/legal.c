@@ -223,3 +223,15 @@ Moves GenerateLegalMovesSquare(const Board* board, Square square)
 
     return result;
 }
+
+Moves GenerateMoves(const Board* board, MoveType type)
+{
+    switch (type) {
+    case MOVE_LEGAL:
+        return GenerateLegalMoves(board);
+    case MOVE_PSEUDO:
+        return GeneratePseudoLegalMoves(board);
+    }
+
+    return NO_MOVES;
+}

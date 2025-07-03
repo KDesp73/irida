@@ -87,11 +87,7 @@ extern "C" {
  * @param minor Pointer to an int to store the minor version
  * @param patch Pointer to an int to store the patch version
  */
-static inline void version(int* major, int* minor, int* patch) {
-    if (major) *major = CASTRO_VERSION_MAJOR;
-    if (minor) *minor = CASTRO_VERSION_MINOR;
-    if (patch) *patch = CASTRO_VERSION_PATCH;
-}
+void version(int* major, int* minor, int* patch);
 
 /*------------------------------------.
 | *SQUARE*                            |
@@ -883,14 +879,7 @@ uint64_t CalculateZobristHash(const Board* board);
  * @param fen Forsyth-Edwards Notation string
  * @return 64-bit Zobrist hash
  */
-static inline uint64_t CalculateZobristHashFen(const char* fen)
-{
-    Board b;
-    BoardInitFen(&b, fen);
-    uint64_t hash = CalculateZobristHash(&b);
-    BoardFree(&b);
-    return hash;
-}
+uint64_t CalculateZobristHashFen(const char* fen);
 
 
 /*------------------------------------.
@@ -1839,17 +1828,7 @@ Moves GenerateLegalKingMoves(const Board* board, Bitboard pieces, PieceColor col
  * @param type MOVE_LEGAL or MOVE_PSEUDO
  * @return Moves struct containing the resulting moves
  */
-static inline Moves GenerateMoves(const Board* board, MoveType type)
-{
-    switch (type) {
-    case MOVE_LEGAL:
-        return GenerateLegalMoves(board);
-    case MOVE_PSEUDO:
-        return GeneratePseudoLegalMoves(board);
-    }
-
-    return NO_MOVES;
-}
+Moves GenerateMoves(const Board* board, MoveType type);
 
 /*------------------------------------.
 | *PERFT*                             |
@@ -1860,35 +1839,7 @@ static inline Moves GenerateMoves(const Board* board, MoveType type)
 typedef unsigned long long u64;
 
 // NOTE: See https://www.chessprogramming.org/Perft
-static inline u64 Perft(Board* board, int depth, bool root)
-{
-    uint64_t cnt = 0, nodes = 0;
-    bool leaf = (depth == 2);
-
-    Moves moves = GenerateMoves(board, MOVE_LEGAL);
-    for (int i = 0; i < moves.count; i++) {
-        Move move = moves.list[i];
-
-        if (root && depth <= 1) {
-            cnt = 1;
-            nodes++;
-        } else {
-            if (!MakeMove(board, move)) continue;
-            cnt = leaf ? GenerateMoves(board, MOVE_LEGAL).count : Perft(board, depth - 1, false);
-            nodes += cnt;
-
-            UnmakeMove(board);
-        }
-
-        if (root) {
-            char moveStr[16];
-            MoveToString(move, moveStr);
-            printf("%s: %lu\n", moveStr, cnt);
-        }
-    }
-
-    return nodes;
-}
+u64 Perft(Board* board, int depth, bool root);
 
 
 /*------------------------------------.
@@ -2137,39 +2088,12 @@ static const uint64_t Random64[781] = {
 /**
  * @brief Converts polyglot's 16bit format to my 32bit one
  */
-static inline Move ConvertMove(uint16_t polyglotMove)
-{
-    int to_file = (polyglotMove >> 0) & 0b111;  // Bits 0-2
-    int to_rank = (polyglotMove >> 3) & 0b111;  // Bits 3-5
-    int from_file = (polyglotMove >> 6) & 0b111; // Bits 6-8
-    int from_rank = (polyglotMove >> 9) & 0b111; // Bits 9-11
-    int promotion = (polyglotMove >> 12) & 0b111; // Bits 12-14
-
-    int from_square = (from_rank * 8) + from_file;
-    int to_square = (to_rank * 8) + to_file;
-
-    return (from_square) | (to_square << 6) | (promotion << 12) | FLAG_NORMAL;
-}
+Move ConvertMove(uint16_t polyglotMove);
 
 /**
  * @brief Returns the next book move based on the current polyglot hash
  */
-static inline Move LookupBookMove(uint64_t position_hash, const char* book_path)
-{
-    FILE* book = fopen(book_path, "rb");
-    if (!book) return 0;
-
-    PolyglotEntry entry;
-    while (fread(&entry, sizeof(PolyglotEntry), 1, book)) {
-        if (__builtin_bswap64(entry.zobrist_hash) == position_hash) {
-            fclose(book);
-            return ConvertMove(__builtin_bswap16(entry.move));
-        }
-    }
-
-    fclose(book);
-    return NULL_MOVE;
-}
+Move LookupBookMove(uint64_t position_hash, const char* book_path);
 
 
 #ifdef __cplusplus
