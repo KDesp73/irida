@@ -1,10 +1,4 @@
-#include "zobrist.h"
-#include "polyglot.h"
-#include "bitboard.h"
-#include "board.h"
-#include "move.h"
-#include "piece.h"
-#include "square.h"
+#include "castro.h"
 
 #include <ctype.h>
 #include <stdio.h>

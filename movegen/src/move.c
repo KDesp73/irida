@@ -1,12 +1,4 @@
-#include "bitboard.h"
-#include "board.h"
-#include "move.h"
-#include "hashing.h"
-#include "history.h"
-#include "masks.h"
-#include "piece.h"
-#include "square.h"
-#include "zobrist.h"
+#include "castro.h"
 
 #include <ctype.h>
 #include <stdint.h>

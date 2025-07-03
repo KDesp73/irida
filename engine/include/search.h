@@ -1,8 +1,7 @@
 #ifndef ENGINE_SEARCH_H
 #define ENGINE_SEARCH_H
 
-#include "board.h"
-#include "move.h"
+#include "castro.h"
 
 // See: https://www.chessprogramming.org/Negamax
 

@@ -1,7 +1,4 @@
-#include "hashing.h"
-#include "board.h"
-#include "notation.h"
-#include "zobrist.h"
+#include "castro.h"
 #include "IncludeOnly/logging.h"
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,13 +1,6 @@
-#include "board.h"
+#include "castro.h"
 #include "evaluation.h"
-#include "masks.h"
-#include "move.h"
-#include "movegen.h"
-#include "notation.h"
-#include "perft.h"
-#include "square.h"
 #include "uci.h"
-#include "zobrist.h"
 
 #include <stdarg.h>
 #include <stdint.h>

@@ -1,10 +1,4 @@
-#include "board.h"
-#include "movegen.h"
-#include "move.h"
-#include "notation.h"
-#include "piece.h"
-#include "result.h"
-#include "square.h"
+#include "castro.h"
 #include <ctype.h>
 #define LOGGING_IMPLEMENTATION
 #include "IncludeOnly/logging.h"

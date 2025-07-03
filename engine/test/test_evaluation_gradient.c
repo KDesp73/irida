@@ -1,6 +1,6 @@
 #include "IncludeOnly/test.h"
-#include "board.h"
 #include "evaluation.h"
+
 int test_evaluation_gradient(char* worse, char* better) 
 {
     Board worse_board = {0};

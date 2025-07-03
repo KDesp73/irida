@@ -1,4 +1,4 @@
-#include "board.h"
+#include "castro.h"
 #include "uci.h"
 
 bool GetUciOption(const State* state, char* name, UciOption* opt)

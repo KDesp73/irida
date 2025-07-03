@@ -1,5 +1,4 @@
 #include "IncludeOnly/test.h"
-#include "board.h"
 #include "evaluation.h"
 
 int test_evaluation_known_position(char* position, int eval)

@@ -1,7 +1,4 @@
-#include "bitboard.h"
-#include "masks.h"
-#include "move.h"
-#include "square.h"
+#include "castro.h"
 #include <stdint.h>
 #include <stdlib.h>
 

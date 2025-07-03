@@ -1,11 +1,4 @@
-#include "board.h"
-#include "bitboard.h"
-#include "hashing.h"
-#include "move.h"
-#include "notation.h"
-#include "piece.h"
-#include "square.h"
-#include "movegen.h"
+#include "castro.h"
 
 #include <ctype.h>
 #include <stdint.h>

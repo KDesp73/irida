@@ -1,7 +1,4 @@
-#include "masks.h"
-#include "bitboard.h"
-#include "board.h"
-#include "square.h"
+#include "castro.h"
 
 Bitboard GeneralOccupancy(Bitboard whitePieces, Bitboard blackPieces)
 {

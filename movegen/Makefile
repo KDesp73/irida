@@ -2,7 +2,7 @@ include ../common.mk
 
 type ?= RELEASE
 
-LIBRARY_NAME = movegen
+LIBRARY_NAME = castro
 SO_NAME      = lib$(LIBRARY_NAME).so
 A_NAME       = lib$(LIBRARY_NAME).a
 

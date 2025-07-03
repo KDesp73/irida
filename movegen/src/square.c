@@ -1,5 +1,4 @@
-#include "square.h"
-#include "board.h"
+#include "castro.h"
 #include <assert.h>
 #include <string.h>
 

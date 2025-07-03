@@ -1,8 +1,5 @@
 #include "IncludeOnly/test.h"
-#include "bitboard.h"
-#include "board.h"
-#include "movegen.h"
-#include "piece.h"
+#include "castro.h"
 #include "tests.h"
 
 int test_bishop_pseudo(const char* fen, const char* square, const char* first, ...)

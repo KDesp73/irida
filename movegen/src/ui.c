@@ -1,5 +1,4 @@
-#include "board.h"
-#include "square.h"
+#include "castro.h"
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>

@@ -1,8 +1,6 @@
 #ifndef ENGINE_TESTS_H
 #define ENGINE_TESTS_H
-#include "perft.h"
-#include "square.h"
-#include "move.h"
+#include "castro.h"
 
 #define FAILF(fen, fmt, ...) \
     fprintf(stderr, ANSI_RED "FAILED: (%s) " fmt ANSI_RESET "\n", fen, ##__VA_ARGS__)

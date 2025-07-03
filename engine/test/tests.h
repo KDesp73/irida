@@ -1,5 +1,6 @@
 #ifndef TESTS_H
 #define TESTS_H
+#include "castro.h"
 
 #include "test_evaluation_mirroring.h"
 int test_evaluation_mirroring(char* white_fen);

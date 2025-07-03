@@ -1,9 +1,4 @@
-#include "bitboard.h"
-#include "movegen.h"
-#include "board.h"
-#include "move.h"
-#include "piece.h"
-#include "square.h"
+#include "castro.h"
 #include "tests.h"
 #include <stdarg.h>
 #include "IncludeOnly/test.h"

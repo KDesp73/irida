@@ -1,9 +1,4 @@
-#include "bitboard.h"
-#include "board.h"
-#include "masks.h"
-#include "move.h"
-#include "movegen.h"
-#include "square.h"
+#include "castro.h"
 
 Bitboard DoMove(Bitboard* current, Move move)
 {

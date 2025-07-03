@@ -1,6 +1,4 @@
-#include "move.h"
-#include "movegen.h"
-#include "perft.h"
+#include "castro.h"
 #include "search.h"
 #include "uci.h"
 #include "version.h"

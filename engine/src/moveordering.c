@@ -1,5 +1,5 @@
 #include "moveordering.h"
-#include "square.h"
+#include "castro.h"
 #include <string.h>
 
 int MVV_LVA_SCORES[12][12];

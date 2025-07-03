@@ -1,8 +1,4 @@
-#include "history.h"
-#include "IncludeOnly/logging.h"
-#include "hashing.h"
-#include "move.h"
-#include "square.h"
+#include "castro.h"
 #include <stdio.h>
 
 bool AddUndo(Board* board, uint32_t move)
@@ -46,7 +42,7 @@ void UndoPrint(Undo undo)
 Undo HistoryGetLast(History history)
 {
     if(history.count <= 0) {
-        ERRO("No more moves");
+        fprintf(stderr, "No more moves\n");
         return NULL_UNDO;
     }
     return history.moves[history.count-1];

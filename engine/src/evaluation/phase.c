@@ -1,4 +1,4 @@
-#include "board.h"
+#include "castro.h"
 #include "tuning.h"
 
 #define MAX_PHASE 24 // 1+1+2+4 per side = 8 × 2 = 16 (knights, bishops, rooks, queens)

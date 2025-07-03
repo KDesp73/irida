@@ -1,10 +1,8 @@
 #include "IncludeOnly/test.h"
 #include <stdint.h>
 #include <stdio.h>
-#include "board.h"
 #include "tests.h"
-#include "move.h"
-#include "zobrist.h"
+#include "castro.h"
 
 #define DEBUG
 #include "IncludeOnly/logging.h"

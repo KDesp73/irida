@@ -1,10 +1,4 @@
-#include "board.h"
-#include "movegen.h"
-#include "hashing.h"
-#include "move.h"
-#include "piece.h"
-#include "zobrist.h"
-#include "result.h"
+#include "castro.h"
 #include <ctype.h>
 
 Result IsResult(Board* board)

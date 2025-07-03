@@ -1,5 +1,4 @@
-#include "piece.h"
-#include "board.h"
+#include "castro.h"
 
 int GetPieceColor(char piece)
 {

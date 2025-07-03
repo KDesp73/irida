@@ -5,8 +5,7 @@ Independent Move Generation Library
 ## Example
 
 ```c
-#include <movegen/board.h>
-#include <movegen/moves.h>
+#include <castro.h>
 
 int main() {
     Board board = {0};

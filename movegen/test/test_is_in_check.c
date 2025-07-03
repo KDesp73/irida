@@ -1,5 +1,4 @@
-#include "board.h"
-#include "movegen.h"
+#include "castro.h"
 #include "tests.h"
 #include "IncludeOnly/test.h"
 

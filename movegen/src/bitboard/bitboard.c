@@ -1,5 +1,4 @@
-#include "bitboard.h"
-#include "masks.h"
+#include "castro.h"
 #include <assert.h>
 
 Square lsb(Bitboard b)

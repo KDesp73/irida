@@ -1,8 +1,7 @@
 #ifndef ENGINE_PIECE_TABLES_H
 #define ENGINE_PIECE_TABLES_H
 
-#include "board.h"
-#include "square.h"
+#include "castro.h"
 #include "tuning.h"
 #include "evaluation.h"
 

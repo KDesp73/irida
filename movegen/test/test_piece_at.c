@@ -1,6 +1,4 @@
-#include "board.h"
-#include "piece.h"
-#include "square.h"
+#include "castro.h"
 #include "tests.h"
 #include "IncludeOnly/test.h"
 

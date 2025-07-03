@@ -1,11 +1,8 @@
 #include "search.h"
+#include "castro.h"
 #include "evaluation.h"
-#include "move.h"
-#include "movegen.h"
 #include "moveordering.h"
-#include "result.h"
 #include "uci.h"
-#include "zobrist.h"
 #include <limits.h>
 #include <stdio.h>
 

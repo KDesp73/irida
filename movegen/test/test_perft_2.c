@@ -1,4 +1,4 @@
-#include "perft.h"
+#include "castro.h"
 #include "test-perft.h"
 #include "tests.h"
 

@@ -1,11 +1,6 @@
-#include "bitboard.h"
-#include "board.h"
+#include "castro.h"
 #include "evaluation.h"
-#include "masks.h"
-#include "movegen.h"
 #include "heatmaps.h"
-#include "piece.h"
-#include "result.h"
 #include "tuning.h"
 #include <stdio.h>
 #include <ctype.h>

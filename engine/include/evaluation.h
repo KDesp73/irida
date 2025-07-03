@@ -1,7 +1,7 @@
 #ifndef ENGINE_EVALUATION_H
 #define ENGINE_EVALUATION_H
 
-#include "board.h"
+#include "castro.h"
 #include "tuning.h"
 
 typedef struct {

@@ -1,5 +1,4 @@
-#include "notation.h"
-#include "square.h"
+#include "castro.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
