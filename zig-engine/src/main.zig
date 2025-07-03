@@ -1,19 +1,19 @@
 const std = @import("std");
+const uci = @import("uci.zig");
 
 const castro = @cImport({
     @cInclude("castro.h");
 });
 
-pub fn main() void {
+pub fn main() !void {
     castro.InitMasks();
     castro.InitZobrist();
 
-    var board: castro.Board = .{};
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer std.debug.assert(gpa.deinit() == .ok);
 
-    castro.BoardInitFen(&board, castro.STARTING_FEN);
+    var Uci = try uci.Uci.init(gpa.allocator());
+    defer Uci.deinit();
 
-    castro.BoardPrint(&board, castro.SQUARE_NONE);
-
-    const moves = castro.GenerateMoves(&board, castro.MOVE_LEGAL);
-    std.debug.print("Legal moves count: {}\n", .{moves.count});
+    try Uci.run();
 }

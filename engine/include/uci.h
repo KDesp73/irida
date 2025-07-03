@@ -65,9 +65,6 @@ typedef struct {
     Board board;
 } State;
 
-#define UCI_CONFIG_SCRIPT "config.lua"
-#define UCI_TUNING_SCRIPT "tuning.lua"
-
 void LoadUciConfig(State* state);
 void PrintUciOptions(State* state);
 void StatePrint(const State* state);

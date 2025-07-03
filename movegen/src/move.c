@@ -184,14 +184,22 @@ void MoveToString(Move move, char* buffer)
 
 Move StringToMove(const char* str) 
 {
-    if (!str || strlen(str) < 4 || strlen(str) > 5)
+    if (!str || strlen(str) < 4 || strlen(str) > 5){
+        fprintf(stderr, "invalid input\n");
         return NULL_MOVE;
+    }
 
     Square from = SquareFromName(str);
     Square to = SquareFromName(str + 2);
 
-    if (!IsSquareValid(from) || !IsSquareValid(to))
+    if (!IsSquareValid(from)){
+        fprintf(stderr, "invalid from square\n");
         return NULL_MOVE;
+    }
+    if(!IsSquareValid(to)) {
+        fprintf(stderr, "invalid to square\n");
+        return NULL_MOVE;
+    }
 
     Promotion promotion = PROMOTION_NONE;
     Flag flag = FLAG_NORMAL;
@@ -208,6 +216,7 @@ Move StringToMove(const char* str)
         flag = FLAG_PROMOTION;
     }
 
+    printf("here\n");
     return MoveEncode(from, to, promotion, flag);
 }
 
