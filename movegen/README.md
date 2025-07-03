@@ -1,4 +1,4 @@
-# movegen
+# Castro
 
 Independent Move Generation Library
 

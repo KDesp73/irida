@@ -2135,7 +2135,7 @@ static const uint64_t Random64[781] = {
 
 
 /**
- * Converts polyglot's 16bit format to my 32bit one
+ * @brief Converts polyglot's 16bit format to my 32bit one
  */
 static inline Move ConvertMove(uint16_t polyglotMove)
 {
@@ -2151,6 +2151,9 @@ static inline Move ConvertMove(uint16_t polyglotMove)
     return (from_square) | (to_square << 6) | (promotion << 12) | FLAG_NORMAL;
 }
 
+/**
+ * @brief Returns the next book move based on the current polyglot hash
+ */
 static inline Move LookupBookMove(uint64_t position_hash, const char* book_path)
 {
     FILE* book = fopen(book_path, "rb");

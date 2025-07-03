@@ -32,7 +32,6 @@ test_movegen: ## Build and run the tests
 	build/bin/test_movegen load
 	make -C movegen all
 	clear
-	bin/fastchess --compliance build/bin/engine
 	build/bin/test_movegen
 
 .PHONY: test_engine
@@ -42,6 +41,7 @@ test_engine: ## Build and run the tests
 	build/bin/test_engine load
 	make -C engine all
 	clear
+	bin/fastchess --compliance build/bin/engine
 	build/bin/test_engine
 
 .PHONY: help
