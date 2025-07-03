@@ -1,7 +1,65 @@
+/**
+ * MIT License
+ * 
+ * Copyright (c) 2025 Konstantinos Despoinidis
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * ============================================================================
+ *
+⠀*⠀⠀⠀⠀⢠⣤⣤⡀⠀⠀⢀⣤⣤⣤⣤⡀⠀⠀⢀⣤⣤⡄⠀⠀⠀⠀⠀⠀
+⠀*⠀⠀⠀⠀⢸⣿⣿⡇⠀⠀⢸⣿⣿⣿⣿⡇⠀⠀⢸⣿⣿⡇⠀⠀⠀⠀⠀⠀
+⠀*⠀⠀⠀⠀⢸⣿⣿⣧⣤⣤⣼⣿⣿⣿⣿⣧⣤⣤⣼⣿⣿⡇⠀⠀⠀⠀⠀⠀
+⠀*⠀⠀⠀⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀
+⠀*⠀⠀⠀⠀⠀⠀⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⠀⠀⠀⠀⠀⠀⠀⠀
+⠀*⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀
+⠀*⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀
+⠀*⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀
+⠀*⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀
+⠀*⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀
+⠀*⠀⠀⠀⠀⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⠀⠀⠀⠀⠀⠀
+⠀*⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀
+⠀*⠀⠀⠀⠀⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉
+ *
+ * Castro is a chess move generation library written in C
+ *
+ * -Contents-
+ * 1.  SQUARE
+ * 2.  BITBOARD
+ * 3.  HASHING
+ * 4.  HISTORY
+ * 5.  BOARD
+ * 6.  ZOBRIST
+ * 7.  MASKS
+ * 8.  MOVE
+ * 9.  PIECE
+ * 10. NOTATION
+ * 11. RESULT
+ * 12. MOVEGEN
+ * 13. PERFT
+ * 14. POLYGLOT
+ *
+ * Written by Konstantinos Despoinidis <despoinidisk@gmail.com> (KDesp73)
+ */
+
 #ifndef CASTRO_H
 #define CASTRO_H
-
-// TODO: HEADER, LICENSE
 
 // Includes
 #include <stdint.h>
@@ -50,29 +108,84 @@ static inline void version(int* major, int* minor, int* patch) {
 #include <stdint.h>
 #include <stdlib.h>
 
+/// Represents a square on the chessboard (0-63).
 typedef uint8_t Square;
 
+/**
+ * @brief Prints a square's name and index to stdout.
+ * 
+ * Example output: `e4 = E4 28`
+ */
 #define SQUARE_PRINT(square)\
-    do{\
+    do {\
         char __square_name__[3];\
         SquareToName(__square_name__, square);\
         printf("%s = %s %d\n", #square, __square_name__, square);\
     } while(0)
 
+/**
+ * @brief Macro to convert a square index to (row, col) coordinates.
+ * 
+ * Use as: `board[COORDS(s)] = ...;` → expands to `board[(s)/8][(s)%8]`
+ */
 #define COORDS(square) (square) / 8][(square) % 8
 
+/**
+ * @brief Converts a square index (0-63) to algebraic notation (e.g. "e4").
+ * 
+ * @param[out] buffer A 3-character buffer (e.g., `char name[3]`) to store the result.
+ * @param[in] square Square index from 0 to 63.
+ */
 void SquareToName(char buffer[3], Square square);
+
+/**
+ * @brief Converts algebraic notation (e.g. "e4") to a square index (0-63).
+ * 
+ * @param[in] buffer A null-terminated string containing the square name.
+ * @return Square index corresponding to the name, or SQUARE_NONE if invalid.
+ */
 Square NameToSquare(const char buffer[3]);
 
+/**
+ * @brief Returns the rank (0–7) of a square index.
+ */
 int Rank(Square square);
+
+/**
+ * @brief Returns the file (0–7) of a square index.
+ */
 int File(Square square);
+
+/**
+ * @brief Checks whether a square index is valid (0–63).
+ */
 bool IsSquareValid(Square square);
 
+/**
+ * @brief Converts (rank, file) coordinates to a square index.
+ * 
+ * @param y Rank (0 = rank 1, 7 = rank 8)
+ * @param x File (0 = file A, 7 = file H)
+ * @return Square index.
+ */
 Square SquareFromCoords(size_t y, size_t x);
+
+/**
+ * @brief Converts a square name (e.g. "d2") to an index.
+ * 
+ * @param name A 2-character string like "e4".
+ * @return Square index or SQUARE_NONE.
+ */
 Square SquareFromName(const char* name);
 
-#define SR(s)\
-    (7 - (s/ 8)) * 8 + (s% 8)
+/**
+ * @brief Flips a square vertically (used for mirror board logic).
+ * 
+ * E.g., SR(E2) returns the square index of E7.
+ */
+#define SR(s) (7 - ((s) / 8)) * 8 + ((s) % 8)
+
+/// Square indices (0–63), rank by rank from A1 to H8
 
 // Rank 1
 #define A1  0
@@ -154,132 +267,337 @@ Square SquareFromName(const char* name);
 #define G8 62
 #define H8 63
 
+/// Special marker for an invalid or uninitialized square
 #define SQUARE_NONE 64
 
 
 /*------------------------------------.
 | *BITBOARD*                          |
-| ----------------------------------- |
-|                                     |
+|-------------------------------------|
+| Low-level bitboard manipulation     |
 `------------------------------------*/
 
-
+/// A 64-bit bitboard where each bit represents a square.
 typedef uint64_t Bitboard;
 
+/**
+ * @brief Cardinal and diagonal directions for sliding piece movement or bitboard shifting.
+ */
 typedef enum {
-    NORTH = 8,
-    SOUTH = -8,
-    EAST = 1,
-    WEST = -1,
-    NORTH_EAST = 9,
-    NORTH_WEST = 7,
-    SOUTH_EAST = -7,
-    SOUTH_WEST = -9
+    NORTH       = 8,   ///< One rank up
+    SOUTH       = -8,  ///< One rank down
+    EAST        = 1,   ///< One file right
+    WEST        = -1,  ///< One file left
+    NORTH_EAST  = 9,   ///< Diagonal up-right
+    NORTH_WEST  = 7,   ///< Diagonal up-left
+    SOUTH_EAST  = -7,  ///< Diagonal down-right
+    SOUTH_WEST  = -9   ///< Diagonal down-left
 } Direction;
 
+/**
+ * @brief Converts a square index to a bitboard with a single set bit.
+ * 
+ * Returns 0ULL if the square is SQUARE_NONE (64).
+ */
 #define BB(square) ((square == 64) ? 0ULL : 1ULL << (square))
 
+/**
+ * @brief Returns the index of the least significant bit set (LSB).
+ * 
+ * @param b Input bitboard.
+ * @return Square index (0–63) of the lowest bit set.
+ */
 Square lsb(Bitboard b);
+
+/**
+ * @brief Returns the index of the most significant bit set (MSB).
+ * 
+ * @param b Input bitboard.
+ * @return Square index (0–63) of the highest bit set.
+ */
 Square msb(Bitboard b);
+
+/**
+ * @brief Shifts a bitboard in a specified direction.
+ * 
+ * @param b Input bitboard.
+ * @param D Direction to shift in.
+ * @return Resulting shifted bitboard.
+ */
 Bitboard shift(Bitboard b, Direction D);
+
+/**
+ * @brief Pops and returns the index of the least significant bit set.
+ * 
+ * The bit is cleared from the input bitboard.
+ * 
+ * @param b Pointer to bitboard.
+ * @return Square index that was popped.
+ */
 Square poplsb(Bitboard* b);
+
+/**
+ * @brief Counts the number of bits set in the bitboard.
+ * 
+ * @param bb Input bitboard.
+ * @return Number of set bits.
+ */
 int popcount(Bitboard bb);
+
+/**
+ * @brief Sets the bit corresponding to the square in the bitboard.
+ */
 void on(Bitboard* bitboard, Square square);
+
+/**
+ * @brief Clears the bit corresponding to the square in the bitboard.
+ */
 void off(Bitboard* bitboard, Square square);
 
-/*** Pseudo Legal Attack Maps ***/
+
+/*-----------------------------------------.
+| *PSEUDO LEGAL ATTACK MAP GENERATION*     |
+`-----------------------------------------*/
+
+/**
+ * @brief Computes pseudo-legal pawn attacks.
+ * 
+ * @param pawn Square of pawn.
+ * @param enemySquares Bitboard of enemy pieces.
+ * @param color 0 = white, 1 = black.
+ */
 Bitboard PawnAttacks(Square pawn, Bitboard enemySquares, uint8_t color);
+
+/**
+ * @brief Computes pseudo-legal pawn forward pushes.
+ * 
+ * @param pawn Square of pawn.
+ * @param emptySquares Bitboard of empty squares.
+ * @param color 0 = white, 1 = black.
+ */
 Bitboard PawnPushes(Square pawn, Bitboard emptySquares, uint8_t color);
+
+/**
+ * @brief Computes pawn promotions (non-capturing).
+ * 
+ * @param pawns Bitboard of pawns eligible to promote.
+ * @param emptySquares Bitboard of empty target squares.
+ * @param color 0 = white, 1 = black.
+ */
 Bitboard PawnPromotions(Square pawns, Bitboard emptySquares, uint8_t color);
+
+/**
+ * @brief Computes pawn promotion captures.
+ * 
+ * @param pawns Bitboard of pawns eligible to promote by capture.
+ * @param opponentPieces Bitboard of capturable opponent pieces.
+ * @param color 0 = white, 1 = black.
+ */
 Bitboard PawnPromotionCaptures(Square pawns, Bitboard opponentPieces, uint8_t color);
 
+/**
+ * @brief Computes knight attacks from a given square.
+ */
 Bitboard KnightAttacks(Square knights, Bitboard emptySquares, Bitboard enemySquares);
+
+/**
+ * @brief Computes king attacks from a given square.
+ */
 Bitboard KingAttacks(Square king, Bitboard emptySquares, Bitboard enemySquares);
+
+/**
+ * @brief Computes bishop attacks using a sliding attack method.
+ */
 Bitboard BishopAttacks(Square bishops, Bitboard emptySquares, Bitboard enemySquares);
+
+/**
+ * @brief Computes rook attacks using a sliding attack method.
+ */
 Bitboard RookAttacks(Square rooks, Bitboard emptySquares, Bitboard enemySquares);
+
+/**
+ * @brief Computes queen attacks as the union of rook and bishop attacks.
+ */
 Bitboard QueenAttacks(Square queens, Bitboard emptySquares, Bitboard enemySquares);
 
-/*** King Safety ***/
+
+/*------------------------.
+| *KING SAFETY / CHECKS*  |
+`------------------------*/
+
+/**
+ * @brief Checks whether the king is in check.
+ * 
+ * @param kingPosition Bitboard with one bit set where the king is.
+ * @param enemyAttacks Bitboard of all enemy attacks.
+ */
 bool IsKingInCheck(Bitboard kingPosition, Bitboard enemyAttacks);
+
+/**
+ * @brief Returns the bitboard of pinned pieces relative to the king.
+ * 
+ * @param kingPosition Bitboard with king’s square.
+ * @param slidingAttacks Bitboard of enemy rooks/bishops/queens.
+ * @param occupancy Bitboard of all occupied squares.
+ */
 Bitboard _PinnedPieces(Bitboard kingPosition, Bitboard slidingAttacks, Bitboard occupancy);
 
-/*** Printing ***/
+
+/*-------------.
+| *PRINTING*   |
+`-------------*/
+
+/**
+ * @brief Prints a 32-bit unsigned integer (e.g. in binary or hex).
+ */
 void Uint32Print(uint32_t value);
+
+/**
+ * @brief Prints a 64-bit unsigned integer (e.g. in binary or hex).
+ */
 void Uint64Print(uint64_t value);
+
+/**
+ * @brief Prints a visual representation of a bitboard.
+ * 
+ * Useful for debugging. Marks set bits on an 8x8 grid.
+ */
 void BitboardPrint(Bitboard bitboard);
+
 
 /*------------------------------------.
 | *HASHING*                           |
-| ----------------------------------- |
-|                                     |
+|-------------------------------------|
+| Position repetition tracking        |
 `------------------------------------*/
 
+/**
+ * @brief Represents a single hash entry (position and repetition count).
+ */
 typedef struct {
-    uint64_t hash;
-    int count;
+    uint64_t hash;  ///< Zobrist hash of the position
+    int count;      ///< Number of times this position has occurred
 } HashEntry;
 
+/**
+ * @brief Tracks position repetition using Zobrist hashes.
+ */
 typedef struct {
-    uint64_t last_added;
-    HashEntry* entries;
-    size_t count;
+    uint64_t last_added;  ///< Last added hash (for quick duplicate check)
+    HashEntry* entries;   ///< Dynamic array of hash entries
+    size_t count;         ///< Number of stored entries
 } HashTable;
 
+/**
+ * @brief Initializes a hash table from a FEN string.
+ * 
+ * Parses the FEN, computes the initial Zobrist hash, and sets up the table.
+ * 
+ * @param table Pointer to an uninitialized HashTable
+ * @param starting_fen FEN string of the initial position
+ */
 void InitHashTable(HashTable* table, const char* starting_fen);
+
+/**
+ * @brief Initializes a hash table directly from a known Zobrist hash.
+ * 
+ * @param table Pointer to HashTable
+ * @param starting_hash Precomputed Zobrist hash of the position
+ */
 void InitHashTableHash(HashTable* table, uint64_t starting_hash);
+
+/**
+ * @brief Adds a new position hash or updates an existing entry.
+ * 
+ * If the hash already exists, increments the count.
+ * 
+ * @param table Pointer to HashTable
+ * @param hash New Zobrist hash to insert
+ * @return true if repetition >= 3 (e.g., threefold repetition), false otherwise
+ */
 _Bool UpdateHashTable(HashTable* table, uint64_t hash);
+
+/**
+ * @brief Frees all memory used by the hash table.
+ */
 void FreeHashTable(HashTable* table);
 
 
 /*------------------------------------.
 | *HISTORY*                           |
-| ----------------------------------- |
-|                                     |
+|-------------------------------------|
+| Move history and undo management    |
 `------------------------------------*/
 
-#define MAX_MOVES 2 * 1024
+/// Maximum number of moves stored in history
+#define MAX_MOVES (2 * 1024)
+
+/**
+ * @brief Stores the necessary data to undo a move.
+ */
 typedef struct {
-    uint32_t move;
-    uint8_t castling;
-    Square enpassant;
-    size_t fiftyMove;
-    char captured;
+    uint32_t move;       ///< Encoded move representation
+    uint8_t castling;    ///< Castling rights before the move
+    Square enpassant;    ///< En passant square before the move
+    size_t fiftyMove;    ///< Fifty-move rule counter before the move
+    char captured;       ///< Captured piece type (if any), 0 if none
 } Undo;
 
+/// Null undo object representing no previous move
 #define NULL_UNDO (Undo){.move = NULL_MOVE}
 
+/**
+ * @brief Prints the contents of an Undo struct (for debugging).
+ */
 void UndoPrint(Undo undo);
 
+/**
+ * @brief Stores full game history for repetition detection and undo functionality.
+ */
 typedef struct {
-    HashTable positions;
-    Undo moves[MAX_MOVES];
-    size_t count;
+    HashTable positions;       ///< Hash table tracking seen positions
+    Undo moves[MAX_MOVES];     ///< Stack of undo records
+    size_t count;              ///< Number of moves in history
 } History;
 
+/**
+ * @brief Removes the last move from history (pop operation).
+ * 
+ * Updates position table and count.
+ */
 void HistoryRemove(History* history);
+
+/**
+ * @brief Returns the most recent Undo record from history.
+ * 
+ * @param history History object
+ * @return Undo struct of the last move; undefined if history is empty.
+ */
 Undo HistoryGetLast(History history);
 
 
 /*------------------------------------.
 | *BOARD*                             |
-| ----------------------------------- |
-|                                     |
+|-------------------------------------|
+| Game state and board representation |
 `------------------------------------*/
 
-#define BLACK_ROOK 'r'
+/// Piece character definitions (FEN-compatible)
+#define BLACK_ROOK   'r'
 #define BLACK_KNIGHT 'n'
 #define BLACK_BISHOP 'b'
-#define BLACK_KING 'k'
-#define BLACK_QUEEN 'q'
-#define BLACK_PAWN 'p'
+#define BLACK_KING   'k'
+#define BLACK_QUEEN  'q'
+#define BLACK_PAWN   'p'
 
-#define WHITE_ROOK 'R'
+#define WHITE_ROOK   'R'
 #define WHITE_KNIGHT 'N'
 #define WHITE_BISHOP 'B'
-#define WHITE_KING 'K'
-#define WHITE_QUEEN 'Q'
-#define WHITE_PAWN 'P'
+#define WHITE_KING   'K'
+#define WHITE_QUEEN  'Q'
+#define WHITE_PAWN   'P'
 
+/// Piece type used for indexing and logic
 typedef enum {
     PAWN,
     KNIGHT,
@@ -289,39 +607,61 @@ typedef enum {
     KING
 } PieceType;
 
+/// Used to indicate no piece on a square
 #define EMPTY_SQUARE ' '
 
+/// Standard starting position in Forsyth-Edwards Notation (FEN)
 #define STARTING_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-#define BOARD_SIZE 8
-#define PIECE_TYPES 12
+#define BOARD_SIZE   8
+#define PIECE_TYPES  12
 
 /*---------------------------.
 | Hybrid Representation      |
 | `grid` is used for fast    |
 | piece lookup               |
-`--------------------------*/
+`---------------------------*/
 
+/**
+ * @brief Core board structure combining bitboards and grid for performance and simplicity.
+ */
 typedef struct {
-    Bitboard bitboards[PIECE_TYPES];
-    char grid[8][8];
-    Bitboard empty;
+    Bitboard bitboards[PIECE_TYPES]; ///< One bitboard per piece type (white/black)
+    char grid[8][8];                 ///< ASCII piece grid for quick access
+    Bitboard empty;                 ///< Cached empty square bitboard
 
-    // State
-    Square enpassant_square;
-    bool turn;
-    uint8_t castling_rights;
-    size_t halfmove;
-    size_t fullmove;
+    // Game state
+    Square enpassant_square;        ///< En passant target square, if any
+    bool turn;                      ///< true = white to move, false = black
+    uint8_t castling_rights;        ///< Castling rights bitfield
+    size_t halfmove;                ///< Halfmove clock for 50-move rule
+    size_t fullmove;                ///< Fullmove number (starts at 1)
 
-    History history;
-    uint64_t hash;
+    History history;                ///< Move history
+    uint64_t hash;                  ///< Zobrist hash of current position
 } Board;
 
+/**
+ * @brief Records an undo step into the board's history.
+ * 
+ * @param board The board to update
+ * @param move The move to be undone later
+ * @return true on success
+ */
 bool AddUndo(Board* board, uint32_t move);
+
+/**
+ * @brief Loads and removes the last undo record.
+ * 
+ * @param board The board to restore
+ * @return Undo information for the last move
+ */
 Undo LoadLastUndo(Board* board);
 
+/// All 12 supported pieces, as characters
 #define PIECES "pnbrqkPNBRQK"
+
+/// Bitboard index constants for each piece type
 enum {
     INDEX_BLACK_PAWN,
     INDEX_BLACK_KNIGHT,
@@ -336,71 +676,213 @@ enum {
     INDEX_WHITE_QUEEN,
     INDEX_WHITE_KING,
 };
-#define INDEX_PAWN INDEX_BLACK_PAWN
+
+// Aliases for working with types generically (e.g. loops)
+#define INDEX_PAWN   INDEX_BLACK_PAWN
 #define INDEX_KNIGHT INDEX_BLACK_KNIGHT
 #define INDEX_BISHOP INDEX_BLACK_BISHOP
-#define INDEX_ROOK INDEX_BLACK_ROOK
-#define INDEX_QUEEN INDEX_BLACK_QUEEN
-#define INDEX_KING INDEX_BLACK_KING
+#define INDEX_ROOK   INDEX_BLACK_ROOK
+#define INDEX_QUEEN  INDEX_BLACK_QUEEN
+#define INDEX_KING   INDEX_BLACK_KING
 
+/// Color of pieces
 typedef enum {
     COLOR_NONE = -1,
     COLOR_BLACK = 0,
-    COLOR_WHITE,
+    COLOR_WHITE
 } PieceColor;
 
+/**
+ * @brief Converts a promotion code to its corresponding character.
+ * 
+ * @param promotion Numeric code (0 = queen, 1 = rook, etc.)
+ * @return Promotion piece character ('q', 'r', ...)
+ */
 char PromotionToChar(uint8_t promotion);
+
+/**
+ * @brief Converts a promotion piece character to a numeric code.
+ * 
+ * @param promotion Piece character (e.g., 'q', 'n')
+ * @return Numeric code
+ */
 uint8_t CharToPromotion(char promotion);
 
+/**
+ * @brief Initializes a board from a FEN string.
+ */
 void BoardInitFen(Board* board, const char* fen);
+
+/**
+ * @brief Heap-allocates and initializes a board from FEN.
+ * 
+ * Must be freed with BoardFree().
+ */
 Board* BoardInitFenHeap(const char* fen);
+
+/**
+ * @brief Frees heap-allocated board (from BoardInitFenHeap).
+ */
 void BoardFree(Board* board);
 
-// TODO: store in seperate bitboard instead of calculating
+/**
+ * @brief Returns a bitboard of all white pieces.
+ */
 Bitboard GetWhite(const Board* board);
-Bitboard GetBlack(const Board* board);
-Bitboard GetEnemyColor(const Board *board, PieceColor us);
-Bitboard GetEnemy(const Board* board);
-Bitboard GetEmpty(const Board* board);
-int CountPieces(const Board* board, PieceColor, PieceType);
 
+/**
+ * @brief Returns a bitboard of all black pieces.
+ */
+Bitboard GetBlack(const Board* board);
+
+/**
+ * @brief Returns a bitboard of all opponent pieces.
+ */
+Bitboard GetEnemyColor(const Board* board, PieceColor us);
+
+/**
+ * @brief Returns a bitboard of all enemy pieces (based on current turn).
+ */
+Bitboard GetEnemy(const Board* board);
+
+/**
+ * @brief Returns a bitboard of all empty squares.
+ */
+Bitboard GetEmpty(const Board* board);
+
+/**
+ * @brief Counts the number of a specific piece color/type on the board.
+ */
+int CountPieces(const Board* board, PieceColor color, PieceType type);
+
+/**
+ * @brief Checks if a board has certain castling rights.
+ */
 int HasCastlingRights(const Board* board, uint8_t castling_rights);
+
+/**
+ * @brief Revokes specific castling rights from a board.
+ */
 void RevokeCastlingRights(Board* board, uint8_t castling_rights);
 
+/**
+ * @brief Checks if a square is attacked by a given color.
+ */
 bool IsSquareAttacked(const Board* board, Square square, PieceColor color);
+
+/**
+ * @brief Checks if a square is empty.
+ */
 bool IsSquareEmpty(const Board* board, Square square);
+
+/**
+ * @brief Checks if a square is occupied by a given color.
+ */
 bool IsSquareOccupiedBy(const Board* board, Square square, PieceColor color);
 
+/**
+ * @brief Returns the number of pieces on the board for a given color.
+ */
 size_t NumberOfPieces(const Board* board, PieceColor color);
 
+/**
+ * @brief Checks if a color is in check.
+ */
 bool IsInCheckColor(const Board* board, PieceColor color);
+
+/**
+ * @brief Checks if the player to move is in check.
+ */
 bool IsInCheck(const Board* board);
 
+/**
+ * @brief Prints a list of squares (e.g. legal moves) on the board.
+ */
 void BoardPrintSquares(const Board* board, Square* squares, size_t count);
+
+/**
+ * @brief Highlights a bitboard on the board (used for debugging).
+ */
 void BoardPrintBitboard(const Board* board, Bitboard highlight);
+
+/**
+ * @brief Prints the board with a list of highlighted squares.
+ * 
+ * Usage: `BoardPrint(board, E4, G5, A2, ...)`
+ */
 void BoardPrint(const Board* board, Square first, ...);
+
+/**
+ * @brief Prints all bitboards in the board structure (for debugging).
+ */
 void BoardPrintBitboards(Board board);
+
+/**
+ * @brief Prints the character grid of the board.
+ */
 void BoardPrintGrid(const Board* board);
 
+/**
+ * @brief Returns a deep copy of the board.
+ */
 Board BoardCopy(const Board* board);
 
 /*------------------------------------.
 | *ZOBRIST*                           |
-| ----------------------------------- |
-|                                     |
+|-------------------------------------|
+| Zobrist hashing for board states    |
 `------------------------------------*/
 
+/// Total number of castling rights encoded (K, Q, k, q)
 #define CASTLING_OPTIONS 4
 
+/**
+ * @brief Zobrist random numbers for each piece on each square.
+ * 
+ * Dimensions:
+ * - PIECE_TYPES: 12 (black/white * 6 types)
+ * - BOARD_SIZE: 8x8 squares
+ * 
+ * Indexed as [piece][rank][file]
+ */
 extern uint64_t zobrist_table[PIECE_TYPES][BOARD_SIZE][BOARD_SIZE] __attribute__((unused));
-extern uint64_t zobrist_castling[CASTLING_OPTIONS]                 __attribute__((unused));
-extern uint64_t zobrist_en_passant[BOARD_SIZE]                     __attribute__((unused));
-extern uint64_t zobrist_black_to_move                              __attribute__((unused));
 
-// NOTE: Not used since we are using polyglot's standard 781 "random" values
+/// Zobrist keys for each of the 4 castling rights (K, Q, k, q)
+extern uint64_t zobrist_castling[CASTLING_OPTIONS] __attribute__((unused));
+
+/// Zobrist keys for each en passant file (a-h)
+extern uint64_t zobrist_en_passant[BOARD_SIZE] __attribute__((unused));
+
+/// Zobrist key to represent "black to move"
+extern uint64_t zobrist_black_to_move __attribute__((unused));
+
+/**
+ * @brief Initializes the Zobrist tables.
+ * 
+ * WARNING: Not used in practice since Polyglot's standard set of 781 random numbers is used instead.
+ */
 void InitZobrist();
 
+/**
+ * @brief Calculates the Zobrist hash of a board.
+ * 
+ * This includes:
+ * - Pieces on the board
+ * - Side to move
+ * - Castling rights
+ * - En passant square
+ * 
+ * @param board Pointer to the Board structure
+ * @return 64-bit Zobrist hash
+ */
 uint64_t CalculateZobristHash(const Board* board);
+
+/**
+ * @brief Convenience function to calculate a Zobrist hash directly from a FEN string.
+ * 
+ * @param fen Forsyth-Edwards Notation string
+ * @return 64-bit Zobrist hash
+ */
 static inline uint64_t CalculateZobristHashFen(const char* fen)
 {
     Board b;
@@ -526,30 +1008,42 @@ Bitboard KingMoveMask(Square square);
 
 // TODO: Make Move 16bits if an application is not found for the flags
 
+/**
+ * @brief Flags representing special move types.
+ */
 typedef enum {
-    FLAG_NORMAL = 0,
-    FLAG_CASTLING,
-    FLAG_ENPASSANT,
-    FLAG_PAWN_DOUBLE_MOVE,
-    FLAG_PROMOTION,
-    FLAG_PROMOTION_WITH_CAPTURE,
+    FLAG_NORMAL = 0,              ///< Regular move
+    FLAG_CASTLING,                ///< Castling move
+    FLAG_ENPASSANT,               ///< En passant capture
+    FLAG_PAWN_DOUBLE_MOVE,        ///< Initial two-square pawn push
+    FLAG_PROMOTION,               ///< Promotion without capture
+    FLAG_PROMOTION_WITH_CAPTURE   ///< Promotion with capture
 } Flag;
 
+/**
+ * @brief Types of piece promotions.
+ */
 typedef enum {
-    PROMOTION_NONE = 0,
+    PROMOTION_NONE = 0,           ///< No promotion
     PROMOTION_KNIGHT,
     PROMOTION_BISHOP,
     PROMOTION_ROOK,
-    PROMOTION_QUEEN,
+    PROMOTION_QUEEN
 } Promotion;
 
+/**
+ * @brief Bit flags representing castling rights.
+ */
 enum {
-    CASTLE_WHITE_KINGSIDE = 0b0001,
+    CASTLE_WHITE_KINGSIDE  = 0b0001,
     CASTLE_WHITE_QUEENSIDE = 0b0010,
-    CASTLE_BLACK_KINGSIDE = 0b0100,
-    CASTLE_BLACK_QUEENSIDE = 0b1000,
+    CASTLE_BLACK_KINGSIDE  = 0b0100,
+    CASTLE_BLACK_QUEENSIDE = 0b1000
 };
 
+/**
+ * @brief Used to store minimal board state when making a null move.
+ */
 typedef struct {
     PieceColor turn;
     int halfmoveClock;
@@ -557,171 +1051,508 @@ typedef struct {
     Square epSquare;
 } NullMoveState;
 
+/// Stores the state of the board before a null move is made
 extern NullMoveState nullState;
 
+/**
+ * @brief Encoded move type (bitfield). Format:
+ * - bits 0–5:   from square
+ * - bits 6–11:  to square
+ * - bits 12–14: promotion type
+ * - bits 15–17: move flag
+ */
 typedef uint32_t Move;
+
+/// Special constant representing no move
 #define NULL_MOVE ((Move) 0)
 
+/// Max number of moves in a move list
 #define MOVES_CAPACITY 256
+
+/**
+ * @brief Represents a dynamic list of moves.
+ */
 typedef struct {
     Move list[MOVES_CAPACITY];
     size_t count;
 } Moves;
+
+/// Empty move list constant
 #define NO_MOVES ((Moves){.count = 0})
+
+/**
+ * @brief Appends a move to a move list.
+ */
 void MovesAppend(Moves* moves, Move move);
+
+/**
+ * @brief Appends one move list to another.
+ */
 void MovesAppendList(Moves* dest, Moves src);
+
+/**
+ * @brief Combines two move lists into a new one.
+ */
 Moves MovesCombine(Moves m1, Moves m2);
 
-
+/**
+ * @brief Creates an Undo struct representing a move played on a board.
+ */
 Undo MakeUndo(const Board* board, Move move);
+
+/*-----------------------------------------------.
+| Piece-specific movement offsets (mailbox 0x88) |
+`-----------------------------------------------*/
 
 #define KNIGHT_OFFSETS_COUNT 8
 const static int KNIGHT_OFFSETS[] = {
     -17, -15, -10, -6, 6, 10, 15, 17
 };
+
 #define BISHOP_OFFSETS_COUNT 4
 const static int BISHOP_OFFSETS[] = {
     -9, -7, 7, 9
 };
+
 #define ROOK_OFFSETS_COUNT 4
 const static int ROOK_OFFSETS[] = {
     -8, -1, 1, 8
 };
+
 #define KING_OFFSETS_COUNT 8
 const static int KING_OFFSETS[] = {
     -9, -8, -7, -1, 1, 7, 8, 9
 };
 
-// Adds src, dst, promotion and flag withing the current scope
+/**
+ * @brief Decodes a move into its components (used inside a scope).
+ */
 #define MOVE_DECODE(move) \
     Square src, dst; \
     uint8_t promotion, flag; \
     MoveDecode(move, &src, &dst, &promotion, &flag)
 
+/*-----------------------------.
+| Move encoding/decoding/util  |
+`-----------------------------*/
 
+/**
+ * @brief Checks whether a move is legal and does not leave the king in check.
+ */
 _Bool MoveIsValid(const Board* board, Move move, PieceColor color);
+
+/**
+ * @brief Encodes a move from components into a 32-bit integer.
+ */
 Move MoveEncode(Square from, Square to, uint8_t promotion, uint8_t flag);
+
+/**
+ * @brief Encodes a move from algebraic names ("e2", "e4", etc.).
+ */
 Move MoveEncodeNames(const char* from, const char* to, uint8_t promotion, uint8_t flag);
+
+/**
+ * @brief Decodes a move into from-square, to-square, promotion, and flag.
+ */
 void MoveDecode(Move move, Square* from, Square* to, uint8_t* promotion, uint8_t* flag);
 
+/**
+ * @brief Sets the move flag field.
+ */
 void MoveSetFlag(Move* move, Flag flag);
+
+/**
+ * @brief Sets the promotion field in a move.
+ */
 void MoveSetPromotion(Move* move, Promotion promotion);
 
+/*-------------------------------.
+| Bitboard Move Application API  |
+`-------------------------------*/
+
+/**
+ * @brief Applies a move on a bitboard.
+ */
 Bitboard DoMove(Bitboard* current, Move move);
+
+/**
+ * @brief Undoes a move on a bitboard.
+ */
 Bitboard UndoMove(Bitboard* current, Move move);
 
+/*-----------------------------.
+| Full board move application  |
+`-----------------------------*/
+
+/**
+ * @brief Makes a move and updates board state accordingly.
+ */
 bool MakeMove(Board* board, Move move);
+
+/**
+ * @brief Unmakes the last move and restores previous board state.
+ */
 void UnmakeMove(Board* board);
 
+/**
+ * @brief Performs a null move (used in search algorithms).
+ */
 void MakeNullMove(Board* board);
+
+/**
+ * @brief Reverts a null move.
+ */
 void UnmakeNullMove(Board* board);
 
+/*-------------------------------.
+| Move-type specific helpers     |
+`-------------------------------*/
+
+/**
+ * @brief Executes castling move.
+ */
 bool Castle(Board* board, Move move);
+
+/**
+ * @brief Checks if a move is a castling move.
+ */
 bool IsCastle(const Board* board, Move* move);
+
+/**
+ * @brief Executes en passant capture.
+ */
 bool Enpassant(Board* board, Move move);
+
+/**
+ * @brief Checks if a move is an en passant capture.
+ */
 bool IsEnpassant(const Board* board, Move* move);
+
+/**
+ * @brief Checks if a move is a two-square pawn advance.
+ */
 bool IsDoublePawnPush(Board* board, Move move);
+
+/**
+ * @brief Checks if a move is a promotion.
+ */
 bool IsPromotion(Board* board, Move* move);
+
+/**
+ * @brief Checks if a move is a capture (regular or en passant).
+ */
 bool IsCapture(const Board* board, Move move);
+
+/**
+ * @brief Checks if executing a move leaves the king in check.
+ */
 bool IsInCheckAfterMove(Board *board, Move move);
 
+/**
+ * @brief Makes a move with full legality rules.
+ */
 _Bool MoveMake(Board* board, Move move);
+
+/**
+ * @brief Applies a move directly (ignores turn/check legality).
+ */
 void MoveFreely(Board* board, Move move, PieceColor color);
+
+/**
+ * @brief Prints a move to stdout in algebraic format.
+ */
 void MovePrint(Move move);
+
+/**
+ * @brief Converts an algebraic string (e.g., "e2e4") to a move.
+ */
 Move StringToMove(const char* str);
+
+/**
+ * @brief Converts a move to a string in algebraic format (e.g., "e2e4").
+ */
 void MoveToString(Move move, char* buffer);
 
+/*--------------------.
+| Move comparisons    |
+`--------------------*/
+
+/**
+ * @brief Compares two moves for equality (ignores metadata).
+ */
 bool MoveCmp(Move m1, Move m2);
+
+/**
+ * @brief Compares two moves strictly (includes metadata).
+ */
 bool MoveCmpStrict(Move m1, Move m2);
 
+/*--------------------.
+| Move field getters  |
+`--------------------*/
+
+/**
+ * @brief Gets the source square of a move.
+ */
 Square GetFrom(Move move);
+
+/**
+ * @brief Gets the destination square of a move.
+ */
 Square GetTo(Move move);
+
+/**
+ * @brief Gets the promotion type of a move.
+ */
 uint8_t GetPromotion(Move move);
+
+/**
+ * @brief Gets the move flag.
+ */
 uint8_t GetFlag(Move move);
 
+/*----------------------------.
+| Board state update helpers  |
+`----------------------------*/
 
+/**
+ * @brief Updates the 50-move counter based on the move.
+ */
 void UpdateHalfmove(Board* board, Move move, size_t piece_count_before, size_t piece_count_after, char piece);
+
+/**
+ * @brief Updates castling rights after a move.
+ */
 uint8_t UpdateCastlingRights(Board* board, Move move);
+
+/**
+ * @brief Updates en passant target square.
+ */
 Square UpdateEnpassantSquare(Board* board, Move move);
 
+/*-------------------------.
+| Bitboard-Move conversion |
+`-------------------------*/
+
+/**
+ * @brief Converts a bitboard of destinations to move list from a source square.
+ */
 Moves BitboardToMoves(Bitboard bitboard, Square from);
+
+/**
+ * @brief Converts a move list to a bitboard of destinations.
+ */
 Bitboard MovesToBitboard(Moves moves);
 
+/*-------------------------.
+| Board Debugging Helpers  |
+`-------------------------*/
+
+/**
+ * @brief Prints a move on a board (highlighted view).
+ */
 void BoardPrintMove(const Board* board, Move move);
-#define MOVE_PRINT(move) MovePrint(move);
+
+/// Debug macro alias for MovePrint
+#define MOVE_PRINT(move) MovePrint(move)
 
 
 /*------------------------------------.
 | *PIECE*                             |
-| ----------------------------------- |
-|                                     |
+|-------------------------------------|
+| Piece abstraction and utilities     |
 `------------------------------------*/
 
+/**
+ * @brief Represents a chess piece.
+ * 
+ * Each piece is defined by a type (character) and a color.
+ * - Uppercase letters: white pieces (e.g., 'P', 'N')
+ * - Lowercase letters: black pieces (e.g., 'p', 'n')
+ */
 typedef struct {
-    char type;
-    PieceColor color;
+    char type;         ///< Character representing the piece ('P', 'n', etc.)
+    PieceColor color;  ///< COLOR_WHITE or COLOR_BLACK
 } Piece;
 
+/**
+ * @brief Prints the contents of a Piece struct (for debugging).
+ */
 #define PIECE_PRINT(piece)\
     printf("%s = {.type=%c, .color=%d}\n", #piece, piece.type, piece.color)
 
+/*------------------------------.
+| Piece type identification     |
+`------------------------------*/
 
+/**
+ * @brief Checks if a piece is a pawn.
+ */
 #define IS_PAWN(piece) \
     (tolower(piece.type) == 'p')
+
+/**
+ * @brief Checks if a piece is a knight.
+ */
 #define IS_KNIGHT(piece) \
     (tolower(piece.type) == 'n')
+
+/**
+ * @brief Checks if a piece is a bishop.
+ */
 #define IS_BISHOP(piece) \
     (tolower(piece.type) == 'b')
+
+/**
+ * @brief Checks if a piece is a rook.
+ */
 #define IS_ROOK(piece) \
     (tolower(piece.type) == 'r')
+
+/**
+ * @brief Checks if a piece is a queen.
+ */
 #define IS_QUEEN(piece) \
     (tolower(piece.type) == 'q')
+
+/**
+ * @brief Checks if a piece is a king.
+ */
 #define IS_KING(piece) \
     (tolower(piece.type) == 'k')
+
+/**
+ * @brief Checks if a piece has a given color.
+ */
 #define IS_COLOR(piece, c) \
     (piece.color == c)
+
+/**
+ * @brief Checks if a piece is white.
+ */
 #define IS_WHITE(piece) \
     IS_COLOR(piece, COLOR_WHITE)
+
+/**
+ * @brief Checks if a piece is black.
+ */
 #define IS_BLACK(piece) \
     IS_COLOR(piece, COLOR_BLACK)
 
+/*------------------------------.
+| Piece utility functions       |
+`------------------------------*/
 
+/**
+ * @brief Gets the color of a piece given its character representation.
+ * 
+ * @param piece The character representing a piece
+ * @return COLOR_WHITE, COLOR_BLACK, or COLOR_NONE
+ */
 int GetPieceColor(char piece);
+
+/**
+ * @brief Returns the Piece located at a specific square on the board.
+ * 
+ * @param board Pointer to the board
+ * @param square Square index (0–63)
+ * @return Piece struct representing the piece at that square
+ */
 Piece PieceAt(const Board* board, Square square);
+
+/**
+ * @brief Compares two Piece structs for type and color equality.
+ * 
+ * @param p1 First piece
+ * @param p2 Second piece
+ * @return true if both pieces are the same type and color
+ */
 bool PieceCmp(Piece p1, Piece p2);
 
 /*------------------------------------.
 | *NOTATION*                          |
-| ----------------------------------- |
-|                                     |
+|-------------------------------------|
+| Handles FEN/PGN I/O and SAN parsing |
 `------------------------------------*/
 
+/*-------------.
+| FEN Support  |
+`-------------*/
+
+/**
+ * @brief Imports a FEN string into a board.
+ * 
+ * Sets up position, castling rights, side to move, en passant, etc.
+ * 
+ * @param board Pointer to the board to initialize
+ * @param fen FEN string
+ */
 void FenImport(Board* board, const char* fen);
+
+/**
+ * @brief Exports the current board state to a FEN string.
+ * 
+ * @param board Board to serialize
+ * @param fen Output buffer (must be large enough)
+ */
 void FenExport(const Board* board, char fen[]);
 
+/**
+ * @brief Maximum length for PGN header fields (Event, Site, etc.)
+ */
 #define MAX_HEADER_LENGTH 256
 
+/*-----------------.
+| SAN and PGN I/O  |
+`-----------------*/
 
+/**
+ * @brief Represents a move in Standard Algebraic Notation (e.g., "e4", "Nf3").
+ */
 typedef struct {
-    char move[16];  // For example, "e4", "Nf3"
+    char move[16];
 } SanMove;
 
+/**
+ * @brief PGN/notation-based game format.
+ * 
+ * Stores metadata and the list of SAN moves.
+ */
 typedef struct {
-    char event[MAX_HEADER_LENGTH];
-    char site[MAX_HEADER_LENGTH];
-    char date[MAX_HEADER_LENGTH];
-    char white[MAX_HEADER_LENGTH];
-    char black[MAX_HEADER_LENGTH];
-    char result[MAX_HEADER_LENGTH];
-    char fen[MAX_HEADER_LENGTH];
-    SanMove moves[MAX_MOVES];
-    size_t move_count;
+    char event[MAX_HEADER_LENGTH];   ///< Event name
+    char site[MAX_HEADER_LENGTH];    ///< Site/location
+    char date[MAX_HEADER_LENGTH];    ///< Date of game
+    char white[MAX_HEADER_LENGTH];   ///< White player name
+    char black[MAX_HEADER_LENGTH];   ///< Black player name
+    char result[MAX_HEADER_LENGTH];  ///< Result string (e.g., "1-0")
+    char fen[MAX_HEADER_LENGTH];     ///< Initial FEN position (optional)
+    SanMove moves[MAX_MOVES];        ///< List of SAN moves
+    size_t move_count;               ///< Number of moves made
 } Game;
 
+/**
+ * @brief Parses a SAN move and applies it to the board and game state.
+ * 
+ * @param board Current board
+ * @param game Game context
+ * @param move_str SAN move string (e.g., "e4", "O-O")
+ * @return true on success
+ */
 bool move_name(const Board* board, Game* game, const char* move_str);
+
+/**
+ * @brief Shorthand for move_name(board, game, move)
+ */
 #define MOVE(board, game, move) \
         move_name(board, game, move)
 
+/*------------------------.
+| Game metadata handling  |
+`------------------------*/
+
+/**
+ * @brief Initializes a Game object with basic metadata and FEN.
+ */
 void GameInit(Game* game, 
     const char* event,
     const char* site,
@@ -730,9 +1561,24 @@ void GameInit(Game* game,
     const char* fen
 );
 
+/**
+ * @brief Runs a game move-by-move, showing each updated board (for debugging/visualization).
+ */
 void GameRun(Game game);
+
+/**
+ * @brief Prints the full PGN representation of a game.
+ */
 void GamePrint(Game game);
+
+/**
+ * @brief Appends a SAN move to the game.
+ */
 void GameAddMove(Game* game, SanMove move);
+
+/**
+ * @brief Setters for PGN metadata fields.
+ */
 void GameSetEvent(Game* game, const char* event);
 void GameSetSite(Game* game, const char* site);
 void GameSetDate(Game* game, const char* date);
@@ -741,31 +1587,68 @@ void GameSetBlack(Game* game, const char* black);
 void GameSetFen(Game* game, const char* fen);
 void GameSetResult(Game* game, const char* result);
 
+/*--------------------------.
+| PGN Import/Export Support |
+`--------------------------*/
+
+/**
+ * @brief Parses a PGN string and populates the game object.
+ */
 void PgnImport(Game* game, const char* pgn);
+
+/**
+ * @brief Serializes a Game to PGN format.
+ */
 void PgnExport(Game* game, char* pgn);
+
+/**
+ * @brief Saves a PGN game to a file.
+ */
 void PgnExportFile(Game* game, const char* path);
 
+/*-----------------------------.
+| SAN <-> Move conversions     |
+`-----------------------------*/
+
+/**
+ * @brief Converts a Move to a SAN notation string (e.g., "Nf3", "O-O").
+ */
 void Notate(Board* board, Move move, SanMove* san);
+
+/**
+ * @brief Converts a SAN move to an internal Move.
+ */
 Move SanToMove(Board* board, SanMove san);
 
 
 /*------------------------------------.
 | *RESULT*                            |
-| ----------------------------------- |
-|                                     |
+|-------------------------------------|
+| Game termination and result logic   |
 `------------------------------------*/
 
+/**
+ * @brief Enumeration of possible game outcomes.
+ */
 typedef enum {
-    RESULT_NONE = 0,
-    RESULT_WHITE_WON,
-    RESULT_BLACK_WON,
-    RESULT_STALEMATE,
-    RESULT_DRAW_BY_REPETITION,
-    RESULT_DRAW_DUE_TO_INSUFFICIENT_MATERIAL,
-    RESULT_DRAW_DUE_TO_50_MOVE_RULE,
-    RESULT_COUNT
-} Result ;
+    RESULT_NONE = 0,                               ///< Game is still ongoing
+    RESULT_WHITE_WON,                              ///< White won by checkmate or resignation
+    RESULT_BLACK_WON,                              ///< Black won by checkmate or resignation
+    RESULT_STALEMATE,                              ///< Game ended in stalemate
+    RESULT_DRAW_BY_REPETITION,                     ///< Game drawn by threefold repetition
+    RESULT_DRAW_DUE_TO_INSUFFICIENT_MATERIAL,      ///< Draw due to insufficient mating material
+    RESULT_DRAW_DUE_TO_50_MOVE_RULE,               ///< Draw due to 50-move rule (no pawn move or capture)
+    RESULT_COUNT                                    ///< Internal count for range checking
+} Result;
 
+/**
+ * @brief String representations of results for PGN output.
+ * 
+ * Matches the Result enum index:
+ * - "*" for ongoing
+ * - "1-0", "0-1" for wins
+ * - "1/2-1/2" for all draws
+ */
 static const char result_score[][8] = {
     "*",
     "1-0",
@@ -775,6 +1658,12 @@ static const char result_score[][8] = {
     "1/2-1/2",
     "1/2-1/2"
 };
+
+/**
+ * @brief Human-readable messages describing the result.
+ * 
+ * Matches the Result enum index.
+ */
 static const char result_message[][256] = {
     "No result yet",
     "White won",
@@ -785,37 +1674,119 @@ static const char result_message[][256] = {
     "Draw due to 50 move rule"
 };
 
+/*-----------------------------.
+| Result Detection Functions   |
+`-----------------------------*/
+
+/**
+ * @brief Determines the current result of the game.
+ * 
+ * Checks for checkmate, stalemate, 3-fold repetition, 50-move rule, or insufficient material.
+ * 
+ * @param board Current board state
+ * @return Corresponding Result enum
+ */
 Result IsResult(Board* board);
+
+/**
+ * @brief Determines if the current position is checkmate.
+ * 
+ * @param board Pointer to the board
+ * @return true if checkmate
+ */
 bool IsCheckmate(const Board* board);
+
+/**
+ * @brief Determines if the current position is stalemate.
+ * 
+ * @param board Pointer to the board
+ * @return true if stalemate
+ */
 bool IsStalemate(const Board* board);
+
+/**
+ * @brief Checks if neither player has sufficient material to checkmate.
+ * 
+ * Includes cases like:
+ * - King vs King
+ * - King and Bishop vs King
+ * - King and Knight vs King
+ * 
+ * @param board Pointer to the board
+ * @return true if the game should be drawn due to insufficient material
+ */
 bool IsInsufficientMaterial(const Board* board);
+
+/**
+ * @brief Determines if the current position has occurred three times (3-fold repetition).
+ * 
+ * Uses the board's `History` and `HashTable` to detect repeated positions.
+ * 
+ * @param board Pointer to the board
+ * @return true if position repeated three times
+ */
 bool IsThreefoldRepetition(Board* board);
 
 /*------------------------------------.
 | *MOVEGEN*                           |
-| ----------------------------------- |
-|                                     |
+|-------------------------------------|
+| Move generation for legal and       |
+| pseudo-legal moves in the engine    |
 `------------------------------------*/
 
+/**
+ * @brief Enumeration of move types to control legality enforcement.
+ */
 typedef enum {
-    MOVE_LEGAL,        // A fully legal move after legality checks
-    MOVE_PSEUDO,       // A pseudo-legal move (ignores check legality)
+    MOVE_LEGAL,   ///< Fully legal moves that leave the king safe
+    MOVE_PSEUDO   ///< Pseudo-legal moves, ignoring king safety
 } MoveType;
 
-/*** Pseudo-Legal Moves ***/
+/*-----------------------------.
+| Pseudo-Legal Move Generation |
+`-----------------------------*/
 
+/**
+ * @brief Generates all pseudo-legal moves for the current position.
+ * 
+ * Includes moves that may leave the king in check.
+ */
 Moves GeneratePseudoLegalMoves(const Board* board);
+
+/**
+ * @brief Generates a bitboard representing all pseudo-legal moves.
+ */
 Bitboard GeneratePseudoLegalMovesBitboard(const Board* board);
 
+/**
+ * @brief Pseudo-legal push moves for pawns.
+ */
 Bitboard GeneratePseudoLegalPawnMoves(Bitboard pawns, Bitboard enemy, PieceColor color);
+
+/**
+ * @brief Pseudo-legal pawn attacks.
+ * 
+ * If `strict` is true, diagonal movement is restricted to squares with capturable enemies.
+ */
 Bitboard GeneratePseudoLegalPawnAttacks(Bitboard pawns, Bitboard enemy, PieceColor color, bool strict);
+
+/**
+ * @brief Pseudo-legal attacks for specific pieces.
+ */
 Bitboard GeneratePseudoLegalKnightAttacks(Bitboard knights, Bitboard empty, Bitboard enemy);
 Bitboard GeneratePseudoLegalBishopAttacks(Bitboard bishops, Bitboard empty, Bitboard enemy);
 Bitboard GeneratePseudoLegalRookAttacks(Bitboard rooks, Bitboard empty, Bitboard enemy);
 Bitboard GeneratePseudoLegalQueenAttacks(Bitboard queens, Bitboard empty, Bitboard enemy);
 Bitboard GeneratePseudoLegalKingAttacks(Bitboard kings, Bitboard empty, Bitboard enemy);
+
+/**
+ * @brief Generates all pseudo-legal attacks for a given color.
+ */
 Bitboard GeneratePseudoLegalAttacks(const Board* board, PieceColor color);
 
+/**
+ * @brief Generates potential moves for a single piece square.
+ */
 Bitboard GeneratePawnMoves(const Board* board, Square piece, PieceColor color);
 Bitboard GenerateKnightMoves(const Board* board, Square piece, PieceColor color);
 Bitboard GenerateBishopMoves(const Board* board, Square piece, PieceColor color);
@@ -823,14 +1794,33 @@ Bitboard GenerateRookMoves(const Board* board, Square piece, PieceColor color);
 Bitboard GenerateQueenMoves(const Board* board, Square piece, PieceColor color);
 Bitboard GenerateKingMoves(const Board* board, Square piece, PieceColor color);
 
-/*** Legal Moves ***/
+/*------------------------.
+| Legal Move Generation   |
+`------------------------*/
 
+/**
+ * @brief Returns whether a move is fully legal (doesn't leave the king in check).
+ */
 bool IsLegal(const Board* board, Move move);
 
+/**
+ * @brief Generates all legal moves for the current board position.
+ */
 Moves GenerateLegalMoves(const Board* board);
+
+/**
+ * @brief Generates legal moves that originate from a specific square.
+ */
 Moves GenerateLegalMovesSquare(const Board* board, Square square);
+
+/**
+ * @brief Returns a bitboard of all legal destination squares.
+ */
 Bitboard GenerateLegalMovesBitboard(const Board* board);
 
+/**
+ * @brief Generates legal moves for piece sets by type.
+ */
 Moves GenerateLegalPawnMoves(const Board* board, Bitboard pieces, PieceColor color);
 Moves GenerateLegalKnightMoves(const Board* board, Bitboard pieces, PieceColor color);
 Moves GenerateLegalBishopMoves(const Board* board, Bitboard pieces, PieceColor color);
@@ -838,6 +1828,17 @@ Moves GenerateLegalRookMoves(const Board* board, Bitboard pieces, PieceColor col
 Moves GenerateLegalQueenMoves(const Board* board, Bitboard pieces, PieceColor color);
 Moves GenerateLegalKingMoves(const Board* board, Bitboard pieces, PieceColor color);
 
+/*---------------------------------------------.
+| Convenience inline dispatcher for move types |
+`---------------------------------------------*/
+
+/**
+ * @brief Dispatches to legal or pseudo-legal move generation.
+ * 
+ * @param board The board to generate moves from
+ * @param type MOVE_LEGAL or MOVE_PSEUDO
+ * @return Moves struct containing the resulting moves
+ */
 static inline Moves GenerateMoves(const Board* board, MoveType type)
 {
     switch (type) {
@@ -858,7 +1859,7 @@ static inline Moves GenerateMoves(const Board* board, MoveType type)
 
 typedef unsigned long long u64;
 
-// https://www.chessprogramming.org/Perft
+// NOTE: See https://www.chessprogramming.org/Perft
 static inline u64 Perft(Board* board, int depth, bool root)
 {
     uint64_t cnt = 0, nodes = 0;
@@ -903,7 +1904,7 @@ typedef struct {
     uint32_t learn;
 } PolyglotEntry;
 
-// See: http://hgm.nubati.net/book_format.html
+// NOTE: See http://hgm.nubati.net/book_format.html
 #ifdef _MSC_VER
 #  define U64(u) (u##ui64)
 #else
@@ -1136,7 +2137,8 @@ static const uint64_t Random64[781] = {
 /**
  * Converts polyglot's 16bit format to my 32bit one
  */
-static inline Move ConvertMove(uint16_t polyglotMove) {
+static inline Move ConvertMove(uint16_t polyglotMove)
+{
     int to_file = (polyglotMove >> 0) & 0b111;  // Bits 0-2
     int to_rank = (polyglotMove >> 3) & 0b111;  // Bits 3-5
     int from_file = (polyglotMove >> 6) & 0b111; // Bits 6-8
