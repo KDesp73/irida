@@ -15,7 +15,7 @@ pub const Searcher = struct {
     max_millis: u64 = 0,
     ideal_time: u64 = 0,
     force_thinking: bool = false,
-    iterative_deepening_depth: usize = 4,
+    iterative_deepening_depth: usize = 6,
     timer: std.time.Timer = undefined,
 
     soft_max_nodes: ?u64 = null,

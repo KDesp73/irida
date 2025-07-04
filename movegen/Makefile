@@ -9,7 +9,7 @@ A_NAME       = lib$(LIBRARY_NAME).a
 TEST_DIR = test
 
 # Flags
-INCLUDE = -Iinclude -I../deps/include
+INCLUDE = -Isrc -Iextern
 CFLAGS  = -Wall $(INCLUDE) -fPIC
 LDFLAGS =
 

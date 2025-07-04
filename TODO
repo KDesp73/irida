@@ -1,6 +1,9 @@
-TODO: performance optimization
 TODO: syzygy tablebase
 TODO: pick a license
+TODO: nnue evaluation
+TODO: transposition tables
+TODO: aspiration windows
+TODO: pick a name
 DONE: tests
 DONE: move generation
 DONE: perft testing
