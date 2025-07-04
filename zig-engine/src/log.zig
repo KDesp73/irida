@@ -31,8 +31,8 @@ pub fn bestmove(best: []const u8, ponder: ?[]const u8) void {
     const w = std.io.getStdOut().writer();
 
     if (ponder) |p| {
-        w.print("bestmove {s} ponder {s}", .{ best, p }) catch return;
+        w.print("bestmove {s} ponder {s}\n", .{ best, p }) catch return;
     } else {
-        w.print("bestmove {s}", .{ best }) catch return;
+        w.print("bestmove {s}\n", .{ best }) catch return;
     }
 }

@@ -216,7 +216,6 @@ Move StringToMove(const char* str)
         flag = FLAG_PROMOTION;
     }
 
-    printf("here\n");
     return MoveEncode(from, to, promotion, flag);
 }
 

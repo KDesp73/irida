@@ -193,20 +193,28 @@ pub const Uci = struct {
     }
 
     pub fn run(self: *Uci) !void {
-        var buf: []u8 = try self.allocator.alloc(u8, 256);
-        defer self.allocator.free(buf);
-        var rdr = std.io.getStdIn().reader();
+        var stdin = std.io.getStdIn().reader();
 
         // TODO: welcome message
-
+        
         while (self.status != .quit) {
-            const n = try rdr.read(buf);
-            if (n == 0) break;
+            const line = try stdin.readUntilDelimiterOrEofAlloc(self.allocator, '\n', 16384);
 
-            self.last_command = buf[0..n];
-            self.handle(self.last_command) catch |err| switch (err) {
+            if (line == null) {
+                break;
+            }
+
+            const tline = std.mem.trim(u8, line.?, "\r");
+
+            self.handle(tline) catch |err| switch (err) {
+                error.NoCommand => {
+                    log.info("No command found", .{});
+                },
+                error.UnknownCommand => {
+                    log.info("Unknown command", .{});
+                },
                 error.BadCommand => {
-                    log.info("Invalid command", .{});
+                    log.info("Bad command", .{});
                 },
                 error.OutOfMemory => {
                     log.info("Not enough memory", .{});
@@ -215,38 +223,41 @@ pub const Uci = struct {
         }
     }
 
-    fn handle(self: *Uci, input: []u8) !void {
-        if(std.mem.startsWith(u8, input, "debug")) {
-            try self.debug();
-        } else if(std.mem.startsWith(u8, input, "D")) {
-            self.display();
-        } else if(std.mem.startsWith(u8, input, "ucinewgame")) {
-            try self.ucinewgame();
-        } else if(std.mem.startsWith(u8, input, "go")) {
-            try self.go();
-        } else if(std.mem.startsWith(u8, input, "isready")) {
-            try self.isready();
-        } else if(std.mem.startsWith(u8, input, "position")) {
-            try self.position();
-        } else if(std.mem.startsWith(u8, input, "quit")) {
-            try self.quit();
-        } else if(std.mem.startsWith(u8, input, "setoption")){
-            try self.setoption();
-        } else if(std.mem.startsWith(u8, input, "uci")){
-            try self.uci();
-        } else if(std.mem.startsWith(u8, input, "stop")){
-            try self.stop();
+    fn handle(self: *Uci, input: []const u8) !void {
+        var tokens = std.mem.splitScalar(u8, input, ' ');
+
+        const token_opt = tokens.next();
+        if (token_opt) |token| {
+            if (std.mem.eql(u8, token, "debug")) {
+                try self.debug(&tokens);
+            } else if (std.mem.eql(u8, token, "d")) {
+                self.display();
+            } else if (std.mem.eql(u8, token, "ucinewgame")) {
+                try self.ucinewgame();
+            } else if (std.mem.eql(u8, token, "go")) {
+                try self.go();
+            } else if (std.mem.eql(u8, token, "isready")) {
+                try self.isready();
+            } else if (std.mem.eql(u8, token, "position")) {
+                try self.position(&tokens);
+            } else if (std.mem.eql(u8, token, "quit")) {
+                try self.quit();
+            } else if (std.mem.eql(u8, token, "setoption")) {
+                try self.setoption(&tokens);
+            } else if (std.mem.eql(u8, token, "uci")) {
+                try self.uci();
+            } else if (std.mem.eql(u8, token, "stop")) {
+                try self.stop();
+            } else {
+                return error.UnknownCommand;
+            }
+        } else {
+            return error.NoCommand;
         }
-    } 
+    }
 
-    fn debug(self: *Uci) !void {
-        var it = std.mem.splitScalar(u8, self.last_command, ' ');
-
-        const cmd = it.next() orelse return error.BadCommand;
-        if (!std.mem.eql(u8, cmd, "debug"))
-            return error.BadCommand;
-
-        var arg = it.next() orelse {
+    fn debug(self: *Uci, tokens: anytype) !void {
+        var arg = tokens.next() orelse {
             log.info("debug is currently {s}\n",
                 .{ if (self.debug_mode) "on" else "off" });
             return;
@@ -277,8 +288,9 @@ pub const Uci = struct {
         self.status = .quit;
     }
 
-    fn setoption(self: *Uci) !void {
+    fn setoption(self: *Uci, tokens: anytype) !void {
         _ = self;
+        _ = tokens;
     }
 
     fn go(self: *Uci) !void {
@@ -286,53 +298,39 @@ pub const Uci = struct {
         log.bestmove("e2e4", null);
     }
 
-    fn position(self: *Uci) !void {
-        var fen_buf: [128:0]u8 = .{0} ** 128;
-        var moves_slice: []const u8 = &[_]u8{};
-        const line = self.last_command;
+    fn position(self: *Uci, tokens: anytype) !void {
+        var fen_builder = std.ArrayList(u8).init(self.allocator);
+        defer fen_builder.deinit();
 
-        if (std.mem.startsWith(u8, line, "position startpos")) {
-            _ = std.mem.copyForwards(u8, &fen_buf, c.STARTING_FEN[0..]);
+        if (tokens.next()) |token| {
+            if (std.mem.eql(u8, token, "startpos")) {
+                try fen_builder.appendSlice(c.STARTING_FEN);
+            } else if (std.mem.eql(u8, token, "fen")) {
+                while (tokens.next()) |t| {
+                    if (std.mem.eql(u8, t, "moves")) break;
 
-            if (std.mem.indexOf(u8, line, "moves")) |idx| {
-                moves_slice = line[idx + "moves".len + 1 ..];
+                    try fen_builder.append(' ');
+                    try fen_builder.appendSlice(t);
+                }
             }
-        } else if (std.mem.startsWith(u8, line, "position fen ")) {
-            const fen_start = line["position fen ".len ..];
-
-            const moves_idx = std.mem.indexOf(u8, fen_start, " moves ");
-            const fen_part = if (moves_idx != null and moves_idx.? != 0) fen_start[0 .. moves_idx.?] else fen_start;
-
-            const copy_len = if(fen_part.len < fen_buf.len - 1) fen_part.len else fen_buf.len - 1;
-            _ = std.mem.copyForwards(u8, fen_buf[0..copy_len], fen_part[0..copy_len]);
-
-            if (moves_idx != null and moves_idx != 0) {
-                moves_slice = fen_start[moves_idx.? + " moves ".len ..];
-            }
-        } else {
-            log.info("string Invalid position command", .{});
-            return;
         }
 
-        _ = std.mem.copyForwards(u8, self.start_position_fen[0 .. fen_buf.len - 1],
-            fen_buf[0 .. fen_buf.len - 1]);
-        c.BoardInitFen(&self.board, &self.start_position_fen);
+        const fen = try fen_builder.toOwnedSlice();
+        defer self.allocator.free(fen);
 
-        if (moves_slice.len != 0) {
-            var tokenizer = std.mem.splitScalar(u8, moves_slice, ' ');
-            while (tokenizer.next()) |tok| {
-                if (tok.len == 0) continue;
+        while(tokens.next()) |token| {
+            if(token.len == 0) break;
+            if(std.mem.eql(u8, token, "moves")) continue;
 
-                var move_buf: [9:0]u8 = undefined;          // 8 bytes + sentinel
-                const n = if(tok.len < move_buf.len - 1) tok.len else move_buf.len - 1;
-                std.mem.copyForwards(u8, move_buf[0..n], tok[0..n]);
-                move_buf[n] = 0;                            // NULL‑terminate
+            var move_buf: [9:0]u8 = undefined;          // 8 bytes + sentinel
+            const n = if(token.len < move_buf.len - 1) token.len else move_buf.len - 1;
+            std.mem.copyForwards(u8, move_buf[0..n], token[0..n]);
+            move_buf[n] = 0;                            // NULL‑terminate
 
-                const move: c.Move = c.StringToMove(&move_buf);
-                if (!c.MakeMove(&self.board, move)) {
-                    log.info("string Illegal move in position: {s}", .{ tok });
-                    break;
-                }
+            const move: c.Move = c.StringToMove(&move_buf);
+            if (!c.MakeMove(&self.board, move)) {
+                log.info("string Illegal move in position: {s}", .{ token });
+                break;
             }
         }
     }
@@ -359,7 +357,7 @@ pub const Uci = struct {
     fn ucinewgame(self: *Uci) !void {
         self.deinit();
         self.* = try Uci.init(self.allocator);
-        // log.info("New game started.", .{});
+        log.info("New game started.", .{});
     }
 };
 
