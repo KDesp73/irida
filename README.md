@@ -1,6 +1,6 @@
-# ⚔️ Chess Engine Project
+# Chess Engine Project
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 
@@ -15,16 +15,16 @@ chess-engine/
 
 ````
 
-## 🚀 Quick Start
+## Quick Start
 
-### 🔧 Prerequisites
+### Prerequisites
 
 - `gcc` with support for `-fsanitize`
 - `make`
 - `bear` (optional, for generating `compile_commands.json`)
 - Linux (tested), but should be portable with adjustments
 
-### 🛠 Building the Project
+### Building the Project
 
 To build everything (engine, libraries, and tests):
 
@@ -32,7 +32,7 @@ To build everything (engine, libraries, and tests):
 make all -j3
 ````
 
-### ⚙️ Build Types
+### Build Types
 
 You can choose between `DEBUG` and `RELEASE` build types:
 
@@ -43,7 +43,7 @@ make -C engine type=RELEASE
 
 Defaults to `DEBUG` if unspecified.
 
-### 🧪 Running Tests
+### Running Tests
 
 To run tests for each module:
 
@@ -54,13 +54,13 @@ make test_*
 > Data-driven testing handled by
 > [IncludeOnly/test.h](https://github.com/KDesp73/IncludeOnly/blob/main/libs/test.h).
 
-## 🧠 Features
+## Features
 
-* ✅ **Correct Move Generation** — handles all legal chess moves
-* ⚙️ **Modular Architecture** — `movegen` is a standalone library
-* 🧪 **Testable Components** — every module is independently testable
-* 🧠 **Evaluation** — early-stage evaluation with potential for learning-based scoring
-* 📦 **Static/Shared Libraries** — both are supported for reuse and embedding
+* **Correct Move Generation** — handles all legal chess moves
+* **Modular Architecture** — `movegen` is a standalone library
+* **Testable Components** — every module is independently testable
+* **Evaluation** — early-stage evaluation with potential for learning-based scoring
+* **Static/Shared Libraries** — both are supported for reuse and embedding
 
 ---
 

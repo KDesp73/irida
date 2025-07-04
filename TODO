@@ -1,9 +1,6 @@
 TODO: performance optimization
-TODO: search function iterations
-TODO: evaluation function iterations
 TODO: syzygy tablebase
 TODO: pick a license
-TODO: movegen documentation
 DONE: tests
 DONE: move generation
 DONE: perft testing
@@ -13,3 +10,4 @@ DONE: replace Zobrist hashing keys with polyglot's predefined ones
 DONE: book moves database
 DONE: refactor move generation into its own library
 DONE: move ordering
+DONE: movegen documentation

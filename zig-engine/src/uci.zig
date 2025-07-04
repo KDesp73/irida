@@ -1,5 +1,9 @@
 const std = @import("std");
 const log = @import("log.zig");
+const engine = @import("engine.zig");
+const eval = @import("eval.zig");
+const search = @import("search.zig");
+const cutils = @import("cutils.zig");
 
 const c = @cImport({
     @cInclude("castro.h");
@@ -113,6 +117,8 @@ pub const Uci = struct {
     board              : c.Board = undefined,
     allocator          : std.mem.Allocator,
 
+    searcher: search.Searcher = undefined,
+
     pub fn init(alloc: std.mem.Allocator) !Uci {
         var self = Uci{
             .allocator = alloc,
@@ -124,6 +130,8 @@ pub const Uci = struct {
             .last_command = "",
         };
 
+        self.searcher = try search.Searcher.init(alloc);
+
         std.mem.copyForwards(u8, self.start_position_fen[0..], c.STARTING_FEN[0..]);
         c.BoardInitFen(&self.board, &self.start_position_fen);
         try self.populateOptions();
@@ -132,6 +140,7 @@ pub const Uci = struct {
 
     pub fn deinit(self: *Uci) void {
         self.uci_options.deinit();
+        self.searcher.deinit();
     }
 
     fn populateOptions(self: *Uci) !void {
@@ -195,7 +204,7 @@ pub const Uci = struct {
     pub fn run(self: *Uci) !void {
         var stdin = std.io.getStdIn().reader();
 
-        // TODO: welcome message
+        try engine.Engine.welcome();
         
         while (self.status != .quit) {
             const line = try stdin.readUntilDelimiterOrEofAlloc(self.allocator, '\n', 16384);
@@ -218,6 +227,9 @@ pub const Uci = struct {
                 },
                 error.OutOfMemory => {
                     log.info("Not enough memory", .{});
+                },
+                error.TimerUnsupported => {
+                    log.info("Unsupported timer", .{});
                 }
             };
         }
@@ -294,8 +306,17 @@ pub const Uci = struct {
     }
 
     fn go(self: *Uci) !void {
-        _ = self;
-        log.bestmove("e2e4", null);
+        try self.searcher.run(&self.board);
+
+        const move   = self.searcher.best_move;
+        const buf    = try self.allocator.alloc(u8, 6); // 5 chars + NUL
+        defer self.allocator.free(buf);
+
+        c.MoveToString(move, @as([*c]u8, @ptrCast(buf.ptr)));
+
+        const move_str = std.mem.sliceTo(buf, 0);
+
+        log.bestmove(move_str, null);
     }
 
     fn position(self: *Uci, tokens: anytype) !void {
@@ -318,6 +339,13 @@ pub const Uci = struct {
         const fen = try fen_builder.toOwnedSlice();
         defer self.allocator.free(fen);
 
+        var fen_with_null: [256]u8 = undefined;
+        const fen_len = fen.len;
+        std.mem.copyForwards(u8, fen_with_null[0..fen_len], fen);
+        fen_with_null[fen_len] = 0; // null terminator
+
+        c.BoardInitFen(&self.board, &fen_with_null);
+
         while(tokens.next()) |token| {
             if(token.len == 0) break;
             if(std.mem.eql(u8, token, "moves")) continue;
@@ -336,15 +364,15 @@ pub const Uci = struct {
     }
 
     fn stop(self: *Uci) !void {
-        self.status = .stopped;
+        self.searcher.stop = true;
         log.info("Calculation stopped.", .{});
     }
 
     fn uci(self: *Uci) !void {
         self.uci_mode = true;
 
-        log.id("name", "engine");
-        log.id("author", "KDesp73");
+        log.id("name", engine.Engine.name);
+        log.id("author", engine.Engine.author);
 
         var it = self.uci_options.iterator();
         while (it.next()) |entry| {
@@ -357,7 +385,7 @@ pub const Uci = struct {
     fn ucinewgame(self: *Uci) !void {
         self.deinit();
         self.* = try Uci.init(self.allocator);
-        log.info("New game started.", .{});
+        // log.info("New game started.", .{});
     }
 };
 
