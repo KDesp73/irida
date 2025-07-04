@@ -1,2 +1,2 @@
-engine
-libengine.*
+.zig-cache
+zig-out
