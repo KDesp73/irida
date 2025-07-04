@@ -11,8 +11,8 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    exe.addIncludePath(b.path("../movegen/include/"));
-    exe.addObjectFile(b.path("../movegen/libcastro.a"));
+    exe.addIncludePath(b.path("../castro/src/"));
+    exe.addObjectFile(b.path("../castro/libcastro.a"));
     exe.linkLibC();
 
     b.installArtifact(exe);
