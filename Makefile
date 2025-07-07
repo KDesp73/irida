@@ -1,3 +1,4 @@
+include common.mk
 .DEFAULT_GOAL := help
 
 SUBDIRS := castro engine
@@ -15,6 +16,7 @@ clean: ## Clean every project
 		echo "[INFO] Cleaning $$dir..."; \
 		$(MAKE) -C $$dir clean || exit 1; \
 	done
+	rm -rf build
 
 .PHONY: compile_commands.json
 compile_commands.json: ## Generate compile_commands.json for every project

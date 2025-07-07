@@ -15,7 +15,7 @@ pub const Searcher = struct {
     max_millis: u64 = 0,
     ideal_time: u64 = 0,
     force_thinking: bool = false,
-    iterative_deepening_depth: usize = 6,
+    iterative_deepening_depth: usize = 5,
     timer: std.time.Timer = undefined,
 
     soft_max_nodes: ?u64 = null,
@@ -91,7 +91,7 @@ pub const Searcher = struct {
             c.MoveToString(self.best_move, &move_buf);    // write c‑string
             const move_slice = std.mem.sliceTo(move_buf[0..], 0);
 
-            log.info("depth {} score cp {} nodes {} pv {s}",
+            log.info("depth {} score cp {} nodes {} pv {s}\r",
                 .{ depth, score, self.nodes, move_slice });
 
             self.checkStop();

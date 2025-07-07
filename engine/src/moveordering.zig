@@ -1,6 +1,8 @@
 const std    = @import("std");
 const c      = @cImport({ @cInclude("castro.h"); });
 
+const MoveOrdering = @This();
+
 pub const PAWN_VALUE   = 100;
 pub const KNIGHT_VALUE = 320;
 pub const BISHOP_VALUE = 330;

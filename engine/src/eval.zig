@@ -1,27 +1,26 @@
-// pesto.zig  – evaluation based on PeSTO, works with castro.Board
-// ---------------------------------------------------------------------------
-
 const std    = @import("std");
 const castro = @cImport({ @cInclude("castro.h"); });
 
 const Piece = enum(u8) { Pawn, Knight, Bishop, Rook, Queen, King };
 const Color = enum(u8) { Black = 0, White = 1 }; // castro.turn == true → White
 
-pub const WHITE_PAWN   : u8 = 2 * @intFromEnum(Piece.Pawn)   + @intFromEnum(Color.White);
-pub const BLACK_PAWN   : u8 = 2 * @intFromEnum(Piece.Pawn)   + @intFromEnum(Color.Black);
-pub const WHITE_KNIGHT : u8 = 2 * @intFromEnum(Piece.Knight) + @intFromEnum(Color.White);
-pub const BLACK_KNIGHT : u8 = 2 * @intFromEnum(Piece.Knight) + @intFromEnum(Color.Black);
-pub const WHITE_BISHOP : u8 = 2 * @intFromEnum(Piece.Bishop) + @intFromEnum(Color.White);
-pub const BLACK_BISHOP : u8 = 2 * @intFromEnum(Piece.Bishop) + @intFromEnum(Color.Black);
-pub const WHITE_ROOK   : u8 = 2 * @intFromEnum(Piece.Rook)   + @intFromEnum(Color.White);
-pub const BLACK_ROOK   : u8 = 2 * @intFromEnum(Piece.Rook)   + @intFromEnum(Color.Black);
-pub const WHITE_QUEEN  : u8 = 2 * @intFromEnum(Piece.Queen)  + @intFromEnum(Color.White);
-pub const BLACK_QUEEN  : u8 = 2 * @intFromEnum(Piece.Queen)  + @intFromEnum(Color.Black);
-pub const WHITE_KING   : u8 = 2 * @intFromEnum(Piece.King)   + @intFromEnum(Color.White);
-pub const BLACK_KING   : u8 = 2 * @intFromEnum(Piece.King)   + @intFromEnum(Color.Black);
-pub const EMPTY        : u8 = BLACK_KING + 1;
+const WHITE_PAWN   : u8 = 2 * @intFromEnum(Piece.Pawn)   + @intFromEnum(Color.White);
+const BLACK_PAWN   : u8 = 2 * @intFromEnum(Piece.Pawn)   + @intFromEnum(Color.Black);
+const WHITE_KNIGHT : u8 = 2 * @intFromEnum(Piece.Knight) + @intFromEnum(Color.White);
+const BLACK_KNIGHT : u8 = 2 * @intFromEnum(Piece.Knight) + @intFromEnum(Color.Black);
+const WHITE_BISHOP : u8 = 2 * @intFromEnum(Piece.Bishop) + @intFromEnum(Color.White);
+const BLACK_BISHOP : u8 = 2 * @intFromEnum(Piece.Bishop) + @intFromEnum(Color.Black);
+const WHITE_ROOK   : u8 = 2 * @intFromEnum(Piece.Rook)   + @intFromEnum(Color.White);
+const BLACK_ROOK   : u8 = 2 * @intFromEnum(Piece.Rook)   + @intFromEnum(Color.Black);
+const WHITE_QUEEN  : u8 = 2 * @intFromEnum(Piece.Queen)  + @intFromEnum(Color.White);
+const BLACK_QUEEN  : u8 = 2 * @intFromEnum(Piece.Queen)  + @intFromEnum(Color.Black);
+const WHITE_KING   : u8 = 2 * @intFromEnum(Piece.King)   + @intFromEnum(Color.White);
+const BLACK_KING   : u8 = 2 * @intFromEnum(Piece.King)   + @intFromEnum(Color.Black);
+const EMPTY        : u8 = BLACK_KING + 1;
 
-inline fn pcolor(pc: u8) Color           { return @enumFromInt(pc & 1); }
+inline fn pcolor(pc: u8) Color { 
+    return @enumFromInt(pc & 1); 
+}
 inline fn flipSq(sq: u8) usize {
     return @as(usize, sq) ^ 56;
 }
@@ -173,10 +172,10 @@ const eg_pesto_table = [_][]const i32{
 
 const gamephase_inc = [_]i32{ 0,0,1,1,1,1, 2,2,4,4, 0,0 };
 
-var mg_table: [12][64]i32 = undefined;
-var eg_table: [12][64]i32 = undefined;
+var mg_table: [13][64]i32 = undefined;
+var eg_table: [13][64]i32 = undefined;
 
-pub fn initTables() void {
+pub fn init_tables() void {
     for (0..6) |p_idx| {
         const pc_white: usize = 2 * p_idx + @intFromEnum(Color.White);
         const pc_black: usize = pc_white + 1;
@@ -187,7 +186,7 @@ pub fn initTables() void {
             eg_table[pc_white][sq] =
                 eg_value[p_idx] + eg_pesto_table[p_idx][sq];
 
-            const fsq: usize = flipSq(@as(u8, sq));
+            const fsq: usize = flipSq(@as(u8, @intCast(sq)));
             mg_table[pc_black][sq] =
                 mg_value[p_idx] + mg_pesto_table[p_idx][fsq];
             eg_table[pc_black][sq] =
