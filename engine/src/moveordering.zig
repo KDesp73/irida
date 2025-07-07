@@ -1,5 +1,5 @@
 const std    = @import("std");
-const c      = @cImport({ @cInclude("castro.h"); });
+const castro = @import("castro.zig");
 
 const MoveOrdering = @This();
 
@@ -38,23 +38,23 @@ inline fn pieceIndex(ch: u8) ?usize {
     return std.mem.indexOfScalar(u8, PIECES, ch);
 }
 
-inline fn gridChar(board: *const c.Board, sq: c.Square) u8 {
+inline fn gridChar(board: *const castro.lib.Board, sq: castro.lib.Square) u8 {
     const rank: usize = sq / 8;
     const file: usize = sq % 8;
     return @as(u8, @intCast(board.*.grid[rank][file]));
 }
 
-fn scoreMove(board: *c.Board, move: c.Move) i32 {
-    const from      = c.GetFrom(move);
-    const to        = c.GetTo(move);
-    const promotion = c.GetPromotion(move);
+fn scoreMove(board: *castro.lib.Board, move: castro.lib.Move) i32 {
+    const from      = castro.lib.GetFrom(move);
+    const to        = castro.lib.GetTo(move);
+    const promotion = castro.lib.GetPromotion(move);
 
     const attacker_ch = gridChar(board, from);
     const victim_ch   = gridChar(board, to);
 
     var score: i32 = 0;
 
-    if (victim_ch != c.EMPTY_SQUARE) {
+    if (victim_ch != castro.lib.EMPTY_SQUARE) {
         const att_idx = pieceIndex(attacker_ch) orelse 0;
         const vic_idx = pieceIndex(victim_ch)   orelse 0;
         score += 100_000 + MVV_LVA_SCORES[att_idx][vic_idx];
@@ -62,16 +62,16 @@ fn scoreMove(board: *c.Board, move: c.Move) i32 {
 
     var m = move;
 
-    if (c.IsPromotion(board, &m)) {
+    if (castro.lib.IsPromotion(board, &m)) {
         // prefer Queen > Rook > Bishop > Knight
         score += 80_000 + @as(i32, promotion) * 1_000;
     }
 
-    if (c.IsCapture(board, move)) {
+    if (castro.lib.IsCapture(board, move)) {
         score += 50_000; // generic capture bonus
     }
 
-    if (c.IsInCheckAfterMove(board, move)) {
+    if (castro.lib.IsInCheckAfterMove(board, move)) {
         score += 3_000;
     }
 
@@ -79,12 +79,12 @@ fn scoreMove(board: *c.Board, move: c.Move) i32 {
 }
 
 const ScoredMove = struct {
-    move : c.Move,
+    move : castro.lib.Move,
     score: i32,
 };
 
-pub fn sortMoves(board: *c.Board, moves: *c.Moves) void {
-    var scored: [c.MOVES_CAPACITY]ScoredMove = undefined;
+pub fn sortMoves(board: *castro.lib.Board, moves: *castro.lib.Moves) void {
+    var scored: [castro.lib.MOVES_CAPACITY]ScoredMove = undefined;
 
     for (0..moves.count) |i| {
         const m = moves.list[i];

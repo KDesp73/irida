@@ -2,11 +2,7 @@ const std = @import("std");
 const eval = @import("eval.zig");
 const log =  @import("log.zig");
 const order = @import("moveordering.zig");
-
-
-const c = @cImport({
-    @cInclude("castro.h");
-});
+const castro = @import("castro.zig");
 
 pub const MAX_PLY = 128;
 
@@ -33,17 +29,17 @@ pub const Searcher = struct {
 
     hash_history: std.ArrayList(u64) = undefined,
     eval_history: [MAX_PLY]i32 = undefined,
-    move_history: [MAX_PLY]c.Move = undefined,
-    moved_piece_history: [MAX_PLY]c.Piece = undefined,
+    move_history: [MAX_PLY]castro.lib.Move = undefined,
+    moved_piece_history: [MAX_PLY]castro.lib.Piece = undefined,
 
-    best_move: c.Move = undefined,
-    pv: [MAX_PLY][MAX_PLY]c.Move = undefined,
+    best_move: castro.lib.Move = undefined,
+    pv: [MAX_PLY][MAX_PLY]castro.lib.Move = undefined,
     pv_size: [MAX_PLY]usize = undefined,
 
-    killer: [MAX_PLY][2]c.Move = undefined,
+    killer: [MAX_PLY][2]castro.lib.Move = undefined,
     history: [2][64][64]i32 = undefined,
 
-    // counter_moves: [2][64][64]c.Move = undefined,
+    // counter_moves: [2][64][64]castro.lib.Move = undefined,
     // continuation: *[12][64][64][64]i32,
 
     pub fn init(alloc: std.mem.Allocator) !Searcher {
@@ -68,7 +64,7 @@ pub const Searcher = struct {
         // TODO: other stopping conditions
     }
 
-    pub fn run(self: *Searcher, board: *c.Board) !void {
+    pub fn run(self: *Searcher, board: *castro.lib.Board) !void {
         self.is_searching = true;
         self.timer = try std.time.Timer.start();
 
@@ -88,7 +84,7 @@ pub const Searcher = struct {
             const score = self.searchDepth(board, depth, alpha_base, beta_base);
 
             var move_buf: [6:0]u8 = undefined;            // 5 chars + NUL
-            c.MoveToString(self.best_move, &move_buf);    // write c‑string
+            castro.lib.MoveToString(self.best_move, &move_buf);    // write c‑string
             const move_slice = std.mem.sliceTo(move_buf[0..], 0);
 
             log.info("depth {} score cp {} nodes {} pv {s}\r",
@@ -102,7 +98,7 @@ pub const Searcher = struct {
 
     fn searchDepth(
         self : *Searcher,
-        board: *c.Board,
+        board: *castro.lib.Board,
         depth: usize,
         alpha: i32,
         beta : i32,
@@ -115,13 +111,13 @@ pub const Searcher = struct {
             return eval.eval(board);
         }
 
-        var moves = c.GenerateLegalMoves(board);
+        var moves = castro.lib.GenerateLegalMoves(board);
         order.sortMoves(board, &moves);
 
         if (moves.count == 0) {
             // mate / stalemate
             const mate_val: i32 = 100_000;
-            if (c.IsInCheck(board)) {
+            if (castro.lib.IsInCheck(board)) {
                 // losing: negative score, shorter mate is worse
                 return -mate_val + @as(i32, @intCast(self.ply));
             } else {
@@ -136,13 +132,13 @@ pub const Searcher = struct {
             const m = moves.list[i];
 
             // play
-            if (!c.MakeMove(board, m)) continue;  // skip illegal (shouldn’t happen)
+            if (!castro.lib.MakeMove(board, m)) continue;  // skip illegal (shouldn’t happen)
 
             self.ply += 1;
             const score = -self.searchDepth(board, depth - 1, -beta, -alpha_local);
             self.ply -= 1;
 
-            c.UnmakeMove(board);
+            castro.lib.UnmakeMove(board);
 
             if (self.stop) return 0;
 

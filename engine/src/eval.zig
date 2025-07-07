@@ -1,5 +1,5 @@
 const std    = @import("std");
-const castro = @cImport({ @cInclude("castro.h"); });
+const castro = @import("castro.zig");
 
 const Piece = enum(u8) { Pawn, Knight, Bishop, Rook, Queen, King };
 const Color = enum(u8) { Black = 0, White = 1 }; // castro.turn == true → White
@@ -208,7 +208,7 @@ inline fn charToPiece(ch: u8) u8 {
     };
 }
 
-pub fn eval(board: *const castro.Board) i32 {
+pub fn eval(board: *const castro.lib.Board) i32 {
     // mg/eg accumulators: idx 0 = Black, idx 1 = White
     var mg_acc = [_]i32{ 0, 0 };
     var eg_acc = [_]i32{ 0, 0 };

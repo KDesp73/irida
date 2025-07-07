@@ -4,19 +4,16 @@ const engine = @import("engine.zig");
 const eval = @import("eval.zig");
 const search = @import("search.zig");
 const cutils = @import("cutils.zig");
+const castro = @import("castro.zig");
 
-const c = @cImport({
-    @cInclude("castro.h");
-});
-
-pub const UciOptionType = enum(u8) {
+const UciOptionType = enum(u8) {
     check,   // true / false
     spin,    // integer spin
     combo,   // drop‑down value
     string,  // free text
 };
 
-pub const UciStatus = enum(u8) {
+const UciStatus = enum(u8) {
     waiting,
     start_thinking,
     thinking,
@@ -31,20 +28,20 @@ pub const UciStatus = enum(u8) {
 const SpinRange   = struct { min: i32, max: i32 };
 const ComboList   = [10][64]u8;
 
-pub const UciOptionValue = union(enum) {
+const UciOptionValue = union(enum) {
     check : bool,
     spin  : i32,
     combo : []const u8,
     string: []const u8,
 };
 
-pub const UciOptionParams = union(enum) {
+const UciOptionParams = union(enum) {
     range  : SpinRange,
     combos : ComboList,
     none: void
 };
 
-pub const UciOption = struct {
+const UciOption = struct {
     name          : []const u8,
     type          : UciOptionType,
     value         : UciOptionValue,
@@ -114,7 +111,7 @@ pub const Uci = struct {
     status             : UciStatus = .waiting,
     last_command       : [] u8,
     uci_options        : std.StringHashMap(UciOption),
-    board              : c.Board = undefined,
+    board              : castro.lib.Board = undefined,
     allocator          : std.mem.Allocator,
 
     searcher: search.Searcher = undefined,
@@ -132,8 +129,8 @@ pub const Uci = struct {
 
         self.searcher = try search.Searcher.init(alloc);
 
-        std.mem.copyForwards(u8, self.start_position_fen[0..], c.STARTING_FEN[0..]);
-        c.BoardInitFen(&self.board, &self.start_position_fen);
+        std.mem.copyForwards(u8, self.start_position_fen[0..], castro.lib.STARTING_FEN[0..]);
+        self.board = castro.board_init(null);
         try self.populateOptions();
         return self;
     }
@@ -288,7 +285,7 @@ pub const Uci = struct {
     }
 
     fn display(self: *Uci) void {
-        c.BoardPrint(&self.board, c.SQUARE_NONE);
+        castro.lib.BoardPrint(&self.board, castro.lib.SQUARE_NONE);
     }
 
     fn isready(self: *Uci) !void {
@@ -309,12 +306,8 @@ pub const Uci = struct {
         try self.searcher.run(&self.board);
 
         const move   = self.searcher.best_move;
-        const buf    = try self.allocator.alloc(u8, 6); // 5 chars + NUL
-        defer self.allocator.free(buf);
-
-        c.MoveToString(move, @as([*c]u8, @ptrCast(buf.ptr)));
-
-        const move_str = std.mem.sliceTo(buf, 0);
+        const move_str = try castro.move_to_string(self.allocator, move);
+        defer self.allocator.free(move_str);
 
         log.bestmove(move_str, null);
     }
@@ -325,7 +318,7 @@ pub const Uci = struct {
 
         if (tokens.next()) |token| {
             if (std.mem.eql(u8, token, "startpos")) {
-                try fen_builder.appendSlice(c.STARTING_FEN);
+                try fen_builder.appendSlice(castro.lib.STARTING_FEN);
             } else if (std.mem.eql(u8, token, "fen")) {
                 while (tokens.next()) |t| {
                     if (std.mem.eql(u8, t, "moves")) break;
@@ -337,26 +330,17 @@ pub const Uci = struct {
         }
 
         const fen = try fen_builder.toOwnedSlice();
+        const tfen = std.mem.trim(u8, fen, " ");
         defer self.allocator.free(fen);
 
-        var fen_with_null: [256]u8 = undefined;
-        const fen_len = fen.len;
-        std.mem.copyForwards(u8, fen_with_null[0..fen_len], fen);
-        fen_with_null[fen_len] = 0; // null terminator
-
-        c.BoardInitFen(&self.board, &fen_with_null);
+        self.board = castro.board_init(tfen);
 
         while(tokens.next()) |token| {
             if(token.len == 0) break;
             if(std.mem.eql(u8, token, "moves")) continue;
 
-            var move_buf: [9:0]u8 = undefined;          // 8 bytes + sentinel
-            const n = if(token.len < move_buf.len - 1) token.len else move_buf.len - 1;
-            std.mem.copyForwards(u8, move_buf[0..n], token[0..n]);
-            move_buf[n] = 0;                            // NULL‑terminate
-
-            const move: c.Move = c.StringToMove(&move_buf);
-            if (!c.MakeMove(&self.board, move)) {
+            const move: castro.lib.Move = castro.parse_move(token);
+            if (!castro.lib.MakeMove(&self.board, move)) {
                 log.info("string Illegal move in position: {s}", .{ token });
                 break;
             }

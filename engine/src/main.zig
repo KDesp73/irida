@@ -1,14 +1,10 @@
 const std = @import("std");
 const uci = @import("uci.zig");
 const eval = @import("eval.zig");
-
-const castro = @cImport({
-    @cInclude("castro.h");
-});
+const castro = @import("castro.zig");
 
 pub fn main() !void {
-    castro.InitMasks();
-    castro.InitZobrist();
+    castro.init();
     eval.init_tables();
 
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
