@@ -1,7 +1,7 @@
-const std = @import("std");
-const eval = @import("eval.zig");
-const log =  @import("log.zig");
-const order = @import("moveordering.zig");
+const std    = @import("std");
+const eval   = @import("eval.zig");
+const log    = @import("log.zig");
+const order  = @import("moveordering.zig");
 const castro = @import("castro.zig");
 
 pub const MAX_PLY = 128;
@@ -9,13 +9,8 @@ pub const MAX_PLY = 128;
 pub const Searcher = struct {
     min_depth: usize = 1,
     max_millis: u64 = 0,
-    ideal_time: u64 = 0,
-    force_thinking: bool = false,
     iterative_deepening_depth: usize = 5,
     timer: std.time.Timer = undefined,
-
-    soft_max_nodes: ?u64 = null,
-    max_nodes: ?u64 = null,
 
     time_stop: bool = false,
 
@@ -25,34 +20,19 @@ pub const Searcher = struct {
     stop: bool = false,
     is_searching: bool = false,
 
-    nmp_min_ply: u32 = 0,
-
-    hash_history: std.ArrayList(u64) = undefined,
-    eval_history: [MAX_PLY]i32 = undefined,
-    move_history: [MAX_PLY]castro.lib.Move = undefined,
-    moved_piece_history: [MAX_PLY]castro.lib.Piece = undefined,
-
     best_move: castro.lib.Move = undefined,
-    pv: [MAX_PLY][MAX_PLY]castro.lib.Move = undefined,
-    pv_size: [MAX_PLY]usize = undefined,
-
-    killer: [MAX_PLY][2]castro.lib.Move = undefined,
-    history: [2][64][64]i32 = undefined,
-
-    // counter_moves: [2][64][64]castro.lib.Move = undefined,
-    // continuation: *[12][64][64][64]i32,
 
     pub fn init(alloc: std.mem.Allocator) !Searcher {
-        var sh = Searcher{};
-        sh.hash_history = std.ArrayList(u64).init(alloc);
+        _ = alloc;
+        const sh = Searcher{};
         return sh;
     }
 
     pub fn deinit(self: *Searcher) void {
-        self.hash_history.deinit();
+        _ = self;
     }
 
-    fn checkStop(self: *Searcher) void {
+    fn check_stop(self: *Searcher) void {
         // Stop if time limit reached or external stop flag set
         if (self.max_millis != 0) {
             const elapsed = self.timer.read();
@@ -78,25 +58,24 @@ pub const Searcher = struct {
         const alpha_base = -100_000_000;
         const beta_base  =  100_000_000;
 
-        // start at depth 1 up to min_depth (or further if you like)
         var depth: usize = 1;
         while (!self.stop and depth <= self.iterative_deepening_depth) : (depth += 1) {
-            const score = self.searchDepth(board, depth, alpha_base, beta_base);
+            const score = self.search_depth(board, depth, alpha_base, beta_base);
 
-            var move_buf: [6:0]u8 = undefined;            // 5 chars + NUL
-            castro.lib.MoveToString(self.best_move, &move_buf);    // write c‑string
+            var move_buf: [6:0]u8 = undefined;
+            castro.lib.MoveToString(self.best_move, &move_buf);
             const move_slice = std.mem.sliceTo(move_buf[0..], 0);
 
             log.info("depth {} score cp {} nodes {} pv {s}\r",
                 .{ depth, score, self.nodes, move_slice });
 
-            self.checkStop();
+            self.check_stop();
         }
 
         self.is_searching = false;
     }
 
-    fn searchDepth(
+    fn search_depth(
         self : *Searcher,
         board: *castro.lib.Board,
         depth: usize,
@@ -131,11 +110,10 @@ pub const Searcher = struct {
         for (0..moves.count) |i| {
             const m = moves.list[i];
 
-            // play
             if (!castro.lib.MakeMove(board, m)) continue;  // skip illegal (shouldn’t happen)
 
             self.ply += 1;
-            const score = -self.searchDepth(board, depth - 1, -beta, -alpha_local);
+            const score = -self.search_depth(board, depth - 1, -beta, -alpha_local);
             self.ply -= 1;
 
             castro.lib.UnmakeMove(board);

@@ -1,0 +1,21 @@
+[Event "?"]
+[Site "?"]
+[Date "2025.07.13"]
+[Round "?"]
+[White "White"]
+[Black "Black"]
+[Result "1-0"]
+
+1. d4 d5 2. c4 c5 3. cxd5 Qxd5 4. Nf3 cxd4 5. Nc3 Qd8 6. Ne4 {EV: 99.9%} Nc6 7.
+Bg5 {EV: 99.9%} f6 8. Bd2 {EV: 99.9%} e5 9. Qa4 {EV: 99.9%} Bd7 10. Qb5 {EV:
+99.9%} Qc7 11. Rc1 {EV: 99.9%} a6 12. Qd5 {EV: 99.9%} Nge7 13. Nd6+ {EV: 99.9%}
+Kd8 14. Nf7+ {EV: 99.9%} Ke8 15. Nd6+ {EV: 99.9%} Kd8 16. Nf7+ {EV: 99.9%} Kc8
+17. Qc5 {EV: 99.9%} Ng6 18. Qc4 {EV: 99.9%} Rg8 19. N7g5 {EV: 99.9%} fxg5 20.
+Qxg8 {EV: 99.9%} Bg4 21. h3 {EV: 99.9%} Bxf3 22. gxf3 {EV: 99.9%} h6 23. Bb4
+{EV: 99.9%} Qd8 24. Qe6+ {EV: 99.9%} Kb8 25. Bd2 {EV: 99.9%} Nf4 26. Qb3 {EV:
+99.9%} Ka7 27. Qf7 {EV: 99.9%} Rc8 28. Rc2 {EV: 99.9%} Bb4 29. Bxb4 {EV: 99.9%}
+Nxb4 30. Rd2 {EV: 99.9%} Rc1+ 31. Rd1 {EV: 99.9%} Qa5 32. Rxc1 {EV: 99.9%} Nc2+
+33. Kd1 {EV: 99.9%} Ne3+ 34. fxe3 {EV: 99.9%} dxe3 35. Kc2 {EV: 99.9%} Qc5+ 36.
+Kb1 {EV: 99.9%} Qb4 37. Rd1 {EV: 99.9%} Qc4 38. Qxc4 {EV: 99.9%} Nd5 39. Qxd5
+{EV: 99.9%} e4 40. Qxe4 {EV: 99.9%} b6 41. Rd7+ {EV: 99.9%} Kb8 42. Qb7# {EV:
+99.9%} 1-0

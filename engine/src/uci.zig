@@ -306,8 +306,12 @@ pub const Uci = struct {
         try self.searcher.run(&self.board);
 
         const move   = self.searcher.best_move;
-        const move_str = try castro.move_to_string(self.allocator, move);
-        defer self.allocator.free(move_str);
+        const buf    = try self.allocator.alloc(u8, 6); // 5 chars + NUL
+        defer self.allocator.free(buf);
+
+        castro.lib.MoveToString(move, @as([*c]u8, @ptrCast(buf.ptr)));
+
+        const move_str = std.mem.sliceTo(buf, 0);
 
         log.bestmove(move_str, null);
     }
