@@ -8,7 +8,7 @@ pub const KNIGHT_VALUE = 320;
 pub const BISHOP_VALUE = 330;
 pub const ROOK_VALUE   = 500;
 pub const QUEEN_VALUE  = 900;
-pub const KING_VALUE   = 0;      // usually 0 because the king is priceless
+pub const KING_VALUE   = 0;
 
 pub const PIECE_VALUES = [_]i32{
     PAWN_VALUE,
@@ -22,7 +22,6 @@ pub const PIECE_VALUES = [_]i32{
 pub var MVV_LVA_SCORES: [12][12]i32 = undefined;
 
 pub inline fn initMVVLVA() void {
-    // 12 = 6 piece types × 2 colours
     for (0..12) |attacker| {
         for (0..12) |victim| {
             MVV_LVA_SCORES[attacker][victim] =

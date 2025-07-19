@@ -3,15 +3,18 @@ const std = @import("std");
 /// Write a raw line to stdout, swallowing I/O errors (GUI will simply not see
 /// the line in that unlikely case).
 inline fn _println(msg: []const u8) void {
-    const w = std.io.getStdOut().writer();
+    const out = std.io.getStdOut();
+    var buf = std.io.bufferedWriter(out.writer());
+    var w = buf.writer();
     w.print("{s}\n", .{msg}) catch {};
+    buf.flush() catch {};
 }
 
 /// Send an `info` line (printf‐style).
 pub fn info(comptime fmt: []const u8, args: anytype) void {
     var buf: [256]u8 = undefined;
-    _ = std.fmt.bufPrint(&buf, "info " ++ fmt, args) catch return;
-    _println(&buf);
+    const msg = std.fmt.bufPrint(&buf, "info " ++ fmt, args) catch return;
+    _println(msg);
 }
 
 /// Send `id name ...`  or  `id author ...`
