@@ -7,3 +7,6 @@ compile_commands.json
 .changelog
 tmp
 *.log
+
+.zig-cache
+zig-out

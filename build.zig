@@ -9,7 +9,7 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
         .use_clang = true,
         .link_libc = true,
-        .root_source_file = b.path("../castro/src/castro.h"),
+        .root_source_file = b.path("./castro/src/castro.h"),
     });
     
     const exe = b.addExecutable(.{
@@ -20,8 +20,8 @@ pub fn build(b: *std.Build) void {
     });
     
     exe.root_module.addImport("castro", castro_bindings.createModule());
-    exe.addIncludePath(b.path("../castro/src/"));
-    exe.addObjectFile(b.path("../castro/libcastro.a"));
+    exe.addIncludePath(b.path("./castro/src/"));
+    exe.addObjectFile(b.path("./castro/libcastro.a"));
     exe.linkLibC();
     
     b.installArtifact(exe);
