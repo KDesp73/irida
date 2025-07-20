@@ -42,6 +42,10 @@ pub const Janitor = struct {
         };
     }
 
+    fn ensureMod(self: *Self) *std.Build.Step.Compile {
+        return self.mod orelse @panic("mod is not initialized. Call exe(), staticLib() or sharedLib() first.");
+    }
+
     /// Defines the executable target.
     ///
     /// This must be called before adding dependencies.
@@ -89,13 +93,10 @@ pub const Janitor = struct {
     ///
     /// `name` should match the dependency declared in `build.zig.zon`.
     pub fn dep(self: *Self, name: []const u8) void {
-        if (self.mod == null) {
-            std.log.err("Exe is not initialized", .{});
-            return;
-        }
+        const mod = self.ensureMod();
 
         const d = self.b.dependency(name, .{});
-        self.mod.?.root_module.addImport(name, d.module(name));
+        mod.root_module.addImport(name, d.module(name));
     }
 
     /// Declares a build option and returns its value.
@@ -115,25 +116,25 @@ pub const Janitor = struct {
     /// Adds a predefined step to the build pipeline.
     ///
     /// Supported steps: `.run` and `.clean`.
-    pub fn step(self: *Self, s: Step) void {
-        switch (s) {
+    pub fn step(self: *Self, s: Step) *std.Build.Step {
+        return switch (s) {
             Step.run => self.addRunStep(),
             Step.clean => self.addCleanStep(),
             Step.tests => self.addTestStep("src")
-        }
+        };
     }
 
     /// Adds a `run` step that builds and executes the binary.
-    fn addRunStep(self: *Self) void {
-        if (self.mod) |e| {
-            const run_cmd = self.b.addRunArtifact(e);
-            const run_step = self.b.step("run", "Run the app");
-            run_step.dependOn(&run_cmd.step);
-        }
+    fn addRunStep(self: *Self) *std.Build.Step {
+        const mod = self.ensureMod();
+        const run_cmd = self.b.addRunArtifact(mod);
+        const run_step = self.b.step("run", "Run the app");
+        run_step.dependOn(&run_cmd.step);
+        return run_step;
     }
 
     /// Adds a `test` step that runs all tests
-    pub fn addTestStep(self: *Self, path: []const u8) void {
+    pub fn addTestStep(self: *Self, path: []const u8) *std.Build.Step {
         const t = self.b.addTest(.{
             .root_source_file = self.b.path(path),
             .target = self.target,
@@ -141,12 +142,13 @@ pub const Janitor = struct {
         });
         const s = self.b.step("test", "Run tests");
         s.dependOn(&t.step);
+        return s;
     }
 
     /// Adds a `clean` step that deletes the Zig cache and output directories.
     ///
     /// This allows running `zig build clean` to reset the build state.
-    fn addCleanStep(self: *Self) void {
+    fn addCleanStep(self: *Self) *std.Build.Step {
         const clean_step = self.b.step("clean", "Clean build output");
         clean_step.makeFn = struct {
             fn make(_: *std.Build.Step, _: std.Build.Step.MakeOptions) anyerror!void {
@@ -159,14 +161,16 @@ pub const Janitor = struct {
                 };
             }
         }.make;
+        return clean_step;
     }
 
     /// Adds a fully custom step with a user-defined function.
     ///
     /// `makeFn` must follow the `std.Build.Step.MakeFn` signature.
-    pub fn customStep(self: *Self, name: []const u8, desc: []const u8, makeFn: std.Build.Step.MakeFn) void {
+    pub fn customStep(self: *Self, name: []const u8, desc: []const u8, makeFn: std.Build.Step.MakeFn) *std.Build.Step {
         const s = self.b.step(name, desc);
         s.makeFn = makeFn;
+        return s;
     }
 
     /// Attempts to get the current Git version/tag.
