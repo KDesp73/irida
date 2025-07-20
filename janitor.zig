@@ -4,6 +4,7 @@ const std = @import("std");
 pub const Step = enum {
     run,
     clean,
+    tests,
 };
 
 /// A utility struct to simplify and organize common Zig build steps.
@@ -12,13 +13,14 @@ pub const Step = enum {
 /// a clean interface for setting up an executable target, managing dependencies,
 /// creating custom build steps, and running or cleaning the project.
 pub const Janitor = struct {
+    const version = "0.1.0";
     const Self = @This();
 
     /// The main build object passed into `build.zig`.
     b: *std.Build,
 
     /// The compiled executable module, created via `exe()`.
-    exeMod: ?*std.Build.Step.Compile,
+    mod: ?*std.Build.Step.Compile,
 
     /// The target platform (e.g., x86_64-linux).
     target: std.Build.ResolvedTarget,
@@ -33,7 +35,7 @@ pub const Janitor = struct {
     pub fn init(b: *std.Build) Self {
         return Self{
             .b = b,
-            .exeMod = null,
+            .mod = null,
             .name = null,
             .target = b.standardTargetOptions(.{}),
             .optimize = b.standardOptimizeOption(.{}),
@@ -45,7 +47,7 @@ pub const Janitor = struct {
     /// This must be called before adding dependencies.
     pub fn exe(self: *Self, name: []const u8) void {
         self.name = name;
-        self.exeMod = self.b.addExecutable(.{
+        self.mod = self.b.addExecutable(.{
             .name = name,
             .root_source_file = self.b.path("src/main.zig"),
             .target = self.target,
@@ -53,17 +55,47 @@ pub const Janitor = struct {
         });
     }
 
+    /// Defines a static lib target.
+    ///
+    /// This must be called before adding dependencies.
+    pub fn staticLib(self: *Self, name: []const u8, root: []const u8) void {
+        const lib = self.b.addStaticLibrary(.{
+            .name = name,
+            .root_source_file = self.b.path(root),
+            .target = self.target,
+            .optimize = self.optimize,
+        });
+        self.name = name;
+        self.mod = lib;
+        _ = self.b.installArtifact(lib);
+    }
+
+    /// Defines a shared lib target.
+    ///
+    /// This must be called before adding dependencies.
+    pub fn sharedLib(self: *Self, name: []const u8, root: []const u8) void {
+        const lib = self.b.addSharedLibrary(.{
+            .name = name,
+            .root_source_file = self.b.path(root),
+            .target = self.target,
+            .optimize = self.optimize,
+        });
+        self.name = name;
+        self.mod = lib;
+        _ = self.b.installArtifact(lib);
+    }
+
     /// Adds a dependency to the executable's root module.
     ///
     /// `name` should match the dependency declared in `build.zig.zon`.
     pub fn dep(self: *Self, name: []const u8) void {
-        if (self.exeMod == null) {
+        if (self.mod == null) {
             std.log.err("Exe is not initialized", .{});
             return;
         }
 
         const d = self.b.dependency(name, .{});
-        self.exeMod.?.root_module.addImport(name, d.module(name));
+        self.mod.?.root_module.addImport(name, d.module(name));
     }
 
     /// Declares a build option and returns its value.
@@ -75,7 +107,7 @@ pub const Janitor = struct {
 
     /// Marks the executable to be installed to `zig-out/bin` on build.
     pub fn install(self: *Self) void {
-        if (self.exeMod) |e| {
+        if (self.mod) |e| {
             self.b.installArtifact(e);
         }
     }
@@ -87,16 +119,28 @@ pub const Janitor = struct {
         switch (s) {
             Step.run => self.addRunStep(),
             Step.clean => self.addCleanStep(),
+            Step.tests => self.addTestStep("src")
         }
     }
 
     /// Adds a `run` step that builds and executes the binary.
     fn addRunStep(self: *Self) void {
-        if (self.exeMod) |e| {
+        if (self.mod) |e| {
             const run_cmd = self.b.addRunArtifact(e);
             const run_step = self.b.step("run", "Run the app");
             run_step.dependOn(&run_cmd.step);
         }
+    }
+
+    /// Adds a `test` step that runs all tests
+    pub fn addTestStep(self: *Self, path: []const u8) void {
+        const t = self.b.addTest(.{
+            .root_source_file = self.b.path(path),
+            .target = self.target,
+            .optimize = self.optimize,
+        });
+        const s = self.b.step("test", "Run tests");
+        s.dependOn(&t.step);
     }
 
     /// Adds a `clean` step that deletes the Zig cache and output directories.
@@ -153,7 +197,7 @@ pub const Janitor = struct {
     /// - `include`: (Optional) A directory path to be added to the include search paths.
     /// - `obj`: (Optional) A path to a precompiled object file to link into the executable.
     pub fn clib(self: *Self, name: []const u8, rootSrc: []const u8, include: ?[]const u8, obj: ?[]const u8) void {
-        if(self.exeMod) |e| {
+        if(self.mod) |e| {
             const c_bindings = self.b.addTranslateC(.{
                 .target = self.target,
                 .optimize = self.optimize,
@@ -173,6 +217,5 @@ pub const Janitor = struct {
             }
 
         }
-
     }
 };
