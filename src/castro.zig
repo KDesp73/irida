@@ -1,6 +1,5 @@
-/// A zig wrapper for the castro.h library (v0.2.0)
-/// Useful mainly for string dependent functions
-const castro = @This();
+// A zig wrapper for the castro.h library (v0.2.0)
+// Useful mainly for string dependent functions
 pub const lib = @import("castro");
 const std = @import("std");
 

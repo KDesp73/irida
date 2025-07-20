@@ -175,7 +175,7 @@ const gamephase_inc = [_]i32{ 0,0,1,1,1,1, 2,2,4,4, 0,0 };
 var mg_table: [13][64]i32 = undefined;
 var eg_table: [13][64]i32 = undefined;
 
-pub fn init_tables() void {
+pub fn init() void {
     for (0..6) |p_idx| {
         const pc_white: usize = 2 * p_idx + @intFromEnum(Color.White);
         const pc_black: usize = pc_white + 1;
