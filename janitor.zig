@@ -222,4 +222,16 @@ pub const Janitor = struct {
 
         }
     }
+
+    /// Execute a shell command
+    pub fn exec(allocator: std.mem.Allocator, tokens: []const []const u8) !u8 {
+        var process = std.process.Child.init(tokens, allocator);
+
+        process.stderr_behavior = .Inherit;
+        process.stdout_behavior = .Inherit;
+
+        try process.spawn();
+        const result = try process.wait();
+        return result.Exited;
+    }
 };

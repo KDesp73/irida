@@ -21,29 +21,13 @@ pub fn build(b: *std.Build) void {
 fn makeCleanAllStep(step: *std.Build.Step, _: std.Build.Step.MakeOptions) anyerror!void {
     const allocator = step.owner.allocator;
 
-    var process = std.process.Child.init(&[_][]const u8{
-        "make", "-C", "castro", "clean"
-    }, allocator);
-
-    process.stderr_behavior = .Inherit;
-    process.stdout_behavior = .Inherit;
-
-    try process.spawn();
-    const result = try process.wait();
-    if (result.Exited != 0) return error.AutocompleteGenerationFailed;
+    const rc = try Janitor.exec(allocator, &.{"make", "-C", "castro", "clean"});
+    if(rc != 0) return error.CleanAllStepFailed;
 }
 
 fn makeBuildCastroStep(step: *std.Build.Step, _: std.Build.Step.MakeOptions) anyerror!void {
     const allocator = step.owner.allocator;
 
-    var process = std.process.Child.init(&[_][]const u8{
-        "make", "-C", "castro", "all"
-    }, allocator);
-
-    process.stderr_behavior = .Inherit;
-    process.stdout_behavior = .Inherit;
-
-    try process.spawn();
-    const result = try process.wait();
-    if (result.Exited != 0) return error.AutocompleteGenerationFailed;
+    const rc = try Janitor.exec(allocator, &.{"make", "-C", "castro", "all"});
+    if(rc != 0) return error.BuildCastroStepFailed;
 }
