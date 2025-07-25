@@ -12,11 +12,10 @@
 
 ### Building the Project
 
-To build everything (engine, libraries, and tests):
-
 ```bash
 git clone https://github.com/KDesp73/chess-engine --recursive && cd chess-engine
-make all -j3
+make -C castro all
+zig build
 ````
 
 ---

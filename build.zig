@@ -4,18 +4,18 @@ const Janitor = @import("janitor.zig").Janitor;
 pub fn build(b: *std.Build) void {
     var j = Janitor.init(b);
     j.exe("chess-engine");
-    j.install();
     j.clib("castro", "castro/src/castro.h", "castro/src/", "castro/libcastro.a");
+    j.install();
 
     const cleanStep = j.step(.clean);
     _ = j.step(.run);
+    _ = j.step(.help);
 
     const buildCastroStep = j.customStep("build-castro", "Build C movegen library", makeBuildCastroStep);
-    j.b.getInstallStep().dependOn(buildCastroStep);
+    j.b.default_step.dependOn(buildCastroStep);
 
     const cleanAllStep = j.customStep("cleanall", "Clean everything", makeCleanAllStep);
     cleanAllStep.dependOn(cleanStep);
-    
 }
 
 fn makeCleanAllStep(step: *std.Build.Step, _: std.Build.Step.MakeOptions) anyerror!void {

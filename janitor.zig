@@ -5,6 +5,7 @@ pub const Step = enum {
     run,
     clean,
     tests,
+    help,
 };
 
 /// A utility struct to simplify and organize common Zig build steps.
@@ -13,7 +14,7 @@ pub const Step = enum {
 /// a clean interface for setting up an executable target, managing dependencies,
 /// creating custom build steps, and running or cleaning the project.
 pub const Janitor = struct {
-    const version = "0.1.0";
+    const version = "0.1.1";
     const Self = @This();
 
     /// The main build object passed into `build.zig`.
@@ -120,7 +121,8 @@ pub const Janitor = struct {
         return switch (s) {
             Step.run => self.addRunStep(),
             Step.clean => self.addCleanStep(),
-            Step.tests => self.addTestStep("src")
+            Step.tests => self.addTestStep("src"),
+            Step.help => self.addHelpStep(),
         };
     }
 
@@ -164,6 +166,35 @@ pub const Janitor = struct {
         return clean_step;
     }
 
+    /// Adds a `help` step that prints the help message
+    fn addHelpStep(self: *Self) *std.Build.Step {
+        const s = self.b.step("help", "Print the help message");
+
+        s.makeFn = struct {
+            fn make(st: *std.Build.Step, _: std.Build.Step.MakeOptions) anyerror!void {
+                const writer = std.io.getStdOut().writer();
+                const steps = st.owner.top_level_steps;
+
+                try writer.print(
+                \\USAGE
+                \\  zig build [<STEP>]
+                \\
+                \\STEPS
+                \\
+                , .{});
+
+                var it = steps.iterator();
+                while (it.next()) |entry| {
+                    const name = entry.key_ptr.*;
+                    const stp = entry.value_ptr.*;
+                    try writer.print("  {s:<20} {s}\n", .{ name, stp.description });
+                }
+            }
+        }.make;
+
+        return s;
+    }
+
     /// Adds a fully custom step with a user-defined function.
     ///
     /// `makeFn` must follow the `std.Build.Step.MakeFn` signature.
@@ -201,7 +232,7 @@ pub const Janitor = struct {
     /// - `include`: (Optional) A directory path to be added to the include search paths.
     /// - `obj`: (Optional) A path to a precompiled object file to link into the executable.
     pub fn clib(self: *Self, name: []const u8, rootSrc: []const u8, include: ?[]const u8, obj: ?[]const u8) void {
-        if(self.mod) |e| {
+        if(self.mod) |m| {
             const c_bindings = self.b.addTranslateC(.{
                 .target = self.target,
                 .optimize = self.optimize,
@@ -210,14 +241,14 @@ pub const Janitor = struct {
                 .root_source_file = self.b.path(rootSrc),
             });
 
-            e.root_module.addImport(name, c_bindings.createModule());
+            m.root_module.addImport(name, c_bindings.createModule());
 
             if (include) |i| {
-                e.addIncludePath(self.b.path(i));
+                m.addIncludePath(self.b.path(i));
             }
 
             if (obj) |o| {
-                e.addObjectFile(self.b.path(o));
+                m.addObjectFile(self.b.path(o));
             }
 
         }

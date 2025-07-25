@@ -11,5 +11,6 @@
         "build.zig.zon",
         "src",
         "README.md",
+        "CHANGELOG.md",
     },
 }
