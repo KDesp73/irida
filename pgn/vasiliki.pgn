@@ -1,0 +1,39 @@
+[Event "?"]
+[Site "?"]
+[Date "2025.08.08"]
+[Round "?"]
+[White "White"]
+[Black "Black"]
+[Result "1-0"]
+
+1. e4 c5 2. c4 g5 {EV: 0.1%} 3. Na3 g4 {EV: 0.1%} 4. g3 Nf6 {EV: 0.1%} 5. d4
+Nxe4 {EV: 0.2%} 6. dxc5 Qa5+ {EV: 0.5%} 7. Bd2 Nxd2 {EV: 2.0%} 8. Qxd2 Qxd2+
+{EV: 4.0%} 9. Kxd2 Bg7 {EV: 4.7%} 10. Nb5 Bxb2 {EV: 6.9%} 11. Rb1 Be5 {EV:
+11.2%} 12. h3 a6 {EV: 18.9%} 13. Nc3 Bd4 {EV: 20.4%} 14. Ne4 Be5 {EV: 11.9%} 15.
+hxg4 Rg8 {EV: 9.9%} 16. Rxh7 Rxg4 {EV: 38.4%} 17. Nf3 Rxe4 {EV: 20.8%} 18. Nxe5
+Kd8 {EV: 11.9%} 19. Nxf7+ Ke8 {EV: 18.0%} 20. Ng5 Rd4+ {EV: 11.7%} 21. Ke1 Kd8
+{EV: 12.5%} 22. Rb4 Nc6 {EV: 22.4%} 23. Ra4 Na7 {EV: 26.4%} 24. Rh8+ Kc7 {EV:
+29.2%} 25. Re8 d5 {EV: 31.1%} 26. cxd6+ Kxd6 {EV: 41.2%} 27. Rd8+ Kc5 {EV:
+43.1%} 28. Ne6+ Bxe6 {EV: 49.7%} 29. Rxa8 Re4+ {EV: 49.7%} 30. Kd1 b5 {EV:
+49.7%} 31. cxb5 Rxa4 {EV: 87.9%} 32. Rxa7 Rxa2 {EV: 95.0%} 33. Rxe7 Rxf2 {EV:
+96.8%} 34. Bd3 Rf3 {EV: 98.0%} 35. Be4 Bb3+ {EV: 98.0%} 36. Ke1 Re3+ {EV: 99.2%}
+37. Kf2 Kd4 {EV: 99.1%} 38. b6 Bc4 {EV: 99.3%} 39. b7 Re2+ {EV: 99.3%} 40. Kg1
+Re1+ {EV: 99.3%} 41. Kh2 Re2+ {EV: 95.6%} 42. Kh3 Rb2 {EV: 95.7%} 43. Re8 Bf1+
+{EV: 97.0%} 44. Kh4 Rh2+ {EV: 96.3%} 45. Kg5 Rb2 {EV: 95.3%} 46. b8=Q Rxb8 {EV:
+96.6%} 47. Rxb8 Kxe4 {EV: 96.8%} 48. Rb2 Ke5 {EV: 97.1%} 49. Kg4 Bc4 {EV: 97.2%}
+50. Kf3 Bd5+ {EV: 97.2%} 51. Ke3 a5 {EV: 97.2%} 52. Rb1 a4 {EV: 97.2%} 53. Ra1
+a3 {EV: 97.2%} 54. Rxa3 Kf5 {EV: 97.2%} 55. Kd4 Bb7 {EV: 97.1%} 56. Ke3 Kg4 {EV:
+97.3%} 57. Kf2 Kf5 {EV: 97.2%} 58. Kg1 Kg4 {EV: 97.2%} 59. Kh2 Kf5 {EV: 97.2%}
+60. Kh3 Bd5 {EV: 97.2%} 61. Kh4 Ke4 {EV: 97.1%} 62. g4 Kd4 {EV: 97.9%} 63. Kh5
+Bf7+ {EV: 98.0%} 64. Kh6 Be6 {EV: 98.1%} 65. g5 Bd5 {EV: 98.1%} 66. Kh7 Ke5 {EV:
+98.2%} 67. g6 Be4 {EV: 98.1%} 68. Kh6 Kf6 {EV: 98.1%} 69. g7 Bd5 {EV: 98.0%} 70.
+Kh7 Be4+ {EV: 98.1%} 71. Kh8 Bd5 {EV: 94.1%} 72. g8=Q Bxg8 {EV: 93.8%} 73. Kxg8
+Ke5 {EV: 93.6%} 74. Kf8 Kf4 {EV: 93.6%} 75. Ra1 Ke4 {EV: 93.5%} 76. Rd1 Ke5 {EV:
+93.5%} 77. Ke7 Kf5 {EV: 93.2%} 78. Re1 Kg5 {EV: 93.3%} 79. Rf1 Kg6 {EV: 93.2%}
+80. Ke6 Kg5 {EV: 93.3%} 81. Ke5 Kg6 {EV: 93.1%} 82. Rf6+ Kg5 {EV: 93.3%} 83. Rf7
+Kh5 {EV: 93.3%} 84. Rg7 Kh6 {EV: 92.8%} 85. Rg1 Kh5 {EV: 92.2%} 86. Kf5 Kh6 {EV:
+92.5%} 87. Kg4 Kg7 {EV: 92.9%} 88. Rf1 Kg6 {EV: 92.8%} 89. Rf5 Kh6 {EV: 93.1%}
+90. Rg5 Kh7 {EV: 50.0%} 91. Kf5 Kh6 {EV: 92.8%} 92. Kf6 Kh7 {EV: 50.0%} 93. Kf7
+Kh6 {EV: 0.1%} 94. Rg8 Kh5 {EV: 92.9%} 95. Rg1 Kh6 {EV: 92.8%} 96. Kf6 Kh5 {EV:
+92.2%} 97. Kf5 Kh6 {EV: 92.5%} 98. Rg2 Kh7 {EV: 50.0%} 99. Kf6 Kh8 {EV: 0.1%}
+100. Kf7 Kh7 {EV: 0.1%} 101. Rh2# 1-0
