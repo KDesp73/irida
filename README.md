@@ -12,9 +12,7 @@
 ### Building the Project
 
 ```bash
-git clone https://github.com/KDesp73/chess-engine --recursive && cd chess-engine
-make -C castro all
-zig build
+make build.all
 ````
 
 ---

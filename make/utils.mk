@@ -5,4 +5,3 @@ clean: ## Remove all build files, libraries and the executable
 
 compile_commands.json: ## Generate compile commands
 	@bear -- make build.all
-

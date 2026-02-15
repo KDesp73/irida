@@ -19,3 +19,7 @@ build.shared: $(BUILD_DIR) $(OBJ_FILES) ## Build the dynamic library
 .PHONY: build.verbose
 build.verbose: CFLAGS += -DVERBOSE
 build.verbose: all ## Build the project in verbose mode
+
+.PHONY: build.castro
+build.castro: extern/castro ## Build the move generation library
+	cd extern/castro && make all

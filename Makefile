@@ -1,9 +1,9 @@
 include make/config.mk
 include make/rules.mk
-include make/deps.mk
-include make/build.mk
-include make/dist.mk
 include make/utils.mk
+include make/deps.mk
+include make/dist.mk
+include make/build.mk
 
 .PHONY: help
 help: ## Show this help message

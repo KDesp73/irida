@@ -7,4 +7,3 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	@echo "[$(counter)/$(TOTAL_FILES)] Compiling $< -> $@"
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) -c -o $@ $<
-
