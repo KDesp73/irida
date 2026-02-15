@@ -29,7 +29,7 @@ int CliMain(int argc, char** argv)
     LOOP_ARGS(opt, args) {
         switch (opt) {
             case ARG_HELP:
-                TODO("help");
+                help(command);
                 goto cleanup;
             case ARG_VERSION:
                 printf("%s v%s\n", engine.name, VERSION_STRING);

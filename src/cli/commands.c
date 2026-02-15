@@ -40,10 +40,15 @@ bool eval_handler(Context context)
 
 bool search_handler(Context context)
 {
+    if(!context.depth) {
+        ERRO("Provide a depth");
+        return false;
+    }
+
     castro_BoardInitFen(&engine.board, context.fen);
 
     char bestmove[16];
-    Move move = engine.search(&engine.board, engine.eval, 4);
+    Move move = engine.search(&engine.board, engine.eval, context.depth);
 
     castro_BoardFree(&engine.board);
 

@@ -42,4 +42,6 @@ bool perft_handler(Context context);
 bool eval_handler(Context context);
 bool search_handler(Context context);
 
+void help(Command command);
+
 #endif // CLI_CONFIG_H
