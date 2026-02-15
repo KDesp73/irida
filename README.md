@@ -7,7 +7,6 @@
 - `gcc` with support for `-fsanitize`
 - `make`
 - `bear` (optional, for generating `compile_commands.json`)
-- `zig`
 - `linux`
 
 ### Building the Project

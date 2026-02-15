@@ -1,0 +1,6 @@
+libcastro.*
+build
+compile_commands.json
+.cache
+check
+bench.log
