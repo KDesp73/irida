@@ -1,6 +1,7 @@
 #ifndef ENGINE_UCI_H
 #define ENGINE_UCI_H
 
+#define CASTRO_STRIP_PREFIX
 #include "castro.h"
 #include <stdbool.h>
 #include <string.h>
@@ -115,7 +116,7 @@ static inline void StateSetStartPos(State* state, const char* startpos)
 {
     strncpy(state->startPositionFen, startpos, sizeof(state->startPositionFen) - 1);
     state->startPositionFen[sizeof(state->startPositionFen) - 1] = '\0'; // Null-terminate
-    BoardInitFen(&state->board, state->startPositionFen);
+    castro_BoardInitFen(&state->board, state->startPositionFen);
 }
 
 static inline void InitState(State* state)

@@ -1,4 +1,3 @@
-#include "castro.h"
 #include "search.h"
 #include "uci.h"
 #include <ctype.h>

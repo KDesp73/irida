@@ -7,11 +7,15 @@ deps.check: ## Check that all dependencies are available
 deps.fetch: extern/castro extern/IncludeOnly ## Fetch dependencies
 
 extern/castro:
-	git clone https://github.com/KDesp73/castro extern/castro
+	git clone https://github.com/KDesp73/castro extern/castro || echo "[INFO] already exists"
 	cd extern/castro && git checkout v$(CASTRO_VERSION)
+
+define fetchio
+	curl -s -f https://raw.githubusercontent.com/KDesp73/IncludeOnly/refs/heads/main/libs/$1.h -o extern/IncludeOnly/$1.h
+endef
 
 extern/IncludeOnly:
 	mkdir -p extern/IncludeOnly
-	curl https://raw.githubusercontent.com/KDesp73/IncludeOnly/refs/heads/main/libs/ansi.h -o extern/IncludeOnly/ansi.h
-	curl https://raw.githubusercontent.com/KDesp73/IncludeOnly/refs/heads/main/libs/cli.h -o extern/IncludeOnly/cli.h
-	curl https://raw.githubusercontent.com/KDesp73/IncludeOnly/refs/heads/main/libs/logging.h -o extern/IncludeOnly/logging.h
+	$(call fetchio,ansi)
+	$(call fetchio,cli)
+	$(call fetchio,logging)
