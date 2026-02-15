@@ -35,11 +35,17 @@ void default_help()
     INDENT("-F --fen <FEN>          Specify the FEN string");
     INDENT("-d --depth <DEPTH>      Specify the depth");
     INDENT("-E --eval <EVAL>        Specify the evaluation function to use");
+    INDENT("-S --search <SEARCH>    Specify the search function to use");
     PRINT("");
 
     HEADER("EVALUATION FUNCTIONS");
     INDENT("material");
     INDENT("pesto");
+    PRINT("");
+
+    HEADER("SEARCH FUNCTIONS");
+    INDENT("alpha-beta");
+    INDENT("quiescence-iterative-deepening");
     PRINT("");
 
     PRINT("Written by %s", engine.author);

@@ -1,7 +1,8 @@
 #include "castro.h"
 #include "eval.h"
+#include "moveordering.h"
+#include "search.h"
 
-#define INF 1000000
 
 int negamax(Board* board, int depth, int alpha, int beta, EvalFn eval)
 {
@@ -10,6 +11,7 @@ int negamax(Board* board, int depth, int alpha, int beta, EvalFn eval)
     }
 
     Moves moves = castro_GenerateMoves(board, MOVE_LEGAL);
+    order_moves(board, moves.list, moves.count, depth);
 
     if (moves.count == 0) {
         // Checkmate or stalemate
@@ -44,6 +46,34 @@ int negamax(Board* board, int depth, int alpha, int beta, EvalFn eval)
     return bestScore;
 }
 
+int negamax_quiscence(Board* board, int depth, int alpha, int beta, EvalFn eval)
+{
+    if (depth == 0) return quiescence(board, alpha, beta, eval);
+
+    Moves moves = castro_GenerateMoves(board, MOVE_LEGAL);
+    if (moves.count == 0) {
+        return castro_IsInCheck(board) ? -INF + 1 : 0;
+    }
+
+    order_moves(board, moves.list, moves.count, depth);
+
+    int bestScore = -INF;
+    for (size_t i = 0; i < moves.count; i++) {
+        Move move = moves.list[i];
+        if (!castro_MakeMove(board, move)) continue;
+
+        int score = -negamax(board, depth - 1, -beta, -alpha, eval);
+        castro_UnmakeMove(board);
+
+        if (score > bestScore) bestScore = score;
+        if (score > alpha) alpha = score;
+        if (alpha >= beta) break;
+    }
+
+    return bestScore;
+}
+
+
 Move alpha_beta_search(Board* board, EvalFn eval, int depth)
 {
     Moves moves = castro_GenerateMoves(board, MOVE_LEGAL);
@@ -51,7 +81,7 @@ Move alpha_beta_search(Board* board, EvalFn eval, int depth)
     Move bestMove = {0};
     int bestScore = -INF;
 
-    for (int i = 0; i < moves.count; i++) {
+    for (size_t i = 0; i < moves.count; i++) {
 
         Move move = moves.list[i];
 

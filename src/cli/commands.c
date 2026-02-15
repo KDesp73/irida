@@ -3,6 +3,7 @@
 #include "castro.h"
 #include "core.h"
 #include "eval.h"
+#include "search.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -36,9 +37,17 @@ EvalFn eval_dispatcher(char* eval) {
     return engine.eval;
 }
 
+SearchFn search_dispatcher(char* search) {
+    if(!search) return engine.search;
+    if(!strcmp(search, "alpha-beta")) return alpha_beta_search;
+    if(!strcmp(search, "quiscence-iterative-deepening")) return iterative_deepening;
+    return engine.search;
+}
+
 bool eval_handler(Context context)
 {
     engine.eval = eval_dispatcher(context.eval);
+    engine.search = search_dispatcher(context.search);
 
     castro_BoardInitFen(&engine.board, context.fen);
     int eval = engine.eval(&engine.board);
@@ -52,6 +61,7 @@ bool eval_handler(Context context)
 bool search_handler(Context context)
 {
     engine.eval = eval_dispatcher(context.eval);
+    engine.search = search_dispatcher(context.search);
 
     if(!context.depth) {
         ERRO("Provide a depth");

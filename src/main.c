@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 
     EngineInit(&engine, "chess-engine", "KDesp73");
     engine.eval = pesto_eval;
-    engine.search = alpha_beta_search;
+    engine.search = iterative_deepening;
 
     if(argc > 1) return CliMain(argc, argv);
 

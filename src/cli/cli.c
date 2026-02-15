@@ -19,7 +19,8 @@ void context_init(Context* ctx, Command command)
     context_reset(ctx);
     ctx->command = command;
     ctx->fen = NULL;
-    ctx->eval= NULL;
+    ctx->eval = NULL;
+    ctx->search = NULL;
 }
 
 void context_reset(Context* ctx)
@@ -28,6 +29,7 @@ void context_reset(Context* ctx)
     ctx->command = COMMAND_NONE;
     ctx->fen = NULL;
     ctx->eval = NULL;
+    ctx->search = NULL;
 }
 
 void context_free(Context* ctx)
@@ -35,6 +37,7 @@ void context_free(Context* ctx)
     if(!ctx) return;
     if(ctx->fen) free(ctx->fen);
     if(ctx->eval) free(ctx->eval);
+    if(ctx->search) free(ctx->search);
 }
 
 void set_handler(Dispatcher* this, Command command, HandlerFunc handler)
