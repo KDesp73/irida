@@ -1,15 +1,15 @@
-#include "search.h"
 #include "uci.h"
+#include "core.h"
 #include <ctype.h>
 #include <stdio.h>
 
-void uci_setoption(State* state, const char *command)
+void uci_setoption(UciState* state, const char *command)
 {
     char option_name[64];
     char option_value[128];
 
     if (sscanf(command, "setoption name %63s value %127[^\n]", option_name, option_value) != 2) {
-        LogPrintf("info string Invalid setoption format\n");
+        printf("info string Invalid setoption format\n");
         return;
     }
 
@@ -29,26 +29,34 @@ void uci_setoption(State* state, const char *command)
                     snprintf(state->uciOptions[i].value.string, sizeof(state->uciOptions[i].value.string), "%s", option_value);
                     break;
                 default:
-                    LogPrintf("info string Unknown option type\n");
+                    printf("info string Unknown option type\n");
                     return;
             }
-            LogPrintf("info string Option %s set to %s\n", option_name, option_value);
+            printf("info string Option %s set to %s\n", option_name, option_value);
             return;
         }
     }
 
-    LogPrintf("info string Unknown option: %s\n", option_name);
+    printf("info string Unknown option: %s\n", option_name);
 }
 
 #include "utils.h"
-void uci_go(State* state, const char* command)
+void uci_go(UciState* state, const char* command)
 {
-    UNUSED(state);
-    UNUSED(command);
-    printf("go\n");
+    if (strncmp(command, "go perft ", 9) == 0) {
+        int depth = atoi(command + 9);
+        printf("depth: %d\n", depth);
+        int nodes = castro_Perft(&engine.board, depth, true);
+        printf("\nNodes searched: %d\n", nodes);
+    } else {
+        char bestmove[16];
+        Move move = engine.search(&engine.board, engine.eval, 4);
+        castro_MoveToString(move, bestmove);
+        printf("bestmove %s\n", bestmove);
+    }
 }
 
-void uci_position(State* state, const char* command)
+void uci_position(UciState* state, const char* command)
 {
     char fen[128] = "";
     const char* moves_str = NULL;
@@ -71,7 +79,7 @@ void uci_position(State* state, const char* command)
         if (moves_keyword)
             moves_str = moves_keyword + 7; // skip " moves "
     } else {
-        LogPrintf("info string Invalid position command\n");
+        printf("info string Invalid position command\n");
         return;
     }
 
@@ -92,59 +100,58 @@ void uci_position(State* state, const char* command)
 
             while (*ptr && isspace(*ptr)) ptr++; // Skip whitespace
 
-            Move move = StringToMove(move_str);
-            if (!MakeMove(&state->board, move)) {
-                LogPrintf("info string Illegal move in position: %s\n", move_str);
+            Move move = castro_StringToMove(move_str);
+            if (!castro_MakeMove(&engine.board, move)) {
+                printf("info string Illegal move in position: %s\n", move_str);
                 break;
             }
         }
     }
 }
 
-void uci_uci(State* state)
+void uci_uci(UciState* state)
 {
     state->uciMode = true;
-    LogPrintf("id name %s\n", ENGINE_NAME);
-    LogPrintf("id author %s\n", ENGINE_AUTHOR);
+    printf("id name %s\n", engine.name);
+    printf("id author %s\n", engine.author);
 
-    LogPrintf("\n");
+    printf("\n");
 
     PrintUciOptions(state);
-    LogPrintf("uciok\n");
+    printf("uciok\n");
 }
 
-void uci_isready(State* state)
+void uci_isready(UciState* state)
 {
     UNUSED(state);
-    LogPrintf("readyok\n");
+    printf("readyok\n");
 }
 
-void uci_ucinewgame(State* state)
+void uci_ucinewgame(UciState* state)
 {
     InitState(state);
-    LogPrintf("info New game started.\n");
+    printf("info New game started.\n");
 }
 
-void uci_stop(State* state)
+void uci_stop(UciState* state)
 {
     // TODO: Handle stop command if a calculation is running
     state->stopRequested = true;
-    LogPrintf("info Calculation stopped.\n");
+    printf("info Calculation stopped.\n");
 }
 
-void uci_quit(State* state)
+void uci_quit(UciState* state)
 {
     uci_stop(state);
-    BoardFree(&state->board);
-    exit(0);
 }
 
-void uci_debug(State* state, const char* command)
+void uci_debug(UciState* state, const char* command)
 {
     state->debugMode = strcmp(command + strlen(COMMAND_DEBUG), "on") == 0;
 }
 
-void uci_display(State* state)
+void uci_display(UciState* state)
 {
-    BoardPrint(&state->board, 64);
+    UNUSED(state);
+    castro_BoardPrint(&engine.board, 64);
 }

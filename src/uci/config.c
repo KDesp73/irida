@@ -2,7 +2,7 @@
 #include "uci.h"
 #include <string.h>
 
-bool GetUciOption(const State* state, char* name, UciOption* opt)
+bool GetUciOption(const UciState* state, char* name, UciOption* opt)
 {
     for(size_t i = 0; i < state->uciOptionCount; i++){
         if(!strcmp(name, state->uciOptions[i].name)){
@@ -13,7 +13,7 @@ bool GetUciOption(const State* state, char* name, UciOption* opt)
     return false;
 }
 
-void LoadUciConfig(State* state)
+void LoadUciConfig(UciState* state)
 {
     strncpy(state->startPositionFen, STARTING_FEN, sizeof(state->startPositionFen));
     state->uciMode = true;
@@ -112,7 +112,7 @@ void LoadUciConfig(State* state)
     };
 }
 
-void PrintUciOptions(State* state)
+void PrintUciOptions(UciState* state)
 {
     UciOption* options = state->uciOptions;
 

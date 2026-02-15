@@ -24,7 +24,7 @@ VERSION       := $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 CASTRO_VERSION=0.2.2
 
 # Flags
-CFLAGS  := -Wall -Wextra -fPIC -I$(INCLUDE_DIR) -Iextern/castro/src
+CFLAGS  := -Wall -Wextra -fPIC -I$(INCLUDE_DIR) -Iextern/castro/src -Iextern/
 LDFLAGS := -Lextern/castro -l:libcastro.a
 
 # Build type

@@ -1,6 +1,7 @@
 #ifndef ENGINE_UCI_H
 #define ENGINE_UCI_H
 
+#include "core.h"
 #define CASTRO_STRIP_PREFIX
 #include "castro.h"
 #include <stdbool.h>
@@ -69,23 +70,14 @@ typedef struct {
     UciOption uciOptions[MAX_UCI_OPTIONS]; // Array of UCI options
     size_t uciOptionCount;         // Number of UCI options available
     char lastCommand[128];         // Stores the last command received 
-    
-    Board board;
-} State;
+} UciState;
 
-void LoadUciConfig(State* state);
-void PrintUciOptions(State* state);
-void StatePrint(const State* state);
-bool GetUciOption(const State* state, char* name, UciOption* opt);
+extern UciState uci_state;
 
-extern FILE* in_debug_file;
-extern FILE* out_debug_file;
-extern FILE* original_stdout;
-void LogPrintf(const char* format, ...);
-
-
-#define ENGINE_NAME   "chess-engine"
-#define ENGINE_AUTHOR "KDesp73"
+void LoadUciConfig(UciState* state);
+void PrintUciOptions(UciState* state);
+void StatePrint(const UciState* state);
+bool GetUciOption(const UciState* state, char* name, UciOption* opt);
 
 #define COMMAND_DEBUG      "debug"
 #define COMMAND_DISPLAY    "d"
@@ -99,27 +91,27 @@ void LogPrintf(const char* format, ...);
 #define COMMAND_UCINEWGAME "ucinewgame"
 
 int UciMain();
-bool HandleCommand(State* state, const char *command);
+bool HandleCommand(UciState* state, const char *command);
 
-void uci_debug(State* state, const char* command);
-void uci_display(State* state);
-void uci_go(State* state, const char* command);
-void uci_isready(State* state);
-void uci_position(State* state, const char* command);
-void uci_quit(State* state);
-void uci_setoption(State* state, const char *command);
-void uci_stop(State* state);
-void uci_uci(State* state);
-void uci_ucinewgame(State* state);
+void uci_debug(UciState* state, const char* command);
+void uci_display(UciState* state);
+void uci_go(UciState* state, const char* command);
+void uci_isready(UciState* state);
+void uci_position(UciState* state, const char* command);
+void uci_quit(UciState* state);
+void uci_setoption(UciState* state, const char *command);
+void uci_stop(UciState* state);
+void uci_uci(UciState* state);
+void uci_ucinewgame(UciState* state);
 
-static inline void StateSetStartPos(State* state, const char* startpos)
+static inline void StateSetStartPos(UciState* state, const char* startpos)
 {
     strncpy(state->startPositionFen, startpos, sizeof(state->startPositionFen) - 1);
     state->startPositionFen[sizeof(state->startPositionFen) - 1] = '\0'; // Null-terminate
-    castro_BoardInitFen(&state->board, state->startPositionFen);
+    castro_BoardInitFen(&engine.board, state->startPositionFen);
 }
 
-static inline void InitState(State* state)
+static inline void InitState(UciState* state)
 {
     StateSetStartPos(state, STARTING_FEN);
 }
