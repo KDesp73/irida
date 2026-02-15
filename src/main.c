@@ -13,7 +13,7 @@ int main(int argc, char** argv)
     castro_InitMasks();
 
     EngineInit(&engine, "chess-engine", "KDesp73");
-    engine.eval = simple_eval_fn;
+    engine.eval = pesto_eval;
     engine.search = alpha_beta_search;
 
     if(argc > 1) return CliMain(argc, argv);

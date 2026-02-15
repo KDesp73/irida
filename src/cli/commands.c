@@ -2,8 +2,10 @@
 #include "cli.h"
 #include "castro.h"
 #include "core.h"
+#include "eval.h"
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 
 bool perft_handler(Context context)
 {
@@ -27,8 +29,17 @@ bool perft_handler(Context context)
     return true;
 }
 
+EvalFn eval_dispatcher(char* eval) {
+    if(!eval) return engine.eval;
+    if(!strcmp(eval, "material")) return material_eval;
+    if(!strcmp(eval, "pesto")) return pesto_eval;
+    return engine.eval;
+}
+
 bool eval_handler(Context context)
 {
+    engine.eval = eval_dispatcher(context.eval);
+
     castro_BoardInitFen(&engine.board, context.fen);
     int eval = engine.eval(&engine.board);
 
@@ -40,6 +51,8 @@ bool eval_handler(Context context)
 
 bool search_handler(Context context)
 {
+    engine.eval = eval_dispatcher(context.eval);
+
     if(!context.depth) {
         ERRO("Provide a depth");
         return false;

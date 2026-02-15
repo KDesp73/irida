@@ -5,6 +5,7 @@
 
 typedef int (*EvalFn)(Board*) ;
 
-int simple_eval_fn(Board* board);
+int material_eval(Board* board);
+int pesto_eval(Board* board);
 
 #endif // EVAL_H

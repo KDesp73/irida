@@ -1,7 +1,7 @@
 #include "castro.h"
 #include "eval.h"
 
-int simple_eval_fn(Board* board)
+int material_eval(Board* board)
 {
     size_t white = 0, black = 0;
 
@@ -38,4 +38,3 @@ int simple_eval_fn(Board* board)
 
     return (int)(white - black);
 }
-

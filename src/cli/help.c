@@ -25,16 +25,21 @@ void default_help()
     PRINT("%s <COMMAND> [<OPTIONS>...]", engine.name);
     PRINT("");
     HEADER("COMMANDS");
-    INDENT("perft           Run PERFT on a specific fen");
-    INDENT("eval            Run an evaluation on a position");
-    INDENT("search          Find the best move in a position");
+    INDENT("perft                   Run PERFT on a specific fen");
+    INDENT("eval                    Run an evaluation on a position");
+    INDENT("search                  Find the best move in a position");
     PRINT("");
 
     HEADER("OPTIONS");
-    INDENT("-h --help       Print this message and exit");
-    INDENT("-v --version    Print the version and exit");
-    INDENT("-F --fen        Specify the FEN string");
-    INDENT("-d --depth      Specify the depth");
+    INDENT("-h --help               Print this message and exit");
+    INDENT("-F --fen <FEN>          Specify the FEN string");
+    INDENT("-d --depth <DEPTH>      Specify the depth");
+    INDENT("-E --eval <EVAL>        Specify the evaluation function to use");
+    PRINT("");
+
+    HEADER("EVALUATION FUNCTIONS");
+    INDENT("material");
+    INDENT("pesto");
     PRINT("");
 
     PRINT("Written by %s", engine.author);
@@ -45,9 +50,10 @@ void perft_help()
     PRINT("%s perft [<OPTIONS>...]", engine.name);
     PRINT("");
     HEADER("OPTIONS");
-    INDENT("-h --help       Print this message and exit");
-    INDENT("-F --fen        Specify the FEN string");
-    INDENT("-d --depth      Specify the depth");
+    INDENT("-h --help               Print this message and exit");
+    INDENT("-F --fen <FEN>          Specify the FEN string");
+    INDENT("-d --depth <DEPTH>      Specify the depth");
+    INDENT("-E --eval <EVAL>        Specify the evaluation function to use");
 }
 
 void eval_help()
@@ -55,8 +61,9 @@ void eval_help()
     PRINT("%s eval [<OPTIONS>...]", engine.name);
     PRINT("");
     HEADER("OPTIONS");
-    INDENT("-h --help       Print this message and exit");
-    INDENT("-F --fen        Specify the FEN string");
+    INDENT("-h --help               Print this message and exit");
+    INDENT("-F --fen <FEN>          Specify the FEN string");
+    INDENT("-E --eval <EVAL>        Specify the evaluation function to use");
 }
 
 void search_help()
@@ -64,9 +71,10 @@ void search_help()
     PRINT("%s search [<OPTIONS>...]", engine.name);
     PRINT("");
     HEADER("OPTIONS");
-    INDENT("-h --help       Print this message and exit");
-    INDENT("-F --fen        Specify the FEN string");
-    INDENT("-d --depth      Specify the depth");
+    INDENT("-h --help               Print this message and exit");
+    INDENT("-F --fen <FEN>          Specify the FEN string");
+    INDENT("-d --depth <DEPTH>      Specify the depth");
+    INDENT("-E --eval <EVAL>        Specify the evaluation function to use");
 }
 
 void help(Command command) {

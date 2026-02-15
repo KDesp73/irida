@@ -17,6 +17,7 @@ int CliMain(int argc, char** argv)
         cli_arg_new(ARG_VERSION, "version", "", no_argument),
         cli_arg_new(ARG_FEN, "fen", "", required_argument),
         cli_arg_new(ARG_DEPTH, "depth", "", required_argument),
+        cli_arg_new(ARG_EVAL, "eval", "", required_argument),
         NULL
     );
     char* command_str = argc == 1 ? NULL : argv[1];
@@ -39,6 +40,9 @@ int CliMain(int argc, char** argv)
                 break;
             case ARG_DEPTH:
                 ctx.depth = (size_t) atoi(optarg);
+                break;
+            case ARG_EVAL:
+                ctx.eval = strdup(optarg);
                 break;
             default:
                 goto error;

@@ -18,10 +18,12 @@ typedef enum {
    ARG_VERSION = 'v',
    ARG_FEN = 'F',
    ARG_DEPTH = 'd',
+   ARG_EVAL = 'E',
 } CliArgs;
 
 typedef struct {
     char* fen;
+    char* eval;
     size_t depth;
     Command command;
 } Context;
