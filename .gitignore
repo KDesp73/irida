@@ -8,5 +8,5 @@ compile_commands.json
 tmp
 *.log
 
-.zig-cache
-zig-out
+libengine.*
+engine
