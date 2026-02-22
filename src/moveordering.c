@@ -1,8 +1,8 @@
+#include <stddef.h>
 #include <stdint.h>
 #include "castro.h"
+#include "core.h"
 
-// Piece values (0–5 = PAWN..KING)
-static const int PIECE_VALUES[6] = {100, 320, 330, 500, 900, 0};
 
 // 12×12 MVV-LVA table: [attacker][victim]
 static int MVV_LVA[12][12];
@@ -87,13 +87,13 @@ static inline int score_move(Board *board, Move m, int ply)
 }
 
 // Partial selection sort for move picking
-void order_moves(Board *board, Move moves[], int count, int ply)
+void order_moves(Board *board, Move moves[], size_t count, size_t ply)
 {
-    for (int i = 0; i < count; i++) {
-        int best_idx = i;
+    for (size_t i = 0; i < count; i++) {
+        size_t best_idx = i;
         int best_score = score_move(board, moves[i], ply);
 
-        for (int j = i + 1; j < count; j++) {
+        for (size_t j = i + 1; j < count; j++) {
             int s = score_move(board, moves[j], ply);
             if (s > best_score) {
                 best_score = s;
@@ -110,16 +110,14 @@ void order_moves(Board *board, Move moves[], int count, int ply)
     }
 }
 
-// Call this after a quiet move causes a beta-cutoff
-static inline void update_history(Move m, int depth)
+void update_history(Move m, int depth)
 {
     int from = castro_GetFrom(m);
     int to   = castro_GetTo(m);
     history[from][to] += depth * depth;
 }
 
-// Call this after a quiet move causes beta-cutoff to update killer moves
-static inline void update_killer(Move m, int ply)
+void update_killer(Move m, int ply)
 {
     if (killer1[ply] != m) {
         killer2[ply] = killer1[ply];

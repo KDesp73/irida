@@ -39,8 +39,7 @@ EvalFn eval_dispatcher(char* eval) {
 
 SearchFn search_dispatcher(char* search) {
     if(!search) return engine.search;
-    if(!strcmp(search, "alpha-beta")) return alpha_beta_search;
-    if(!strcmp(search, "quiscence-iterative-deepening")) return iterative_deepening;
+    // TODO: add variants
     return engine.search;
 }
 
@@ -71,7 +70,7 @@ bool search_handler(Context context)
     castro_BoardInitFen(&engine.board, context.fen);
 
     char bestmove[16];
-    Move move = engine.search(&engine.board, engine.eval, context.depth);
+    Move move = engine.search(&engine.board, engine.eval, engine.order, &g_searchConfig);
 
     castro_BoardFree(&engine.board);
 

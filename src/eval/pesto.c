@@ -1,5 +1,6 @@
 // www.chessprogramming.org/PeSTO's_Evaluation_Function
 
+#include "IncludeOnly/logging.h"
 #include "castro.h"
 
 #define WHITE_PAWN_ENCODING    (2*PAWN   + COLOR_WHITE)

@@ -1,3 +1,4 @@
+#include "search.h"
 #include "uci.h"
 #include "core.h"
 #include <ctype.h>
@@ -50,7 +51,7 @@ void uci_go(UciState* state, const char* command)
         printf("\nNodes searched: %d\n", nodes);
     } else {
         char bestmove[16];
-        Move move = engine.search(&engine.board, engine.eval, 4);
+        Move move = engine.search(&engine.board, engine.eval, engine.order, &g_searchConfig);
         castro_MoveToString(move, bestmove);
         printf("bestmove %s\n", bestmove);
     }
