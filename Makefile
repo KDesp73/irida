@@ -4,6 +4,7 @@ include make/utils.mk
 include make/deps.mk
 include make/dist.mk
 include make/build.mk
+include make/test.mk
 
 .PHONY: help
 help: ## Show this help message

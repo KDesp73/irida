@@ -2,6 +2,48 @@
 
 This document describes how to measure engine strength and run regression tests.
 
+## Unit tests (test.h)
+
+The engine uses the [IncludeOnly/test.h](https://github.com/IncludeOnly/test.h) library with the bundled loader script. Tests are data-driven: each test has a `.c` file (implementation) and a `.ctd` file (one line per case; each line is the C argument list for the test function).
+
+### Running tests
+
+```bash
+make test
+```
+
+This regenerates headers from `.ctd` files, builds the test binary (`check`), and runs all batches. For a release build:
+
+```bash
+make test type=RELEASE
+```
+
+### Running a single batch
+
+```bash
+make test.batch n=1   # batch 1: test_draws
+make test.batch n=2   # batch 2: test_eval
+make test.batch n=3   # batch 3: test_search
+```
+
+### Regenerating test headers
+
+After editing a `.ctd` file, headers are regenerated automatically when you run `make test`. To regenerate without building:
+
+```bash
+make test.generate
+```
+
+This runs `scripts/loader -d test -H "extern/IncludeOnly/test.h" -L "castro.h"`.
+
+### Test batches
+
+| Batch | Tests | Description |
+|-------|--------|-------------|
+| 1 | test_draws | `is_draw()`: 50-move, insufficient material (K vs K, K+B, etc.) |
+| 2 | test_eval | `pesto_eval()`: score in expected range for start position, e4, and K vs K |
+| 3 | test_search | `search_root()`: completes without crashing at depth 2–3 |
+
 ## Prerequisites
 
 - **cutechess-cli**: run engine-vs-engine games. Install e.g. via:
