@@ -267,7 +267,7 @@ Selective depth increases.
 
 Common extensions:
 
-* In-check extension
+* **In-check extension** (implemented): when the side to move is in check and depth >= 1, extend by one ply so we don't horizon-effect out of check.
 * Recapture extension
 * Passed pawn push near promotion
 * Mate threat extension

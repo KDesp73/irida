@@ -19,3 +19,4 @@ extern/IncludeOnly:
 	$(call fetchio,ansi)
 	$(call fetchio,cli)
 	$(call fetchio,logging)
+	$(call fetchio,test)

@@ -3,6 +3,7 @@
 #include "castro.h"
 #include "core.h"
 #include "eval.h"
+#include "nnue.h"
 #include "search.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -34,6 +35,7 @@ EvalFn eval_dispatcher(char* eval) {
     if(!eval) return engine.eval;
     if(!strcmp(eval, "material")) return material_eval;
     if(!strcmp(eval, "pesto")) return pesto_eval;
+    if(!strcmp(eval, "nnue")) return nnue_eval;
     return engine.eval;
 }
 

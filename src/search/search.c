@@ -1,7 +1,20 @@
 #include "search.h"
 #include "castro.h"
 #include "tt.h"
+#include "moveordering.h"
+#include "uci.h"
+#include "uci_thread.h"
+#include "draws.h"
+#include "syzygy.h"
 #include <stdint.h>
+
+static bool search_should_stop(void)
+{
+    return search_time_up() || uci_state.stopRequested;
+}
+
+/* Cap iterative deepening so we don't run hundreds of trivial iterations (e.g. draw/TB positions). */
+#define MAX_ID_DEPTH 64
 
 Move search_root(Board* board,
                  EvalFn eval,
@@ -17,23 +30,54 @@ Move search_root(Board* board,
 
     search_start_timer(config->timeLimitMs);
 
-    for (int depth = 1; depth <= config->maxDepth; depth++) {
+    const int aspirationWindow = 50;
+    int prevScore = 0;
+    bool fullWindowRetry = false;
+    int maxDepth = config->maxDepth;
+    if (maxDepth > MAX_ID_DEPTH)
+        maxDepth = MAX_ID_DEPTH;
 
-        if (search_time_up())
+    uint64_t prevNodes = 0;
+
+    for (int depth = 1; depth <= maxDepth; depth++) {
+
+        if (search_should_stop())
             break;
 
         int alpha = -INF;
         int beta  = INF;
+        bool usedNarrowWindow = false;
+
+        /* After an aspiration fail we retry this depth with full window (don't check again) */
+        if (fullWindowRetry) {
+            fullWindowRetry = false;
+            /* alpha/beta already -INF/INF */
+        } else if (config->useAspiration && depth > 1) {
+            alpha = prevScore - aspirationWindow;
+            beta  = prevScore + aspirationWindow;
+            if (alpha < -INF) alpha = -INF;
+            if (beta > INF) beta = INF;
+            usedNarrowWindow = true;
+        }
+
+        uint64_t rootHash = castro_CalculateZobristHash(board);
+        Move rootTtMove = {0};
+        int dummyScore;
+        if (tt_probe(rootHash, depth, -INF, INF, 0, &dummyScore, &rootTtMove))
+            set_tt_move(rootTtMove);
+        else
+            set_tt_move((Move){0});
 
         Moves moves = castro_GenerateMoves(board, MOVE_LEGAL);
         order(board, moves.list, moves.count, 0);
 
         int localBestScore = -INF;
         Move localBestMove = {0};
+        bool aspirationFail = false;
 
         for (size_t i = 0; i < moves.count; i++) {
 
-            if (search_time_up())
+            if (search_should_stop())
                 break;
 
             Move move = moves.list[i];
@@ -41,17 +85,18 @@ Move search_root(Board* board,
             if (!castro_MakeMove(board, move))
                 continue;
 
-            int score = -search(board,
-                                depth - 1,
-                                -beta,
-                                -alpha,
-                                1,
-                                eval,
-                                order);
+            int score;
+            if (i == 0) {
+                score = -search(board, depth - 1, -beta, -alpha, 1, eval, order);
+            } else {
+                score = -search(board, depth - 1, -alpha - 1, -alpha, 1, eval, order);
+                if (score > alpha)
+                    score = -search(board, depth - 1, -beta, -alpha, 1, eval, order);
+            }
 
             castro_UnmakeMove(board);
 
-            if (search_time_up())
+            if (search_should_stop())
                 break;
 
             if (score > localBestScore) {
@@ -61,12 +106,31 @@ Move search_root(Board* board,
 
             if (score > alpha)
                 alpha = score;
+
+            /* Aspiration fail-high or fail-low only when we used narrow window; then retry with full window */
+            if (usedNarrowWindow && (score <= prevScore - aspirationWindow || score >= prevScore + aspirationWindow)) {
+                aspirationFail = true;
+                break;
+            }
         }
 
-        if (!search_time_up()) {
+        if (aspirationFail) {
+            fullWindowRetry = true;
+            depth--;  /* re-do same depth with full window next iteration */
+            continue;
+        }
+
+        if (!search_should_stop()) {
             bestMove = localBestMove;
             bestScore = localBestScore;
         }
+        prevScore = localBestScore;
+
+        /* Early exit only when tree has clearly collapsed (e.g. draw/TB): high depth but almost no new nodes. */
+        uint64_t nodesThisDepth = g_searchStats.nodes;
+        if (depth >= 16 && (nodesThisDepth - prevNodes) < 50)
+            break;
+        prevNodes = nodesThisDepth;
 
     uint64_t timeMs = search_elapsed_ms();
     uint64_t nodes  = g_searchStats.nodes;
@@ -75,6 +139,7 @@ Move search_root(Board* board,
     char move[12];
     castro_MoveToString(bestMove, move);
 
+    uci_stdout_lock();
     printf("info depth %d seldepth %d score cp %d nodes %llu nps %llu time %llu pv %s\n",
            depth,
            g_searchStats.selDepth,
@@ -84,6 +149,8 @@ Move search_root(Board* board,
            (unsigned long long)timeMs,
            move
         );
+    fflush(stdout);
+    uci_stdout_unlock();
     }
 
     return bestMove;
@@ -99,7 +166,7 @@ int search(Board* board,
            OrderFn order)
 {
     if ((g_searchStats.nodes++ & 2047) == 0) {
-        if (search_time_up())
+        if (search_should_stop())
             return 0;
     }
 
@@ -116,6 +183,7 @@ int search(Board* board,
                  depth,
                  alpha,
                  beta,
+                 ply,
                  &ttScore,
                  &ttMove))
     {
@@ -126,16 +194,45 @@ int search(Board* board,
     if (depth <= 0)
         return quiescence(board, alpha, beta, ply, eval, order);
 
+    if (is_draw(board))
+        return 0;
+
+    /* Syzygy probe: in leaf-like positions within limit, use TB score */
+    if (syzygy_available()
+        && depth <= g_searchConfig.syzygyProbeDepth
+        && syzygy_piece_count(board) <= (unsigned)g_searchConfig.syzygyProbeLimit) {
+        int tb_score = syzygy_probe_wdl(board, g_searchConfig.syzygy50MoveRule);
+        if (tb_score != SYZYGY_PROBE_FAILED)
+            return tb_score;
+    }
+
     Moves moves = castro_GenerateMoves(board, MOVE_LEGAL);
 
     if (moves.count == 0) {
-        // Checkmate or stalemate
+        /* Checkmate or stalemate */
         if (castro_IsInCheck(board))
             return -MATE_SCORE + ply;
         else
             return 0;
     }
 
+    /* Check extension: extend by one ply when in check */
+    int extension = (castro_IsInCheck(board) && depth >= 1) ? 1 : 0;
+    int effective_depth = depth + extension;
+
+    /* Null move pruning (requires castro_MakeNullMove/UnmakeNullMove in castro) */
+#if defined(CASTRO_HAS_NULLMOVE) && CASTRO_HAS_NULLMOVE
+    const int R = 3;
+    if (g_searchConfig.useNullMove && effective_depth >= R + 1 && !castro_IsInCheck(board)) {
+        castro_MakeNullMove(board);
+        int nullScore = -search(board, effective_depth - 1 - R, -beta, -beta + 1, ply + 1, eval, order);
+        castro_UnmakeNullMove(board);
+        if (nullScore >= beta)
+            return beta;
+    }
+#endif
+
+    set_tt_move(ttMove);
     order(board, moves.list, moves.count, ply);
 
     int bestScore = -INF;
@@ -144,17 +241,41 @@ int search(Board* board,
     for (size_t i = 0; i < moves.count; i++) {
 
         Move move = moves.list[i];
+        bool isCapture = castro_IsCapture(board, move);
 
         if (!castro_MakeMove(board, move))
             continue;
 
-        int score = -search(board,
-                            depth - 1,
-                            -beta,
-                            -alpha,
-                            ply + 1,
-                            eval,
-                            order);
+        int score;
+        bool doFullSearch = true;
+        int reduction = 0;
+
+        if (g_searchConfig.useLMR && effective_depth >= 3 && i >= 2 && !isCapture)
+            reduction = 2;
+
+        if (reduction > 0) {
+            /* Late move reduction: try reduced depth with zero window first */
+            score = -search(board, effective_depth - 1 - reduction, -alpha - 1, -alpha, ply + 1, eval, order);
+            if (score > alpha)
+                doFullSearch = true;
+            else
+                doFullSearch = false;
+        }
+
+        if (doFullSearch) {
+            if (g_searchConfig.useLMR && reduction > 0) {
+                /* Re-search at full depth */
+                score = -search(board, effective_depth - 1, -beta, -alpha, ply + 1, eval, order);
+            } else if (i == 0) {
+                /* PVS: first move with full window */
+                score = -search(board, effective_depth - 1, -beta, -alpha, ply + 1, eval, order);
+            } else {
+                /* PVS: zero window for remaining moves */
+                score = -search(board, effective_depth - 1, -alpha - 1, -alpha, ply + 1, eval, order);
+                if (score > alpha)
+                    score = -search(board, effective_depth - 1, -beta, -alpha, ply + 1, eval, order);
+            }
+        }
 
         castro_UnmakeMove(board);
 
@@ -166,8 +287,13 @@ int search(Board* board,
         if (score > alpha)
             alpha = score;
 
-        if (alpha >= beta)
+        if (alpha >= beta) {
+            if (!isCapture) {
+                update_killer(move, ply);
+                update_history(move, depth);
+            }
             break;  // beta cutoff
+        }
     }
 
     TTNodeType type;
@@ -180,10 +306,11 @@ int search(Board* board,
         type = TT_EXACT;
 
     tt_store(zobrist,
-             depth,
+             effective_depth,
              bestScore,
              type,
-             bestMove);
+             bestMove,
+             ply);
 
     return bestScore;
 }

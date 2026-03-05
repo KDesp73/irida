@@ -24,6 +24,7 @@ bool tt_probe(uint64_t key,
               int depth,
               int alpha,
               int beta,
+              int ply,
               int* outScore,
               Move* outMove);
 
@@ -31,7 +32,8 @@ void tt_store(uint64_t key,
               int depth,
               int score,
               TTNodeType type,
-              Move bestMove);
+              Move bestMove,
+              int ply);
 
 
 #endif // TT_H

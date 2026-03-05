@@ -64,7 +64,8 @@ typedef struct {
     int movesToGo;                 // Moves to the next time control, if applicable
     bool ponderMode;               // Whether ponder mode is enabled
     bool infiniteMode;             // Whether infinite search mode is enabled
-    bool stopRequested;            // Whether a stop command has been received
+    bool stopRequested;            // Whether a stop command has been received (tells search to stop)
+    bool quitRequested;            // Whether to exit the UCI loop (set by "quit" only)
     UciStatus status;
 
     UciOption uciOptions[MAX_UCI_OPTIONS]; // Array of UCI options

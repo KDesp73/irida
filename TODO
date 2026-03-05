@@ -1,14 +1,14 @@
-TODO: syzygy tablebase
 TODO: pick a license
-TODO: nnue evaluation
-TODO: transposition tables
 TODO: aspiration windows
 TODO: pick a name
 TODO: engine testing
 TODO: better traditional evaluation
-TODO: move ordering
 TODO: recipes
 TODO: cache
+DONE: syzygy tablebase (optional Fathom)
+DONE: nnue evaluation (optional nnue-probe)
+DONE: transposition tables
+DONE: move ordering
 DONE: tests
 DONE: move generation
 DONE: perft testing

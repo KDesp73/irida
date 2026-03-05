@@ -1,0 +1,4 @@
+# (fen, score_min, score_max) centipawns for pesto_eval. Start position ~0.
+"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", -50, 50
+"rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", -100, 100
+"4k3/8/8/8/8/8/8/4K3 w - - 0 1", -50, 50

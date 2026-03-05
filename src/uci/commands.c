@@ -1,33 +1,81 @@
 #include "search.h"
 #include "uci.h"
 #include "core.h"
+#include "tt.h"
+#include "uci_thread.h"
+#include "nnue.h"
+#include "syzygy.h"
 #include <ctype.h>
 #include <stdio.h>
+#include <string.h>
+
+static void trim_tail(char* s)
+{
+    for (size_t i = strlen(s); i > 0 && (s[i - 1] == ' ' || s[i - 1] == '\t'); i--)
+        s[i - 1] = '\0';
+}
 
 void uci_setoption(UciState* state, const char *command)
 {
     char option_name[64];
     char option_value[128];
 
-    if (sscanf(command, "setoption name %63s value %127[^\n]", option_name, option_value) != 2) {
+    const char* name_key = " name ";
+    const char* value_key = " value ";
+    const char* p = strstr(command, name_key);
+    if (!p) {
         printf("info string Invalid setoption format\n");
         return;
     }
+    p += strlen(name_key);
+    const char* value_start = strstr(p, value_key);
+    if (!value_start) {
+        printf("info string Invalid setoption format\n");
+        return;
+    }
+    size_t name_len = (size_t)(value_start - p);
+    if (name_len >= sizeof(option_name))
+        name_len = sizeof(option_name) - 1;
+    memcpy(option_name, p, name_len);
+    option_name[name_len] = '\0';
+    trim_tail(option_name);
+
+    const char* val = value_start + strlen(value_key);
+    strncpy(option_value, val, sizeof(option_value) - 1);
+    option_value[sizeof(option_value) - 1] = '\0';
+    trim_tail(option_value);
 
     for (size_t i = 0; i < state->uciOptionCount; i++) {
         if (strcmp(state->uciOptions[i].name, option_name) == 0) {
             switch (state->uciOptions[i].type) {
                 case UCI_CHECK:
                     state->uciOptions[i].value.check = (strcmp(option_value, "true") == 0);
+                    if (strcmp(option_name, "Syzygy50MoveRule") == 0)
+                        g_searchConfig.syzygy50MoveRule = state->uciOptions[i].value.check;
                     break;
-                case UCI_SPIN:
-                    state->uciOptions[i].value.spin = atoi(option_value);
+                case UCI_SPIN: {
+                    int v = atoi(option_value);
+                    state->uciOptions[i].value.spin = v;
+                    if (strcmp(option_name, "Hash") == 0) {
+                        if (v < 1) v = 1;
+                        if (v > 2048) v = 2048;
+                        tt_init((size_t)v);
+                    } else if (strcmp(option_name, "SyzygyProbeDepth") == 0) {
+                        g_searchConfig.syzygyProbeDepth = (v < 1) ? 1 : (v > 100) ? 100 : v;
+                    } else if (strcmp(option_name, "SyzygyProbeLimit") == 0) {
+                        g_searchConfig.syzygyProbeLimit = (v < 0) ? 0 : (v > 7) ? 7 : v;
+                    }
                     break;
+                }
                 case UCI_COMBO:
                     snprintf(state->uciOptions[i].value.combo, sizeof(state->uciOptions[i].value.combo), "%s", option_value);
                     break;
                 case UCI_STRING:
                     snprintf(state->uciOptions[i].value.string, sizeof(state->uciOptions[i].value.string), "%s", option_value);
+                    if (strcmp(option_name, "EvalFile") == 0)
+                        nnue_load(option_value);
+                    else if (strcmp(option_name, "SyzygyPath") == 0)
+                        syzygy_init(option_value);
                     break;
                 default:
                     printf("info string Unknown option type\n");
@@ -42,6 +90,99 @@ void uci_setoption(UciState* state, const char *command)
 }
 
 #include "utils.h"
+
+/* Parse "go depth N", "go movetime M", "go wtime W btime B", "go infinite" and set g_searchConfig. */
+static void parse_go_command(const char* command)
+{
+    /* Defaults: use existing config; override from command */
+    int maxDepth = g_searchConfig.maxDepth;
+    int timeLimitMs = g_searchConfig.timeLimitMs;
+    bool saw_wtime = false, saw_btime = false;
+    bool go_infinite = false;
+
+    const char* p = command + 2;  /* skip "go" */
+    while (*p) {
+        while (*p == ' ') p++;
+        if (!*p) break;
+        if (strncmp(p, "depth ", 6) == 0) {
+            maxDepth = atoi(p + 6);
+            if (maxDepth < 1) maxDepth = 1;
+            if (maxDepth > 128) maxDepth = 128;
+            p += 6;
+            while (*p && *p != ' ') p++;
+            continue;
+        }
+        if (strncmp(p, "movetime ", 9) == 0) {
+            timeLimitMs = atoi(p + 9);
+            if (timeLimitMs < 0) timeLimitMs = 0;
+            p += 9;
+            while (*p && *p != ' ') p++;
+            continue;
+        }
+        if (strncmp(p, "infinite", 8) == 0 && (p[8] == '\0' || p[8] == ' ')) {
+            timeLimitMs = 0;
+            maxDepth = 128;
+            go_infinite = true;
+            p += 8;
+            continue;
+        }
+        if (strncmp(p, "wtime ", 6) == 0) {
+            uci_state.timeLeft[0] = atoi(p + 6);
+            saw_wtime = true;
+            p += 6;
+            while (*p && *p != ' ') p++;
+            continue;
+        }
+        if (strncmp(p, "btime ", 6) == 0) {
+            uci_state.timeLeft[1] = atoi(p + 6);
+            saw_btime = true;
+            p += 6;
+            while (*p && *p != ' ') p++;
+            continue;
+        }
+        if (strncmp(p, "winc ", 5) == 0) {
+            uci_state.increment[0] = atoi(p + 5);
+            p += 5;
+            while (*p && *p != ' ') p++;
+            continue;
+        }
+        if (strncmp(p, "binc ", 5) == 0) {
+            uci_state.increment[1] = atoi(p + 5);
+            p += 5;
+            while (*p && *p != ' ') p++;
+            continue;
+        }
+        if (strncmp(p, "movestogo ", 10) == 0) {
+            uci_state.movesToGo = atoi(p + 10);
+            p += 10;
+            while (*p && *p != ' ') p++;
+            continue;
+        }
+        /* Unknown token: skip until next space */
+        while (*p && *p != ' ') p++;
+    }
+
+    /* If wtime/btime were given in this command, set time limit from remaining time.
+     * Allocate (time_left / moves) + increment with a 10% reserve to avoid flagging. */
+    if ((saw_wtime || saw_btime) && timeLimitMs <= 0) {
+        int side = engine.board.turn ? 0 : 1;  /* white = 0, black = 1 */
+        int time_left = uci_state.timeLeft[side];
+        int inc = uci_state.increment[side];
+        int moves = (uci_state.movesToGo > 0) ? uci_state.movesToGo : 20;
+        if (moves < 1) moves = 1;
+        int alloc = (time_left / moves) + inc;
+        if (alloc > 0)
+            timeLimitMs = (alloc * 90) / 100;  /* use 90% to keep reserve */
+    }
+
+    /* If still no time limit (plain "go" or no time params), use 10s default so we don't hang */
+    if (timeLimitMs <= 0 && !go_infinite)
+        timeLimitMs = 10000;
+
+    g_searchConfig.maxDepth = maxDepth;
+    g_searchConfig.timeLimitMs = timeLimitMs;
+}
+
 void uci_go(UciState* state, const char* command)
 {
     if (strncmp(command, "go perft ", 9) == 0) {
@@ -50,15 +191,16 @@ void uci_go(UciState* state, const char* command)
         int nodes = castro_Perft(&engine.board, depth, true);
         printf("\nNodes searched: %d\n", nodes);
     } else {
-        char bestmove[16];
-        Move move = engine.search(&engine.board, engine.eval, engine.order, &g_searchConfig);
-        castro_MoveToString(move, bestmove);
-        printf("bestmove %s\n", bestmove);
+        parse_go_command(command);
+        state->stopRequested = false;  /* clear so search runs until time or explicit stop */
+        uci_search_start();  /* run search in worker thread; bestmove printed there */
     }
 }
 
 void uci_position(UciState* state, const char* command)
 {
+    uci_search_wait_done();  /* don't touch board while search is running */
+
     char fen[128] = "";
     const char* moves_str = NULL;
 
@@ -136,14 +278,14 @@ void uci_ucinewgame(UciState* state)
 
 void uci_stop(UciState* state)
 {
-    // TODO: Handle stop command if a calculation is running
-    state->stopRequested = true;
+    state->stopRequested = true;  /* search thread will see this and return bestmove */
     printf("info Calculation stopped.\n");
 }
 
 void uci_quit(UciState* state)
 {
-    uci_stop(state);
+    state->stopRequested = true;  /* stop any running search first */
+    state->quitRequested = true;  /* then exit the main loop */
 }
 
 void uci_debug(UciState* state, const char* command)

@@ -2,7 +2,8 @@
 #include <string.h>
 #include "tt.h"
 
-#define TT_CLUSTER_SIZE 1
+/* Mate scores are adjusted by ply when storing/retrieving so they remain valid at any ply. */
+#define MATE_THRESHOLD 899488
 
 static TTEntry* ttTable = NULL;
 static size_t ttSize = 0;
@@ -39,10 +40,20 @@ void tt_clear(void)
         memset(ttTable, 0, ttSize * sizeof(TTEntry));
 }
 
+static int tt_unadjust_score(int stored, int ply)
+{
+    if (stored > MATE_THRESHOLD)
+        return stored + ply;
+    if (stored < -MATE_THRESHOLD)
+        return stored - ply;
+    return stored;
+}
+
 bool tt_probe(uint64_t key,
               int depth,
               int alpha,
               int beta,
+              int ply,
               int* outScore,
               Move* outMove)
 {
@@ -58,7 +69,7 @@ bool tt_probe(uint64_t key,
 
     if (entry->depth >= depth) {
 
-        int score = entry->score;
+        int score = tt_unadjust_score(entry->score, ply);
 
         switch (entry->type) {
 
@@ -85,11 +96,21 @@ bool tt_probe(uint64_t key,
     return false;
 }
 
+static int tt_adjust_score(int score, int ply)
+{
+    if (score > MATE_THRESHOLD)
+        return score - ply;
+    if (score < -MATE_THRESHOLD)
+        return score + ply;
+    return score;
+}
+
 void tt_store(uint64_t key,
               int depth,
               int score,
               TTNodeType type,
-              Move bestMove)
+              Move bestMove,
+              int ply)
 {
     if (!ttTable)
         return;
@@ -106,7 +127,7 @@ void tt_store(uint64_t key,
     {
         entry->key = key;
         entry->depth = depth;
-        entry->score = score;
+        entry->score = tt_adjust_score(score, ply);
         entry->type = type;
         entry->bestMove = bestMove;
     }
