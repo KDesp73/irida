@@ -21,11 +21,11 @@ VERSION_MINOR := $(shell sed -n -e 's/\#define VERSION_MINOR \([0-9]*\)/\1/p' $(
 VERSION_PATCH := $(shell sed -n -e 's/\#define VERSION_PATCH \([0-9]*\)/\1/p' $(version_file))
 VERSION       := $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 
-CASTRO_VERSION=0.3.0
+CASTRO_VERSION=0.4.0
 
 # Flags
 CFLAGS  := -Wall -Wextra -fPIC -I$(INCLUDE_DIR) -Iextern/castro/src -Iextern/
-LDFLAGS := -Lextern/castro -l:libcastro.a
+LDFLAGS := -lpthread 
 
 # Build type
 ifeq ($(type), RELEASE)

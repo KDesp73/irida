@@ -2,6 +2,7 @@
 #include "uci.h"
 #include "core.h"
 #include "tt.h"
+#include "uci_thread.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
@@ -162,7 +163,7 @@ static void parse_go_command(const char* command)
 
     /* If still no time limit (plain "go" or no time params), use 5s default so we don't hang */
     if (timeLimitMs <= 0 && !go_infinite)
-        timeLimitMs = 5000;
+        timeLimitMs = 10000;
 
     g_searchConfig.maxDepth = maxDepth;
     g_searchConfig.timeLimitMs = timeLimitMs;
@@ -178,15 +179,14 @@ void uci_go(UciState* state, const char* command)
     } else {
         parse_go_command(command);
         state->stopRequested = false;  /* clear so search runs until time or explicit stop */
-        char bestmove[16];
-        Move move = engine.search(&engine.board, engine.eval, engine.order, &g_searchConfig);
-        castro_MoveToString(move, bestmove);
-        printf("bestmove %s\n", bestmove);
+        uci_search_start();  /* run search in worker thread; bestmove printed there */
     }
 }
 
 void uci_position(UciState* state, const char* command)
 {
+    uci_search_wait_done();  /* don't touch board while search is running */
+
     char fen[128] = "";
     const char* moves_str = NULL;
 

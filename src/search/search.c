@@ -3,6 +3,7 @@
 #include "tt.h"
 #include "moveordering.h"
 #include "uci.h"
+#include "uci_thread.h"
 #include <stdint.h>
 
 static bool search_should_stop(void)
@@ -122,6 +123,7 @@ Move search_root(Board* board,
     char move[12];
     castro_MoveToString(bestMove, move);
 
+    uci_stdout_lock();
     printf("info depth %d seldepth %d score cp %d nodes %llu nps %llu time %llu pv %s\n",
            depth,
            g_searchStats.selDepth,
@@ -131,6 +133,8 @@ Move search_root(Board* board,
            (unsigned long long)timeMs,
            move
         );
+    fflush(stdout);
+    uci_stdout_unlock();
     }
 
     return bestMove;
