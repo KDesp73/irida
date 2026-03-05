@@ -1,18 +1,46 @@
 #include "search.h"
 #include "uci.h"
 #include "core.h"
+#include "tt.h"
 #include <ctype.h>
 #include <stdio.h>
+#include <string.h>
+
+static void trim_tail(char* s)
+{
+    for (size_t i = strlen(s); i > 0 && (s[i - 1] == ' ' || s[i - 1] == '\t'); i--)
+        s[i - 1] = '\0';
+}
 
 void uci_setoption(UciState* state, const char *command)
 {
     char option_name[64];
     char option_value[128];
 
-    if (sscanf(command, "setoption name %63s value %127[^\n]", option_name, option_value) != 2) {
+    const char* name_key = " name ";
+    const char* value_key = " value ";
+    const char* p = strstr(command, name_key);
+    if (!p) {
         printf("info string Invalid setoption format\n");
         return;
     }
+    p += strlen(name_key);
+    const char* value_start = strstr(p, value_key);
+    if (!value_start) {
+        printf("info string Invalid setoption format\n");
+        return;
+    }
+    size_t name_len = (size_t)(value_start - p);
+    if (name_len >= sizeof(option_name))
+        name_len = sizeof(option_name) - 1;
+    memcpy(option_name, p, name_len);
+    option_name[name_len] = '\0';
+    trim_tail(option_name);
+
+    const char* val = value_start + strlen(value_key);
+    strncpy(option_value, val, sizeof(option_value) - 1);
+    option_value[sizeof(option_value) - 1] = '\0';
+    trim_tail(option_value);
 
     for (size_t i = 0; i < state->uciOptionCount; i++) {
         if (strcmp(state->uciOptions[i].name, option_name) == 0) {
@@ -20,9 +48,16 @@ void uci_setoption(UciState* state, const char *command)
                 case UCI_CHECK:
                     state->uciOptions[i].value.check = (strcmp(option_value, "true") == 0);
                     break;
-                case UCI_SPIN:
-                    state->uciOptions[i].value.spin = atoi(option_value);
+                case UCI_SPIN: {
+                    int v = atoi(option_value);
+                    state->uciOptions[i].value.spin = v;
+                    if (strcmp(option_name, "Hash") == 0) {
+                        if (v < 1) v = 1;
+                        if (v > 2048) v = 2048;
+                        tt_init((size_t)v);
+                    }
                     break;
+                }
                 case UCI_COMBO:
                     snprintf(state->uciOptions[i].value.combo, sizeof(state->uciOptions[i].value.combo), "%s", option_value);
                     break;
@@ -42,6 +77,97 @@ void uci_setoption(UciState* state, const char *command)
 }
 
 #include "utils.h"
+
+/* Parse "go depth N", "go movetime M", "go wtime W btime B", "go infinite" and set g_searchConfig. */
+static void parse_go_command(const char* command)
+{
+    /* Defaults: use existing config; override from command */
+    int maxDepth = g_searchConfig.maxDepth;
+    int timeLimitMs = g_searchConfig.timeLimitMs;
+    bool saw_wtime = false, saw_btime = false;
+    bool go_infinite = false;
+
+    const char* p = command + 2;  /* skip "go" */
+    while (*p) {
+        while (*p == ' ') p++;
+        if (!*p) break;
+        if (strncmp(p, "depth ", 6) == 0) {
+            maxDepth = atoi(p + 6);
+            if (maxDepth < 1) maxDepth = 1;
+            if (maxDepth > 128) maxDepth = 128;
+            p += 6;
+            while (*p && *p != ' ') p++;
+            continue;
+        }
+        if (strncmp(p, "movetime ", 9) == 0) {
+            timeLimitMs = atoi(p + 9);
+            if (timeLimitMs < 0) timeLimitMs = 0;
+            p += 9;
+            while (*p && *p != ' ') p++;
+            continue;
+        }
+        if (strncmp(p, "infinite", 8) == 0 && (p[8] == '\0' || p[8] == ' ')) {
+            timeLimitMs = 0;
+            maxDepth = 128;
+            go_infinite = true;
+            p += 8;
+            continue;
+        }
+        if (strncmp(p, "wtime ", 6) == 0) {
+            uci_state.timeLeft[0] = atoi(p + 6);
+            saw_wtime = true;
+            p += 6;
+            while (*p && *p != ' ') p++;
+            continue;
+        }
+        if (strncmp(p, "btime ", 6) == 0) {
+            uci_state.timeLeft[1] = atoi(p + 6);
+            saw_btime = true;
+            p += 6;
+            while (*p && *p != ' ') p++;
+            continue;
+        }
+        if (strncmp(p, "winc ", 5) == 0) {
+            uci_state.increment[0] = atoi(p + 5);
+            p += 5;
+            while (*p && *p != ' ') p++;
+            continue;
+        }
+        if (strncmp(p, "binc ", 5) == 0) {
+            uci_state.increment[1] = atoi(p + 5);
+            p += 5;
+            while (*p && *p != ' ') p++;
+            continue;
+        }
+        if (strncmp(p, "movestogo ", 10) == 0) {
+            uci_state.movesToGo = atoi(p + 10);
+            p += 10;
+            while (*p && *p != ' ') p++;
+            continue;
+        }
+        /* Unknown token: skip until next space */
+        while (*p && *p != ' ') p++;
+    }
+
+    /* If wtime/btime were given in this command, set time limit from remaining time */
+    if ((saw_wtime || saw_btime) && timeLimitMs <= 0) {
+        int side = engine.board.turn ? 0 : 1;  /* white = 0, black = 1 */
+        int time_left = uci_state.timeLeft[side];
+        int inc = uci_state.increment[side];
+        int moves = (uci_state.movesToGo > 0) ? uci_state.movesToGo : 20;
+        int alloc = (time_left / moves) + inc;
+        if (alloc > 0)
+            timeLimitMs = alloc;
+    }
+
+    /* If still no time limit (plain "go" or no time params), use 5s default so we don't hang */
+    if (timeLimitMs <= 0 && !go_infinite)
+        timeLimitMs = 5000;
+
+    g_searchConfig.maxDepth = maxDepth;
+    g_searchConfig.timeLimitMs = timeLimitMs;
+}
+
 void uci_go(UciState* state, const char* command)
 {
     if (strncmp(command, "go perft ", 9) == 0) {
@@ -50,6 +176,8 @@ void uci_go(UciState* state, const char* command)
         int nodes = castro_Perft(&engine.board, depth, true);
         printf("\nNodes searched: %d\n", nodes);
     } else {
+        parse_go_command(command);
+        state->stopRequested = false;  /* clear so search runs until time or explicit stop */
         char bestmove[16];
         Move move = engine.search(&engine.board, engine.eval, engine.order, &g_searchConfig);
         castro_MoveToString(move, bestmove);

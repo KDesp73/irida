@@ -9,6 +9,9 @@ void init_mvv_lva(void);
 int mvv_lva_score(Board *board, Move m);
 void order_moves(Board *board, Move moves[], size_t count, size_t ply);
 
+/** Set the transposition table move for the next order_moves call (used to search it first). */
+void set_tt_move(Move move);
+
 /* Killer moves */
 void update_killer(Move move, int ply);
 

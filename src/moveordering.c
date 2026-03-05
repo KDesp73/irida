@@ -125,3 +125,8 @@ void update_killer(Move m, int ply)
     }
 }
 
+void set_tt_move(Move m)
+{
+    tt_move = m;
+}
+
