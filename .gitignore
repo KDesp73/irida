@@ -12,3 +12,5 @@ libengine.*
 engine
 
 extern
+check.dSYM
+check
