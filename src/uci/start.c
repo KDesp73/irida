@@ -1,5 +1,4 @@
 #include "uci.h"
-#include "uci_thread.h"
 #include "version.h"
 #include <stdio.h>
 

@@ -1,4 +1,3 @@
-#include "uci_thread.h"
 #include "uci.h"
 #include "core.h"
 #include "search.h"

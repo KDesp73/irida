@@ -4,7 +4,7 @@ deps.check: ## Check that all dependencies are available
 	@command -v bear >/dev/null 2>&1 || { echo "[WARN] bear not installed."; }
 
 .PHONY: deps.fetch
-deps.fetch: extern/castro extern/IncludeOnly ## Fetch dependencies
+deps.fetch: extern/castro extern/IncludeOnly nn ## Fetch dependencies
 
 extern/castro:
 	git clone https://github.com/KDesp73/castro extern/castro || echo "[INFO] already exists"
@@ -20,3 +20,8 @@ extern/IncludeOnly:
 	$(call fetchio,cli)
 	$(call fetchio,logging)
 	$(call fetchio,test)
+
+nn: ## Fetch neural networks
+	mkdir -p nn
+	wget https://tests.stockfishchess.org/api/nn/nn-37f18f62d772.nnue -o ./nn/nn-37f18f62d772.nnue
+	wget https://tests.stockfishchess.org/api/nn/nn-ad9b42354671.nnue -o ./nn/nn-ad9b42354671.nnue

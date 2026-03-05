@@ -2,7 +2,6 @@
 #include "uci.h"
 #include "core.h"
 #include "tt.h"
-#include "uci_thread.h"
 #include "nnue.h"
 #include "syzygy.h"
 #include <ctype.h>

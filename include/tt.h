@@ -6,7 +6,8 @@
 typedef enum {
     TT_EXACT,
     TT_LOWERBOUND,
-    TT_UPPERBOUND
+    TT_UPPERBOUND,
+    TT_NONE
 } TTNodeType;
 
 typedef struct {

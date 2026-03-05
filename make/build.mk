@@ -4,7 +4,7 @@ build.all: deps.check $(BUILD_DIR) build.castro build.static build.shared $(TARG
 
 $(TARGET): build.static ## Build the main executable
 	@echo "[INFO] Building executable: $(TARGET)"
-	$(CC) src/main.c -o $(TARGET) $(A_NAME) extern/castro/libcastro.a $(LDFLAGS) -I$(INCLUDE_DIR) -Iextern/castro/src -DUSE_NNUE_PROBE -DUSE_FATHOM
+	$(CC) src/main.c -o $(TARGET) -L. -l:$(A_NAME) extern/castro/libcastro.a $(LDFLAGS) -I$(INCLUDE_DIR) -Iextern/castro/src -DUSE_NNUE_PROBE -DUSE_FATHOM
 
 .PHONY: build.static
 build.static: $(BUILD_DIR) $(OBJ_FILES) ## Build the static library

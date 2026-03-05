@@ -6,6 +6,28 @@
 #include "extern/IncludeOnly/test.h"
 #include "registry.h"
 #include <stdio.h>
+#include "uci.h"
+#include "search.h"
+
+
+Engine engine;
+UciState uci_state = { .stopRequested = false };
+
+SearchStats g_searchStats = {0};
+SearchConfig g_searchConfig = {
+    .maxDepth = 20,
+    .timeLimitMs = 0, // No limit unless provided by the gui
+    .useAspiration = true,
+    .useLMR = true,
+    .useNullMove = true,
+    .useTT = true,
+    .useQuiescence = true,
+    .syzygyProbeDepth = 1,
+    .syzygyProbeLimit = 7,
+    .syzygy50MoveRule = true,
+};
+
+
 
 int main(int argc, char** argv)
 {
