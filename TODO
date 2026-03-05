@@ -1,6 +1,6 @@
-TODO: syzygy tablebase
 TODO: pick a license
-TODO: nnue evaluation
+DONE: syzygy tablebase (optional Fathom)
+DONE: nnue evaluation (optional nnue-probe)
 TODO: transposition tables
 TODO: aspiration windows
 TODO: pick a name

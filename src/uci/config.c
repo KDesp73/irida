@@ -1,5 +1,6 @@
 #include "castro.h"
 #include "uci.h"
+#include "nnue.h"
 #include <string.h>
 
 bool GetUciOption(const UciState* state, char* name, UciOption* opt)
@@ -22,6 +23,14 @@ void LoadUciConfig(UciState* state)
     state->infiniteMode = false;
     state->depthLimit = 3;
     state->maxBookmoves = 10;
+
+    if(state->uciOptionCount >= MAX_UCI_OPTIONS) return;
+    state->uciOptions[state->uciOptionCount++] = (UciOption) {
+        .name = "EvalFile",
+        .type = UCI_STRING,
+        .value.string = "",
+        .default_value = ""
+    };
 
     if(state->uciOptionCount >= MAX_UCI_OPTIONS) return;
     state->uciOptions[state->uciOptionCount++] = (UciOption) {

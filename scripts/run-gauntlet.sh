@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# Run a short gauntlet for strength/regression testing.
+# Requires: cutechess-cli (install e.g. via brew install cutechess, or build from source).
+# Optional: a second engine path as first argument for engine-vs-engine.
+
+set -e
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+ENGINE="$ROOT/engine"
+PGN_OUT="${ROOT}/gauntlet.pgn"
+
+if ! command -v cutechess-cli &>/dev/null; then
+    echo "cutechess-cli not found. Install it (e.g. brew install cutechess) or build from https://github.com/cutechess/cutechess-cli"
+    exit 1
+fi
+
+if [[ ! -x "$ENGINE" ]]; then
+    echo "Engine not built. Run: make build.static type=RELEASE && make engine type=RELEASE"
+    exit 1
+fi
+
+REF_ENGINE="${1:-}"
+GAMES="${2:-50}"
+TC="${3:-10+0.1}"
+
+if [[ -z "$REF_ENGINE" ]]; then
+    echo "Usage: $0 [reference_engine_path] [games] [time_control]"
+    echo "  reference_engine_path  optional; if omitted, engine plays itself (self-play)."
+    echo "  games                  number of games (default: 50)"
+    echo "  time_control           e.g. 10+0.1 or 60+0.6 (default: 10+0.1)"
+    echo ""
+    echo "Running self-play: $GAMES games at $TC"
+    cutechess-cli \
+        -engine name=engine cmd="$ENGINE" \
+        -engine name=engine2 cmd="$ENGINE" \
+        -each tc="$TC" \
+        -games "$GAMES" \
+        -pgnout "$PGN_OUT" \
+        -repeat
+else
+    if [[ ! -x "$REF_ENGINE" ]]; then
+        echo "Reference engine not executable: $REF_ENGINE"
+        exit 1
+    fi
+    echo "Running engine vs reference: $GAMES games at $TC"
+    cutechess-cli \
+        -engine name=engine cmd="$ENGINE" \
+        -engine name=reference cmd="$REF_ENGINE" \
+        -each tc="$TC" \
+        -games "$GAMES" \
+        -pgnout "$PGN_OUT" \
+        -repeat
+fi
+
+echo "Games saved to $PGN_OUT"
+echo "To compute ELO, use BayesElo or Ordo (see docs/Testing.md)."

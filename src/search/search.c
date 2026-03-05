@@ -4,12 +4,17 @@
 #include "moveordering.h"
 #include "uci.h"
 #include "uci_thread.h"
+#include "draws.h"
+#include "syzygy.h"
 #include <stdint.h>
 
 static bool search_should_stop(void)
 {
     return search_time_up() || uci_state.stopRequested;
 }
+
+/* Cap iterative deepening so we don't run hundreds of trivial iterations (e.g. draw/TB positions). */
+#define MAX_ID_DEPTH 64
 
 Move search_root(Board* board,
                  EvalFn eval,
@@ -28,8 +33,13 @@ Move search_root(Board* board,
     const int aspirationWindow = 50;
     int prevScore = 0;
     bool fullWindowRetry = false;
+    int maxDepth = config->maxDepth;
+    if (maxDepth > MAX_ID_DEPTH)
+        maxDepth = MAX_ID_DEPTH;
 
-    for (int depth = 1; depth <= config->maxDepth; depth++) {
+    uint64_t prevNodes = 0;
+
+    for (int depth = 1; depth <= maxDepth; depth++) {
 
         if (search_should_stop())
             break;
@@ -116,6 +126,12 @@ Move search_root(Board* board,
         }
         prevScore = localBestScore;
 
+        /* Early exit only when tree has clearly collapsed (e.g. draw/TB): high depth but almost no new nodes. */
+        uint64_t nodesThisDepth = g_searchStats.nodes;
+        if (depth >= 16 && (nodesThisDepth - prevNodes) < 50)
+            break;
+        prevNodes = nodesThisDepth;
+
     uint64_t timeMs = search_elapsed_ms();
     uint64_t nodes  = g_searchStats.nodes;
     uint64_t nps    = (timeMs > 0) ? (nodes * 1000ULL / timeMs) : 0;
@@ -178,22 +194,38 @@ int search(Board* board,
     if (depth <= 0)
         return quiescence(board, alpha, beta, ply, eval, order);
 
+    if (is_draw(board))
+        return 0;
+
+    /* Syzygy probe: in leaf-like positions within limit, use TB score */
+    if (syzygy_available()
+        && depth <= g_searchConfig.syzygyProbeDepth
+        && syzygy_piece_count(board) <= (unsigned)g_searchConfig.syzygyProbeLimit) {
+        int tb_score = syzygy_probe_wdl(board, g_searchConfig.syzygy50MoveRule);
+        if (tb_score != SYZYGY_PROBE_FAILED)
+            return tb_score;
+    }
+
     Moves moves = castro_GenerateMoves(board, MOVE_LEGAL);
 
     if (moves.count == 0) {
-        // Checkmate or stalemate
+        /* Checkmate or stalemate */
         if (castro_IsInCheck(board))
             return -MATE_SCORE + ply;
         else
             return 0;
     }
 
+    /* Check extension: extend by one ply when in check */
+    int extension = (castro_IsInCheck(board) && depth >= 1) ? 1 : 0;
+    int effective_depth = depth + extension;
+
     /* Null move pruning (requires castro_MakeNullMove/UnmakeNullMove in castro) */
 #if defined(CASTRO_HAS_NULLMOVE) && CASTRO_HAS_NULLMOVE
     const int R = 3;
-    if (g_searchConfig.useNullMove && depth >= R + 1 && !castro_IsInCheck(board)) {
+    if (g_searchConfig.useNullMove && effective_depth >= R + 1 && !castro_IsInCheck(board)) {
         castro_MakeNullMove(board);
-        int nullScore = -search(board, depth - 1 - R, -beta, -beta + 1, ply + 1, eval, order);
+        int nullScore = -search(board, effective_depth - 1 - R, -beta, -beta + 1, ply + 1, eval, order);
         castro_UnmakeNullMove(board);
         if (nullScore >= beta)
             return beta;
@@ -218,12 +250,12 @@ int search(Board* board,
         bool doFullSearch = true;
         int reduction = 0;
 
-        if (g_searchConfig.useLMR && depth >= 3 && i >= 2 && !isCapture)
+        if (g_searchConfig.useLMR && effective_depth >= 3 && i >= 2 && !isCapture)
             reduction = 2;
 
         if (reduction > 0) {
             /* Late move reduction: try reduced depth with zero window first */
-            score = -search(board, depth - 1 - reduction, -alpha - 1, -alpha, ply + 1, eval, order);
+            score = -search(board, effective_depth - 1 - reduction, -alpha - 1, -alpha, ply + 1, eval, order);
             if (score > alpha)
                 doFullSearch = true;
             else
@@ -233,15 +265,15 @@ int search(Board* board,
         if (doFullSearch) {
             if (g_searchConfig.useLMR && reduction > 0) {
                 /* Re-search at full depth */
-                score = -search(board, depth - 1, -beta, -alpha, ply + 1, eval, order);
+                score = -search(board, effective_depth - 1, -beta, -alpha, ply + 1, eval, order);
             } else if (i == 0) {
                 /* PVS: first move with full window */
-                score = -search(board, depth - 1, -beta, -alpha, ply + 1, eval, order);
+                score = -search(board, effective_depth - 1, -beta, -alpha, ply + 1, eval, order);
             } else {
                 /* PVS: zero window for remaining moves */
-                score = -search(board, depth - 1, -alpha - 1, -alpha, ply + 1, eval, order);
+                score = -search(board, effective_depth - 1, -alpha - 1, -alpha, ply + 1, eval, order);
                 if (score > alpha)
-                    score = -search(board, depth - 1, -beta, -alpha, ply + 1, eval, order);
+                    score = -search(board, effective_depth - 1, -beta, -alpha, ply + 1, eval, order);
             }
         }
 
@@ -274,7 +306,7 @@ int search(Board* board,
         type = TT_EXACT;
 
     tt_store(zobrist,
-             depth,
+             effective_depth,
              bestScore,
              type,
              bestMove,

@@ -20,6 +20,9 @@ typedef struct {
     bool useAspiration;
     bool useTT;
     bool useQuiescence;
+    int syzygyProbeDepth;
+    int syzygyProbeLimit;
+    bool syzygy50MoveRule;
 } SearchConfig;
 
 typedef struct {

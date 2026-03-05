@@ -3,6 +3,8 @@
 #include "core.h"
 #include "tt.h"
 #include "uci_thread.h"
+#include "nnue.h"
+#include "syzygy.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
@@ -48,6 +50,8 @@ void uci_setoption(UciState* state, const char *command)
             switch (state->uciOptions[i].type) {
                 case UCI_CHECK:
                     state->uciOptions[i].value.check = (strcmp(option_value, "true") == 0);
+                    if (strcmp(option_name, "Syzygy50MoveRule") == 0)
+                        g_searchConfig.syzygy50MoveRule = state->uciOptions[i].value.check;
                     break;
                 case UCI_SPIN: {
                     int v = atoi(option_value);
@@ -56,6 +60,10 @@ void uci_setoption(UciState* state, const char *command)
                         if (v < 1) v = 1;
                         if (v > 2048) v = 2048;
                         tt_init((size_t)v);
+                    } else if (strcmp(option_name, "SyzygyProbeDepth") == 0) {
+                        g_searchConfig.syzygyProbeDepth = (v < 1) ? 1 : (v > 100) ? 100 : v;
+                    } else if (strcmp(option_name, "SyzygyProbeLimit") == 0) {
+                        g_searchConfig.syzygyProbeLimit = (v < 0) ? 0 : (v > 7) ? 7 : v;
                     }
                     break;
                 }
@@ -64,6 +72,10 @@ void uci_setoption(UciState* state, const char *command)
                     break;
                 case UCI_STRING:
                     snprintf(state->uciOptions[i].value.string, sizeof(state->uciOptions[i].value.string), "%s", option_value);
+                    if (strcmp(option_name, "EvalFile") == 0)
+                        nnue_load(option_value);
+                    else if (strcmp(option_name, "SyzygyPath") == 0)
+                        syzygy_init(option_value);
                     break;
                 default:
                     printf("info string Unknown option type\n");
@@ -150,18 +162,20 @@ static void parse_go_command(const char* command)
         while (*p && *p != ' ') p++;
     }
 
-    /* If wtime/btime were given in this command, set time limit from remaining time */
+    /* If wtime/btime were given in this command, set time limit from remaining time.
+     * Allocate (time_left / moves) + increment with a 10% reserve to avoid flagging. */
     if ((saw_wtime || saw_btime) && timeLimitMs <= 0) {
         int side = engine.board.turn ? 0 : 1;  /* white = 0, black = 1 */
         int time_left = uci_state.timeLeft[side];
         int inc = uci_state.increment[side];
         int moves = (uci_state.movesToGo > 0) ? uci_state.movesToGo : 20;
+        if (moves < 1) moves = 1;
         int alloc = (time_left / moves) + inc;
         if (alloc > 0)
-            timeLimitMs = alloc;
+            timeLimitMs = (alloc * 90) / 100;  /* use 90% to keep reserve */
     }
 
-    /* If still no time limit (plain "go" or no time params), use 5s default so we don't hang */
+    /* If still no time limit (plain "go" or no time params), use 10s default so we don't hang */
     if (timeLimitMs <= 0 && !go_infinite)
         timeLimitMs = 10000;
 

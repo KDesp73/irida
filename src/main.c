@@ -2,6 +2,7 @@
 #include "core.h"
 #include "eval.h"
 #include "moveordering.h"
+#include "nnue.h"
 #include "search.h"
 #include "tt.h"
 #include "uci.h"
@@ -18,7 +19,10 @@ SearchConfig g_searchConfig = {
     .useLMR = true,
     .useNullMove = true,
     .useTT = true,
-    .useQuiescence = true
+    .useQuiescence = true,
+    .syzygyProbeDepth = 1,
+    .syzygyProbeLimit = 7,
+    .syzygy50MoveRule = true,
 };
 
 int main(int argc, char** argv)
@@ -29,7 +33,7 @@ int main(int argc, char** argv)
     tt_init(16);
 
     EngineInit(&engine, "chess-engine", "KDesp73");
-    engine.eval = pesto_eval;
+    engine.eval = nnue_eval;
     engine.search = search_root;
     engine.order = order_moves;
 
