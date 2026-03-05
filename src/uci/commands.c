@@ -264,14 +264,14 @@ void uci_ucinewgame(UciState* state)
 
 void uci_stop(UciState* state)
 {
-    // TODO: Handle stop command if a calculation is running
-    state->stopRequested = true;
+    state->stopRequested = true;  /* search thread will see this and return bestmove */
     printf("info Calculation stopped.\n");
 }
 
 void uci_quit(UciState* state)
 {
-    uci_stop(state);
+    state->stopRequested = true;  /* stop any running search first */
+    state->quitRequested = true;  /* then exit the main loop */
 }
 
 void uci_debug(UciState* state, const char* command)

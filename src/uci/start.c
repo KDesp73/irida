@@ -17,7 +17,7 @@ int UciMain()
 
     uci_search_thread_start();
 
-    while (!uci_state.stopRequested) {
+    while (!uci_state.quitRequested) {
 
         if (!fgets(input, sizeof(input), stdin))
             break;  /* Exit on EOF */
