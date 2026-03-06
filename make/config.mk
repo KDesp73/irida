@@ -12,7 +12,7 @@ DIST_DIR     := dist
 # Library naming
 LIBRARY_NAME := engine
 A_NAME       := lib$(LIBRARY_NAME).a
-TARGET       := engine
+TARGET       := $(LIBRARY_NAME)
 
 # Version extraction
 version_file := include/version.h

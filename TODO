@@ -1,10 +1,10 @@
-TODO: pick a license
-TODO: aspiration windows
-TODO: pick a name
-TODO: engine testing
-TODO: better traditional evaluation
 TODO: recipes
-TODO: cache
+TODO: pick a license
+TODO: pick a name
+DONE: aspiration windows
+DONE: engine testing
+DONE: better traditional evaluation
+DONE: cache
 DONE: syzygy tablebase (optional Fathom)
 DONE: nnue evaluation (optional nnue-probe)
 DONE: transposition tables

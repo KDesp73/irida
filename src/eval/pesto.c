@@ -270,6 +270,73 @@ int pesto_eval(Board* board)
 
     int eg_phase = 24 - game_phase;
 
-    return (mg_score * game_phase + eg_score * eg_phase) / 24;
+    int score = (mg_score * game_phase + eg_score * eg_phase) / 24;
+
+    /* Passed pawns: no enemy pawn on same or adjacent files ahead */
+    int max_black_rank[8];
+    int min_white_rank[8];
+    for (int f = 0; f < 8; f++) {
+        max_black_rank[f] = -1;
+        min_white_rank[f] = 8;
+    }
+    for (int sq = 0; sq < 64; sq++) {
+        int r = sq / 8, f = sq % 8;
+        char ascii = board->grid[r][f];
+        if (ascii == 'p' && r > max_black_rank[f]) max_black_rank[f] = r;
+        if (ascii == 'P' && r < min_white_rank[f]) min_white_rank[f] = r;
+    }
+    for (int sq = 0; sq < 64; sq++) {
+        int r = sq / 8, f = sq % 8;
+        char ascii = board->grid[r][f];
+        if (ascii == 'P') {
+            int passed = 1;
+            for (int df = -1; df <= 1 && passed; df++) {
+                int ff = f + df;
+                if (ff >= 0 && ff <= 7 && max_black_rank[ff] >= r) passed = 0;
+            }
+            if (passed && r < 7) score += (6 - r) * 6;
+        }
+        if (ascii == 'p') {
+            int passed = 1;
+            for (int df = -1; df <= 1 && passed; df++) {
+                int ff = f + df;
+                if (ff >= 0 && ff <= 7 && min_white_rank[ff] <= r) passed = 0;
+            }
+            if (passed && r > 0) score -= (r - 1) * 6;
+        }
+    }
+
+    /* Doubled pawns */
+    int wpawns[8] = {0}, bpawns[8] = {0};
+    for (int sq = 0; sq < 64; sq++) {
+        int f = sq % 8;
+        char c = board->grid[sq / 8][f];
+        if (c == 'P') wpawns[f]++;
+        if (c == 'p') bpawns[f]++;
+    }
+    for (int f = 0; f < 8; f++) {
+        if (wpawns[f] > 1) score -= (wpawns[f] - 1) * 12;
+        if (bpawns[f] > 1) score += (bpawns[f] - 1) * 12;
+    }
+
+    /* King safety: penalty for king in center in middlegame */
+    if (game_phase > 10) {
+        for (int sq = 0; sq < 64; sq++) {
+            int r = sq / 8, f = sq % 8;
+            char c = board->grid[r][f];
+            if (c == 'K' && (f == 3 || f == 4) && r <= 2) score -= 12;
+            if (c == 'k' && (f == 3 || f == 4) && r >= 5) score += 12;
+        }
+    }
+
+    /* Piece activity: small bonus for pieces in active half */
+    for (int sq = 0; sq < 64; sq++) {
+        int r = sq / 8;
+        char c = board->grid[r][sq % 8];
+        if ((c == 'N' || c == 'B' || c == 'R' || c == 'Q') && r >= 2 && r <= 6) score += 3;
+        if ((c == 'n' || c == 'b' || c == 'r' || c == 'q') && r >= 1 && r <= 5) score -= 3;
+    }
+
+    return score;
 }
 

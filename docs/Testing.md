@@ -18,6 +18,14 @@ This regenerates headers from `.ctd` files, builds the test binary (`check`), an
 make test type=RELEASE
 ```
 
+**Engine testing** (unit tests + quick sanity check without cutechess):
+
+```bash
+make test.engine
+```
+
+This runs all unit tests and a single fixed-depth search to confirm the engine does not crash. For strength/regression testing, use `make gauntlet` (see [Quick gauntlet](#quick-gauntlet-cutechess-cli)).
+
 ### Running a single batch
 
 ```bash
@@ -58,7 +66,19 @@ This runs `scripts/loader -d test -H "extern/IncludeOnly/test.h" -L "castro.h"`.
 From the project root, build the engine in release mode then run:
 
 ```bash
-./scripts/run-gauntlet.sh
+./scripts/run-gauntlet
+```
+
+Or via Make (same defaults: 50 games, 10+0.1):
+
+```bash
+make gauntlet type=RELEASE
+```
+
+Optional: pass a reference engine path, number of games, and time control:
+
+```bash
+make gauntlet REF_ENGINE=/path/to/other_engine GAMES=100 TC=60+0.6
 ```
 
 Or manually, example with a reference engine (adjust paths):

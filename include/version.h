@@ -16,6 +16,11 @@ extern "C" {
 
 #define VERSION_HEX ((VERSION_MAJOR * 10000) + (VERSION_MINOR * 100) + VERSION_PATCH)
 
+/** Default engine name; override with -DENGINE_NAME=\"YourName\" when compiling. */
+#ifndef ENGINE_NAME
+#define ENGINE_NAME "chess-engine"
+#endif
+
 /**
  * @brief Fills in the provided pointers with the current version numbers.
  * 

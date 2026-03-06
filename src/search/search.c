@@ -5,6 +5,7 @@
 #include "uci.h"
 #include "draws.h"
 #include "syzygy.h"
+#include "eval_cache.h"
 #include <assert.h>
 #include <stdint.h>
 
@@ -31,6 +32,7 @@ Move search_root(Board* board,
 
     tt_clear();
     tt_inc_generation();  /* only use TT entries from this search */
+    eval_cache_clear();
     search_start_timer(config->timeLimitMs);
 
     const int aspirationWindow = 50;

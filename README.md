@@ -13,7 +13,33 @@
 
 ```bash
 make build.all
-````
+```
+
+For a release build (optimized, no sanitizers):
+
+```bash
+make build.all type=RELEASE
+```
+
+---
+
+## Recipes (common tasks)
+
+| Task | Command |
+|------|---------|
+| Build everything | `make build.all` |
+| Run unit tests | `make test` |
+| Run gauntlet (engine-vs-engine) | `make gauntlet` (optional: `REF_ENGINE=path GAMES=50 TC=10+0.1`) |
+| Engine sanity check (tests + one search) | `make test.engine` |
+| Compute ELO from PGN | See [docs/Testing.md](docs/Testing.md) (BayesElo / Ordo) |
+| List all make targets | `make help` |
+
+Gauntlet requires `cutechess-cli`. Unit tests regenerate headers from `.ctd` files automatically.
+
+**License:** This project is licensed under the MIT License. See [LICENSE](LICENSE).  
+Dependencies (castro, nnue-probe, Fathom, IncludeOnly) have their own licenses; see their repositories if you distribute binaries.
+
+**Engine name:** The UCI engine name defaults to `chess-engine`. To override, build with `make CFLAGS="-DENGINE_NAME=\\\"MyEngine\\\"\" build.all` (or set `ENGINE_NAME` in [include/version.h](include/version.h)).
 
 ---
 

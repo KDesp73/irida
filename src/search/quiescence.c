@@ -1,5 +1,6 @@
 #include "castro.h"
 #include "eval.h"
+#include "eval_cache.h"
 #include "moveordering.h"
 #include "search.h"
 
@@ -15,9 +16,9 @@ int quiescence(Board* board,
     g_searchStats.qnodes++;
 
     if (ply >= MAX_PLY)
-        return eval(board);
+        return eval_cached(board, eval);
 
-    int stand_pat = eval(board);
+    int stand_pat = eval_cached(board, eval);
 
     // Mate score distance correction
     if (stand_pat > MATE_SCORE - MAX_PLY)

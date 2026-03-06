@@ -7,6 +7,7 @@
 #include "tt.h"
 #include "uci.h"
 #include "cli.h"
+#include "version.h"
 
 Engine engine;
 UciState uci_state;
@@ -32,7 +33,7 @@ int main(int argc, char** argv)
     init_mvv_lva();
     tt_init(16);
 
-    EngineInit(&engine, "chess-engine", "KDesp73");
+    EngineInit(&engine, ENGINE_NAME, "KDesp73");
     engine.eval = nnue_eval;
     engine.search = search_root;
     engine.order = order_moves;
