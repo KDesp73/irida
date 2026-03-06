@@ -4,7 +4,7 @@ build.all: deps.check $(BUILD_DIR) build.castro build.static build.shared $(TARG
 
 $(TARGET): build.static ## Build the main executable
 	@echo "[INFO] Building executable: $(TARGET)"
-	$(CC) $(CFLAGS) src/main.c -o $(TARGET) $(LDFLAGS_ENGINE) $(LDFLAGS_CASTRO) $(LDFLAGS_NNUE_PROBE) $(LDFLAGS) -DUSE_NNUE_PROBE -DUSE_FATHOM
+	$(CC) $(CFLAGS) src/main.c -o $(TARGET) $(LDFLAGS_ENGINE) $(LDFLAGS_CASTRO) $(LDFLAGS) -DUSE_NNUE_PROBE -DUSE_FATHOM
 
 .PHONY: build.static
 build.static: $(BUILD_DIR) $(OBJ_FILES) ## Build the static library
@@ -14,7 +14,7 @@ build.static: $(BUILD_DIR) $(OBJ_FILES) ## Build the static library
 .PHONY: build.shared
 build.shared: $(BUILD_DIR) $(OBJ_FILES) ## Build the dynamic library
 	@echo "[INFO] Building shared library: $(SO_NAME)"
-	@$(CC) -shared -o $(SO_NAME) $(OBJ_FILES)
+	@$(CC) $(SO_LDFLAGS) -o $(SO_NAME) $(OBJ_FILES)
 
 .PHONY: build.verbose
 build.verbose: CFLAGS += -DVERBOSE

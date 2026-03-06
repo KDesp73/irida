@@ -10,7 +10,7 @@ test.generate: ## Run loader to regenerate test registry and headers from .ctd f
 .PHONY: test.build
 test.build: build.castro build.static test.generate ## Build test binary (check)
 	@echo "[INFO] Building test executable: $(TEST_BIN)"
-	@$(CC) $(TEST_FILES) -o $(TEST_BIN) -L. -l:$(A_NAME) $(LDFLAGS) \
+	@$(CC) $(TEST_FILES) -o $(TEST_BIN) $(LDFLAGS_ENGINE) $(LDFLAGS) \
 		-I. -I$(INCLUDE_DIR) -Iextern -Iextern/castro/src -I$(TEST_DIR) 
 
 .PHONY: test

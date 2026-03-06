@@ -13,7 +13,7 @@ UciState uci_state;
 
 SearchStats g_searchStats = {0};
 SearchConfig g_searchConfig = {
-    .maxDepth = 20,
+    .maxDepth = 100,
     .timeLimitMs = 0, // No limit unless provided by the gui
     .useAspiration = true,
     .useLMR = true,

@@ -1,6 +1,7 @@
-# Compiler
-CC       := gcc
-AR       := ar
+# Compiler and OS
+UNAME_S := $(shell uname -s)
+CC      := gcc
+AR      := ar
 
 # Directories
 SRC_DIR      := src
@@ -10,7 +11,6 @@ DIST_DIR     := dist
 
 # Library naming
 LIBRARY_NAME := engine
-SO_NAME      := lib$(LIBRARY_NAME).so
 A_NAME       := lib$(LIBRARY_NAME).a
 TARGET       := engine
 
@@ -23,10 +23,25 @@ VERSION       := $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 
 CASTRO_VERSION=0.3.0
 
-LDFLAGS_ENGINE = -L. -l:$(A_NAME)
-LDFLAGS_CASTRO = -Lextern/castro -l:libcastro.a
-LDFLAGS_NNUE_PROBE = -Lextern/nnue-probe/src -lnnueprobe -Wl,-rpath,$(shell pwd)/extern/nnue-probe/src
-LDFLAGS_FATHOM = -Lextern/fathom -lfathom -Wl,-rpath,$(shell pwd)/extern/fathom
+# macOS: use clang and platform-specific settings (BSD ld, .dylib)
+ifeq ($(UNAME_S),Darwin)
+    CC       := clang
+    SO_NAME  := lib$(LIBRARY_NAME).dylib
+    SO_LDFLAGS := -dynamiclib -undefined dynamic_lookup
+    # BSD ld doesn't support -l:filename. Link both engine and castro statically (path to .a)
+    # so the engine has no runtime dylib dependency and all symbols resolve at link time.
+    LDFLAGS_ENGINE   := $(A_NAME)
+    LDFLAGS_CASTRO   := extern/castro/libcastro.a
+    LDFLAGS_NNUE_PROBE := -Lextern/nnue-probe/src -lnnueprobe -Wl,-rpath,@loader_path/extern/nnue-probe/src
+    LDFLAGS_FATHOM   := -Lextern/fathom -lfathom -Wl,-rpath,@loader_path/extern/fathom
+else
+    SO_NAME  := lib$(LIBRARY_NAME).so
+    SO_LDFLAGS := -shared
+    LDFLAGS_ENGINE   := -L. -l:$(A_NAME)
+    LDFLAGS_CASTRO   := -Lextern/castro -l:libcastro.a
+    LDFLAGS_NNUE_PROBE := -Lextern/nnue-probe/src -lnnueprobe -Wl,-rpath,$(shell pwd)/extern/nnue-probe/src
+    LDFLAGS_FATHOM   := -Lextern/fathom -lfathom -Wl,-rpath,$(shell pwd)/extern/fathom
+endif
 
 WARNINGS = -Wall -Wextra
 INCLUDES = -I$(INCLUDE_DIR) -Iextern/castro/src -Iextern/ -Iextern/nnue-probe -Iextern/fathom/src

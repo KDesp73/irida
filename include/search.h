@@ -29,6 +29,7 @@ typedef struct {
     uint64_t nodes;
     uint64_t qnodes;
     uint64_t ttHits;
+    uint64_t rootChildTtHits;  /* diagnostic: TT hits at ply 1 (root children) */
     int selDepth;
 } SearchStats;
 

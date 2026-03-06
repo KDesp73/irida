@@ -5,6 +5,7 @@
 #include "uci.h"
 #include "draws.h"
 #include "syzygy.h"
+#include <assert.h>
 #include <stdint.h>
 
 static bool search_should_stop(void)
@@ -26,7 +27,10 @@ Move search_root(Board* board,
     g_searchStats.nodes = 0;
     g_searchStats.qnodes = 0;
     g_searchStats.selDepth = 0;
+    g_searchStats.rootChildTtHits = 0;
 
+    tt_clear();
+    tt_inc_generation();  /* only use TT entries from this search */
     search_start_timer(config->timeLimitMs);
 
     const int aspirationWindow = 50;
@@ -62,7 +66,8 @@ Move search_root(Board* board,
         uint64_t rootHash = castro_CalculateZobristHash(board);
         Move rootTtMove = {0};
         int dummyScore;
-        if (tt_probe(rootHash, depth, -INF, INF, 0, &dummyScore, &rootTtMove))
+        g_searchStats.rootChildTtHits = 0;  /* diagnostic: count TT hits at ply 1 this depth */
+        if (config->useTT && tt_probe(rootHash, depth, -INF, INF, 0, &dummyScore, &rootTtMove))
             set_tt_move(rootTtMove);
         else
             set_tt_move((Move){0});
@@ -94,6 +99,8 @@ Move search_root(Board* board,
             }
 
             castro_UnmakeMove(board);
+            /* Board/hash sanity: board must be restored to root position */
+            assert(castro_CalculateZobristHash(board) == rootHash && "UnmakeMove did not restore board");
 
             if (search_should_stop())
                 break;
@@ -126,13 +133,13 @@ Move search_root(Board* board,
         prevScore = localBestScore;
 
         /* Early exit only when tree has clearly collapsed (e.g. draw/TB): high depth but almost no new nodes. */
-        uint64_t nodesThisDepth = g_searchStats.nodes;
+        uint64_t nodesThisDepth = g_searchStats.nodes + g_searchStats.qnodes;
         if (depth >= 16 && (nodesThisDepth - prevNodes) < 50)
             break;
         prevNodes = nodesThisDepth;
 
     uint64_t timeMs = search_elapsed_ms();
-    uint64_t nodes  = g_searchStats.nodes;
+    uint64_t nodes  = g_searchStats.nodes + g_searchStats.qnodes;
     uint64_t nps    = (timeMs > 0) ? (nodes * 1000ULL / timeMs) : 0;
 
     char move[12];
@@ -178,7 +185,7 @@ int search(Board* board,
     int ttScore;
 
     uint64_t zobrist = castro_CalculateZobristHash(board);
-    if (tt_probe(zobrist,
+    if (g_searchConfig.useTT && tt_probe(zobrist,
                  depth,
                  alpha,
                  beta,
@@ -187,13 +194,17 @@ int search(Board* board,
                  &ttMove))
     {
         g_searchStats.ttHits++;
+        if (ply == 1)
+            g_searchStats.rootChildTtHits++;
         return ttScore;
     }
 
     if (depth <= 0)
         return quiescence(board, alpha, beta, ply, eval, order);
 
-    if (is_draw(board))
+    /* Skip draw check at root children (ply 1): ensures we always recurse so the tree grows.
+     * If is_draw wrongly returns true at ply 1 (e.g. board/hash bug), we'd otherwise add only 20 nodes/depth. */
+    if (ply != 1 && is_draw(board))
         return 0;
 
     /* Syzygy probe: in leaf-like positions within limit, use TB score */
@@ -231,7 +242,8 @@ int search(Board* board,
     }
 #endif
 
-    set_tt_move(ttMove);
+    if (g_searchConfig.useTT)
+        set_tt_move(ttMove);
     order(board, moves.list, moves.count, ply);
 
     int bestScore = -INF;
@@ -304,12 +316,13 @@ int search(Board* board,
     else
         type = TT_EXACT;
 
-    tt_store(zobrist,
-             effective_depth,
-             bestScore,
-             type,
-             bestMove,
-             ply);
+    if (g_searchConfig.useTT)
+        tt_store(zobrist,
+                 effective_depth,
+                 bestScore,
+                 type,
+                 bestMove,
+                 ply);
 
     return bestScore;
 }

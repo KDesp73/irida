@@ -8,7 +8,12 @@
 static TTEntry* ttTable = NULL;
 static size_t ttSize = 0;
 static size_t ttMask = 0;
+static uint16_t g_tt_generation = 0;
 
+void tt_inc_generation(void)
+{
+    g_tt_generation++;
+}
 
 static inline size_t tt_index(uint64_t key) {
     return key & ttMask;
@@ -65,14 +70,17 @@ bool tt_probe(uint64_t key,
     if (entry->key != key)
         return false;
 
+    if (entry->generation != g_tt_generation)
+        return false;
+
     *outMove = entry->bestMove;
 
-    if (entry->depth >= depth) {
+    /* Only use score if entry is from a strictly deeper search (fixes ID tree not growing). */
+    if (entry->depth > depth) {
 
         int score = tt_unadjust_score(entry->score, ply);
 
         switch (entry->type) {
-
             case TT_EXACT:
                 *outScore = score;
                 return true;
@@ -89,6 +97,9 @@ bool tt_probe(uint64_t key,
                     *outScore = score;
                     return true;
                 }
+                break;
+
+            case TT_NONE:
                 break;
         }
     }
@@ -130,5 +141,6 @@ void tt_store(uint64_t key,
         entry->score = tt_adjust_score(score, ply);
         entry->type = type;
         entry->bestMove = bestMove;
+        entry->generation = g_tt_generation;
     }
 }

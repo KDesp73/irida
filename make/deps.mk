@@ -1,6 +1,6 @@
 .PHONY: deps.check 
 deps.check: ## Check that all dependencies are available
-	@command -v gcc >/dev/null 2>&1 || { echo "[ERRO] gcc missing."; exit 1; }
+	@command -v $(CC) >/dev/null 2>&1 || { echo "[ERRO] $(CC) missing. On macOS install Xcode or run xcode-select --install."; exit 1; }
 	@command -v bear >/dev/null 2>&1 || { echo "[WARN] bear not installed."; }
 
 .PHONY: deps.fetch
@@ -15,6 +15,8 @@ nn: ## Fetch neural networks
 	mkdir -p nn
 	wget https://tests.stockfishchess.org/api/nn/nn-37f18f62d772.nnue -o ./nn/nn-37f18f62d772.nnue
 	wget https://tests.stockfishchess.org/api/nn/nn-ad9b42354671.nnue -o ./nn/nn-ad9b42354671.nnue
+	rm ./nn-37f18f62d772.nnue
+	rm ./nn-ad9b42354671.nnue
 
 extern/castro:
 	git clone https://github.com/KDesp73/castro extern/castro || echo "[INFO] already exists"
