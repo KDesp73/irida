@@ -2,6 +2,8 @@ build
 compile_commands.json
 .cache
 
+__pycache__
+
 *.o
 
 .changelog
@@ -16,3 +18,7 @@ check.dSYM
 check
 nn
 engine.dSYM
+
+# NNUE training outputs
+nnue_training/*.pt
+nnue_training/*.nnue

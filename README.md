@@ -41,6 +41,8 @@ Dependencies (castro, nnue-probe, Fathom, IncludeOnly) have their own licenses; 
 
 **Engine name:** The UCI engine name defaults to `chess-engine`. To override, build with `make CFLAGS="-DENGINE_NAME=\\\"MyEngine\\\"\" build.all` (or set `ENGINE_NAME` in [include/version.h](include/version.h)).
 
+**Custom NNUE training:** To train your own NNUE net (loadable via UCI option EvalFile), see the [nnue_training](nnue_training/README.md) Python module: it documents the pipeline (nnue-pytorch, data, export) and provides a script to generate FEN,score data from this engine.
+
 ---
 
 > This engine is a work-in-progress and being developed with learning, experimentation, and future research in mind.

@@ -1,0 +1,4 @@
+# For the custom trainer (train.py): PyTorch is required.
+# Install with: pip install torch
+#
+# For full NNUE training with nnue-pytorch, use that repo's requirements.txt instead.
