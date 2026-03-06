@@ -2,17 +2,13 @@
 """
 Custom NNUE-style trainer without nnue-pytorch.
 
-Reads CSV (fen, score_cp) from generate_data.py, converts FENs to a simple
-board feature vector, trains a small MLP, and saves weights to a .pt file.
-
-The model architecture is chosen so it can later be exported to Stockfish
-.nnue format (feature transformer output 512, then 512->32->1). This script
-uses a simplified dense board encoding instead of full HalfKP; for
-Stockfish-compatible .nnue you still need to implement HalfKP features and
-the exact .nnue binary serializer (see README).
+Reads CSV (fen, score_cp) from generate_data.py. Two architectures:
+- mlp: dense 768-dim board -> 256 -> 32 -> 1 (simple).
+- halfkp: HalfKP feature indices -> feature transformer (512) -> 32 -> 1 (Stockfish-compatible).
 
 Usage:
-  python3 -m nnue_training.train --data data.csv --epochs 10 --output model.pt
+  python3 -m training.train --data data.csv --epochs 10 --output model.pt
+  python3 -m training.train --data data.csv --arch halfkp --output model.pt
 """
 
 from __future__ import annotations
@@ -29,6 +25,10 @@ except ImportError:
     print("train.py requires PyTorch: pip install torch", file=sys.stderr)
     sys.exit(1)
 
+from training.features.halfkp import (
+    HalfKP,
+    halfkp_indices_from_fen,
+)
 
 # Piece codes for FEN (uppercase = white, lowercase = black). We map to indices.
 FEN_PIECE = {
@@ -36,10 +36,13 @@ FEN_PIECE = {
     "p": 6, "n": 7, "b": 8, "r": 9, "q": 10, "k": 11,
 }
 # Simple encoding: 12 piece types * 64 squares = 768 dimensions (sparse in practice)
-# We use a dense 768-dim vector: one-hot piece on square (flattened).
 BOARD_DIM = 12 * 64  # 768
 HIDDEN = 256
 OUTPUT = 1
+# HalfKP: 41024 features per half, 256 output per half -> 512
+HALFKP_FEATURES = HalfKP.FEATURES_PER_HALF
+FT_OUTPUT_PER_HALF = 256
+FT_OUTPUT_DIM = FT_OUTPUT_PER_HALF * 2  # 512
 
 
 def fen_to_board_tensor(fen: str) -> torch.Tensor:
@@ -98,9 +101,63 @@ class SmallNet(nn.Module):
         return self.fc3(x).squeeze(-1)
 
 
+class HalfKPNet(nn.Module):
+    """
+    HalfKP NNUE: sparse feature indices -> feature transformer (512) -> 32 -> 1.
+
+    One shared feature table (41024, 256) indexed by white-half and black-half indices;
+    we use two EmbeddingBags (one per half) so each half sums 11 rows to (256,). Concat -> 512.
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.ft_white = nn.EmbeddingBag(
+            HALFKP_FEATURES, FT_OUTPUT_PER_HALF, mode="sum"
+        )
+        self.ft_black = nn.EmbeddingBag(
+            HALFKP_FEATURES, FT_OUTPUT_PER_HALF, mode="sum"
+        )
+        self.fc2 = nn.Linear(FT_OUTPUT_DIM, 32)
+        self.fc3 = nn.Linear(32, OUTPUT)
+
+    def forward(
+        self,
+        white_indices: torch.Tensor,
+        black_indices: torch.Tensor,
+        white_offsets: torch.Tensor,
+        black_offsets: torch.Tensor,
+    ) -> torch.Tensor:
+        w = self.ft_white(white_indices, white_offsets)  # (batch, 256)
+        b = self.ft_black(black_indices, black_offsets)  # (batch, 256)
+        x = torch.cat([w, b], dim=1)  # (batch, 512)
+        x = torch.relu(self.fc2(x))
+        return self.fc3(x).squeeze(-1)
+
+
+def load_csv_halfkp(path: str) -> tuple[list[tuple[list[int], list[int]]], list[float]]:
+    """Load (fen, score_cp) CSV; return list of (white_indices, black_indices) and list of scores."""
+    samples, ys = [], []
+    with open(path, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            fen = row.get("fen", "").strip('"')
+            try:
+                score = float(row.get("score_cp", 0))
+            except ValueError:
+                continue
+            try:
+                wi, bi = halfkp_indices_from_fen(fen)
+                samples.append((wi, bi))
+                ys.append(score)
+            except ValueError:
+                continue
+    return samples, ys
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train a small NNUE-style net from CSV data.")
     parser.add_argument("--data", "-d", required=True, help="CSV file (fen, score_cp) from generate_data.py")
+    parser.add_argument("--arch", choices=("mlp", "halfkp"), default="mlp", help="Architecture: mlp (768->256->32->1) or halfkp (HalfKP FT -> 512->32->1)")
     parser.add_argument("--epochs", "-e", type=int, default=20, help="Training epochs (default: 20)")
     parser.add_argument("--lr", type=float, default=1e-3, help="Learning rate (default: 1e-3)")
     parser.add_argument("--batch-size", type=int, default=256, help="Batch size (default: 256)")
@@ -108,50 +165,127 @@ def main() -> None:
     parser.add_argument("--val-frac", type=float, default=0.1, help="Fraction of data for validation (default: 0.1)")
     args = parser.parse_args()
 
-    xs, ys = load_csv(args.data)
-    if not xs:
-        print("No valid rows in CSV.", file=sys.stderr)
-        sys.exit(1)
+    if args.arch == "mlp":
+        xs, ys = load_csv(args.data)
+        if not xs:
+            print("No valid rows in CSV.", file=sys.stderr)
+            sys.exit(1)
+        X = torch.stack(xs)
+        y = torch.tensor(ys, dtype=torch.float32)
+        n = len(xs)
+        perm = torch.randperm(n)
+        X, y = X[perm], y[perm]
+        nval = max(1, int(n * args.val_frac))
+        X_val, y_val = X[:nval], y[:nval]
+        X_train, y_train = X[nval:], y[nval:]
+        model = SmallNet()
+        opt = torch.optim.Adam(model.parameters(), lr=args.lr)
+        criterion = nn.MSELoss()
 
-    X = torch.stack(xs)
-    y = torch.tensor(ys, dtype=torch.float32)
-    n = len(xs)
-    perm = torch.randperm(n)
-    X, y = X[perm], y[perm]
-    nval = max(1, int(n * args.val_frac))
-    X_val, y_val = X[:nval], y[:nval]
-    X_train, y_train = X[nval:], y[nval:]
+        for epoch in range(args.epochs):
+            model.train()
+            total_loss = 0.0
+            batches = 0
+            for i in range(0, len(X_train), args.batch_size):
+                batch_x = X_train[i : i + args.batch_size]
+                batch_y = y_train[i : i + args.batch_size]
+                pred = model(batch_x)
+                loss = criterion(pred, batch_y)
+                opt.zero_grad()
+                loss.backward()
+                opt.step()
+                total_loss += loss.item()
+                batches += 1
+            train_loss = total_loss / batches if batches else 0
+            model.eval()
+            with torch.no_grad():
+                val_pred = model(X_val)
+                val_loss = criterion(val_pred, y_val).item()
+            print(f"Epoch {epoch+1}/{args.epochs}  train_loss={train_loss:.4f}  val_loss={val_loss:.4f}")
 
-    model = SmallNet()
-    opt = torch.optim.Adam(model.parameters(), lr=args.lr)
-    criterion = nn.MSELoss()
+        Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+        torch.save(
+            {"state_dict": model.state_dict(), "board_dim": BOARD_DIM, "hidden": HIDDEN, "arch": "small_mlp"},
+            args.output,
+        )
+    else:
+        # HalfKP
+        samples, ys = load_csv_halfkp(args.data)
+        if not samples:
+            print("No valid rows in CSV.", file=sys.stderr)
+            sys.exit(1)
+        y = torch.tensor(ys, dtype=torch.float32)
+        n = len(samples)
+        perm = torch.randperm(n)
+        indices_perm = [samples[i] for i in perm]
+        y = y[perm]
+        nval = max(1, int(n * args.val_frac))
+        val_samples = indices_perm[:nval]
+        y_val = y[:nval]
+        train_samples = indices_perm[nval:]
+        y_train = y[nval:]
 
-    for epoch in range(args.epochs):
-        model.train()
-        total_loss = 0.0
-        batches = 0
-        for i in range(0, len(X_train), args.batch_size):
-            batch_x = X_train[i : i + args.batch_size]
-            batch_y = y_train[i : i + args.batch_size]
-            pred = model(batch_x)
-            loss = criterion(pred, batch_y)
-            opt.zero_grad()
-            loss.backward()
-            opt.step()
-            total_loss += loss.item()
-            batches += 1
-        train_loss = total_loss / batches if batches else 0
-        model.eval()
-        with torch.no_grad():
-            val_pred = model(X_val)
-            val_loss = criterion(val_pred, y_val).item()
-        print(f"Epoch {epoch+1}/{args.epochs}  train_loss={train_loss:.4f}  val_loss={val_loss:.4f}")
+        model = HalfKPNet()
+        opt = torch.optim.Adam(model.parameters(), lr=args.lr)
+        criterion = nn.MSELoss()
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        model = model.to(device)
+        y_train = y_train.to(device)
+        y_val = y_val.to(device)
 
-    Path(args.output).parent.mkdir(parents=True, exist_ok=True)
-    torch.save(
-        {"state_dict": model.state_dict(), "board_dim": BOARD_DIM, "hidden": HIDDEN, "arch": "small_mlp"},
-        args.output,
-    )
+        def batch_halfkp(samp_list: list, score_tensor: torch.Tensor, start: int, end: int) -> tuple:
+            B = end - start
+            w_flat, b_flat = [], []
+            for j in range(start, end):
+                wj, bj = samp_list[j]
+                w_flat.extend(wj)
+                b_flat.extend(bj)
+            per_sample = 11
+            white_indices = torch.tensor(w_flat, dtype=torch.long, device=device)
+            black_indices = torch.tensor(b_flat, dtype=torch.long, device=device)
+            white_offsets = torch.arange(0, B * per_sample, per_sample, dtype=torch.long, device=device)
+            black_offsets = torch.arange(0, B * per_sample, per_sample, dtype=torch.long, device=device)
+            return white_indices, black_indices, white_offsets, black_offsets, score_tensor[start:end]
+
+        for epoch in range(args.epochs):
+            model.train()
+            total_loss = 0.0
+            batches = 0
+            for i in range(0, len(train_samples), args.batch_size):
+                end = min(i + args.batch_size, len(train_samples))
+                w_idx, b_idx, w_off, b_off, batch_y = batch_halfkp(train_samples, y_train, i, end)
+                pred = model(w_idx, b_idx, w_off, b_off)
+                loss = criterion(pred, batch_y)
+                opt.zero_grad()
+                loss.backward()
+                opt.step()
+                total_loss += loss.item()
+                batches += 1
+            train_loss = total_loss / batches if batches else 0
+            model.eval()
+            with torch.no_grad():
+                val_loss_sum = 0.0
+                v_batches = 0
+                for vi in range(0, len(val_samples), args.batch_size):
+                    ve = min(vi + args.batch_size, len(val_samples))
+                    w_idx, b_idx, w_off, b_off, batch_y = batch_halfkp(val_samples, y_val, vi, ve)
+                    val_pred = model(w_idx, b_idx, w_off, b_off)
+                    val_loss_sum += criterion(val_pred, batch_y).item()
+                    v_batches += 1
+                val_loss = val_loss_sum / v_batches if v_batches else 0
+            print(f"Epoch {epoch+1}/{args.epochs}  train_loss={train_loss:.4f}  val_loss={val_loss:.4f}")
+
+        Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+        torch.save(
+            {
+                "state_dict": model.state_dict(),
+                "arch": "halfkp",
+                "halfkp_features": HALFKP_FEATURES,
+                "ft_output_per_half": FT_OUTPUT_PER_HALF,
+                "ft_output_dim": FT_OUTPUT_DIM,
+            },
+            args.output,
+        )
     print(f"Saved to {args.output}")
 
 

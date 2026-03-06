@@ -20,5 +20,5 @@ nn
 engine.dSYM
 
 # NNUE training outputs
-nnue_training/*.pt
-nnue_training/*.nnue
+training/out/*.pt
+training/out/*.nnue

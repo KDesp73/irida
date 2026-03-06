@@ -10,24 +10,24 @@ If you want to **train your own net without using Stockfish’s nnue-pytorch**:
 
 1. **Generate data** with the engine:
    ```bash
-   python3 -m nnue_training.generate_data --engine ./engine --depth 6 --fen-file positions.txt --output data.csv
+   python3 -m training.generate_data --engine ./engine --depth 6 --fen-file positions.txt --output data.csv
    ```
 
 2. **Train** with the custom trainer in this module (PyTorch only, no nnue-pytorch):
    ```bash
    pip install torch
-   python3 -m nnue_training.train --data data.csv --epochs 20 --output model.pt
+   python3 -m training.train --data data.csv --epochs 20 --output model.pt
    ```
-   This trains a small MLP from FEN→score and saves weights to `model.pt`.
+   Use `--arch mlp` (default) for a simple 768→256→32→1 MLP, or `--arch halfkp` for a Stockfish-compatible HalfKP feature transformer + 512→32→1. HalfKP models export to a full .nnue (convert script writes the real feature transformer).
 
 3. **Convert .pt to .nnue** so the engine can load it:
    ```bash
-   python3 -m nnue_training.convert_pt_to_nnue model.pt model.nnue
+   python3 -m training.convert_pt_to_nnue model.pt model.nnue
    ```
-   Or from the repo root: `make nnue_training.convert` (uses `nnue_training/model.pt` → `nnue_training/model.nnue`).  
+   Or from the repo root: `make training.convert` (uses `training/out/model.pt` → `training/out/model.nnue`).  
    The script writes the Stockfish .nnue binary layout (header, LEB128 feature transformer placeholder, dense 512→32→1 from your trained weights). The feature transformer is filled with zeros, so evaluation may be weak; for stronger play, see [export_nnue.md](export_nnue.md).
 
-4. **Load the net in the engine**: Set UCI option **EvalFile** to the path of your `.nnue` file (e.g. `nnue_training/model.nnue`). If the engine fails to load the file, nnue-probe may expect a different architecture/hash; see [export_nnue.md](export_nnue.md). Alternatively:
+4. **Load the net in the engine**: Set UCI option **EvalFile** to the path of your `.nnue` file (e.g. `training/out/model.nnue`). If the engine fails to load the file, nnue-probe may expect a different architecture/hash; see [export_nnue.md](export_nnue.md). Alternatively:
    - **Use your own inference**: Replace nnue-probe in the engine with code that loads your format (e.g. ONNX or a custom layout). See [export_nnue.md](export_nnue.md).
 
 See **[export_nnue.md](export_nnue.md)** for more on the .nnue format and export options.
@@ -72,7 +72,7 @@ You need a dataset of positions with target values in the format nnue-pytorch ex
 
   ```bash
   # From the chess-engine repo root, with the engine built:
-  python3 -m nnue_training.generate_data --engine ./engine --depth 6 --fen-file positions.txt --output data.csv
+  python3 -m training.generate_data --engine ./engine --depth 6 --fen-file positions.txt --output data.csv
   ```
 
   This runs the engine in UCI, sends each FEN, runs `go depth N`, parses the score, and writes `fen,score` (or similar). You can then convert `data.csv` to the binary format nnue-pytorch expects (see nnue-pytorch docs).

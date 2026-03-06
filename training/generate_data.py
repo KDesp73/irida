@@ -7,8 +7,8 @@ position, parses the score from the last "info ... score cp N" line, and
 writes output as CSV: fen,score_cp (centipawns from engine's perspective).
 
 Usage:
-  python3 -m nnue_training.generate_data --engine ./engine --depth 6 --fen-file positions.txt --output data.csv
-  cat fens.txt | python3 -m nnue_training.generate_data --engine ./engine --depth 4 --output data.csv
+  python3 -m training.generate_data --engine ./engine --depth 6 --fen-file positions.txt --output data.csv
+  cat fens.txt | python3 -m training.generate_data --engine ./engine --depth 4 --output data.csv
 
 The output format (fen,score_cp) can be converted to the binary format
 expected by nnue-pytorch; see nnue-pytorch docs for the exact schema.

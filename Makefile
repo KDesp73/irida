@@ -5,7 +5,7 @@ include make/deps.mk
 include make/dist.mk
 include make/build.mk
 include make/test.mk
-include make/nnue_training.mk
+include make/training.mk
 
 .PHONY: help
 help: ## Show this help message
