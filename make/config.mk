@@ -23,9 +23,17 @@ VERSION       := $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 
 CASTRO_VERSION=0.3.0
 
+LDFLAGS_ENGINE = -L. -l:$(A_NAME)
+LDFLAGS_CASTRO = -Lextern/castro -l:libcastro.a
+LDFLAGS_NNUE_PROBE = -Lextern/nnue-probe/src -lnnueprobe -Wl,-rpath,$(shell pwd)/extern/nnue-probe/src
+LDFLAGS_FATHOM = -Lextern/fathom -lfathom -Wl,-rpath,$(shell pwd)/extern/fathom
+
+WARNINGS = -Wall -Wextra
+INCLUDES = -I$(INCLUDE_DIR) -Iextern/castro/src -Iextern/ -Iextern/nnue-probe -Iextern/fathom/src
+
 # Flags
-CFLAGS  := -Wall -Wextra -fPIC -I$(INCLUDE_DIR) -Iextern/castro/src -Iextern/
-LDFLAGS := -L./extern/castro -l:libcastro.a -lpthread 
+CFLAGS  := -fPIC $(WARNINGS) $(INCLUDES)
+LDFLAGS := -lpthread
 
 # Build type
 ifeq ($(type), RELEASE)

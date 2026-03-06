@@ -4,7 +4,7 @@ build.all: deps.check $(BUILD_DIR) build.castro build.static build.shared $(TARG
 
 $(TARGET): build.static ## Build the main executable
 	@echo "[INFO] Building executable: $(TARGET)"
-	$(CC) src/main.c -o $(TARGET) -L. -l:$(A_NAME) extern/castro/libcastro.a $(LDFLAGS) -I$(INCLUDE_DIR) -Iextern/castro/src -DUSE_NNUE_PROBE -DUSE_FATHOM
+	$(CC) $(CFLAGS) src/main.c -o $(TARGET) $(LDFLAGS_ENGINE) $(LDFLAGS_CASTRO) $(LDFLAGS_NNUE_PROBE) $(LDFLAGS) -DUSE_NNUE_PROBE -DUSE_FATHOM
 
 .PHONY: build.static
 build.static: $(BUILD_DIR) $(OBJ_FILES) ## Build the static library
@@ -22,4 +22,4 @@ build.verbose: all ## Build the project in verbose mode
 
 .PHONY: build.castro
 build.castro: extern/castro ## Build the move generation library
-	cd extern/castro && make all
+	cd extern/castro && make all type=RELEASE

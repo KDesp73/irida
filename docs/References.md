@@ -15,3 +15,4 @@
 - [Nibbler](https://github.com/rooklift/nibbler)
 - [NNUE](https://github.com/official-stockfish/nnue-pytorch/blob/master/docs/nnue.md)
 - [networks](https://github.com/official-stockfish/networks)
+- [Syzygy Tablebases](https://kirill-kryukov.com/chess/tablebases-online/)

@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 # Run a short gauntlet for strength/regression testing.
-# Requires: cutechess-cli (install e.g. via brew install cutechess, or build from source).
+# Requires: cutechess-cli.
 # Optional: a second engine path as first argument for engine-vs-engine.
 
 set -e
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 ENGINE="$ROOT/engine"
-PGN_OUT="${ROOT}/gauntlet.pgn"
+PGN_OUT="${ROOT}/pgn/gauntlet.pgn"
 
 if ! command -v cutechess-cli &>/dev/null; then
     echo "cutechess-cli not found. Install it (e.g. brew install cutechess) or build from https://github.com/cutechess/cutechess-cli"
@@ -31,8 +32,8 @@ if [[ -z "$REF_ENGINE" ]]; then
     echo ""
     echo "Running self-play: $GAMES games at $TC"
     cutechess-cli \
-        -engine name=engine cmd="$ENGINE" \
-        -engine name=engine2 cmd="$ENGINE" \
+        -engine name=engine cmd="$ENGINE" proto=uci \
+        -engine name=engine2 cmd="$ENGINE" proto=uci \
         -each tc="$TC" \
         -games "$GAMES" \
         -pgnout "$PGN_OUT" \
@@ -44,8 +45,8 @@ else
     fi
     echo "Running engine vs reference: $GAMES games at $TC"
     cutechess-cli \
-        -engine name=engine cmd="$ENGINE" \
-        -engine name=reference cmd="$REF_ENGINE" \
+        -engine name=engine cmd="$ENGINE" proto=uci \
+        -engine name=reference cmd="$REF_ENGINE" proto=uci \
         -each tc="$TC" \
         -games "$GAMES" \
         -pgnout "$PGN_OUT" \

@@ -3,7 +3,6 @@
 #include "tt.h"
 #include "moveordering.h"
 #include "uci.h"
-#include "uci_thread.h"
 #include "draws.h"
 #include "syzygy.h"
 #include <stdint.h>
