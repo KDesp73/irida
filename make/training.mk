@@ -24,7 +24,7 @@ training.data: $(TARGET) ## Generate training CSV from engine. Override: FEN_FIL
 .PHONY: training.train
 training.train: ## Train NNUE-style net from CSV. Override: DATA_CSV=path EPOCHS=N MODEL_OUT=path
 	@test -f "$(DATA_CSV)" || (echo "Run 'make training.data' first or set DATA_CSV=..."; exit 1)
-	python3 -m $(NNUE_DIR).train --data "$(DATA_CSV)" --epochs "$(EPOCHS)" --output "$(MODEL_OUT)"
+	python3 -m $(NNUE_DIR).train --data "$(DATA_CSV)" --epochs "$(EPOCHS)" --output "$(MODEL_OUT)" --arch halfkp
 	@echo "[INFO] Model saved to $(MODEL_OUT)"
 
 .PHONY: training.convert
