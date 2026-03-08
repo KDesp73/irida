@@ -48,7 +48,10 @@ SearchFn search_dispatcher(char* search) {
 bool eval_handler(Context context)
 {
     engine.eval = eval_dispatcher(context.eval);
-    engine.search = search_dispatcher(context.search);
+
+    if (strcmp("nnue", context.eval) == 0) {
+        nnue_load(context.nnue_path);
+    }
 
     castro_BoardInitFen(&engine.board, context.fen);
     int eval = engine.eval(&engine.board);

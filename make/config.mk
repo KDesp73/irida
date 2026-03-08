@@ -47,8 +47,8 @@ WARNINGS = -Wall -Wextra
 INCLUDES = -I$(INCLUDE_DIR) -Iextern/castro/src -Iextern/ -Iextern/nnue-probe -Iextern/fathom/src
 
 # Flags
-CFLAGS  := -fPIC $(WARNINGS) $(INCLUDES)
-LDFLAGS := -lpthread
+CFLAGS  := -fPIC $(WARNINGS) $(INCLUDES) -DUSE_FATHOM
+LDFLAGS := -lpthread $(LDFLAGS_FATHOM) $(LDFLAGS_NNUE_PROBE)
 
 # Build type
 ifeq ($(type), RELEASE)

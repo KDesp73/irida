@@ -11,7 +11,4 @@ bool nnue_load(const char* path);
 /* Whether an NNUE net is loaded and ready. */
 bool nnue_available(void);
 
-/* Evaluate position. Uses NNUE if loaded, otherwise returns 0 (caller should use PeSTO). */
-int nnue_eval(Board* board);
-
 #endif

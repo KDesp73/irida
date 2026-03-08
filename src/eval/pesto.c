@@ -2,6 +2,7 @@
 
 #include "IncludeOnly/logging.h"
 #include "castro.h"
+#include <stdio.h>
 
 #define WHITE_PAWN_ENCODING    (2*PAWN   + COLOR_WHITE)
 #define BLACK_PAWN_ENCODING    (2*PAWN   + COLOR_BLACK)

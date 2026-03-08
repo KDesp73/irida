@@ -21,6 +21,7 @@ void context_init(Context* ctx, Command command)
     ctx->fen = NULL;
     ctx->eval = NULL;
     ctx->search = NULL;
+    ctx->nnue_path = NULL;
 }
 
 void context_reset(Context* ctx)
@@ -30,6 +31,7 @@ void context_reset(Context* ctx)
     ctx->fen = NULL;
     ctx->eval = NULL;
     ctx->search = NULL;
+    ctx->nnue_path = NULL;
 }
 
 void context_free(Context* ctx)
@@ -38,6 +40,7 @@ void context_free(Context* ctx)
     if(ctx->fen) free(ctx->fen);
     if(ctx->eval) free(ctx->eval);
     if(ctx->search) free(ctx->search);
+    if(ctx->nnue_path) free(ctx->nnue_path);
 }
 
 void set_handler(Dispatcher* this, Command command, HandlerFunc handler)

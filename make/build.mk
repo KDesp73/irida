@@ -4,7 +4,7 @@ build.all: deps.check $(BUILD_DIR) build.castro build.static build.shared $(TARG
 
 $(TARGET): build.static ## Build the main executable
 	@echo "[INFO] Building executable: $(TARGET)"
-	$(CC) $(CFLAGS) src/main.c -o $(TARGET) $(LDFLAGS_ENGINE) $(LDFLAGS_CASTRO) $(LDFLAGS) -DUSE_NNUE_PROBE -DUSE_FATHOM
+	$(CC) $(CFLAGS) src/main.c -o $(TARGET) $(LDFLAGS_ENGINE) $(LDFLAGS_CASTRO) $(LDFLAGS) 
 
 .PHONY: build.static
 build.static: $(BUILD_DIR) $(OBJ_FILES) ## Build the static library

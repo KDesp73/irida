@@ -19,6 +19,7 @@ int CliMain(int argc, char** argv)
         cli_arg_new(ARG_DEPTH, "depth", "", required_argument),
         cli_arg_new(ARG_EVAL, "eval", "", required_argument),
         cli_arg_new(ARG_SEARCH, "search", "", required_argument),
+        cli_arg_new(ARG_NNUE_PATH, "nnue-path", "", required_argument),
         NULL
     );
     char* command_str = argc == 1 ? NULL : argv[1];
@@ -48,10 +49,16 @@ int CliMain(int argc, char** argv)
             case ARG_SEARCH:
                 ctx.search = strdup(optarg);
                 break;
+            case ARG_NNUE_PATH:
+                ctx.nnue_path = strdup(optarg);
+                break;
             default:
                 goto error;
         }
     }
+
+    if (!ctx.nnue_path)
+        ctx.nnue_path = strdup("./nn/nn-1c0000000000.nnue");
     
     Dispatcher dispatcher = {0};
     set_handler(&dispatcher, COMMAND_PERFT, perft_handler);

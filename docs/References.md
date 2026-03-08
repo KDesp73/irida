@@ -16,4 +16,5 @@
 - [NNUE](https://github.com/official-stockfish/nnue-pytorch/blob/master/docs/nnue.md)
 - [networks](https://github.com/official-stockfish/networks)
 - [Syzygy Tablebases](https://kirill-kryukov.com/chess/tablebases-online/)
+- [tb](https://github.com/syzygy1/tb)
 - [network visualization](https://deepwiki.com/fairy-stockfish/variant-nnue-pytorch/9.1-network-visualization-(visualize.py))
