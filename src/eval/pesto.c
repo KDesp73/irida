@@ -31,6 +31,42 @@ static inline int other(int c) {
     return c ^ 1;
 }
 
+static inline int is_white_piece_char(char c) {
+    return c >= 'A' && c <= 'Z';
+}
+
+static inline int is_black_piece_char(char c) {
+    return c >= 'a' && c <= 'z';
+}
+
+static inline int same_color(char a, char b) {
+    return (is_white_piece_char(a) && is_white_piece_char(b)) ||
+           (is_black_piece_char(a) && is_black_piece_char(b));
+}
+
+static inline int opposite_color(char a, char b) {
+    return (is_white_piece_char(a) && is_black_piece_char(b)) ||
+           (is_black_piece_char(a) && is_white_piece_char(b));
+}
+
+static inline int piece_index_from_char(char ch) {
+    switch (ch) {
+        case 'P': case 'p': return 0;
+        case 'N': case 'n': return 1;
+        case 'B': case 'b': return 2;
+        case 'R': case 'r': return 3;
+        case 'Q': case 'q': return 4;
+        case 'K': case 'k': return 5;
+        default:            return -1;
+    }
+}
+
+static inline int simple_piece_value_from_char(char ch) {
+    static const int values[6] = {100, 320, 330, 500, 900, 0};
+    int idx = piece_index_from_char(ch);
+    return (idx >= 0) ? values[idx] : 0;
+}
+
 static const int mg_value[6] = { 82, 337, 365, 477, 1025, 0 };
 static const int eg_value[6] = { 94, 281, 297, 512, 936, 0 };
 
@@ -191,6 +227,474 @@ static const int gamephase_inc[12] = {
 static int mg_table[12][64];
 static int eg_table[12][64];
 
+/* --------------------------------------------------------------
+ *  Helper terms: pawn structure, mobility, king safety,
+ *  piece activity, space, threats, endgame extras
+ * -------------------------------------------------------------- */
+
+static int evaluate_pawn_structure(Board* board)
+{
+    int score = 0;
+
+    /* Passed pawns: no enemy pawn on same or adjacent files ahead */
+    int max_black_rank[8];
+    int min_white_rank[8];
+    for (int f = 0; f < 8; f++) {
+        max_black_rank[f] = -1;
+        min_white_rank[f] = 8;
+    }
+
+    for (int sq = 0; sq < 64; sq++) {
+        int r = sq / 8;
+        int f = sq % 8;
+        char ascii = board->grid[r][f];
+        if (ascii == 'p' && r > max_black_rank[f]) max_black_rank[f] = r;
+        if (ascii == 'P' && r < min_white_rank[f]) min_white_rank[f] = r;
+    }
+
+    for (int sq = 0; sq < 64; sq++) {
+        int r = sq / 8;
+        int f = sq % 8;
+        char ascii = board->grid[r][f];
+        if (ascii == 'P') {
+            int passed = 1;
+            for (int df = -1; df <= 1 && passed; df++) {
+                int ff = f + df;
+                if (ff >= 0 && ff <= 7 && max_black_rank[ff] >= r) passed = 0;
+            }
+            if (passed && r < 7) score += (6 - r) * 6;
+        }
+        if (ascii == 'p') {
+            int passed = 1;
+            for (int df = -1; df <= 1 && passed; df++) {
+                int ff = f + df;
+                if (ff >= 0 && ff <= 7 && min_white_rank[ff] <= r) passed = 0;
+            }
+            if (passed && r > 0) score -= (r - 1) * 6;
+        }
+    }
+
+    /* Doubled and isolated pawns */
+    int wpawns[8] = {0}, bpawns[8] = {0};
+    for (int sq = 0; sq < 64; sq++) {
+        int r = sq / 8;
+        int f = sq % 8;
+        (void)r;
+        char c = board->grid[r][f];
+        if (c == 'P') wpawns[f]++;
+        if (c == 'p') bpawns[f]++;
+    }
+
+    for (int f = 0; f < 8; f++) {
+        if (wpawns[f] > 1) score -= (wpawns[f] - 1) * 12;
+        if (bpawns[f] > 1) score += (bpawns[f] - 1) * 12;
+
+        int white_adj = 0;
+        int black_adj = 0;
+        if (f > 0) {
+            white_adj += wpawns[f - 1];
+            black_adj += bpawns[f - 1];
+        }
+        if (f < 7) {
+            white_adj += wpawns[f + 1];
+            black_adj += bpawns[f + 1];
+        }
+
+        if (wpawns[f] > 0 && white_adj == 0)
+            score -= wpawns[f] * 8;
+        if (bpawns[f] > 0 && black_adj == 0)
+            score += bpawns[f] * 8;
+    }
+
+    return score;
+}
+
+static inline int knight_mobility(Board* board, int r, int f, char me)
+{
+    static const int offsets[8][2] = {
+        { 2,  1}, { 1,  2}, {-1,  2}, {-2,  1},
+        {-2, -1}, {-1, -2}, { 1, -2}, { 2, -1}
+    };
+    int mob = 0;
+    for (int i = 0; i < 8; i++) {
+        int nr = r + offsets[i][0];
+        int nf = f + offsets[i][1];
+        if (nr < 0 || nr > 7 || nf < 0 || nf > 7)
+            continue;
+        char t = board->grid[nr][nf];
+        if (!same_color(me, t))
+            mob++;
+    }
+    return mob;
+}
+
+static inline int king_mobility(Board* board, int r, int f, char me)
+{
+    int mob = 0;
+    for (int dr = -1; dr <= 1; dr++) {
+        for (int df = -1; df <= 1; df++) {
+            if (dr == 0 && df == 0) continue;
+            int nr = r + dr;
+            int nf = f + df;
+            if (nr < 0 || nr > 7 || nf < 0 || nf > 7)
+                continue;
+            char t = board->grid[nr][nf];
+            if (!same_color(me, t))
+                mob++;
+        }
+    }
+    return mob;
+}
+
+static inline int sliding_mobility(Board* board,
+                                   int r,
+                                   int f,
+                                   char me,
+                                   const int directions[][2],
+                                   int dir_count)
+{
+    int mob = 0;
+    for (int d = 0; d < dir_count; d++) {
+        int dr = directions[d][0];
+        int df = directions[d][1];
+        int nr = r + dr;
+        int nf = f + df;
+        while (nr >= 0 && nr <= 7 && nf >= 0 && nf <= 7) {
+            char t = board->grid[nr][nf];
+            if (t == '.' || t == ' ') {
+                mob++;
+            } else {
+                if (!same_color(me, t))
+                    mob++;
+                break;
+            }
+            nr += dr;
+            nf += df;
+        }
+    }
+    return mob;
+}
+
+static int evaluate_mobility(Board* board)
+{
+    int white_mob = 0;
+    int black_mob = 0;
+
+    static const int bishop_dirs[4][2] = {
+        { 1,  1}, { 1, -1}, {-1,  1}, {-1, -1}
+    };
+    static const int rook_dirs[4][2] = {
+        { 1,  0}, {-1,  0}, { 0,  1}, { 0, -1}
+    };
+    static const int queen_dirs[8][2] = {
+        { 1,  0}, {-1,  0}, { 0,  1}, { 0, -1},
+        { 1,  1}, { 1, -1}, {-1,  1}, {-1, -1}
+    };
+
+    for (int r = 0; r < 8; r++) {
+        for (int f = 0; f < 8; f++) {
+            char c = board->grid[r][f];
+            if (!is_white_piece_char(c) && !is_black_piece_char(c))
+                continue;
+
+            switch (c) {
+                case 'N':
+                    white_mob += knight_mobility(board, r, f, c);
+                    break;
+                case 'n':
+                    black_mob += knight_mobility(board, r, f, c);
+                    break;
+                case 'B':
+                    white_mob += sliding_mobility(board, r, f, c,
+                                                  bishop_dirs, 4);
+                    break;
+                case 'b':
+                    black_mob += sliding_mobility(board, r, f, c,
+                                                  bishop_dirs, 4);
+                    break;
+                case 'R':
+                    white_mob += sliding_mobility(board, r, f, c,
+                                                  rook_dirs, 4);
+                    break;
+                case 'r':
+                    black_mob += sliding_mobility(board, r, f, c,
+                                                  rook_dirs, 4);
+                    break;
+                case 'Q':
+                    white_mob += sliding_mobility(board, r, f, c,
+                                                  queen_dirs, 8);
+                    break;
+                case 'q':
+                    black_mob += sliding_mobility(board, r, f, c,
+                                                  queen_dirs, 8);
+                    break;
+                case 'K':
+                    white_mob += king_mobility(board, r, f, c);
+                    break;
+                case 'k':
+                    black_mob += king_mobility(board, r, f, c);
+                    break;
+                case 'P': {
+                    int nr = r + 1;
+                    if (nr <= 7) {
+                        if (board->grid[nr][f] == '.' ||
+                            board->grid[nr][f] == ' ')
+                            white_mob++;
+                        if (f > 0 && is_black_piece_char(board->grid[nr][f - 1]))
+                            white_mob++;
+                        if (f < 7 && is_black_piece_char(board->grid[nr][f + 1]))
+                            white_mob++;
+                    }
+                    break;
+                }
+                case 'p': {
+                    int nr = r - 1;
+                    if (nr >= 0) {
+                        if (board->grid[nr][f] == '.' ||
+                            board->grid[nr][f] == ' ')
+                            black_mob++;
+                        if (f > 0 && is_white_piece_char(board->grid[nr][f - 1]))
+                            black_mob++;
+                        if (f < 7 && is_white_piece_char(board->grid[nr][f + 1]))
+                            black_mob++;
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+    }
+
+    const int MOBILITY_WEIGHT = 2;
+    return (white_mob - black_mob) * MOBILITY_WEIGHT;
+}
+
+static int evaluate_king_safety(Board* board, int game_phase)
+{
+    int score = 0;
+
+    if (game_phase > 10) {
+        for (int sq = 0; sq < 64; sq++) {
+            int r = sq / 8;
+            int f = sq % 8;
+            char c = board->grid[r][f];
+            if (c == 'K' && (f == 3 || f == 4) && r <= 2) score -= 16;
+            if (c == 'k' && (f == 3 || f == 4) && r >= 5) score += 16;
+        }
+    }
+
+    return score;
+}
+
+static int evaluate_piece_activity(Board* board)
+{
+    int score = 0;
+    for (int sq = 0; sq < 64; sq++) {
+        int r = sq / 8;
+        int f = sq % 8;
+        (void)f;
+        char c = board->grid[r][f];
+        if ((c == 'N' || c == 'B' || c == 'R' || c == 'Q') &&
+            r >= 2 && r <= 6)
+            score += 4;
+        if ((c == 'n' || c == 'b' || c == 'r' || c == 'q') &&
+            r >= 1 && r <= 5)
+            score -= 4;
+    }
+    return score;
+}
+
+static int evaluate_space(Board* board)
+{
+    int white_space = 0;
+    int black_space = 0;
+
+    for (int r = 0; r < 8; r++) {
+        for (int f = 0; f < 8; f++) {
+            char c = board->grid[r][f];
+            if (c == 'P' && r >= 3)
+                white_space++;
+            if (c == 'p' && r <= 4)
+                black_space++;
+
+            if (c == 'N' || c == 'B' || c == 'R' || c == 'Q') {
+                if (r >= 2 && r <= 5 && f >= 2 && f <= 5)
+                    white_space++;
+            }
+            if (c == 'n' || c == 'b' || c == 'r' || c == 'q') {
+                if (r >= 2 && r <= 5 && f >= 2 && f <= 5)
+                    black_space++;
+            }
+        }
+    }
+
+    const int SPACE_WEIGHT = 2;
+    return (white_space - black_space) * SPACE_WEIGHT;
+}
+
+static int evaluate_threats(Board* board)
+{
+    int white_threat = 0;
+    int black_threat = 0;
+
+    static const int bishop_dirs[4][2] = {
+        { 1,  1}, { 1, -1}, {-1,  1}, {-1, -1}
+    };
+    static const int rook_dirs[4][2] = {
+        { 1,  0}, {-1,  0}, { 0,  1}, { 0, -1}
+    };
+    static const int queen_dirs[8][2] = {
+        { 1,  0}, {-1,  0}, { 0,  1}, { 0, -1},
+        { 1,  1}, { 1, -1}, {-1,  1}, {-1, -1}
+    };
+
+    for (int r = 0; r < 8; r++) {
+        for (int f = 0; f < 8; f++) {
+            char c = board->grid[r][f];
+            if (!is_white_piece_char(c) && !is_black_piece_char(c))
+                continue;
+
+            int sign = is_white_piece_char(c) ? 1 : -1;
+
+            if (c == 'P') {
+                int nr = r + 1;
+                if (nr <= 7) {
+                    if (f > 0 && is_black_piece_char(board->grid[nr][f - 1]))
+                        white_threat += simple_piece_value_from_char(board->grid[nr][f - 1]) / 10;
+                    if (f < 7 && is_black_piece_char(board->grid[nr][f + 1]))
+                        white_threat += simple_piece_value_from_char(board->grid[nr][f + 1]) / 10;
+                }
+                continue;
+            }
+            if (c == 'p') {
+                int nr = r - 1;
+                if (nr >= 0) {
+                    if (f > 0 && is_white_piece_char(board->grid[nr][f - 1]))
+                        black_threat += simple_piece_value_from_char(board->grid[nr][f - 1]) / 10;
+                    if (f < 7 && is_white_piece_char(board->grid[nr][f + 1]))
+                        black_threat += simple_piece_value_from_char(board->grid[nr][f + 1]) / 10;
+                }
+                continue;
+            }
+
+            if (c == 'N' || c == 'n') {
+                static const int offsets[8][2] = {
+                    { 2,  1}, { 1,  2}, {-1,  2}, {-2,  1},
+                    {-2, -1}, {-1, -2}, { 1, -2}, { 2, -1}
+                };
+                for (int i = 0; i < 8; i++) {
+                    int nr = r + offsets[i][0];
+                    int nf = f + offsets[i][1];
+                    if (nr < 0 || nr > 7 || nf < 0 || nf > 7)
+                        continue;
+                    char t = board->grid[nr][nf];
+                    if (t != '.' && t != ' ' && opposite_color(c, t)) {
+                        int val = simple_piece_value_from_char(t) / 8;
+                        if (sign > 0) white_threat += val;
+                        else          black_threat += val;
+                    }
+                }
+            } else if (c == 'B' || c == 'b') {
+                for (int d = 0; d < 4; d++) {
+                    int dr = bishop_dirs[d][0];
+                    int df = bishop_dirs[d][1];
+                    int nr = r + dr;
+                    int nf = f + df;
+                    while (nr >= 0 && nr <= 7 && nf >= 0 && nf <= 7) {
+                        char t = board->grid[nr][nf];
+                        if (t != '.' && t != ' ') {
+                            if (opposite_color(c, t)) {
+                                int val = simple_piece_value_from_char(t) / 8;
+                                if (sign > 0) white_threat += val;
+                                else          black_threat += val;
+                            }
+                            break;
+                        }
+                        nr += dr;
+                        nf += df;
+                    }
+                }
+            } else if (c == 'R' || c == 'r') {
+                for (int d = 0; d < 4; d++) {
+                    int dr = rook_dirs[d][0];
+                    int df = rook_dirs[d][1];
+                    int nr = r + dr;
+                    int nf = f + df;
+                    while (nr >= 0 && nr <= 7 && nf >= 0 && nf <= 7) {
+                        char t = board->grid[nr][nf];
+                        if (t != '.' && t != ' ') {
+                            if (opposite_color(c, t)) {
+                                int val = simple_piece_value_from_char(t) / 8;
+                                if (sign > 0) white_threat += val;
+                                else          black_threat += val;
+                            }
+                            break;
+                        }
+                        nr += dr;
+                        nf += df;
+                    }
+                }
+            } else if (c == 'Q' || c == 'q') {
+                for (int d = 0; d < 8; d++) {
+                    int dr = queen_dirs[d][0];
+                    int df = queen_dirs[d][1];
+                    int nr = r + dr;
+                    int nf = f + df;
+                    while (nr >= 0 && nr <= 7 && nf >= 0 && nf <= 7) {
+                        char t = board->grid[nr][nf];
+                        if (t != '.' && t != ' ') {
+                            if (opposite_color(c, t)) {
+                                int val = simple_piece_value_from_char(t) / 8;
+                                if (sign > 0) white_threat += val;
+                                else          black_threat += val;
+                            }
+                            break;
+                        }
+                        nr += dr;
+                        nf += df;
+                    }
+                }
+            }
+        }
+    }
+
+    const int THREAT_WEIGHT = 1;
+    return (white_threat - black_threat) * THREAT_WEIGHT;
+}
+
+static int evaluate_endgame_terms(Board* board, int game_phase)
+{
+    int score = 0;
+
+    int white_bishops = 0;
+    int black_bishops = 0;
+    int white_pawns = 0;
+    int black_pawns = 0;
+
+    for (int r = 0; r < 8; r++) {
+        for (int f = 0; f < 8; f++) {
+            char c = board->grid[r][f];
+            if (c == 'B') white_bishops++;
+            else if (c == 'b') black_bishops++;
+            else if (c == 'P') white_pawns++;
+            else if (c == 'p') black_pawns++;
+        }
+    }
+
+    if (white_bishops >= 2)
+        score += 15;
+    if (black_bishops >= 2)
+        score -= 15;
+
+    if (game_phase <= 8) {
+        int pawn_diff = white_pawns - black_pawns;
+        score += pawn_diff * 4;
+    }
+
+    return score;
+}
+
 void pesto_init(void)
 {
     for (int p = 0; p < 6; p++) {
@@ -260,11 +764,8 @@ int pesto_eval(Board* board)
         game_phase  += gamephase_inc[pc];
     }
 
-    int side = board->turn ? COLOR_WHITE : COLOR_BLACK;
-    int opp  = other(side);
-
-    int mg_score = mg_acc[side] - mg_acc[opp];
-    int eg_score = eg_acc[side] - eg_acc[opp];
+    int mg_score = mg_acc[COLOR_WHITE] - mg_acc[COLOR_BLACK];
+    int eg_score = eg_acc[COLOR_WHITE] - eg_acc[COLOR_BLACK];
 
     if (game_phase > 24)
         game_phase = 24;
@@ -273,70 +774,16 @@ int pesto_eval(Board* board)
 
     int score = (mg_score * game_phase + eg_score * eg_phase) / 24;
 
-    /* Passed pawns: no enemy pawn on same or adjacent files ahead */
-    int max_black_rank[8];
-    int min_white_rank[8];
-    for (int f = 0; f < 8; f++) {
-        max_black_rank[f] = -1;
-        min_white_rank[f] = 8;
-    }
-    for (int sq = 0; sq < 64; sq++) {
-        int r = sq / 8, f = sq % 8;
-        char ascii = board->grid[r][f];
-        if (ascii == 'p' && r > max_black_rank[f]) max_black_rank[f] = r;
-        if (ascii == 'P' && r < min_white_rank[f]) min_white_rank[f] = r;
-    }
-    for (int sq = 0; sq < 64; sq++) {
-        int r = sq / 8, f = sq % 8;
-        char ascii = board->grid[r][f];
-        if (ascii == 'P') {
-            int passed = 1;
-            for (int df = -1; df <= 1 && passed; df++) {
-                int ff = f + df;
-                if (ff >= 0 && ff <= 7 && max_black_rank[ff] >= r) passed = 0;
-            }
-            if (passed && r < 7) score += (6 - r) * 6;
-        }
-        if (ascii == 'p') {
-            int passed = 1;
-            for (int df = -1; df <= 1 && passed; df++) {
-                int ff = f + df;
-                if (ff >= 0 && ff <= 7 && min_white_rank[ff] <= r) passed = 0;
-            }
-            if (passed && r > 0) score -= (r - 1) * 6;
-        }
-    }
+    score += evaluate_pawn_structure(board);
+    score += evaluate_mobility(board);
+    score += evaluate_king_safety(board, game_phase);
+    score += evaluate_piece_activity(board);
+    score += evaluate_space(board);
+    score += evaluate_threats(board);
+    score += evaluate_endgame_terms(board, game_phase);
 
-    /* Doubled pawns */
-    int wpawns[8] = {0}, bpawns[8] = {0};
-    for (int sq = 0; sq < 64; sq++) {
-        int f = sq % 8;
-        char c = board->grid[sq / 8][f];
-        if (c == 'P') wpawns[f]++;
-        if (c == 'p') bpawns[f]++;
-    }
-    for (int f = 0; f < 8; f++) {
-        if (wpawns[f] > 1) score -= (wpawns[f] - 1) * 12;
-        if (bpawns[f] > 1) score += (bpawns[f] - 1) * 12;
-    }
-
-    /* King safety: penalty for king in center in middlegame */
-    if (game_phase > 10) {
-        for (int sq = 0; sq < 64; sq++) {
-            int r = sq / 8, f = sq % 8;
-            char c = board->grid[r][f];
-            if (c == 'K' && (f == 3 || f == 4) && r <= 2) score -= 12;
-            if (c == 'k' && (f == 3 || f == 4) && r >= 5) score += 12;
-        }
-    }
-
-    /* Piece activity: small bonus for pieces in active half */
-    for (int sq = 0; sq < 64; sq++) {
-        int r = sq / 8;
-        char c = board->grid[r][sq % 8];
-        if ((c == 'N' || c == 'B' || c == 'R' || c == 'Q') && r >= 2 && r <= 6) score += 3;
-        if ((c == 'n' || c == 'b' || c == 'r' || c == 'q') && r >= 1 && r <= 5) score -= 3;
-    }
+    if (!board->turn)
+        score = -score;
 
     return score;
 }
