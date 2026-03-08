@@ -71,9 +71,12 @@ void uci_setoption(UciState* state, const char *command)
                     break;
                 case UCI_STRING:
                     snprintf(state->uciOptions[i].value.string, sizeof(state->uciOptions[i].value.string), "%s", option_value);
-                    if (strcmp(option_name, "EvalFile") == 0)
-                        nnue_load(option_value);
-                    else if (strcmp(option_name, "SyzygyPath") == 0)
+                    if (strcmp(option_name, "EvalFile") == 0) {
+                        if (nnue_load(option_value))
+                            printf("info string EvalFile loaded: %s\n", option_value);
+                        else
+                            printf("info string Failed to load EvalFile '%s' (using PeSTO evaluation)\n", option_value);
+                    } else if (strcmp(option_name, "SyzygyPath") == 0)
                         syzygy_init(option_value);
                     break;
                 default:
@@ -260,6 +263,20 @@ void uci_uci(UciState* state)
     printf("\n");
 
     PrintUciOptions(state);
+
+    /* Load default EvalFile so NNUE is used without GUI sending setoption. */
+    for (size_t i = 0; i < state->uciOptionCount; i++) {
+        if (strcmp(state->uciOptions[i].name, "EvalFile") == 0
+            && state->uciOptions[i].value.string[0] != '\0') {
+            const char* path = state->uciOptions[i].value.string;
+            if (nnue_load(path))
+                printf("info string EvalFile loaded: %s\n", path);
+            else
+                printf("info string Failed to load EvalFile '%s' (using PeSTO evaluation)\n", path);
+            break;
+        }
+    }
+
     printf("uciok\n");
 }
 

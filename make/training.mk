@@ -40,3 +40,25 @@ training.clean: ## Remove resulting files
 
 .PHONY: training.all
 training.all: training.data training.train training.convert
+
+# Texel tuning: tune PeSTO piece values (mg_value, eg_value) from positions with results.
+TEXEL_CSV    ?= $(NNUE_DIR)/out/texel_positions.csv
+TEXEL_PARAMS ?= $(NNUE_DIR)/out/texel_params.json
+TEXEL_PGN    ?= $(NNUE_DIR)/games.pgn
+
+.PHONY: training.texel.deps
+training.texel.deps: ## Install deps for Texel (numpy, scipy; optional: python-chess for PGN)
+	pip install numpy scipy
+
+.PHONY: training.texel.data
+training.texel.data: ## Build fen,result CSV from PGN. Override: TEXEL_PGN=file.pgn TEXEL_CSV=out.csv
+	@test -f "$(TEXEL_PGN)" || (echo "Set TEXEL_PGN=path/to/games.pgn"; exit 1)
+	mkdir -p $(NNUE_DIR)/out
+	python3 -m $(NNUE_DIR).pgn_to_texel --pgn "$(TEXEL_PGN)" --output "$(TEXEL_CSV)"
+	@echo "[INFO] Texel dataset: $(TEXEL_CSV)"
+
+.PHONY: training.texel.tune
+training.texel.tune: ## Run Texel tuning. Override: TEXEL_CSV=positions.csv TEXEL_PARAMS=params.json
+	@test -f "$(TEXEL_CSV)" || (echo "Run 'make training.texel.data' or set TEXEL_CSV=..."; exit 1)
+	python3 -m $(NNUE_DIR).texel_tuning --data "$(TEXEL_CSV)" --output "$(TEXEL_PARAMS)" --iter 1000
+	@echo "[INFO] Tuned params: $(TEXEL_PARAMS). Paste the C snippet into src/eval/pesto.c"

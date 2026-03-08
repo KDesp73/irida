@@ -6,9 +6,6 @@ Supports:
 - small_mlp: 768->256->32->1; writes placeholder FT and padded 512->32->1.
 - halfkp: HalfKP feature transformer (41024*2 x 256) + 512->32->1; writes
   real FT weights and dense layers so the .nnue is fully usable.
-
-Usage:
-  python3 -m training.convert_pt_to_nnue model.pt output.nnue
 """
 
 from __future__ import annotations

@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+
+import subprocess
+import argparse
+import re
+import sys
+
+def get_eval(engine_path: str, depth: int, fen: str):
+    # Use a context manager to ensure the process is closed properly
+    proc = subprocess.Popen(
+        [engine_path], 
+        stdin=subprocess.PIPE, 
+        stdout=subprocess.PIPE, 
+        stderr=subprocess.DEVNULL,
+        text=True,
+        bufsize=1
+    )
+
+    def send(cmd):
+        proc.stdin.write(f"{cmd}\n")
+        proc.stdin.flush()
+
+    # UCI Initialization
+    send("uci")
+    send("isready")
+    
+    # Wait for readyok to ensure engine is loaded
+    while True:
+        line = proc.stdout.readline()
+        if "readyok" in line:
+            break
+
+    # Send position and command
+    send(f"position fen {fen}")
+    send(f"go depth {depth}")
+
+    eval_cp = None
+
+    # Read output until 'bestmove' is found
+    while True:
+        line = proc.stdout.readline()
+        if not line:
+            break
+        
+        line = line.strip()
+        
+        # Capture CP (centipawn) or Mate scores
+        # Engines don't always report "info depth X" in a single line at the end;
+        # they stream updates. We want the most recent evaluation.
+        if "score cp" in line:
+            match = re.search(r"score cp (-?\d+)", line)
+            if match:
+                eval_cp = int(match.group(1))
+        elif "score mate" in line:
+            match = re.search(r"score mate (-?\d+)", line)
+            if match:
+                eval_cp = f"Mate in {match.group(1)}"
+        
+        if "bestmove" in line:
+            break
+
+    # Clean up
+    send("quit")
+    proc.terminate()
+    
+    return eval_cp
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Evaluate chess positions using a UCI engine.")
+    parser.add_argument("--engine", help="Path to engine executable", type=str, default="stockfish")
+    parser.add_argument("--depth", help="Search depth", type=int, default=15)
+    parser.add_argument("--file", help="File containing FEN strings", type=str)
+    parser.add_argument("fen", nargs="?", help="A single FEN string", type=str)
+    args = parser.parse_args()
+
+    # Use a different name than 'eval' to avoid shadowing the built-in Python function
+    if args.file:
+        try:
+            with open(args.file, "r") as f:
+                for line in f:
+                    fen_str = line.strip()
+                    if fen_str and not fen_str.startswith("#"):
+                        result = get_eval(args.engine, args.depth, fen_str)
+                        print(f"{fen_str} | Eval: {result}")
+        except FileNotFoundError:
+            print(f"Error: File '{args.file}' not found.", file=sys.stderr)
+            sys.exit(1)
+    elif args.fen:
+        result = get_eval(args.engine, args.depth, args.fen)
+        print(f"Eval: {result}")
+    else:
+        parser.print_help()
+        sys.exit(1)

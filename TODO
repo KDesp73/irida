@@ -1,12 +1,13 @@
 TODO: recipes
 TODO: pick a license
 TODO: pick a name
+TODO: texel tuning
+TODO: syzygy tablebase (optional Fathom)
+TODO: nnue evaluation (optional nnue-probe)
+TODO: better traditional evaluation
 DONE: aspiration windows
 DONE: engine testing
-DONE: better traditional evaluation
 DONE: cache
-DONE: syzygy tablebase (optional Fathom)
-DONE: nnue evaluation (optional nnue-probe)
 DONE: transposition tables
 DONE: move ordering
 DONE: tests

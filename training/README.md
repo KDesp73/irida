@@ -4,6 +4,31 @@ This Python module provides **scripts and documentation** for training a custom 
 
 ---
 
+## Texel tuning (PeSTO piece values)
+
+**Texel tuning** minimizes the cross-entropy between the engine’s evaluation (via a sigmoid) and the game result (1 = white wins, 0.5 = draw, 0 = black wins) on a dataset of positions. This tunes the **mg_value** and **eg_value** arrays in `src/eval/pesto.c` (piece values for material + PST).
+
+1. **Dataset**: CSV with columns `fen,result`. Create it by hand or from PGN:
+   ```bash
+   pip install python-chess   # optional, for PGN extraction
+   make training.texel.data TEXEL_PGN=/path/to/games.pgn
+   ```
+   Or build a CSV yourself: one line per position, `fen,result` (result 0, 0.5, or 1 from White’s perspective).
+
+2. **Run the tuner** (from repo root):
+   ```bash
+   pip install numpy scipy   # scipy recommended; numpy-only fallback available
+   make training.texel.tune TEXEL_CSV=training/out/texel_positions.csv
+   ```
+   Or: `python3 -m training.texel_tuning --data positions.csv --output params.json --iter 1000`
+
+3. **Apply the result**: The script prints a C snippet. Paste the `mg_value` and `eg_value` lines into `src/eval/pesto.c` (replace the existing `static const int mg_value[6]` and `eg_value[6]`), then rebuild.
+
+- **Make targets**: `training.texel.deps`, `training.texel.data` (from PGN), `training.texel.tune`.
+- **Optional**: `--tune-k` tunes the sigmoid scale K as well (default K=1).
+
+---
+
 ## Training without nnue-pytorch (do it yourself)
 
 If you want to **train your own net without using Stockfish’s nnue-pytorch**:

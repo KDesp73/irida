@@ -1,4 +1,8 @@
 # For the custom trainer (train.py): PyTorch is required.
 # Install with: pip install torch
 #
+# For Texel tuning: numpy, scipy. Optional: python-chess for pgn_to_texel.
+# pip install numpy scipy
+# pip install python-chess   # for make training.texel.data from PGN
+#
 # For full NNUE training with nnue-pytorch, use that repo's requirements.txt instead.
