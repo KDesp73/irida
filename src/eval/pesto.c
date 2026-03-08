@@ -2,6 +2,7 @@
 
 #include "IncludeOnly/logging.h"
 #include "castro.h"
+#include "eval.h"
 #include <stdio.h>
 
 #define WHITE_PAWN_ENCODING    (2*PAWN   + COLOR_WHITE)
@@ -740,7 +741,7 @@ static inline int char_to_piece(char ch)
     }
 }
 
-int pesto_eval(Board* board)
+static int pesto_eval_impl(Board* board, EvalBreakdown* out)
 {
     int mg_acc[2] = {0, 0};
     int eg_acc[2] = {0, 0};
@@ -772,19 +773,64 @@ int pesto_eval(Board* board)
 
     int eg_phase = 24 - game_phase;
 
-    int score = (mg_score * game_phase + eg_score * eg_phase) / 24;
+    int material_pst = (mg_score * game_phase + eg_score * eg_phase) / 24;
+    int pawn_structure = evaluate_pawn_structure(board);
+    int mobility = evaluate_mobility(board);
+    int king_safety = evaluate_king_safety(board, game_phase);
+    int piece_activity = evaluate_piece_activity(board);
+    int space = evaluate_space(board);
+    int threats = evaluate_threats(board);
+    int endgame = evaluate_endgame_terms(board, game_phase);
 
-    score += evaluate_pawn_structure(board);
-    score += evaluate_mobility(board);
-    score += evaluate_king_safety(board, game_phase);
-    score += evaluate_piece_activity(board);
-    score += evaluate_space(board);
-    score += evaluate_threats(board);
-    score += evaluate_endgame_terms(board, game_phase);
+    int score_white = material_pst + pawn_structure + mobility + king_safety
+                    + piece_activity + space + threats + endgame;
+    int score = board->turn ? score_white : -score_white;
 
-    if (!board->turn)
-        score = -score;
+    if (out) {
+        out->game_phase = game_phase;
+        if (board->turn) {
+            out->material_pst = material_pst;
+            out->pawn_structure = pawn_structure;
+            out->mobility = mobility;
+            out->king_safety = king_safety;
+            out->piece_activity = piece_activity;
+            out->space = space;
+            out->threats = threats;
+            out->endgame = endgame;
+            out->total = score_white;
+        } else {
+            out->material_pst = -material_pst;
+            out->pawn_structure = -pawn_structure;
+            out->mobility = -mobility;
+            out->king_safety = -king_safety;
+            out->piece_activity = -piece_activity;
+            out->space = -space;
+            out->threats = -threats;
+            out->endgame = -endgame;
+            out->total = -score_white;
+        }
+    }
 
     return score;
+}
+
+int pesto_eval(Board* board)
+{
+    return pesto_eval_impl(board, NULL);
+}
+
+int pesto_eval_breakdown(Board* board, EvalBreakdown* out)
+{
+    return pesto_eval_impl(board, out);
+}
+
+void pesto_log_breakdown(Board* board)
+{
+    EvalBreakdown b;
+    (void)pesto_eval_breakdown(board, &b);
+    fprintf(stderr,
+            "eval breakdown (side-to-move cp) | material_pst=%d pawn_structure=%d mobility=%d king_safety=%d piece_activity=%d space=%d threats=%d endgame=%d | total=%d game_phase=%d\n",
+            b.material_pst, b.pawn_structure, b.mobility, b.king_safety,
+            b.piece_activity, b.space, b.threats, b.endgame, b.total, b.game_phase);
 }
 

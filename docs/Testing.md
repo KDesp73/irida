@@ -30,8 +30,9 @@ This runs all unit tests and a single fixed-depth search to confirm the engine d
 
 ```bash
 make test.batch n=1   # batch 1: test_draws
-make test.batch n=2   # batch 2: test_eval
+make test.batch n=2   # batch 2: test_eval, test_eval_breakdown, test_eval_log, test_symmetry
 make test.batch n=3   # batch 3: test_search
+make test.batch n=4   # batch 4: test_eval_stockfish (optional; skip if Stockfish not in PATH)
 ```
 
 ### Regenerating test headers
@@ -49,8 +50,11 @@ This runs `scripts/loader -d test -H "extern/IncludeOnly/test.h" -L "castro.h"`.
 | Batch | Tests | Description |
 |-------|--------|-------------|
 | 1 | test_draws | `is_draw()`: 50-move, insufficient material (K vs K, K+B, etc.) |
-| 2 | test_eval | `pesto_eval()`: score in expected range for start position, e4, and K vs K |
+| 2 | test_eval, test_eval_breakdown, test_eval_log, test_symmetry | `pesto_eval()` range; breakdown sum; log breakdown to stderr; symmetry |
 | 3 | test_search | `search_root()`: completes without crashing at depth 2–3 |
+| 4 | test_eval_stockfish | Compare pesto to Stockfish static eval (skip if Stockfish not in PATH) |
+
+**Eval breakdown:** Use `pesto_eval_breakdown(Board*, EvalBreakdown*)` for per-term scores; `pesto_log_breakdown(Board*)` prints to stderr. Batch 2 runs one log so you see a breakdown line when running `make test`.
 
 ## Prerequisites
 

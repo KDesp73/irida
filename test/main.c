@@ -39,14 +39,16 @@ int main(int argc, char** argv)
     test_set_dispatcher(dispatch_test_by_name);
 
     char* b0[] = { "test_draws" };
-    char* b1[] = { "test_eval" };
+    char* b1[] = { "test_eval", "test_eval_breakdown", "test_eval_log", "test_symmetry" };
     char* b2[] = { "test_search" };
+    char* b3[] = { "test_eval_stockfish" };
 
-    char** batches[] = { b0, b1, b2 };
+    char** batches[] = { b0, b1, b2, b3 };
     size_t sizes[] = {
         sizeof(b0) / sizeof(char*),
         sizeof(b1) / sizeof(char*),
         sizeof(b2) / sizeof(char*),
+        sizeof(b3) / sizeof(char*),
     };
 
     test_batches(batches, sizeof(batches) / sizeof(char**), sizes);

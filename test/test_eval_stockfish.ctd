@@ -1,0 +1,5 @@
+# (fen, max_cp_diff) - compare pesto_eval to Stockfish static eval; skip if Stockfish not in PATH
+# Start pos: both ~0; allow large diff (different eval style)
+"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 250
+"rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", 250
+"4k3/8/8/8/8/8/8/4K3 w - - 0 1", 50
