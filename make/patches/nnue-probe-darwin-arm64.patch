@@ -1,6 +1,6 @@
 --- Makefile
 +++ Makefile
-@@ -14,6 +14,7 @@ DEFINES =
+@@ -14,7 +14,9 @@ DEFINES =
  DEFINES += -DIS_64BIT 
  ifeq ($(COMP),$(filter $(COMP),gcc clang win icpc))
 +  ifneq ($(shell uname -m),arm64)

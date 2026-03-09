@@ -9,7 +9,10 @@ deps.check: ## Check that all dependencies are available
 UNAME_S := $(shell uname -s)
 NNUE_COMP := $(if $(filter Darwin,$(UNAME_S)),clang,gcc)
 
-deps.fetch: nn vendor/castro vendor/IncludeOnly vendor/nnue-probe vendor/fathom ## Fetch dependency sources
+deps.fetch: nn vendor/IncludeOnly vendor/castro vendor/nnue-probe vendor/fathom ## Fetch dependency sources
+	cd vendor/castro && rm -rf .git
+	cd vendor/nnue-probe && rm -rf .git
+	cd vendor/fathom && rm -rf .git
 
 define fetchio
 	curl -s -f https://raw.githubusercontent.com/KDesp73/IncludeOnly/refs/heads/main/libs/$1.h -o vendor/IncludeOnly/$1.h
@@ -23,7 +26,7 @@ nn:
 
 vendor/castro:
 	@(git clone https://github.com/KDesp73/castro vendor/castro 2>/dev/null || true) && \
-		cd vendor/castro && git checkout v$(CASTRO_VERSION)
+		[ -d vendor/castro ] && (cd vendor/castro && git fetch -t 2>/dev/null) || true
 
 vendor/IncludeOnly:
 	@mkdir -p vendor/IncludeOnly
@@ -41,13 +44,20 @@ vendor/fathom:
 # Build targets (used by build.all and deps.build)
 build.castro: vendor/castro ## Build castro move-generation library
 	@echo "[INFO] Building castro"
+	@[ "$(UNAME_S)" = Darwin ] && (cd vendor/castro && grep -q 'SHARED_FLAG' Makefile || (patch -N -p0 < ../../make/patches/castro-darwin.patch || true; rm -f Makefile.rej); \
+		sed -e 's/-L\. -l:$$(A_NAME)/$$(A_NAME)/g' -e 's/-shared /$$(SHARED_FLAG) /g' Makefile > Makefile.tmp && mv Makefile.tmp Makefile) || true
 	@cd vendor/castro && make all type=RELEASE
 
 build.nnue-probe: vendor/nnue-probe ## Build nnue-probe (Mac: clang, Linux: gcc)
 	@[ "$(UNAME_S)" = Darwin ] && [ "$$(uname -m)" = arm64 ] && ( \
-		cd vendor/nnue-probe/src && grep -q 'ifneq.*arm64' Makefile || ( \
+		cd vendor/nnue-probe/src && ( grep -q 'ifneq.*arm64' Makefile || ( \
 			sed 's/\r$$//' Makefile > Makefile.tmp && mv Makefile.tmp Makefile && \
-			patch -N -p0 < ../../../make/patches/nnue-probe-darwin-arm64.patch ); \
+			patch -N -p0 < ../../../make/patches/nnue-probe-darwin-arm64.patch || true ); \
+		grep -q 'ifneq.*arm64' Makefile || sed -e '/DEFINES += -DUSE_AVX2 -mavx2/s/^/# arm64: /' \
+			-e '/DEFINES += -DUSE_SSE41 -msse4.1/s/^/# arm64: /' \
+			-e '/DEFINES += -DUSE_SSE3 -msse3/s/^/# arm64: /' \
+			-e '/DEFINES += -DUSE_SSE2 -msse2/s/^/# arm64: /' \
+			-e '/DEFINES += -DUSE_SSE -msse$$/s/^/# arm64: /' Makefile > Makefile.tmp && mv Makefile.tmp Makefile ); \
 		rm -f Makefile.rej ) || true
 	@echo "[INFO] Building nnue-probe (COMP=$(NNUE_COMP))"
 	@cd vendor/nnue-probe/src && make clean && \

@@ -6,40 +6,40 @@
 +# macOS (Darwin): clang, .dylib, -dynamiclib; Linux: gcc, .so, -shared
 +UNAME_S := $(shell uname -s)
 +ifeq ($(UNAME_S),Darwin)
-+	CC = clang
-+	SO_NAME = lib$(LIBRARY_NAME).dylib
-+	SHARED_FLAG = -dynamiclib
++ CC = clang
++ SO_NAME = lib$(LIBRARY_NAME).dylib
++ SHARED_FLAG = -dynamiclib
 +else
-+	SO_NAME = lib$(LIBRARY_NAME).so
-+	SHARED_FLAG = -shared
++ SO_NAME = lib$(LIBRARY_NAME).so
++ SHARED_FLAG = -shared
 +endif
 +
  # Directories
  SRC_DIR = src
  INCLUDE_DIR = include
-@@ -11,7 +22,6 @@ type ?= RELEASE
+@@ -14,7 +25,6 @@ type ?= RELEASE
  
  # Binaries
  LIBRARY_NAME = castro
--SO_NAME      = lib$(LIBRARY_NAME).so
- A_NAME       = lib$(LIBRARY_NAME).a
+-SO_NAME = lib$(LIBRARY_NAME).so
+ A_NAME = lib$(LIBRARY_NAME).a
  TEST_BIN = check
  
-@@ -61,7 +71,7 @@ $(BUILD_DIR): ## Create build directories
+@@ -62,7 +72,7 @@ $(BUILD_DIR): ## Create build directories
  
  $(TEST_BIN): $(BUILD_DIR) static ## Build test binary
- 	@echo "[INFO] Building test executable: $(TEST_BIN)"
--	@$(CC) $(TEST_FILES) -o $(TEST_BIN) $(INCLUDE) -L. -l:$(A_NAME) -ggdb $(SANITIZERS)
-+	@$(CC) $(TEST_FILES) -o $(TEST_BIN) $(INCLUDE) $(A_NAME) -ggdb $(SANITIZERS)
+  @echo "[INFO] Building test executable: $(TEST_BIN)"
+- @$(CC) $(TEST_FILES) -o $(TEST_BIN) $(INCLUDE) -L. -l:$(A_NAME) -ggdb $(SANITIZERS)
++ @$(CC) $(TEST_FILES) -o $(TEST_BIN) $(INCLUDE) $(A_NAME) -ggdb $(SANITIZERS)
  
  .PHONY: test
  test: $(TEST_BIN) ## Build and run tests
-@@ -70,7 +80,7 @@ test: $(TEST_BIN) ## Build and run tests
+@@ -71,7 +81,7 @@ test: $(TEST_BIN) ## Build and run tests
  .PHONY: shared
  shared: $(OBJ_FILES) ## Build shared library
- 	@echo "[INFO] Building shared library: $(SO_NAME)"
--	@$(CC) -shared $(CFLAGS) -o $(SO_NAME) $(OBJ_FILES)
-+	@$(CC) $(SHARED_FLAG) $(CFLAGS) -o $(SO_NAME) $(OBJ_FILES)
+  @echo "[INFO] Building shared library: $(SO_NAME)"
+- @$(CC) -shared $(CFLAGS) -o $(SO_NAME) $(OBJ_FILES)
++ @$(CC) $(SHARED_FLAG) $(CFLAGS) -o $(SO_NAME) $(OBJ_FILES)
  
  .PHONY: static
  static: $(OBJ_FILES) ## Build static library

@@ -21,3 +21,8 @@ engine.dSYM
 # NNUE training outputs
 training/out/*.pt
 training/out/*.nnue
+
+# Vendor
+vendor/fathom/obj
+vendor/fathom/libfathom.so
+vendor/nnue-probe/src/libnnueprobe.so

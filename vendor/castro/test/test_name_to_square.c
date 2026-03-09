@@ -1,0 +1,16 @@
+#define TAG "name_to_square"
+#include "IncludeOnly/test.h"
+#define CASTRO_STRIP_PREFIX
+#include "castro.h"
+
+int test_name_to_square(const char name[3], int expected)
+{
+    Square found = NameToSquare(name);
+    if(found != expected){
+        FAIL("For %s. Expected %d. Found %d", name, expected, found);
+        return 0;
+    }
+
+    SUCC("Passed for %s", name);
+    return 1;
+}

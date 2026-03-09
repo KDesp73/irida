@@ -40,7 +40,7 @@ else
 endif
 
 WARNINGS = -Wall -Wextra
-INCLUDES = -I$(INCLUDE_DIR) -Ivendor/castro/src -Ivendor/ -Ivendor/nnue-probe -Ivendor/fathom/src
+INCLUDES = -I$(INCLUDE_DIR) -Ivendor/castro/src -Ivendor -Ivendor/nnue-probe -Ivendor/fathom/src
 
 # Flags
 CFLAGS  := -fPIC $(WARNINGS) $(INCLUDES) -DUSE_FATHOM
