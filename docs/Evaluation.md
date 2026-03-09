@@ -42,4 +42,4 @@ If loading fails:
 2. Set **EvalFile** to an **absolute path**:  
    `setoption name EvalFile value /path/to/net.nnue`
 
-Fetch nets with `make deps.fetch` (downloads into `nn/`). The **nnue-probe** library must be built (`extern/nnue-probe`); `make build.all` does this. The `.nnue` file must match the architecture nnue-probe expects (Stockfish-format nets).
+Fetch nets with `make deps.fetch` (downloads into `nn/`). The **nnue-probe** library must be built (`vendor/nnue-probe`); `make build.all` does this. The `.nnue` file must match the architecture nnue-probe expects (Stockfish-format nets).

@@ -41,7 +41,7 @@ Dependencies (castro, nnue-probe, Fathom, IncludeOnly) have their own licenses; 
 
 **Engine name:** The UCI engine name defaults to `chess-engine`. To override, build with `make CFLAGS="-DENGINE_NAME=\\\"MyEngine\\\"\" build.all` (or set `ENGINE_NAME` in [include/version.h](include/version.h)).
 
-**NNUE evaluation:** The engine loads an NNUE net at startup from the **EvalFile** UCI option (default: `nn/nn-37f18f62d772.nnue`). You will see either `info string EvalFile loaded: ...` or `info string Failed to load EvalFile '...' (using PeSTO evaluation)`. If loading fails, (1) run the engine from the repo root so `nn/` is found, or (2) set EvalFile to an absolute path: `setoption name EvalFile value /path/to/your.net.nnue`. Fetch nets with `make deps.fetch` (downloads into `nn/`) and ensure **nnue-probe** is built (`extern/nnue-probe`, built automatically with `make build.all`).
+**NNUE evaluation:** The engine loads an NNUE net at startup from the **EvalFile** UCI option (default: `nn/nn-37f18f62d772.nnue`). You will see either `info string EvalFile loaded: ...` or `info string Failed to load EvalFile '...' (using PeSTO evaluation)`. If loading fails, (1) run the engine from the repo root so `nn/` is found, or (2) set EvalFile to an absolute path: `setoption name EvalFile value /path/to/your.net.nnue`. Fetch nets with `make deps.fetch` (downloads into `nn/`) and ensure **nnue-probe** is built (`vendor/nnue-probe`, built automatically with `make build.all`).
 
 **Custom NNUE training:** To train your own NNUE net (loadable via UCI option EvalFile), see the [training](training/README.md) Python module: it documents the pipeline (nnue-pytorch, data, export) and provides a script to generate FEN,score data from this engine.
 

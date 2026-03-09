@@ -3,7 +3,7 @@
 #include "moveordering.h"
 #include "tt.h"
 #define TEST_IMPLEMENTATION
-#include "extern/IncludeOnly/test.h"
+#include "IncludeOnly/test.h"
 #include "registry.h"
 #include <stdio.h>
 #include "uci.h"

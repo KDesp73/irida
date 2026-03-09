@@ -13,7 +13,6 @@ tmp
 libengine.*
 engine
 
-extern
 check.dSYM
 check
 nn

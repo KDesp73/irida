@@ -1,7 +1,7 @@
 DIST_INCLUDE = $(SRC_DIR) $(INCLUDE_DIR) $(SO_NAME) $(A_NAME) $(TARGET)
 
 .PHONY: dist
-dist: $(DIST_INCLUDE) ## Create a tarball of the project
+dist: build.all ## Create a tarball of the project
 	@echo "[INFO] Creating release $(VERSION)"
 	@mkdir -p $(DIST_DIR)
 	@tar -czvf $(DIST_DIR)/$(TARGET)-$(VERSION).tar.gz \

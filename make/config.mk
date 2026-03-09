@@ -28,23 +28,21 @@ ifeq ($(UNAME_S),Darwin)
     CC       := clang
     SO_NAME  := lib$(LIBRARY_NAME).dylib
     SO_LDFLAGS := -dynamiclib -undefined dynamic_lookup
-    # BSD ld doesn't support -l:filename. Link both engine and castro statically (path to .a)
-    # so the engine has no runtime dylib dependency and all symbols resolve at link time.
     LDFLAGS_ENGINE   := $(A_NAME)
-    LDFLAGS_CASTRO   := extern/castro/libcastro.a
-    LDFLAGS_NNUE_PROBE := -Lextern/nnue-probe/src -lnnueprobe -Wl,-rpath,@loader_path/extern/nnue-probe/src
-    LDFLAGS_FATHOM   := -Lextern/fathom -lfathom -Wl,-rpath,@loader_path/extern/fathom
+    LDFLAGS_CASTRO   := vendor/castro/libcastro.a
+    LDFLAGS_NNUE_PROBE := -Lvendor/nnue-probe/src -lnnueprobe -Wl,-rpath,@executable_path/vendor/nnue-probe/src
+    LDFLAGS_FATHOM   := -Lvendor/fathom -lfathom -Wl,-rpath,@executable_path/vendor/fathom
 else
     SO_NAME  := lib$(LIBRARY_NAME).so
     SO_LDFLAGS := -shared
     LDFLAGS_ENGINE   := -L. -l:$(A_NAME)
-    LDFLAGS_CASTRO   := -Lextern/castro -l:libcastro.a
-    LDFLAGS_NNUE_PROBE := -Lextern/nnue-probe/src -lnnueprobe -Wl,-rpath,$(shell pwd)/extern/nnue-probe/src
-    LDFLAGS_FATHOM   := -Lextern/fathom -lfathom -Wl,-rpath,$(shell pwd)/extern/fathom
+    LDFLAGS_CASTRO   := -Lvendor/castro -l:libcastro.a
+    LDFLAGS_NNUE_PROBE := -Lvendor/nnue-probe/src -lnnueprobe -Wl,-rpath,$(shell pwd)/vendor/nnue-probe/src
+    LDFLAGS_FATHOM   := -Lvendor/fathom -lfathom -Wl,-rpath,$(shell pwd)/vendor/fathom
 endif
 
 WARNINGS = -Wall -Wextra
-INCLUDES = -I$(INCLUDE_DIR) -Iextern/castro/src -Iextern/ -Iextern/nnue-probe -Iextern/fathom/src
+INCLUDES = -I$(INCLUDE_DIR) -Ivendor/castro/src -Ivendor/ -Ivendor/nnue-probe -Ivendor/fathom/src
 
 # Flags
 CFLAGS  := -fPIC $(WARNINGS) $(INCLUDES) -DUSE_FATHOM
@@ -62,9 +60,6 @@ endif
 # Sources
 SRC_FILES := $(shell find $(SRC_DIR) -name '*.c' ! -name 'main.c')
 OBJ_FILES := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRC_FILES))
-
-TOTAL_FILES := $(words $(SRC_FILES))
-counter = 0
 
 .DEFAULT_GOAL := help
 
