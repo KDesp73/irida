@@ -1241,7 +1241,8 @@ static void init_weights(const void *evalData)
 #endif
 }
 
-static bool load_eval_file(const char *evalFile)
+/* Returns: 0 = success, 1 = file not found, 2 = wrong/unsupported format */
+static int load_eval_file(const char *evalFile)
 {
   const void *evalData;
   map_t mapping;
@@ -1249,35 +1250,41 @@ static bool load_eval_file(const char *evalFile)
 
   {
     FD fd = open_file(evalFile);
-    if (fd == FD_ERR) return false;
+    if (fd == FD_ERR) return 1;
     evalData = map_file(fd, &mapping);
     size = file_size(fd);
     close_file(fd);
   }
 
-  bool success = verify_net(evalData, size);
-  if (success)
-    init_weights(evalData);
+  if (!verify_net(evalData, size)) {
+    if (mapping) unmap_file(evalData, mapping);
+    return 2;
+  }
+  init_weights(evalData);
   if (mapping) unmap_file(evalData, mapping);
-  return success;
+  return 0;
 }
 
 /*
 Interfaces
 */
-DLLExport void _CDECL nnue_init(const char* evalFile)
+DLLExport int _CDECL nnue_init(const char* evalFile)
 {
   printf("Loading NNUE : %s\n", evalFile);
   fflush(stdout);
 
-  if (load_eval_file(evalFile)) {
+  int r = load_eval_file(evalFile);
+  if (r == 0) {
     printf("NNUE loaded !\n");
     fflush(stdout);
-    return;
+    return 0;
   }
-
-  printf("NNUE file not found!\n");
+  if (r == 1)
+    printf("NNUE file not found!\n");
+  else
+    printf("Unsupported NNUE format (nnue-probe expects halfkp_256x2-32-32, 21022697 bytes). Use a legacy-format net from e.g. FireFather/halfkp_256x2-32-32-nets.\n");
   fflush(stdout);
+  return -1;
 }
 
 DLLExport int _CDECL nnue_evaluate(

@@ -58,7 +58,7 @@ int CliMain(int argc, char** argv)
     }
 
     if (!ctx.nnue_path)
-        ctx.nnue_path = strdup("./nn/nn-1c0000000000.nnue");
+        ctx.nnue_path = strdup("./nn/nn-04cf2b4ed1da.nnue");
     
     Dispatcher dispatcher = {0};
     set_handler(&dispatcher, COMMAND_PERFT, perft_handler);

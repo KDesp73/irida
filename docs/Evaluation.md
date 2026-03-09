@@ -31,10 +31,12 @@ Tuning: keep weights small and re-run symmetry tests (`make test.batch n=2`) and
 
 ## NNUE
 
-The engine can use an NNUE net (UCI option **EvalFile**). At startup it tries to load the default path (`nn/nn-37f18f62d772.nnue`). You should see either:
+The engine can use an NNUE net (UCI option **EvalFile**). At startup it tries to load the default path (`nn/nn-04cf2b4ed1da.nnue`). You should see either:
 
 - `info string EvalFile loaded: ...`  
 - `info string Failed to load EvalFile '...' (using PeSTO evaluation)`
+
+**nnue-probe** only supports the legacy **halfkp_256x2-32-32** format (21022697 bytes). Current Stockfish test-server nets use a newer format and will not load; use nets from e.g. [FireFather/halfkp_256x2-32-32-nets](https://github.com/FireFather/halfkp_256x2-32-32-nets). `make deps.fetch` downloads compatible nets into `nn/`.
 
 If loading fails:
 
@@ -42,4 +44,4 @@ If loading fails:
 2. Set **EvalFile** to an **absolute path**:  
    `setoption name EvalFile value /path/to/net.nnue`
 
-Fetch nets with `make deps.fetch` (downloads into `nn/`). The **nnue-probe** library must be built (`vendor/nnue-probe`); `make build.all` does this. The `.nnue` file must match the architecture nnue-probe expects (Stockfish-format nets).
+The **nnue-probe** library must be built (`vendor/nnue-probe`); `make build.all` does this.

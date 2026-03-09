@@ -18,11 +18,10 @@ define fetchio
 	curl -s -f https://raw.githubusercontent.com/KDesp73/IncludeOnly/refs/heads/main/libs/$1.h -o vendor/IncludeOnly/$1.h
 endef
 
-# Neural network files (Stockfish .nnue). Use -O to write to file; -o is log file for wget.
 nn:
 	@mkdir -p nn
-	@curl -sSfL -o nn/nn-37f18f62d772.nnue https://tests.stockfishchess.org/api/nn/nn-37f18f62d772.nnue
-	@curl -sSfL -o nn/nn-ad9b42354671.nnue https://tests.stockfishchess.org/api/nn/nn-ad9b42354671.nnue
+	@curl -sSfL -o nn/nn-04cf2b4ed1da.nnue https://github.com/FireFather/halfkp_256x2-32-32-nets/raw/refs/heads/main/sf%20non-master/nn-04cf2b4ed1da.nnue
+	@curl -sSfL -o nn/nn-79da3a6b905b.nnue https://github.com/FireFather/halfkp_256x2-32-32-nets/raw/refs/heads/main/sf%20non-master/nn-79da3a6b905b.nnue
 
 vendor/castro:
 	@(git clone https://github.com/KDesp73/castro vendor/castro 2>/dev/null || true) && \

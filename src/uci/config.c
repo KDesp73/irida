@@ -28,8 +28,8 @@ void LoadUciConfig(UciState* state)
     state->uciOptions[state->uciOptionCount++] = (UciOption) {
         .name = "EvalFile",
         .type = UCI_STRING,
-        .value.string = "nn/nn-37f18f62d772.nnue",
-        .default_value = "nn/nn-37f18f62d772.nnue"
+        .value.string = "nn/nn-04cf2b4ed1da.nnue",
+        .default_value = "nn/nn-04cf2b4ed1da.nnue"
     };
 
     if(state->uciOptionCount >= MAX_UCI_OPTIONS) return;
