@@ -21,8 +21,6 @@ VERSION_MINOR := $(shell sed -n -e 's/\#define VERSION_MINOR \([0-9]*\)/\1/p' $(
 VERSION_PATCH := $(shell sed -n -e 's/\#define VERSION_PATCH \([0-9]*\)/\1/p' $(version_file))
 VERSION       := $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 
-CASTRO_VERSION=0.3.0
-
 # macOS: use clang and platform-specific settings (BSD ld, .dylib)
 ifeq ($(UNAME_S),Darwin)
     CC       := clang
