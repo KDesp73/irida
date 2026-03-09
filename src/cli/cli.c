@@ -9,6 +9,8 @@ Command parse_command(const char* str)
 
     if(!strcmp("perft", str)) return COMMAND_PERFT;
     else if(!strcmp("eval", str)) return COMMAND_EVAL;
+    else if(!strcmp("eval-batch", str)) return COMMAND_EVAL_BATCH;
+    else if(!strcmp("eval-breakdown-batch", str)) return COMMAND_EVAL_BREAKDOWN_BATCH;
     else if(!strcmp("search", str)) return COMMAND_SEARCH;
 
     return COMMAND_NONE;

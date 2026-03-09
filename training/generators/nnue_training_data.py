@@ -55,14 +55,16 @@ def run_engine_score(engine_path: str, fen: str, depth: int) -> int | None:
     return last_cp
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate FEN,score data from engine via UCI.")
+def add_arguments(parser: argparse.ArgumentParser) -> None:
+    """Add data-generation arguments to a parser or subparser."""
     parser.add_argument("--engine", required=True, help="Path to engine executable (UCI)")
     parser.add_argument("--depth", type=int, default=6, help="Search depth for each position (default: 6)")
     parser.add_argument("--fen-file", help="Input file with one FEN per line (default: stdin)")
     parser.add_argument("--output", "-o", default="-", help="Output CSV file (default: stdout)")
-    args = parser.parse_args()
 
+
+def run(args: argparse.Namespace) -> None:
+    """Generate FEN,score CSV from parsed arguments (from add_arguments)."""
     fen_source = open(args.fen_file) if args.fen_file else sys.stdin
     out = open(args.output, "w") if args.output != "-" else sys.stdout
 
@@ -82,6 +84,12 @@ def main() -> None:
             fen_source.close()
         if args.output != "-":
             out.close()
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Generate FEN,score data from engine via UCI.")
+    add_arguments(parser)
+    run(parser.parse_args())
 
 
 if __name__ == "__main__":

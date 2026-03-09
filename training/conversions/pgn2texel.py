@@ -30,14 +30,16 @@ def result_to_white_score(result: str) -> float | None:
     return None
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Extract FEN,result from PGN for Texel tuning")
+def add_arguments(parser: argparse.ArgumentParser) -> None:
+    """Add pgn2texel arguments to a parser or subparser."""
     parser.add_argument("--pgn", "-p", required=True, help="Input PGN file")
     parser.add_argument("--output", "-o", required=True, help="Output CSV: fen,result")
     parser.add_argument("--ply", type=int, default=20, help="Sample position after this many half-moves (default 20)")
     parser.add_argument("--max", type=int, default=0, help="Max games to process (0 = all)")
-    args = parser.parse_args()
 
+
+def run(args: argparse.Namespace) -> None:
+    """Extract fen,result CSV from PGN (from add_arguments)."""
     count = 0
     with open(args.pgn) as pgn_file, open(args.output, "w") as out:
         out.write("fen,result\n")
@@ -60,6 +62,12 @@ def main() -> None:
             if args.max and count >= args.max:
                 break
     print(f"Wrote {count} positions to {args.output}", file=sys.stderr)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Extract FEN,result from PGN for Texel tuning")
+    add_arguments(parser)
+    run(parser.parse_args())
 
 
 if __name__ == "__main__":

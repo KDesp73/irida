@@ -7,6 +7,8 @@
 typedef enum {
     COMMAND_PERFT,
     COMMAND_EVAL,
+    COMMAND_EVAL_BATCH,
+    COMMAND_EVAL_BREAKDOWN_BATCH,
     COMMAND_SEARCH,
     COMMAND_NONE,
 } Command;
@@ -46,6 +48,8 @@ int CliMain(int argc, char** argv);
 
 bool perft_handler(Context context);
 bool eval_handler(Context context);
+bool eval_batch_handler(Context context);
+bool eval_breakdown_batch_handler(Context context);
 bool search_handler(Context context);
 
 void help(Command command);

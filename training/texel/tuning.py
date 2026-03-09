@@ -6,15 +6,19 @@ Dataset: CSV with columns fen,result (result from White's view: 1=white wins,
 0.5=draw, 0=black wins). We tune mg_value[0..5] and eg_value[0..5] (piece values
 for material+PST). King (index 5) is fixed at 0.
 
+Use --engine PATH to call the C engine's eval-batch (no Python eval clone).
+Otherwise uses the Python eval in texel/eval.py.
+
 Usage:
-  python3 -m training.texel_tuning --data positions.csv --output params.json
-  python3 -m training.texel_tuning --data positions.csv --iter 500 --k 1.0
+  python3 -m training texel --data positions.csv --output params.json
+  python3 -m training texel --data positions.csv --engine ./engine --iter 1000
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 import numpy as np
 
@@ -36,37 +40,72 @@ def sigmoid(x: np.ndarray, k: float) -> np.ndarray:
     return 1.0 / (1.0 + np.exp(-k * x / 400.0))
 
 
+def _engine_evals(
+    pipe_in,
+    pipe_out,
+    fens: list[str],
+    params: np.ndarray,
+    tune_k: bool,
+) -> np.ndarray:
+    """Send one batch (params + FENs) to engine eval-batch; return array of scores (white cp)."""
+    mg = np.zeros(6)
+    eg = np.zeros(6)
+    mg[:5] = params[:5]
+    eg[:5] = params[5:10]
+    n = len(fens)
+    # Protocol: N\n  mg0 mg1 mg2 mg3 mg4 eg0 eg1 eg2 eg3 eg4\n  FEN1\n ... FENn\n
+    param_line = " ".join(str(int(round(x))) for x in list(mg[:5]) + list(eg[:5]))
+    pipe_in.write(f"{n}\n")
+    pipe_in.write(param_line + "\n")
+    for fen in fens:
+        pipe_in.write(fen + "\n")
+    pipe_in.flush()
+    scores = []
+    for _ in range(n):
+        line = pipe_out.readline()
+        if not line:
+            break
+        scores.append(int(line.strip()))
+    return np.array(scores, dtype=np.float64)
+
+
 def cross_entropy_loss(
     params: np.ndarray,
     fens: list[str],
     results: np.ndarray,
     tune_k: bool,
+    get_evals=None,
 ) -> float:
-    """Params: [mg0..mg5, eg0..eg5] or [mg0..mg5, eg0..eg5, k]. King mg5=eg5=0 fixed."""
+    """Params: [mg0..mg5, eg0..eg5] or [mg0..mg5, eg0..eg5, k]. King mg5=eg5=0 fixed.
+    If get_evals is set, call get_evals(params) to get evals; else use Python eval_fen."""
     mg = np.zeros(6)
     eg = np.zeros(6)
     mg[:5] = params[:5]
     eg[:5] = params[5:10]
-    # mg[5]=eg[5]=0
     k = params[10] if tune_k else 1.0
     if tune_k and (k <= 0.01 or k > 10.0):
         return 1e10
-    evals = np.array([eval_fen(fen, mg, eg) for fen in fens], dtype=np.float64)
+    if get_evals is not None:
+        evals = get_evals(params)
+    else:
+        evals = np.array([eval_fen(fen, mg, eg) for fen in fens], dtype=np.float64)
     p = sigmoid(evals, k)
-    # Clip to avoid log(0)
     p = np.clip(p, 1e-6, 1 - 1e-6)
     return float(-np.sum(results * np.log(p) + (1 - results) * np.log(1 - p)))
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Texel tuning for PeSTO piece values")
+def add_arguments(parser: argparse.ArgumentParser) -> None:
+    """Add texel tuning arguments to a parser or subparser."""
     parser.add_argument("--data", "-d", required=True, help="CSV file: fen,result (result 0, 0.5, or 1)")
     parser.add_argument("--output", "-o", help="Write tuned params to JSON (and C snippet to stdout)")
     parser.add_argument("--iter", "-n", type=int, default=1000, help="Max optimization iterations (default 1000)")
     parser.add_argument("--tune-k", action="store_true", help="Also tune sigmoid K (default: K=1)")
+    parser.add_argument("--engine", "-e", metavar="PATH", help="Use engine eval-batch (no Python eval); e.g. ./engine")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
-    args = parser.parse_args()
 
+
+def run(args: argparse.Namespace) -> None:
+    """Run Texel tuning from parsed arguments (from add_arguments)."""
     np.random.seed(args.seed)
     fens = []
     results = []
@@ -94,6 +133,31 @@ def main() -> None:
         sys.exit(1)
     print(f"Loaded {len(fens)} positions from {args.data}", file=sys.stderr)
 
+    engine_proc = None
+    get_evals = None
+    if args.engine:
+        engine_proc = subprocess.Popen(
+            [args.engine, "eval-batch"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            text=True,
+            bufsize=1,
+        )
+
+        def get_evals_fn(params: np.ndarray) -> np.ndarray:
+            return _engine_evals(
+                engine_proc.stdin,
+                engine_proc.stdout,
+                fens,
+                params,
+                args.tune_k,
+            )
+
+        get_evals = get_evals_fn
+        print(f"Using engine for eval: {args.engine}", file=sys.stderr)
+    else:
+        print("Using Python eval (use --engine ./engine to use C engine).", file=sys.stderr)
+
     # Initial point: default PeSTO values (only tune pawn..queen; king=0)
     x0 = np.concatenate([DEFAULT_MG[:5], DEFAULT_EG[:5]])
     if args.tune_k:
@@ -103,7 +167,7 @@ def main() -> None:
         bounds.append((0.1, 10.0))
 
     def obj(x: np.ndarray) -> float:
-        return cross_entropy_loss(x, fens, results, tune_k=args.tune_k)
+        return cross_entropy_loss(x, fens, results, tune_k=args.tune_k, get_evals=get_evals)
 
     if HAS_SCIPY:
         res = scipy_minimize(
@@ -139,6 +203,10 @@ def main() -> None:
                 break
         res = type('Res', (), {'fun': loss_best, 'x': x_best})()
 
+    if engine_proc is not None:
+        engine_proc.stdin.close()
+        engine_proc.wait()
+
     mg = np.zeros(6)
     eg = np.zeros(6)
     mg[:5] = res.x[:5]
@@ -166,6 +234,12 @@ def main() -> None:
     print("\n/* Paste into src/eval/pesto.c (replace static const int mg_value[6] / eg_value[6]) */")
     print("static const int mg_value[6] = {", ", ".join(str(int(round(x))) for x in mg), "};")
     print("static const int eg_value[6] = {", ", ".join(str(int(round(x))) for x in eg), "};")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Texel tuning for PeSTO piece values")
+    add_arguments(parser)
+    run(parser.parse_args())
 
 
 if __name__ == "__main__":

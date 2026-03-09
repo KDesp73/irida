@@ -26,6 +26,10 @@ int pesto_eval_breakdown(Board* board, EvalBreakdown* out);
 /* Logs eval breakdown to stderr (e.g. for debugging). */
 void pesto_log_breakdown(Board* board);
 void pesto_init(void);
+/* For Texel tuning: set mg_value[6], eg_value[6] and rebuild tables; then pesto_material_pst_eval_white uses them. */
+void pesto_set_tune_values(const int mg_value[6], const int eg_value[6]);
+/* Material + PST only, from white's perspective (centipawns). */
+int pesto_material_pst_eval_white(Board* board);
 
 /* Evaluate position. Uses NNUE if loaded, otherwise returns 0 (caller should use PeSTO). */
 int nnue_eval(Board* board);

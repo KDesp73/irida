@@ -105,10 +105,8 @@ def load_pt(path: str) -> tuple[dict, str]:
     return sd, "small_mlp"
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Convert .pt (from train.py) to Stockfish .nnue format."
-    )
+def add_arguments(parser: argparse.ArgumentParser) -> None:
+    """Add convert (.pt -> .nnue) arguments to a parser or subparser."""
     parser.add_argument("input", help="Input .pt file")
     parser.add_argument("output", help="Output .nnue file")
     parser.add_argument(
@@ -116,8 +114,10 @@ def main() -> None:
         default="custom_pt",
         help="Description string stored in .nnue (default: custom_pt)",
     )
-    args = parser.parse_args()
 
+
+def run(args: argparse.Namespace) -> None:
+    """Convert .pt to .nnue from parsed arguments (from add_arguments)."""
     sd, arch = load_pt(args.input)
     out_path = Path(args.output)
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -197,6 +197,14 @@ def main() -> None:
     print(
         "Note: Feature transformer is zeros; for full HalfKP train with --arch halfkp and convert."
     )
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Convert .pt (from train) to Stockfish .nnue format."
+    )
+    add_arguments(parser)
+    run(parser.parse_args())
 
 
 if __name__ == "__main__":

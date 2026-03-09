@@ -63,6 +63,8 @@ int CliMain(int argc, char** argv)
     Dispatcher dispatcher = {0};
     set_handler(&dispatcher, COMMAND_PERFT, perft_handler);
     set_handler(&dispatcher, COMMAND_EVAL, eval_handler);
+    set_handler(&dispatcher, COMMAND_EVAL_BATCH, eval_batch_handler);
+    set_handler(&dispatcher, COMMAND_EVAL_BREAKDOWN_BATCH, eval_breakdown_batch_handler);
     set_handler(&dispatcher, COMMAND_SEARCH, search_handler);
 
     HandlerFunc handler = get_handler(&dispatcher, command);

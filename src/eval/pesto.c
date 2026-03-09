@@ -225,6 +225,8 @@ static const int gamephase_inc[12] = {
     0,0, 1,1, 1,1, 1,1, 2,2, 4,4
 };
 
+static inline int char_to_piece(char ch);
+
 static int mg_table[12][64];
 static int eg_table[12][64];
 
@@ -696,30 +698,56 @@ static int evaluate_endgame_terms(Board* board, int game_phase)
     return score;
 }
 
-void pesto_init(void)
+static void rebuild_tables(const int *mg_val, const int *eg_val)
 {
     for (int p = 0; p < 6; p++) {
-
-        int pc_white = 2*p + COLOR_WHITE;
-        int pc_black = 2*p + COLOR_BLACK;
-
+        int pc_white = 2 * p + COLOR_WHITE;
+        int pc_black = 2 * p + COLOR_BLACK;
         for (int sq = 0; sq < 64; sq++) {
-
-            mg_table[pc_white][sq] =
-                mg_value[p] + mg_pesto_table[p][sq];
-
-            eg_table[pc_white][sq] =
-                eg_value[p] + eg_pesto_table[p][sq];
-
+            mg_table[pc_white][sq] = mg_val[p] + mg_pesto_table[p][sq];
+            eg_table[pc_white][sq] = eg_val[p] + eg_pesto_table[p][sq];
             int fsq = flip_sq(sq);
-
-            mg_table[pc_black][sq] =
-                mg_value[p] + mg_pesto_table[p][fsq];
-
-            eg_table[pc_black][sq] =
-                eg_value[p] + eg_pesto_table[p][fsq];
+            mg_table[pc_black][sq] = mg_val[p] + mg_pesto_table[p][fsq];
+            eg_table[pc_black][sq] = eg_val[p] + eg_pesto_table[p][fsq];
         }
     }
+}
+
+void pesto_init(void)
+{
+    rebuild_tables(mg_value, eg_value);
+}
+
+void pesto_set_tune_values(const int mg_val[6], const int eg_val[6])
+{
+    rebuild_tables(mg_val, eg_val);
+}
+
+int pesto_material_pst_eval_white(Board* board)
+{
+    int mg_acc[2] = {0, 0};
+    int eg_acc[2] = {0, 0};
+    int game_phase = 0;
+
+    for (int sq = 0; sq < 64; sq++) {
+        int rank = sq / 8;
+        int file = sq % 8;
+        char ascii = board->grid[rank][file];
+        int pc = char_to_piece(ascii);
+        if (pc == EMPTY)
+            continue;
+        int col = piece_color(pc);
+        mg_acc[col] += mg_table[pc][sq];
+        eg_acc[col] += eg_table[pc][sq];
+        game_phase += gamephase_inc[pc];
+    }
+
+    int mg_score = mg_acc[COLOR_WHITE] - mg_acc[COLOR_BLACK];
+    int eg_score = eg_acc[COLOR_WHITE] - eg_acc[COLOR_BLACK];
+    if (game_phase > 24)
+        game_phase = 24;
+    int eg_phase = 24 - game_phase;
+    return (mg_score * game_phase + eg_score * eg_phase) / 24;
 }
 
 static inline int char_to_piece(char ch)

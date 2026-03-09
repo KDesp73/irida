@@ -27,6 +27,8 @@ void default_help()
     HEADER("COMMANDS");
     INDENT("perft                   Run PERFT on a specific fen");
     INDENT("eval                    Run an evaluation on a position");
+    INDENT("eval-batch              Texel: read params + FENs from stdin, output material+PST scores");
+    INDENT("eval-breakdown-batch    Read N and N FENs from stdin, output N lines of 8 term values");
     INDENT("search                  Find the best move in a position");
     PRINT("");
 
@@ -72,6 +74,20 @@ void eval_help()
     INDENT("-E --eval <EVAL>        Specify the evaluation function to use");
 }
 
+void eval_batch_help()
+{
+    PRINT("%s eval-batch", engine.name);
+    PRINT("Read from stdin: repeat [ N ; mg0 mg1 mg2 mg3 mg4 eg0 eg1 eg2 eg3 eg4 ; N FEN lines ].");
+    PRINT("Output: N centipawn scores (white perspective) per batch, one per line.");
+}
+
+void eval_breakdown_batch_help()
+{
+    PRINT("%s eval-breakdown-batch", engine.name);
+    PRINT("Read from stdin: N (count), then N FEN lines.");
+    PRINT("Output: N lines of 8 integers (material_pst pawn_structure mobility king_safety piece_activity space threats endgame), white perspective.");
+}
+
 void search_help()
 {
     PRINT("%s search [<OPTIONS>...]", engine.name);
@@ -90,6 +106,12 @@ void help(Command command) {
         break;
     case COMMAND_EVAL:
         eval_help();
+        break;
+    case COMMAND_EVAL_BATCH:
+        eval_batch_help();
+        break;
+    case COMMAND_EVAL_BREAKDOWN_BATCH:
+        eval_breakdown_batch_help();
         break;
     case COMMAND_SEARCH:
         search_help();
