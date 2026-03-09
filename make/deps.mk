@@ -20,8 +20,8 @@ endef
 
 nn:
 	@mkdir -p nn
-	@curl -sSfL -o nn/nn-04cf2b4ed1da.nnue https://github.com/FireFather/halfkp_256x2-32-32-nets/raw/refs/heads/main/sf%20non-master/nn-04cf2b4ed1da.nnue
-	@curl -sSfL -o nn/nn-79da3a6b905b.nnue https://github.com/FireFather/halfkp_256x2-32-32-nets/raw/refs/heads/main/sf%20non-master/nn-79da3a6b905b.nnue
+	@curl -sSfL -o nn/nn-04cf2b4ed1da.nnue https://github.com/FireFather/halfkp_256x2-32-32-nets/raw/refs/heads/main/sf%20master/nn-04cf2b4ed1da.nnue
+	@curl -sSfL -o nn/nn-112bb1c8cdb5.nnue https://github.com/FireFather/halfkp_256x2-32-32-nets/raw/refs/heads/main/sf%20master/nn-112bb1c8cdb5.nnue
 
 vendor/castro:
 	@(git clone https://github.com/KDesp73/castro vendor/castro 2>/dev/null || true) && \
