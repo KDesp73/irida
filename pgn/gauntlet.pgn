@@ -2479,3 +2479,105 @@ Ke8 {0.00/15 0s} 21. Rxc8# {+M1/245 0.006s, White mates} 1-0
 
 1. Nc3 {+0.12/12 1.8s} d5 {+0.04/17 0.28s, White's connection stalls} 0-1
 
+[Event "?"]
+[Site "?"]
+[Date "2026.03.08"]
+[Round "1"]
+[White "engine"]
+[Black "reference"]
+[Result "0-1"]
+[ECO "A00"]
+[GameDuration "00:00:17"]
+[GameEndTime "2026-03-08T19:39:13.869 EET"]
+[GameStartTime "2026-03-08T19:38:55.995 EET"]
+[Opening "Anderssen's Opening"]
+[PlyCount "28"]
+[Termination "time forfeit"]
+[TimeControl "10+0.1"]
+
+1. a3 {0.00/11 0.56s} e5 {+0.19/18 0.43s} 2. c3 {0.00/8 0.60s}
+d5 {+0.35/14 0.14s} 3. b3 {0.00/8 0.59s} Nf6 {+1.15/17 0.43s}
+4. d3 {0.00/8 0.63s} Nc6 {+1.09/18 1.1s} 5. e3 {0.00/8 0.62s}
+Bf5 {+1.03/19 0.77s} 6. f3 {0.00/8 0.56s} Bd6 {+2.06/18 0.22s}
+7. g3 {0.00/8 0.60s} e4 {+2.37/17 0.35s} 8. dxe4 {0.00/8 0.56s}
+dxe4 {+2.83/15 0.088s} 9. Qxd6 {0.00/7 0.55s} Qxd6 {+7.07/18 0.13s}
+10. fxe4 {0.00/9 0.63s} Bxe4 {+8.37/19 0.13s} 11. Bd3 {0.00/8 0.71s}
+Qxd3 {+10.37/20 0.14s} 12. Bd2 {0.00/12 0.61s} Bxh1 {+10.85/18 0.15s}
+13. h3 {0.00/12 0.76s} O-O-O {+12.36/18 0.11s} 14. Ne2 {0.00/12 1.2s}
+Rhe8 {+13.16/19 0.12s, White loses on time} 0-1
+
+[Event "?"]
+[Site "?"]
+[Date "2026.03.08"]
+[Round "1"]
+[White "reference"]
+[Black "engine"]
+[Result "1-0"]
+[ECO "B00"]
+[GameDuration "00:00:12"]
+[GameEndTime "2026-03-08T19:39:26.281 EET"]
+[GameStartTime "2026-03-08T19:39:13.870 EET"]
+[Opening "Corn stalk defense"]
+[PlyCount "19"]
+[TimeControl "10+0.1"]
+
+1. e4 {+0.38/15 0.40s} a5 {0.00/11 0.65s} 2. d4 {+0.90/14 0.12s}
+b5 {0.00/8 0.57s} 3. Bxb5 {+2.21/17 0.18s} c5 {0.00/9 0.79s}
+4. d5 {+3.04/18 0.19s} a4 {0.00/10 0.62s} 5. c4 {+3.27/20 0.65s}
+e5 {0.00/8 0.57s} 6. Nf3 {+3.50/19 0.57s} Ke7 {0.00/8 0.56s}
+7. d6+ {+5.73/20 0.35s} Ke6 {0.00/17 3.1s} 8. Qd5+ {+M5/245 0.074s}
+Kf6 {0.00/13 0.76s} 9. Qxe5+ {+M3/245 0.038s} Kg6 {0.00/12 2.1s}
+10. Qf5# {+M1/245 0.015s, White mates} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.03.08"]
+[Round "1"]
+[White "engine"]
+[Black "reference"]
+[Result "0-1"]
+[ECO "A00"]
+[GameDuration "00:00:15"]
+[GameEndTime "2026-03-08T19:39:41.447 EET"]
+[GameStartTime "2026-03-08T19:39:26.283 EET"]
+[Opening "Clemenz (Mead's, Basman's or de Klerk's) Opening"]
+[PlyCount "22"]
+[Termination "time forfeit"]
+[TimeControl "10+0.1"]
+
+1. h3 {0.00/11 0.58s} e5 {+0.20/19 0.41s} 2. c3 {0.00/11 5.0s}
+d5 {+0.30/12 0.17s} 3. d3 {0.00/8 0.62s} Nf6 {+0.61/17 0.60s}
+4. Nd2 {0.00/7 0.55s} c5 {+0.64/16 0.14s} 5. a3 {0.00/8 0.56s}
+Nc6 {+0.76/17 0.16s} 6. a4 {0.00/8 0.61s} Qc7 {+1.31/17 0.45s}
+7. b3 {0.00/8 0.55s} d4 {+2.04/18 0.26s} 8. cxd4 {0.00/10 0.58s}
+cxd4 {+2.26/13 0.14s} 9. f3 {0.00/8 0.59s} Nd5 {+4.21/17 0.35s}
+10. Kf2 {0.00/8 0.59s} Ne3 {+5.27/19 0.56s} 11. Ke1 {0.00/10 0.56s}
+Bb4 {+7.39/19 0.57s, White loses on time} 0-1
+
+[Event "?"]
+[Site "?"]
+[Date "2026.03.08"]
+[Round "1"]
+[White "reference"]
+[Black "engine"]
+[Result "1-0"]
+[ECO "B00"]
+[GameDuration "00:00:31"]
+[GameEndTime "2026-03-08T19:40:13.128 EET"]
+[GameStartTime "2026-03-08T19:39:41.447 EET"]
+[Opening "Corn stalk defense"]
+[PlyCount "29"]
+[Termination "stalled connection"]
+[TimeControl "10+0.1"]
+
+1. e4 {+0.38/15 0.41s} a5 {0.00/11 0.87s} 2. d4 {+0.90/14 0.13s}
+b5 {0.00/9 0.55s} 3. Bxb5 {+2.21/17 0.18s} c5 {0.00/9 0.75s}
+4. d5 {+3.04/18 0.19s} f6 {0.00/9 0.69s} 5. Be3 {+3.63/19 0.47s}
+a4 {0.00/10 0.60s} 6. c4 {+3.94/17 0.23s} g6 {0.00/9 0.55s}
+7. Bxc5 {+3.88/20 0.70s} e6 {0.00/8 0.62s} 8. Bxf8 {+4.36/18 0.13s}
+Kxf8 {0.00/8 0.58s} 9. Nc3 {+4.39/18 0.38s} exd5 {0.00/8 0.55s}
+10. Qxd5 {+4.89/16 0.099s} Ne7 {0.00/11 0.73s} 11. Qxa8 {+6.96/18 0.12s}
+a3 {0.00/10 0.57s} 12. Qxa3 {+7.38/19 0.15s} d5 {0.00/11 0.56s}
+13. exd5 {+8.40/22 1.4s} Qxd5 {0.00/10 0.62s} 14. Nxd5 {+12.99/18 0.14s}
+Bd7 {0.00/11 0.57s} 15. Qxe7+ {+M3/245 0.032s, Black's connection stalls} 1-0
+

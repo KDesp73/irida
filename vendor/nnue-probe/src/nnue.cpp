@@ -1270,17 +1270,15 @@ Interfaces
 */
 DLLExport int _CDECL nnue_init(const char* evalFile)
 {
-  printf("Loading NNUE : %s\n", evalFile);
   fflush(stdout);
 
   int r = load_eval_file(evalFile);
   if (r == 0) {
-    printf("NNUE loaded !\n");
     fflush(stdout);
     return 0;
   }
   if (r == 1)
-    printf("NNUE file not found!\n");
+    printf("NNUE file not found\n");
   else
     printf("Unsupported NNUE format (nnue-probe expects halfkp_256x2-32-32, 21022697 bytes). Use a legacy-format net from e.g. FireFather/halfkp_256x2-32-32-nets.\n");
   fflush(stdout);

@@ -18,4 +18,4 @@
 - [Syzygy Tablebases](https://kirill-kryukov.com/chess/tablebases-online/)
 - [tb](https://github.com/syzygy1/tb)
 - [network visualization](https://deepwiki.com/fairy-stockfish/variant-nnue-pytorch/9.1-network-visualization-(visualize.py))
-- [https://github.com/FireFather/halfkp_256x2-32-32-nets](halfkp_256x2-32-32-nets)
+- [halfkp_256x2-32-32-nets](https://github.com/FireFather/halfkp_256x2-32-32-nets)

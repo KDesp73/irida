@@ -26,3 +26,4 @@ training/out/*.nnue
 vendor/fathom/obj
 vendor/fathom/libfathom.so
 vendor/nnue-probe/src/libnnueprobe.so
+vendor/nvim-laravel

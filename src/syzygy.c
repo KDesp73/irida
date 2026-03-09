@@ -2,9 +2,7 @@
 #include "castro.h"
 #include <string.h>
 
-#ifdef USE_FATHOM
 #include "tbprobe.h"
-#endif
 
 static bool g_syzygy_loaded = false;
 static char g_syzygy_path[512];
@@ -13,34 +11,24 @@ bool syzygy_init(const char* path)
 {
     if (!path || path[0] == '\0') {
         g_syzygy_loaded = false;
-#ifdef USE_FATHOM
         tb_free();
-#endif
         return false;
     }
 
     strncpy(g_syzygy_path, path, sizeof(g_syzygy_path) - 1);
     g_syzygy_path[sizeof(g_syzygy_path) - 1] = '\0';
 
-#ifdef USE_FATHOM
     if (!tb_init(g_syzygy_path)) {
         g_syzygy_loaded = false;
         return false;
     }
     g_syzygy_loaded = true;
     return true;
-#else
-    (void)path;
-    g_syzygy_loaded = false;
-    return false;
-#endif
 }
 
 void syzygy_free(void)
 {
-#ifdef USE_FATHOM
     tb_free();
-#endif
     g_syzygy_loaded = false;
 }
 
@@ -62,7 +50,6 @@ unsigned syzygy_piece_count(Board* board)
     return n;
 }
 
-#ifdef USE_FATHOM
 static uint64_t bitboard_white(const Board* b)
 {
     return b->white;
@@ -109,11 +96,9 @@ static unsigned ep_square(const Board* b)
         return 0;
     return (unsigned)b->enpassant_square;
 }
-#endif
 
 int syzygy_probe_wdl(Board* board, bool use_rule50)
 {
-#ifdef USE_FATHOM
     if (!g_syzygy_loaded)
         return SYZYGY_PROBE_FAILED;
 
@@ -152,16 +137,10 @@ int syzygy_probe_wdl(Board* board, bool use_rule50)
     if (!board->turn)
         score = -score;
     return score;
-#else
-    (void)board;
-    (void)use_rule50;
-    return SYZYGY_PROBE_FAILED;
-#endif
 }
 
 bool syzygy_probe_root(Board* board, bool use_rule50, Move* best_move_out)
 {
-#ifdef USE_FATHOM
     if (!g_syzygy_loaded || !best_move_out)
         return false;
     if (board->castling_rights != 0)
@@ -201,10 +180,4 @@ bool syzygy_probe_root(Board* board, bool use_rule50, Move* best_move_out)
     /* For now we don't decode TbMove to castro Move - would need castro's move encoding.
      * So return false and let search find the move. */
     return false;
-#else
-    (void)board;
-    (void)use_rule50;
-    (void)best_move_out;
-    return false;
-#endif
 }

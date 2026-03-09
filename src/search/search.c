@@ -232,8 +232,6 @@ int search(Board* board,
     int extension = (castro_IsInCheck(board) && depth >= 1) ? 1 : 0;
     int effective_depth = depth + extension;
 
-    /* Null move pruning (requires castro_MakeNullMove/UnmakeNullMove in castro) */
-#if defined(CASTRO_HAS_NULLMOVE) && CASTRO_HAS_NULLMOVE
     const int R = 3;
     if (g_searchConfig.useNullMove && effective_depth >= R + 1 && !castro_IsInCheck(board)) {
         castro_MakeNullMove(board);
@@ -242,7 +240,6 @@ int search(Board* board,
         if (nullScore >= beta)
             return beta;
     }
-#endif
 
     if (g_searchConfig.useTT)
         set_tt_move(ttMove);

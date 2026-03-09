@@ -5,7 +5,7 @@ import argparse
 import re
 import sys
 
-def get_eval(engine_path: str, depth: int, fen: str):
+def get_eval(engine_path: str, fen: str):
     # Use a context manager to ensure the process is closed properly
     proc = subprocess.Popen(
         [engine_path], 
@@ -32,7 +32,7 @@ def get_eval(engine_path: str, depth: int, fen: str):
 
     # Send position and command
     send(f"position fen {fen}")
-    send(f"go depth {depth}")
+    send(f"go depth 1")
 
     eval_cp = None
 
@@ -68,7 +68,6 @@ def get_eval(engine_path: str, depth: int, fen: str):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Evaluate chess positions using a UCI engine.")
     parser.add_argument("--engine", help="Path to engine executable", type=str, default="stockfish")
-    parser.add_argument("--depth", help="Search depth", type=int, default=15)
     parser.add_argument("--file", help="File containing FEN strings", type=str)
     parser.add_argument("fen", nargs="?", help="A single FEN string", type=str)
     args = parser.parse_args()
@@ -80,13 +79,13 @@ if __name__ == "__main__":
                 for line in f:
                     fen_str = line.strip()
                     if fen_str and not fen_str.startswith("#"):
-                        result = get_eval(args.engine, args.depth, fen_str)
+                        result = get_eval(args.engine, fen_str)
                         print(f"{fen_str} | Eval: {result}")
         except FileNotFoundError:
             print(f"Error: File '{args.file}' not found.", file=sys.stderr)
             sys.exit(1)
     elif args.fen:
-        result = get_eval(args.engine, args.depth, args.fen)
+        result = get_eval(args.engine, args.fen)
         print(f"Eval: {result}")
     else:
         parser.print_help()
