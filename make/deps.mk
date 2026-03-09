@@ -36,10 +36,10 @@ vendor/IncludeOnly:
 	@$(call fetchio,test)
 
 vendor/nnue-probe:
-	@git clone --depth=1 https://github.com/dshawul/nnue-probe.git vendor/nnue-probe
+	@git clone --depth=1 https://github.com/dshawul/nnue-probe.git vendor/nnue-probe || true
 
 vendor/fathom:
-	@git clone --depth=1 https://github.com/jdart1/Fathom.git vendor/fathom
+	@git clone --depth=1 https://github.com/jdart1/Fathom.git vendor/fathom || true
 
 # Build targets (used by build.all and deps.build)
 build.castro: vendor/castro ## Build castro move-generation library
