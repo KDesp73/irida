@@ -323,14 +323,13 @@ bool castro_MakeMove(Board* board, Move move)
 
     board->turn = !board->turn;
     board->hash ^= ep_hash(board);
-    board->turn = !board->turn;
 
-    board->hash ^= Random64[780];
+    if (board->turn == COLOR_BLACK)
+        board->hash ^= Random64[780];
 
     castro_UpdateHashTable(&board->history.positions, board->hash);
 
     if (board->turn == COLOR_BLACK) board->fullmove++;
-    board->turn = !board->turn;
 
     return true;
 }
@@ -451,10 +450,12 @@ void castro_UnmakeMove(Board* board)
     }
 
     /* ---- Restore board meta ---- */
-    if (board->turn == COLOR_WHITE) board->fullmove--;
+    /* Decrement fullmove when undoing a white move (child has black to move) */
+    if (board->turn == COLOR_BLACK) board->fullmove--;
 
     castro_HistoryRemove(&board->history, hash_to_decrement);
-    board->turn             = !board->turn;  /* back to the mover's turn */
+    /* Restore parent's turn (the side that made the move we just undid) */
+    board->turn = (PieceColor)color;
     board->enpassant_square = undo.enpassant;
     board->castling_rights  = undo.castling;
 

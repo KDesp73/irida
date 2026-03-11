@@ -8,6 +8,7 @@
 #include "eval_cache.h"
 #include <assert.h>
 #include <stdint.h>
+#include <string.h>
 
 static bool search_should_stop(void)
 {
@@ -66,6 +67,14 @@ Move search_root(Board* board,
         }
 
         uint64_t rootHash = castro_CalculateZobristHash(board);
+        PieceColor rootTurn = board->turn;
+        uint8_t rootCastling = board->castling_rights;
+        Square rootEp = board->enpassant_square;
+        uint64_t rootBitboards[12];
+        char rootGrid[8][8];
+        memcpy(rootBitboards, board->bitboards, sizeof(rootBitboards));
+        memcpy(rootGrid, board->grid, sizeof(rootGrid));
+
         Move rootTtMove = {0};
         int dummyScore;
         g_searchStats.rootChildTtHits = 0;  /* diagnostic: count TT hits at ply 1 this depth */
@@ -100,8 +109,20 @@ Move search_root(Board* board,
                     score = -search(board, depth - 1, -beta, -alpha, 1, eval, order);
             }
 
-            castro_UnmakeMove(board);
-            /* Board/hash sanity: board must be restored to root position */
+            /* Root: expect exactly one move on the stack (the root move we just made).
+             * Always restore from saved root state to avoid UnmakeMove/turn bugs at depth 9+. */
+            assert(board->history.count == 1 && "history stack mismatch at root before UnmakeMove");
+            {
+                uint64_t childHash = board->hash;
+                board->turn = rootTurn;
+                board->castling_rights = rootCastling;
+                board->enpassant_square = rootEp;
+                memcpy(board->bitboards, rootBitboards, sizeof(rootBitboards));
+                memcpy(board->grid, rootGrid, sizeof(rootGrid));
+                castro_BoardUpdateOccupancy(board);
+                board->hash = castro_CalculateZobristHash(board);
+                castro_HistoryRemove(&board->history, childHash);
+            }
             assert(castro_CalculateZobristHash(board) == rootHash && "UnmakeMove did not restore board");
 
             if (search_should_stop())
