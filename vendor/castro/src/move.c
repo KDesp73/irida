@@ -288,6 +288,8 @@ bool castro_MakeMove(Board* board, Move move)
     Piece piece = castro_PieceAt(board, castro_GetFrom(move));
     if (piece.type == EMPTY_SQUARE || piece.color != board->turn) return false;
 
+    size_t piece_count_before = castro_NumberOfPieces(board, COLOR_WHITE) + castro_NumberOfPieces(board, COLOR_BLACK);
+
     board->hash ^= castling_hash(board->castling_rights);
     board->hash ^= ep_hash(board);
 
@@ -314,6 +316,9 @@ bool castro_MakeMove(Board* board, Move move)
     board->castling_rights  = castling;
     board->enpassant_square = enpassant;
 
+    size_t piece_count_after = castro_NumberOfPieces(board, COLOR_WHITE) + castro_NumberOfPieces(board, COLOR_BLACK);
+    castro_UpdateHalfmove(board, move, piece_count_before, piece_count_after, piece.type);
+
     board->hash ^= castling_hash(board->castling_rights);
 
     board->turn = !board->turn;
@@ -336,19 +341,30 @@ void castro_UnmakeMove(Board* board)
 {
     if (board->history.count <= 0) return;
 
-    Undo undo = castro_LoadLastUndo(board);
+    /* Hash of the position we're unmaking (child); must decrement this in history, not last_added */
+    uint64_t hash_to_decrement = board->hash;
+
+    /* Get undo without modifying board yet — we need current (post-move) castling/ep for hash removal */
+    Undo undo = castro_HistoryGetLast(board->history);
+    if (undo.move == NULL_MOVE) return;
+
     MOVE_DECODE(undo.move);
 
     /* Side that made the move */
     int color = !board->turn;
 
     /*
-     * 1. Remove post-move meta from hash.
+     * 1. Remove post-move meta from hash (must use current board state before we restore undo).
      *    board->turn is currently the opponent of the mover.
      */
     board->hash ^= Random64[780];                         /* side to move */
-    board->hash ^= castling_hash(board->castling_rights); /* current castling */
-    board->hash ^= ep_hash(board);                        /* current ep */
+    board->hash ^= castling_hash(board->castling_rights); /* post-move castling */
+    board->hash ^= ep_hash(board);                        /* post-move ep */
+
+    /* Restore meta so halfmove/castling/ep are correct for the remainder of unmake */
+    board->halfmove         = undo.fiftyMove;
+    board->castling_rights  = undo.castling;
+    board->enpassant_square = undo.enpassant;
 
     /* ---- Undo piece movement ---- */
 
@@ -437,7 +453,7 @@ void castro_UnmakeMove(Board* board)
     /* ---- Restore board meta ---- */
     if (board->turn == COLOR_WHITE) board->fullmove--;
 
-    castro_HistoryRemove(&board->history);
+    castro_HistoryRemove(&board->history, hash_to_decrement);
     board->turn             = !board->turn;  /* back to the mover's turn */
     board->enpassant_square = undo.enpassant;
     board->castling_rights  = undo.castling;
@@ -454,6 +470,9 @@ void castro_UnmakeMove(Board* board)
     if (board->turn == COLOR_BLACK) {
         board->hash ^= Random64[780];
     }
+
+    /* Ensure hash matches board state (avoids incremental-update drift in deep search) */
+    board->hash = castro_CalculateZobristHash(board);
 }
 
 /* ------------------------------------------------------------------ */
