@@ -1,3 +1,13 @@
+/*
+ * Theory: Transposition table (replace-by-key, generation-based invalidation).
+ *
+ * Positions are stored by Zobrist key; the index is key & (size-1) for a
+ * power-of-two table. Each search increments a generation counter; only entries
+ * with matching generation are used, so we never reuse entries from a previous
+ * search. Mate scores are adjusted by ply when storing and unadjusted when
+ * probing so they remain valid at any depth. Entries store depth, score type
+ * (exact, lower bound, upper bound), and best move for ordering.
+ */
 #include <stdlib.h>
 #include <string.h>
 #include "tt.h"

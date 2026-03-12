@@ -11,6 +11,7 @@ docs.training: ## Generate documentation for the training module
 		-o docs \
 		--comment-style "#" \
 		--name engine.training
+	mv docs/tiny.docs.json docs/training.tiny.docs.json
 
 docs.engine: ## Generate documentation for the engine
 	tinydocs-cli \
@@ -20,3 +21,4 @@ docs.engine: ## Generate documentation for the engine
 		-o docs \
 		--comment-style "//" \
 		--name engine.training
+	mv docs/tiny.docs.json docs/engine.tiny.docs.json

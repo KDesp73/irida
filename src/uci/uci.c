@@ -1,3 +1,12 @@
+/*
+ * Theory: UCI command dispatch.
+ *
+ * The engine receives text lines from stdin. This module parses the command
+ * name (uci, isready, ucinewgame, position, go, stop, quit, setoption) and
+ * dispatches to the appropriate handler. Commands are matched by prefix; extra
+ * arguments (e.g. "position fen ..." or "go depth 10") are passed to the
+ * handler. No state machine beyond "quit requested"; the GUI drives the flow.
+ */
 #include "uci.h"
 #include "core.h"
 #include <stdio.h>

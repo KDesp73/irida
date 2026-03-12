@@ -1,3 +1,11 @@
+/*
+ * Theory: CLI help and usage text.
+ *
+ * default_help prints a short usage line and lists commands (perft, eval, search,
+ * etc.) with brief descriptions. Optionally we can print more detailed help per
+ * command. Output uses simple ANSI formatting (bold headers) for readability in
+ * a terminal. This is the human-facing documentation for command-line usage.
+ */
 #include "IncludeOnly/ansi.h"
 #include "cli.h"
 #include "core.h"

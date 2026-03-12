@@ -1,3 +1,14 @@
+/*
+ * Theory: Move ordering for alpha-beta.
+ *
+ * We try the transposition table move first, then captures ordered by MVV-LVA
+ * (most valuable victim – least valuable attacker), then killer moves (two per
+ * ply that caused a cutoff), then history heuristic (from-to bonuses that
+ * are updated on cutoff). Moves are sorted by a composite score and then
+ * searched in that order to maximize alpha-beta cutoffs. The ordering is
+ * implemented as a partial selection sort so we can pick the next best move
+ * incrementally if needed (here we fully sort the array).
+ */
 #include <stddef.h>
 #include <stdint.h>
 #include "castro.h"

@@ -1,3 +1,13 @@
+/*
+ * Theory: Quiescence search.
+ *
+ * To avoid evaluating noisy positions (e.g. in the middle of a capture sequence),
+ * we only consider capture moves. We evaluate the standing pat (current position);
+ * if it fails high we return beta. Otherwise we generate captures, order them,
+ * and search with negamax alpha-beta. The search is recursive until no captures
+ * remain or we hit max ply. Mate scores are distance-adjusted so they stay
+ * consistent across plies.
+ */
 #include "castro.h"
 #include "eval.h"
 #include "eval_cache.h"

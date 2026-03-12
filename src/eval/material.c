@@ -1,3 +1,11 @@
+/*
+ * Theory: Material-only evaluation.
+ *
+ * The score is the difference in piece values (white total minus black total)
+ * using a fixed value per piece type (pawn, knight, bishop, rook, queen; king
+ * not counted). Used as a simple fallback or for debugging; the main eval is
+ * PeSTO or NNUE.
+ */
 #include "castro.h"
 #include "eval.h"
 

@@ -1,3 +1,12 @@
+/*
+ * Theory: Search time control.
+ *
+ * We use a monotonic clock (CLOCK_MONOTONIC) so that elapsed time is not
+ * affected by system clock changes. When the search starts we record the
+ * start time and the limit in milliseconds. search_time_up() returns true
+ * when elapsed >= limit; the root search checks this each iteration to stop
+ * iterative deepening in time.
+ */
 #include <time.h>
 #include <stdbool.h>
 #include <stdint.h>

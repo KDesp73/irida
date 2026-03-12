@@ -1,3 +1,12 @@
+/*
+ * Theory: UCI options and config.
+ *
+ * Options are stored in a dynamic array (name, type, value). GetUciOption looks
+ * up by name. LoadUciConfig sets defaults (start FEN, depth, NNUE path, etc.).
+ * setoption handlers update the array and apply side effects (e.g. reload NNUE,
+ * set Syzygy path). The GUI sends setoption before or during a game; we persist
+ * nothing to disk here (that would be a separate feature).
+ */
 #include "castro.h"
 #include "uci.h"
 #include "nnue.h"

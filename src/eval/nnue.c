@@ -1,3 +1,12 @@
+/*
+ * Theory: NNUE (Efficiently Updatable Neural Network) evaluation.
+ *
+ * The engine loads a neural net from a .nnue file (via nnue-probe). Evaluation
+ * is done by exporting the board to FEN and calling the probe; the score is
+ * in centipawns from the side-to-move perspective (we negate for black). If no
+ * net is loaded or load fails, we fall back to PeSTO. This file is a thin
+ * wrapper around the external nnue_init / nnue_evaluate_fen API.
+ */
 #include "nnue.h"
 #include "IncludeOnly/logging.h"
 #include "eval.h"

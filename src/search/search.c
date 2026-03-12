@@ -1,3 +1,17 @@
+/*
+ * Theory: Principal Variation Search (PVS) with iterative deepening.
+ *
+ * The root driver runs depth 1, 2, ... up to maxDepth. At each depth we use
+ * aspiration windows around the previous score to reduce the alpha-beta window
+ * and re-search with full window on fail. The recursive search is PVS (Principal
+ * Variation Search): the first root child is searched with full window; siblings
+ * are searched with zero window (null-window search) to prove they are worse,
+ * and only re-searched with full window if they beat beta. The search uses
+ * optional null-move pruning, late move reduction (LMR), transposition table
+ * (TT), and quiescence search for stability. Draw detection (50-move, threefold,
+ * insufficient material) and optional Syzygy tablebase probing are integrated
+ * at the root and in the tree. Time control is checked at the root each depth.
+ */
 #include "search.h"
 #include "castro.h"
 #include "tt.h"

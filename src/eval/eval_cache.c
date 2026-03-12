@@ -1,3 +1,13 @@
+/*
+ * Theory: Eval cache (position memoization).
+ *
+ * We maintain a fixed-size hash table indexed by (zobrist_key & mask). On each
+ * eval request we probe by key; on hit we return the stored score. On miss we
+ * call the underlying eval, store (key, score), and return. The cache is cleared
+ * at the start of each root search so we never reuse scores across different
+ * trees. This avoids recomputing the same position many times during search
+ * (e.g. transpositions and quiescence).
+ */
 #include "eval_cache.h"
 #include "castro.h"
 #include <string.h>

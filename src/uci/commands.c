@@ -1,3 +1,13 @@
+/*
+ * Theory: UCI command implementations (position, go, setoption).
+ *
+ * position [fen <fen> | startpos] [moves ...] sets the board and applies moves.
+ * go [depth n] [movetime ms] [infinite] [ponder] starts a search; options are
+ * parsed from the command string and override UCI options. setoption name ...
+ * value ... updates UCI options (e.g. NNUE path, Syzygy path, Hash). Search is
+ * launched on a separate thread; stop sends a request to halt. Syzygy TB and
+ * NNUE paths are applied when options are set.
+ */
 #include "search.h"
 #include "uci.h"
 #include "core.h"

@@ -1,3 +1,15 @@
+/*
+ * Theory: PeSTO-style evaluation (chessprogramming.org/PeSTO's_Evaluation_Function).
+ *
+ * The score is a linear combination of terms, interpolated by game phase (0 = endgame,
+ * 24 = midgame). Terms include: material + piece-square tables (mg_value/eg_value
+ * and PSTs per piece type), pawn structure (doubled, isolated, passed), mobility
+ * (squares attacked), king safety, piece activity, space, threats, and endgame
+ * specifics. All terms are in centipawns from the side-to-move perspective; the
+ * board is flipped for black so we always evaluate "for white" and negate when
+ * it's black's turn where needed. Tuneable mg_value/eg_value and PSTs support
+ * Texel tuning.
+ */
 // www.chessprogramming.org/PeSTO's_Evaluation_Function
 
 #include "IncludeOnly/logging.h"

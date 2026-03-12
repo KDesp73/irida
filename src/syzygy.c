@@ -1,3 +1,15 @@
+/*
+ * Theory: Syzygy tablebases (Fathom).
+ *
+ * We use the Fathom library to probe Syzygy endgame tablebases. WDL (win/draw/loss)
+ * probing returns a result from the side-to-move perspective; we map that to a
+ * centipawn-like score. DTZ (distance-to-zero) root probing can suggest the best
+ * move from a TB position; the board is converted to Fathom's bitboard format
+ * (white, black, kings, queens, rooks, bishops, knights, pawns, castling, ep).
+ * Probe is only valid when piece count and other conditions (e.g. halfmove,
+ * castling) match the TB format. syzygy_probe_root currently does not decode
+ * the TB move back to the engine's move format.
+ */
 #include "syzygy.h"
 #include "castro.h"
 #include <string.h>
