@@ -56,7 +56,6 @@ FT_IN_DIMS = HALFKP_FEATURES_PER_HALF
 # @desc Write a 32-bit unsigned integer in little-endian to the binary file.
 # @param f Binary file handle open for writing.
 # @param value Value to write (32-bit).
-# @returns None
 def write_uint32_le(f: object, value: int) -> None:
     f.write(struct.pack("<I", value & 0xFFFFFFFF))
 
@@ -65,7 +64,6 @@ def write_uint32_le(f: object, value: int) -> None:
 # @desc Write a 16-bit signed integer in little-endian, clamped to int16 range.
 # @param f Binary file handle.
 # @param value Value to write.
-# @returns None
 def write_int16_le(f: object, value: int) -> None:
     f.write(struct.pack("<h", max(-32768, min(32767, value))))
 
@@ -74,7 +72,6 @@ def write_int16_le(f: object, value: int) -> None:
 # @desc Write an 8-bit signed integer, clamped to [-128, 127].
 # @param f Binary file handle.
 # @param value Value to write.
-# @returns None
 def write_int8_le(f: object, value: int) -> None:
     f.write(struct.pack("<b", max(-128, min(127, value))))
 
@@ -83,7 +80,6 @@ def write_int8_le(f: object, value: int) -> None:
 # @desc Write a 32-bit signed integer in little-endian.
 # @param f Binary file handle.
 # @param value Value to write.
-# @returns None
 def write_int32_le(f: object, value: int) -> None:
     f.write(struct.pack("<i", value & 0xFFFFFFFF))
 
@@ -150,7 +146,6 @@ def load_pt(path: str) -> tuple[dict, str]:
 # @method add_arguments
 # @desc Registers input, output, and --description for the convert command.
 # @param parser ArgumentParser or subparser.
-# @returns None
 def add_arguments(parser: argparse.ArgumentParser) -> None:
     """Add convert (.pt -> .nnue) arguments to a parser or subparser."""
     parser.add_argument("input", help="Input .pt file")
@@ -174,7 +169,6 @@ def add_arguments(parser: argparse.ArgumentParser) -> None:
 # @param fc3_b fc3 bias scalar.
 # @param description String stored in .nnue header (padded/truncated to 177 bytes).
 # @param scale_bits Quantization scale (default 6).
-# @returns None
 def _write_legacy_nnue(
     f: object,
     ft_biases: np.ndarray,
@@ -259,7 +253,6 @@ def _write_legacy_nnue(
 # @method run
 # @desc Convert .pt to .nnue from parsed args: load state_dict, write legacy format.
 # @param args Parsed namespace from add_arguments.
-# @returns None
 def run(args: argparse.Namespace) -> None:
     """Convert .pt to .nnue from parsed arguments (from add_arguments)."""
     sd, arch = load_pt(args.input)

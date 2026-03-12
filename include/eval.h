@@ -3,9 +3,15 @@
 
 #include "castro.h"
 
+// @module eval
+// @desc Evaluation: EvalFn type, PeSTO (material+PST, terms), NNUE wrapper, breakdown.
+
+// @type EvalFn
+// @desc Function pointer: Board* -> int (centipawns, side-to-move perspective).
 typedef int (*EvalFn)(Board*) ;
 
-/* Per-term breakdown for PeSTO eval (all in centipawns, side-to-move perspective). */
+// @struct EvalBreakdown
+// @desc Per-term breakdown for PeSTO eval (centipawns, side-to-move). total equals pesto_eval when convention matches.
 typedef struct EvalBreakdown {
     int material_pst;     /* Material + piece-square tables (phase-interpolated) */
     int pawn_structure;
@@ -19,19 +25,48 @@ typedef struct EvalBreakdown {
     int game_phase;       /* 0..24, for context */
 } EvalBreakdown;
 
+// @function material_eval
+// @param board Board to evaluate.
+// @returns int Material-only eval (centipawns).
 int material_eval(Board* board);
+
+// @function pesto_eval
+// @param board Board to evaluate.
+// @returns int PeSTO eval (centipawns, side-to-move).
 int pesto_eval(Board* board);
-/* Fills *out with per-term breakdown and returns same value as pesto_eval. */
+
+// @function pesto_eval_breakdown
+// @desc Fills *out with per-term breakdown; returns same value as pesto_eval.
+// @param board Board to evaluate.
+// @param out Output breakdown struct.
+// @returns int PeSTO eval (centipawns).
 int pesto_eval_breakdown(Board* board, EvalBreakdown* out);
-/* Logs eval breakdown to stderr (e.g. for debugging). */
+
+// @function pesto_log_breakdown
+// @desc Logs eval breakdown to stderr (e.g. for debugging).
+// @param board Board to evaluate.
 void pesto_log_breakdown(Board* board);
+
+// @function pesto_init
+// @desc Initialize PeSTO tables. Call once at startup.
 void pesto_init(void);
-/* For Texel tuning: set mg_value[6], eg_value[6] and rebuild tables; then pesto_material_pst_eval_white uses them. */
+
+// @function pesto_set_tune_values
+// @desc For Texel tuning: set mg_value[6], eg_value[6] and rebuild tables.
+// @param mg_value Midgame piece values (pawn..king).
+// @param eg_value Endgame piece values.
 void pesto_set_tune_values(const int mg_value[6], const int eg_value[6]);
-/* Material + PST only, from white's perspective (centipawns). */
+
+// @function pesto_material_pst_eval_white
+// @desc Material + PST only, from white's perspective (centipawns).
+// @param board Board to evaluate.
+// @returns int Centipawns (white perspective).
 int pesto_material_pst_eval_white(Board* board);
 
-/* Evaluate position. Uses NNUE if loaded, otherwise returns 0 (caller should use PeSTO). */
+// @function nnue_eval
+// @desc Evaluate position. Uses NNUE if loaded; otherwise returns 0 (caller should use PeSTO).
+// @param board Board to evaluate.
+// @returns int Centipawns or 0 if NNUE not loaded.
 int nnue_eval(Board* board);
 
 #endif // EVAL_H

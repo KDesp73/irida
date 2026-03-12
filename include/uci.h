@@ -9,6 +9,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// @module uci
+// @desc UCI protocol: option types, state, commands, handlers, search thread sync.
+
+// @enum UciOptionType
+// @desc Option kind: check, spin, combo, string.
 typedef enum {
     UCI_CHECK,   // Checkbox option (true/false)
     UCI_SPIN,    // Integer spin (range of values)
@@ -16,6 +21,8 @@ typedef enum {
     UCI_STRING   // Free-text input
 } UciOptionType;
 
+// @var UciOptionTypeString
+// @desc String names for UciOptionType (for UCI output).
 static char* UciOptionTypeString[] = {
     "check",
     "spin",
@@ -23,6 +30,8 @@ static char* UciOptionTypeString[] = {
     "string"
 };
 
+// @enum UciStatus
+// @desc Engine state: waiting, thinking, stopped, ready, quit, pondering, etc.
 typedef enum {
     UCI_WAITING,         // Idle state, waiting for a command
     UCI_START_THINKING,  // Received "go" command, starting search
@@ -35,6 +44,8 @@ typedef enum {
     UCI_BESTMOVE_SENT    // Best move has been determined and sent to GUI
 } UciStatus;
 
+// @struct UciOption
+// @desc Single UCI option: name, type, value (check/spin/combo/string), params, default.
 typedef struct {
     char name[64];                 // Name of the option
     UciOptionType type;            // Type of the option
@@ -52,7 +63,12 @@ typedef struct {
 } UciOption;
 
 
+// @const MAX_UCI_OPTIONS
+// @desc Max number of UCI options.
 #define MAX_UCI_OPTIONS 32
+
+// @struct UciState
+// @desc Full UCI state: start FEN, mode flags, time, options, status, last command.
 typedef struct {
     char startPositionFen[128];    // The starting position in FEN notation
     bool uciMode;                  // Whether the engine is currently running in UCI mode
@@ -73,13 +89,30 @@ typedef struct {
     char lastCommand[128];         // Stores the last command received 
 } UciState;
 
+// @var uci_state
+// @desc Global UCI state.
 extern UciState uci_state;
 
+// @function LoadUciConfig
+// @param state UciState to load into.
 void LoadUciConfig(UciState* state);
+
+// @function PrintUciOptions
+// @param state UciState with options.
 void PrintUciOptions(UciState* state);
+
+// @function StatePrint
+// @param state UciState to print.
 void StatePrint(const UciState* state);
+
+// @function GetUciOption
+// @param state UciState.
+// @param name Option name.
+// @param opt Output option (if found).
+// @returns bool True if option found.
 bool GetUciOption(const UciState* state, char* name, UciOption* opt);
 
+// @const COMMAND_DEBUG
 #define COMMAND_DEBUG      "debug"
 #define COMMAND_DISPLAY    "d"
 #define COMMAND_GO         "go"
@@ -105,22 +138,33 @@ void uci_stop(UciState* state);
 void uci_uci(UciState* state);
 void uci_ucinewgame(UciState* state);
 
-/** Lock before writing to stdout from any thread. */
+// @function uci_stdout_lock
+// @desc Lock before writing to stdout from any thread.
 void uci_stdout_lock(void);
+
+// @function uci_stdout_unlock
 void uci_stdout_unlock(void);
 
-/** Block until the search thread is idle (so e.g. position can safely update the board). */
+// @function uci_search_wait_done
+// @desc Block until the search thread is idle.
 void uci_search_wait_done(void);
 
-/** Signal the search thread to run search (called from uci_go). */
+// @function uci_search_start
+// @desc Signal the search thread to run search (called from uci_go).
 void uci_search_start(void);
 
-/** Start the search worker thread. Call once from UciMain before the command loop. */
+// @function uci_search_thread_start
+// @desc Start the search worker thread. Call once from UciMain before the command loop.
 void uci_search_thread_start(void);
 
-/** Ask the search thread to exit and wait for it. Call before process exit. */
+// @function uci_search_thread_join
+// @desc Ask the search thread to exit and wait for it. Call before process exit.
 void uci_search_thread_join(void);
 
+// @function StateSetStartPos
+// @desc Set start position FEN and init board.
+// @param state UciState.
+// @param startpos FEN string (e.g. "startpos" or full FEN).
 static inline void StateSetStartPos(UciState* state, const char* startpos)
 {
     strncpy(state->startPositionFen, startpos, sizeof(state->startPositionFen) - 1);
@@ -128,6 +172,9 @@ static inline void StateSetStartPos(UciState* state, const char* startpos)
     castro_BoardInitFen(&engine.board, state->startPositionFen);
 }
 
+// @function InitState
+// @desc Initialize state with starting position.
+// @param state UciState.
 static inline void InitState(UciState* state)
 {
     StateSetStartPos(state, STARTING_FEN);

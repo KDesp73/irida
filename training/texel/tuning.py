@@ -130,7 +130,6 @@ def cross_entropy_loss(
 # @method add_arguments
 # @desc Registers --data, --output, --iter, --tune-k, --engine, --seed for texel command.
 # @param parser ArgumentParser or subparser.
-# @returns None
 def add_arguments(parser: argparse.ArgumentParser) -> None:
     """Add texel tuning arguments to a parser or subparser."""
     parser.add_argument("--data", "-d", required=True, help="CSV file: fen,result (result 0, 0.5, or 1)")
@@ -144,7 +143,6 @@ def add_arguments(parser: argparse.ArgumentParser) -> None:
 # @method run
 # @desc Load fen,result CSV; run Texel tuning (L-BFGS-B or coordinate descent); write JSON and print C snippet.
 # @param args Parsed namespace from add_arguments.
-# @returns None
 def run(args: argparse.Namespace) -> None:
     """Run Texel tuning from parsed arguments (from add_arguments)."""
     np.random.seed(args.seed)

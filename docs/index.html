@@ -25,14 +25,25 @@
                 darkMode: localStorage.getItem('theme') === 'dark',
                 search: '',
                 projectData: { name: '', docs: [], timestamp: '' },
-                
-                async init() {
+                docSet: localStorage.getItem('docSet') || 'training',
+
+                async loadDocs() {
                     try {
-                        const response = await fetch('tiny.docs.json');
+                        const response = await fetch(`${this.docSet}.tiny.docs.json`);
                         this.projectData = await response.json();
                     } catch (e) {
                         console.error("Failed to load documentation JSON", e);
+                        this.projectData = { name: this.docSet, docs: [], timestamp: '', error: true };
                     }
+                },
+
+                async init() {
+                    await this.loadDocs();
+                },
+
+                async onDocSetChange() {
+                    localStorage.setItem('docSet', this.docSet);
+                    await this.loadDocs();
                 },
 
                 toggleTheme() {
@@ -73,6 +84,14 @@
         </div>
 
         <div class="flex items-center gap-4 w-full md:w-auto">
+            <div class="flex items-center gap-2 shrink-0">
+                <label for="doc-set" class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Doc set</label>
+                <select id="doc-set" x-model="docSet" @change="onDocSetChange()"
+                        class="py-2 pl-3 pr-8 bg-slate-100 dark:bg-slate-800 border border-transparent focus:border-indigo-500 dark:focus:border-indigo-400 rounded-xl focus:ring-2 focus:ring-indigo-500/10 outline-none transition-all text-sm font-medium text-slate-700 dark:text-slate-200 cursor-pointer">
+                    <option value="engine">Engine</option>
+                    <option value="training">Training</option>
+                </select>
+            </div>
             <div class="relative w-full md:w-80 group">
                 <input type="text" x-model="search" placeholder="Quick search..."
                        class="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border border-transparent focus:border-indigo-500 dark:focus:border-indigo-400 rounded-xl focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all text-sm">
@@ -86,6 +105,9 @@
 </header>
 
 <main class="max-w-7xl mx-auto px-6 pb-12">
+    <div x-show="projectData.error" class="mb-8 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-sm">
+        <strong>Could not load <span x-text="`${docSet}.tiny.docs.json`" class="font-mono"></span>.</strong> Make sure the file exists in the docs folder (e.g. generate it from the markers).
+    </div>
     <div class="space-y-12">
         <template x-for="item in projectData.docs" :key="item.file">
             <section x-show="shouldShowModule(item)" x-cloak class="relative">

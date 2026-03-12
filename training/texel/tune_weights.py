@@ -83,7 +83,6 @@ def load_breakdown(engine_path: str, fens: list[str]) -> np.ndarray:
 # @method add_arguments
 # @desc Registers --data, --engine, --output, --iter, --tune-k, --seed.
 # @param parser ArgumentParser or subparser.
-# @returns None
 def add_arguments(parser: argparse.ArgumentParser) -> None:
     """Add texel-weights arguments to a parser or subparser."""
     parser.add_argument("--data", "-d", required=True, help="CSV file: fen,result (result 0, 0.5, or 1)")
@@ -97,7 +96,6 @@ def add_arguments(parser: argparse.ArgumentParser) -> None:
 # @method run
 # @desc Load fen,result; get breakdown from engine; minimize cross-entropy over 8 weights; write JSON.
 # @param args Parsed namespace from add_arguments.
-# @returns None
 def run(args: argparse.Namespace) -> None:
     """Tune term weights from parsed arguments (from add_arguments)."""
     np.random.seed(args.seed)

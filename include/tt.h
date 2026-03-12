@@ -3,6 +3,11 @@
 
 #include "castro.h"
 
+// @module tt
+// @desc Transposition table: entry type, init/clear, probe/store.
+
+// @enum TTNodeType
+// @desc TT score type: exact, lower bound, upper bound, or none.
 typedef enum {
     TT_EXACT,
     TT_LOWERBOUND,
@@ -10,6 +15,8 @@ typedef enum {
     TT_NONE
 } TTNodeType;
 
+// @struct TTEntry
+// @desc Single TT entry: key, depth, score, type, best move, generation.
 typedef struct {
     uint64_t key;
     int depth;
@@ -19,10 +26,26 @@ typedef struct {
     uint16_t generation;  /* search generation: only use entry if matches current */
 } TTEntry;
 
+// @function tt_init
+// @param mb Size in megabytes.
 void tt_init(size_t mb);
-void tt_clear(void);
-void tt_inc_generation(void);  /* call at start of each search_root */
 
+// @function tt_clear
+void tt_clear(void);
+
+// @function tt_inc_generation
+// @desc Call at start of each search_root.
+void tt_inc_generation(void);
+
+// @function tt_probe
+// @param key Position key.
+// @param depth Stored depth.
+// @param alpha Alpha bound.
+// @param beta Beta bound.
+// @param ply Current ply.
+// @param outScore Output score (if hit).
+// @param outMove Output best move (if hit).
+// @returns bool True if probe hit and score/move are valid.
 bool tt_probe(uint64_t key,
               int depth,
               int alpha,
@@ -31,6 +54,13 @@ bool tt_probe(uint64_t key,
               int* outScore,
               Move* outMove);
 
+// @function tt_store
+// @param key Position key.
+// @param depth Depth of score.
+// @param score Score to store.
+// @param type TT_EXACT, TT_LOWERBOUND, or TT_UPPERBOUND.
+// @param bestMove Best move at this node.
+// @param ply Current ply (for generation).
 void tt_store(uint64_t key,
               int depth,
               int score,

@@ -73,7 +73,6 @@ def run_engine_score(engine_path: str, fen: str, depth: int) -> int | None:
 # @method add_arguments
 # @desc Registers --engine, --depth, --fen-file, --output for the data command.
 # @param parser ArgumentParser or subparser.
-# @returns None
 def add_arguments(parser: argparse.ArgumentParser) -> None:
     """Add data-generation arguments to a parser or subparser."""
     parser.add_argument("--engine", required=True, help="Path to engine executable (UCI)")
@@ -85,7 +84,6 @@ def add_arguments(parser: argparse.ArgumentParser) -> None:
 # @method run
 # @desc Generate FEN,score_cp CSV: read FENs, run engine per position, write CSV.
 # @param args Parsed namespace from add_arguments.
-# @returns None
 def run(args: argparse.Namespace) -> None:
     """Generate FEN,score CSV from parsed arguments (from add_arguments)."""
     fen_source = open(args.fen_file) if args.fen_file else sys.stdin

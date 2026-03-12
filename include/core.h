@@ -5,9 +5,15 @@
 #include "search.h"
 #include "eval.h"
 
-// Piece values (0–5 = PAWN..KING)
+// @module core
+// @desc Engine core: Engine struct, init, and global engine instance.
+
+// @const PIECE_VALUES
+// @desc Piece values (0–5 = PAWN..KING) for display or tuning.
 static const int PIECE_VALUES[6] = {100, 320, 330, 500, 900, 0};
 
+// @struct Engine
+// @desc Engine descriptor: name, author, function pointers (search, eval, order), and board.
 typedef struct {
     char name[128];
     char author[128];
@@ -19,9 +25,15 @@ typedef struct {
     Board board;
 } Engine;
 
+// @function EngineInit
+// @desc Initialize engine with name and author; set function pointers and board state.
+// @param engine Engine to initialize.
+// @param name Engine name string.
+// @param author Author string.
 void EngineInit(Engine* engine, char* name, char* author);
 
-// Expected to be defined elsewhere
+// @var engine
+// @desc Global engine instance; expected to be defined in main or startup.
 extern Engine engine;
 
 #endif // ENGINE_CORE_H

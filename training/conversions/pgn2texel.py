@@ -45,7 +45,6 @@ def result_to_white_score(result: str) -> float | None:
 # @method add_arguments
 # @desc Registers --pgn, --output, --ply, --max for the pgn2texel command.
 # @param parser ArgumentParser or subparser.
-# @returns None
 def add_arguments(parser: argparse.ArgumentParser) -> None:
     """Add pgn2texel arguments to a parser or subparser."""
     parser.add_argument("--pgn", "-p", required=True, help="Input PGN file")
@@ -57,7 +56,6 @@ def add_arguments(parser: argparse.ArgumentParser) -> None:
 # @method run
 # @desc Read PGN, sample one position per game at --ply, write fen,result CSV.
 # @param args Parsed namespace from add_arguments.
-# @returns None
 def run(args: argparse.Namespace) -> None:
     """Extract fen,result CSV from PGN (from add_arguments)."""
     count = 0

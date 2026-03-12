@@ -191,7 +191,6 @@ def load_csv_halfkp(path: str) -> tuple[list[tuple[list[int], list[int]]], list[
 # @method add_arguments
 # @desc Registers --data, --arch, --epochs, --lr, --batch-size, --output, --val-frac.
 # @param parser ArgumentParser or subparser to add flags to.
-# @returns None
 def add_arguments(parser: argparse.ArgumentParser) -> None:
     """Add train subcommand arguments to a parser or subparser."""
     parser.add_argument("--data", "-d", required=True, help="CSV file (fen, score_cp) from data command")
@@ -206,7 +205,6 @@ def add_arguments(parser: argparse.ArgumentParser) -> None:
 # @method run
 # @desc Train from args: load data, build model, run epochs, save .pt.
 # @param args Parsed namespace from add_arguments.
-# @returns None
 def run(args: argparse.Namespace) -> None:
     """Train from parsed arguments (from add_arguments)."""
     if args.arch == "mlp":
