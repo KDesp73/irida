@@ -1,6 +1,4 @@
 /*
- * Theory: UCI search thread.
- *
  * Search runs in a dedicated thread so the main thread can continue reading
  * commands (e.g. "stop"). A condition variable signals when a "go" is issued;
  * the search thread runs the search and signals when done. stdout is locked

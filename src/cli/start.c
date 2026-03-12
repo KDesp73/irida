@@ -1,12 +1,3 @@
-/*
- * Theory: CLI entry and argument parsing.
- *
- * CliMain is called from main when argv has arguments. We use getopt_long to
- * parse --help, --version, --fen, --depth, --eval, --search, --nnue-path, etc.
- * The parsed command and options are stored in a context; then we dispatch to
- * the appropriate handler (perft, eval, search) or print help/version. This
- * file wires the CLI API to the engine's eval and search.
- */
 #include "core.h"
 #include "version.h"
 #include "cli.h"

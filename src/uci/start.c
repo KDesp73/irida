@@ -1,12 +1,3 @@
-/*
- * Theory: UCI main loop.
- *
- * After initialization we print the engine name and start the search thread.
- * We then read lines from stdin in a loop. Each line is passed to the command
- * handler (uci, isready, position, go, stop, etc.). The loop exits on EOF or
- * when the quit command sets quitRequested. All output is locked so the search
- * thread and main thread do not interleave prints.
- */
 #include "uci.h"
 #include "version.h"
 #include <stdio.h>

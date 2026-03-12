@@ -1,13 +1,3 @@
-/*
- * Theory: Program entry point and engine wiring.
- *
- * We initialize the board masks, PeSTO tables, MVV-LVA table, and transposition
- * table. The global engine is configured with name, author, and the implementations
- * for eval (NNUE with PeSTO fallback), search (iterative deepening PVS), and move
- * ordering. If command-line arguments are present we run the CLI (perft, eval,
- * search, etc.); otherwise we run the UCI main loop so the engine can be used by
- * a GUI.
- */
 #include "castro.h"
 #include "core.h"
 #include "eval.h"

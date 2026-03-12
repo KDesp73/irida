@@ -1,14 +1,14 @@
-# NNUE Training for This Engine
+# Training & Tuning
 
-This module provides **training and tuning** for the engine: **Texel tuning** (PeSTO piece values and term weights from position–result data, using the C engine only) and **NNUE** (train/convert nets loadable via the **EvalFile** UCI option; Stockfish-format .nnue via [nnue-probe](https://github.com/dshawul/nnue-probe)).
+Python tools for **improving this engine**: tune the PeSTO eval (Texel) or train/convert NNUE nets. One CLI, run from the repo root.
 
-**Contents:** [Unified CLI](#unified-cli) · [Texel tuning](#texel-tuning-pesto-piece-values) · [NNUE (in-repo)](#training-without-nnue-pytorch-do-it-yourself) · [nnue-pytorch pipeline](#pipeline-overview-using-nnue-pytorch)
+**Jump to:** [Texel tuning](#texel-tuning-pesto-piece-values) · [CLI reference](#unified-cli) · [NNUE in-repo](#training-without-nnue-pytorch-do-it-yourself) · [nnue-pytorch](#pipeline-overview-using-nnue-pytorch)
 
 ---
 
 ## Unified CLI
 
-All entrypoints live under one CLI. From the **repo root** (engine built when a command needs it):
+From the **repo root** (engine built when a command needs it):
 
 ```bash
 python3 -m training                    # list commands
@@ -17,28 +17,30 @@ python3 -m training texel-weights ...  # PeSTO term weights only (fixed mg/eg)
 python3 -m training data ...           # generate FEN,score CSV from engine
 python3 -m training train ...          # NNUE-style net training
 python3 -m training convert IN OUT     # .pt → .nnue
-python3 -m training pgn2texel ...      # PGN → fen,result CSV for Texel
+python3 -m training pgn2texel ...     # PGN → fen,result CSV for Texel
 ```
 
-Use `-h` for options: `python3 -m training texel -h`.
+`python3 -m training texel -h` for all Texel options.
 
-| Make target | Description |
-|-------------|-------------|
-| `training.texel.deps` | Install numpy, scipy (optional: python-chess for PGN) |
-| `training.texel.data` | Build fen,result CSV from PGN (`TEXEL_PGN`, `TEXEL_CSV`) |
+**Make shortcuts**
+
+| Target | What it does |
+|--------|----------------|
+| `training.texel.deps` | `pip install numpy scipy` (+ optional python-chess) |
+| `training.texel.data` | PGN → fen,result CSV (`TEXEL_PGN`, `TEXEL_CSV`) |
 | `training.texel.tune` | Run Texel tuning (`TEXEL_CSV`, `ENGINE_PATH`) |
 | `training.texel.tune_weights` | Tune 8 term weights only |
-| `training.data` | Generate FEN,score CSV for NNUE |
+| `training.data` | Engine → FEN,score CSV for NNUE |
 | `training.train` | Train .pt model |
-| `training.convert` | Convert .pt → .nnue |
+| `training.convert` | .pt → .nnue |
 
 ---
 
 ## Texel tuning (PeSTO piece values)
 
-Texel tuning minimizes **cross-entropy** between the engine’s evaluation (sigmoid of eval) and game results (1 = white wins, 0.5 = draw, 0 = black wins). It tunes **mg_value** and **eg_value** in `src/eval/pesto.c`, and optionally the **8 PeSTO term weights**. All evaluation runs in the **C engine** (eval-batch); there is no duplicate eval in Python.
+Minimize **cross-entropy** between the engine’s eval (sigmoid) and game results (1 / 0.5 / 0 for white win / draw / black win). Tunes **mg_value** and **eg_value** in `src/eval/pesto.c`, and optionally the **8 PeSTO term weights**. All eval runs in the **C engine** (eval-batch)—no Python eval duplicate.
 
-**Prereqs:** Engine built (`make build.all` or `make`). CSV with columns `fen,result`. Install deps: `pip install numpy scipy` (and `python-chess` if you use PGN).
+**Need:** Engine built, CSV with `fen,result`, and `pip install numpy scipy` (optional: `python-chess` for PGN).
 
 ### Quick start
 
@@ -88,8 +90,8 @@ make training.texel.tune_weights
 
 ### Tips
 
-- If term weights stay at 1.0, the default may already fit your dataset; try more `--iter` or a larger/more diverse CSV.
-- More positions (e.g. thousands) usually give more stable tuning.
+> **Weights stuck at 1.0?** The default may already fit your data. Try more `--iter` or a larger, more diverse CSV.  
+> **Stable tuning** — Use thousands of positions when you can.
 
 ---
 

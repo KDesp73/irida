@@ -1,12 +1,3 @@
-/*
- * Theory: CLI command handlers (perft, eval, search).
- *
- * Each handler takes a Context (command, FEN, depth, eval/search options) and
- * runs the corresponding engine functionality: perft for node counts, eval for
- * position evaluation (optionally with breakdown or batch FENs), search for
- * a full search with optional depth/time limits. Results are printed to stdout.
- * NNUE path and other options are read from the global engine or UCI-style config.
- */
 #include "IncludeOnly/logging.h"
 #include "cli.h"
 #include "castro.h"

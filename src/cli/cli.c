@@ -1,12 +1,3 @@
-/*
- * Theory: CLI command parsing and context.
- *
- * The CLI accepts a command name (perft, eval, eval-batch, search, etc.) and
- * optional arguments. parse_command maps a string to a Command enum. context_init
- * and context_reset prepare a Context that holds the command, FEN, depth, eval
- * type, and search limits. The rest of the CLI uses this context to run the
- * requested operation (e.g. perft_handler, eval_handler, search_handler).
- */
 #include "cli.h"
 #include <stdlib.h>
 #include <string.h>
