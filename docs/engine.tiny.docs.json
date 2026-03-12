@@ -1,6 +1,6 @@
 {
     "name": "engine",
-    "timestamp": "2026-03-12 12:54:43",
+    "timestamp": "2026-03-12 13:43:32",
     "docs": [
         {
             "file": "include/cli.h",
@@ -33,7 +33,7 @@
                                 "marker": "desc",
                                 "type": "description",
                                 "args": [
-                                    "CLI command: PERFT, EVAL, EVAL_BATCH, EVAL_BREAKDOWN_BATCH, SEARCH, NONE."
+                                    "CLI command: PERFT, EVAL, EVAL_BATCH, EVAL_BREAKDOWN_BATCH, SEARCH, CUSTOMIZE, NONE."
                                 ],
                                 "line": 11,
                                 "children": []
@@ -46,7 +46,7 @@
                         "args": [
                             "COMMAND_COUNT"
                         ],
-                        "line": 21,
+                        "line": 22,
                         "children": [
                             {
                                 "marker": "desc",
@@ -54,7 +54,7 @@
                                 "args": [
                                     "Number of commands (COMMAND_NONE)."
                                 ],
-                                "line": 22,
+                                "line": 23,
                                 "children": []
                             }
                         ]
@@ -65,7 +65,7 @@
                         "args": [
                             "parse_command"
                         ],
-                        "line": 25,
+                        "line": 26,
                         "children": [
                             {
                                 "marker": "param",
@@ -74,7 +74,7 @@
                                     "str",
                                     "Command string (e.g. \"perft\", \"eval\")."
                                 ],
-                                "line": 26,
+                                "line": 27,
                                 "children": []
                             },
                             {
@@ -84,7 +84,7 @@
                                     "Command",
                                     "Parsed command or COMMAND_NONE."
                                 ],
-                                "line": 27,
+                                "line": 28,
                                 "children": []
                             }
                         ]
@@ -95,15 +95,15 @@
                         "args": [
                             "CliArgs"
                         ],
-                        "line": 30,
+                        "line": 31,
                         "children": [
                             {
                                 "marker": "desc",
                                 "type": "description",
                                 "args": [
-                                    "Short option characters for getopt (h, v, F, d, E, S, N)."
+                                    "Short option characters for getopt (h, v, F, d, E, S, N) and long-only customize options (128+)."
                                 ],
-                                "line": 31,
+                                "line": 32,
                                 "children": []
                             }
                         ]
@@ -114,43 +114,13 @@
                         "args": [
                             "Context"
                         ],
-                        "line": 42,
+                        "line": 54,
                         "children": [
                             {
                                 "marker": "desc",
                                 "type": "description",
                                 "args": [
                                     "Parsed CLI context: fen, eval, search, nnue_path, depth, command."
-                                ],
-                                "line": 43,
-                                "children": []
-                            }
-                        ]
-                    },
-                    {
-                        "marker": "function",
-                        "type": "function",
-                        "args": [
-                            "context_init"
-                        ],
-                        "line": 53,
-                        "children": [
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "ctx",
-                                    "Context to initialize."
-                                ],
-                                "line": 54,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "command",
-                                    "Initial command."
                                 ],
                                 "line": 55,
                                 "children": []
@@ -161,18 +131,28 @@
                         "marker": "function",
                         "type": "function",
                         "args": [
-                            "context_reset"
+                            "context_init"
                         ],
-                        "line": 58,
+                        "line": 65,
                         "children": [
                             {
                                 "marker": "param",
                                 "type": "parameter",
                                 "args": [
                                     "ctx",
-                                    "Context to reset."
+                                    "Context to initialize."
                                 ],
-                                "line": 59,
+                                "line": 66,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "command",
+                                    "Initial command."
+                                ],
+                                "line": 67,
                                 "children": []
                             }
                         ]
@@ -181,54 +161,16 @@
                         "marker": "function",
                         "type": "function",
                         "args": [
-                            "context_free"
+                            "context_reset"
                         ],
-                        "line": 62,
+                        "line": 70,
                         "children": [
                             {
                                 "marker": "param",
                                 "type": "parameter",
                                 "args": [
                                     "ctx",
-                                    "Context to free."
-                                ],
-                                "line": 63,
-                                "children": []
-                            }
-                        ]
-                    },
-                    {
-                        "marker": "type",
-                        "type": "type",
-                        "args": [
-                            "HandlerFunc"
-                        ],
-                        "line": 66,
-                        "children": [
-                            {
-                                "marker": "desc",
-                                "type": "description",
-                                "args": [
-                                    "CLI handler: Context -> bool (success)."
-                                ],
-                                "line": 67,
-                                "children": []
-                            }
-                        ]
-                    },
-                    {
-                        "marker": "struct",
-                        "type": "any",
-                        "args": [
-                            "Dispatcher"
-                        ],
-                        "line": 70,
-                        "children": [
-                            {
-                                "marker": "desc",
-                                "type": "description",
-                                "args": [
-                                    "Table of handlers per command."
+                                    "Context to reset."
                                 ],
                                 "line": 71,
                                 "children": []
@@ -239,9 +181,67 @@
                         "marker": "function",
                         "type": "function",
                         "args": [
+                            "context_free"
+                        ],
+                        "line": 74,
+                        "children": [
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "ctx",
+                                    "Context to free."
+                                ],
+                                "line": 75,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "type",
+                        "type": "type",
+                        "args": [
+                            "HandlerFunc"
+                        ],
+                        "line": 78,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "CLI handler: Context -> bool (success)."
+                                ],
+                                "line": 79,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "struct",
+                        "type": "any",
+                        "args": [
+                            "Dispatcher"
+                        ],
+                        "line": 82,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Table of handlers per command."
+                                ],
+                                "line": 83,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "function",
+                        "type": "function",
+                        "args": [
                             "set_handler"
                         ],
-                        "line": 76,
+                        "line": 88,
                         "children": [
                             {
                                 "marker": "param",
@@ -250,7 +250,7 @@
                                     "this",
                                     "Dispatcher."
                                 ],
-                                "line": 77,
+                                "line": 89,
                                 "children": []
                             },
                             {
@@ -260,7 +260,7 @@
                                     "command",
                                     "Command to bind."
                                 ],
-                                "line": 78,
+                                "line": 90,
                                 "children": []
                             },
                             {
@@ -269,86 +269,6 @@
                                 "args": [
                                     "handler",
                                     "Handler function."
-                                ],
-                                "line": 79,
-                                "children": []
-                            }
-                        ]
-                    },
-                    {
-                        "marker": "function",
-                        "type": "function",
-                        "args": [
-                            "get_handler"
-                        ],
-                        "line": 82,
-                        "children": [
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "this",
-                                    "Dispatcher."
-                                ],
-                                "line": 83,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "command",
-                                    "Command to look up."
-                                ],
-                                "line": 84,
-                                "children": []
-                            },
-                            {
-                                "marker": "returns",
-                                "type": "return",
-                                "args": [
-                                    "HandlerFunc",
-                                    "Handler or NULL."
-                                ],
-                                "line": 85,
-                                "children": []
-                            }
-                        ]
-                    },
-                    {
-                        "marker": "function",
-                        "type": "function",
-                        "args": [
-                            "CliMain"
-                        ],
-                        "line": 88,
-                        "children": [
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "argc",
-                                    "Argument count."
-                                ],
-                                "line": 89,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "argv",
-                                    "Argument vector."
-                                ],
-                                "line": 90,
-                                "children": []
-                            },
-                            {
-                                "marker": "returns",
-                                "type": "return",
-                                "args": [
-                                    "int",
-                                    "Exit code."
                                 ],
                                 "line": 91,
                                 "children": []
@@ -359,9 +279,89 @@
                         "marker": "function",
                         "type": "function",
                         "args": [
-                            "perft_handler"
+                            "get_handler"
                         ],
                         "line": 94,
+                        "children": [
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "this",
+                                    "Dispatcher."
+                                ],
+                                "line": 95,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "command",
+                                    "Command to look up."
+                                ],
+                                "line": 96,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "HandlerFunc",
+                                    "Handler or NULL."
+                                ],
+                                "line": 97,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "function",
+                        "type": "function",
+                        "args": [
+                            "CliMain"
+                        ],
+                        "line": 100,
+                        "children": [
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "argc",
+                                    "Argument count."
+                                ],
+                                "line": 101,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "argv",
+                                    "Argument vector."
+                                ],
+                                "line": 102,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "int",
+                                    "Exit code."
+                                ],
+                                "line": 103,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "function",
+                        "type": "function",
+                        "args": [
+                            "perft_handler"
+                        ],
+                        "line": 106,
                         "children": [
                             {
                                 "marker": "param",
@@ -370,7 +370,7 @@
                                     "context",
                                     "CLI context."
                                 ],
-                                "line": 95,
+                                "line": 107,
                                 "children": []
                             },
                             {
@@ -380,7 +380,7 @@
                                     "bool",
                                     "Success."
                                 ],
-                                "line": 96,
+                                "line": 108,
                                 "children": []
                             }
                         ]
@@ -391,7 +391,7 @@
                         "args": [
                             "eval_handler"
                         ],
-                        "line": 99,
+                        "line": 111,
                         "children": [
                             {
                                 "marker": "param",
@@ -400,7 +400,7 @@
                                     "context",
                                     "CLI context."
                                 ],
-                                "line": 100,
+                                "line": 112,
                                 "children": []
                             },
                             {
@@ -410,7 +410,7 @@
                                     "bool",
                                     "Success."
                                 ],
-                                "line": 101,
+                                "line": 113,
                                 "children": []
                             }
                         ]
@@ -421,7 +421,7 @@
                         "args": [
                             "eval_batch_handler"
                         ],
-                        "line": 104,
+                        "line": 116,
                         "children": [
                             {
                                 "marker": "param",
@@ -430,7 +430,7 @@
                                     "context",
                                     "CLI context."
                                 ],
-                                "line": 105,
+                                "line": 117,
                                 "children": []
                             },
                             {
@@ -440,7 +440,7 @@
                                     "bool",
                                     "Success."
                                 ],
-                                "line": 106,
+                                "line": 118,
                                 "children": []
                             }
                         ]
@@ -451,7 +451,7 @@
                         "args": [
                             "eval_breakdown_batch_handler"
                         ],
-                        "line": 109,
+                        "line": 121,
                         "children": [
                             {
                                 "marker": "param",
@@ -460,7 +460,7 @@
                                     "context",
                                     "CLI context."
                                 ],
-                                "line": 110,
+                                "line": 122,
                                 "children": []
                             },
                             {
@@ -470,7 +470,7 @@
                                     "bool",
                                     "Success."
                                 ],
-                                "line": 111,
+                                "line": 123,
                                 "children": []
                             }
                         ]
@@ -481,7 +481,7 @@
                         "args": [
                             "search_handler"
                         ],
-                        "line": 114,
+                        "line": 126,
                         "children": [
                             {
                                 "marker": "param",
@@ -490,7 +490,7 @@
                                     "context",
                                     "CLI context."
                                 ],
-                                "line": 115,
+                                "line": 127,
                                 "children": []
                             },
                             {
@@ -500,7 +500,37 @@
                                     "bool",
                                     "Success."
                                 ],
-                                "line": 116,
+                                "line": 128,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "function",
+                        "type": "function",
+                        "args": [
+                            "customize_handler"
+                        ],
+                        "line": 131,
+                        "children": [
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "context",
+                                    "CLI context (eval, nnue_path and customize options set)."
+                                ],
+                                "line": 132,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "bool",
+                                    "Success; on success does not return until UCI exits."
+                                ],
+                                "line": 133,
                                 "children": []
                             }
                         ]
@@ -511,7 +541,7 @@
                         "args": [
                             "help"
                         ],
-                        "line": 119,
+                        "line": 136,
                         "children": [
                             {
                                 "marker": "param",
@@ -520,7 +550,7 @@
                                     "command",
                                     "Command to show help for (or COMMAND_NONE for general)."
                                 ],
-                                "line": 120,
+                                "line": 137,
                                 "children": []
                             }
                         ]
@@ -2877,7 +2907,7 @@
                         "args": [
                             "uci_stdout_lock"
                         ],
-                        "line": 141,
+                        "line": 145,
                         "children": [
                             {
                                 "marker": "desc",
@@ -2885,7 +2915,7 @@
                                 "args": [
                                     "Lock before writing to stdout from any thread."
                                 ],
-                                "line": 142,
+                                "line": 146,
                                 "children": []
                             }
                         ]
@@ -2896,7 +2926,7 @@
                         "args": [
                             "uci_stdout_unlock"
                         ],
-                        "line": 145,
+                        "line": 149,
                         "children": []
                     },
                     {
@@ -2905,32 +2935,13 @@
                         "args": [
                             "uci_search_wait_done"
                         ],
-                        "line": 148,
-                        "children": [
-                            {
-                                "marker": "desc",
-                                "type": "description",
-                                "args": [
-                                    "Block until the search thread is idle."
-                                ],
-                                "line": 149,
-                                "children": []
-                            }
-                        ]
-                    },
-                    {
-                        "marker": "function",
-                        "type": "function",
-                        "args": [
-                            "uci_search_start"
-                        ],
                         "line": 152,
                         "children": [
                             {
                                 "marker": "desc",
                                 "type": "description",
                                 "args": [
-                                    "Signal the search thread to run search (called from uci_go)."
+                                    "Block until the search thread is idle."
                                 ],
                                 "line": 153,
                                 "children": []
@@ -2941,7 +2952,7 @@
                         "marker": "function",
                         "type": "function",
                         "args": [
-                            "uci_search_thread_start"
+                            "uci_search_start"
                         ],
                         "line": 156,
                         "children": [
@@ -2949,7 +2960,7 @@
                                 "marker": "desc",
                                 "type": "description",
                                 "args": [
-                                    "Start the search worker thread. Call once from UciMain before the command loop."
+                                    "Signal the search thread to run search (called from uci_go)."
                                 ],
                                 "line": 157,
                                 "children": []
@@ -2960,7 +2971,7 @@
                         "marker": "function",
                         "type": "function",
                         "args": [
-                            "uci_search_thread_join"
+                            "uci_search_thread_start"
                         ],
                         "line": 160,
                         "children": [
@@ -2968,7 +2979,7 @@
                                 "marker": "desc",
                                 "type": "description",
                                 "args": [
-                                    "Ask the search thread to exit and wait for it. Call before process exit."
+                                    "Start the search worker thread. Call once from UciMain before the command loop."
                                 ],
                                 "line": 161,
                                 "children": []
@@ -2979,7 +2990,7 @@
                         "marker": "function",
                         "type": "function",
                         "args": [
-                            "StateSetStartPos"
+                            "uci_search_thread_join"
                         ],
                         "line": 164,
                         "children": [
@@ -2987,9 +2998,28 @@
                                 "marker": "desc",
                                 "type": "description",
                                 "args": [
-                                    "Set start position FEN and init board."
+                                    "Ask the search thread to exit and wait for it. Call before process exit."
                                 ],
                                 "line": 165,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "function",
+                        "type": "function",
+                        "args": [
+                            "StateSetStartPos"
+                        ],
+                        "line": 168,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Set start position FEN and init board."
+                                ],
+                                "line": 169,
                                 "children": []
                             },
                             {
@@ -2999,7 +3029,7 @@
                                     "state",
                                     "UciState."
                                 ],
-                                "line": 166,
+                                "line": 170,
                                 "children": []
                             },
                             {
@@ -3009,7 +3039,7 @@
                                     "startpos",
                                     "FEN string (e.g. \"startpos\" or full FEN)."
                                 ],
-                                "line": 167,
+                                "line": 171,
                                 "children": []
                             }
                         ]
@@ -3020,7 +3050,7 @@
                         "args": [
                             "InitState"
                         ],
-                        "line": 175,
+                        "line": 179,
                         "children": [
                             {
                                 "marker": "desc",
@@ -3028,7 +3058,7 @@
                                 "args": [
                                     "Initialize state with starting position."
                                 ],
-                                "line": 176,
+                                "line": 180,
                                 "children": []
                             },
                             {
@@ -3038,7 +3068,7 @@
                                     "state",
                                     "UciState."
                                 ],
-                                "line": 177,
+                                "line": 181,
                                 "children": []
                             }
                         ]

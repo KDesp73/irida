@@ -1,9 +1,7 @@
-TODO: recipes
 TODO: pick a license
 TODO: pick a name
 TODO: texel tuning
 TODO: syzygy tablebase (optional Fathom)
-TODO: nnue evaluation (optional nnue-probe)
 TODO: better traditional evaluation
 DONE: aspiration windows
 DONE: engine testing
@@ -19,3 +17,4 @@ DONE: replace Zobrist hashing keys with polyglot's predefined ones
 DONE: book moves database
 DONE: refactor move generation into its own library
 DONE: movegen documentation
+DONE: nnue evaluation (optional nnue-probe)
