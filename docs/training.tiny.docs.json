@@ -1,6 +1,6 @@
 {
-    "name": "engine.training",
-    "timestamp": "2026-03-12 12:51:12",
+    "name": "training",
+    "timestamp": "2026-03-12 12:54:43",
     "docs": [
         {
             "file": "training/__main__.py",

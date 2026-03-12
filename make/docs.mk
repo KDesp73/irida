@@ -10,7 +10,7 @@ docs.training: ## Generate documentation for the training module
 		--ignore .gitignore \
 		-o docs \
 		--comment-style "#" \
-		--name engine.training
+		--name training
 	mv docs/tiny.docs.json docs/training.tiny.docs.json
 
 docs.engine: ## Generate documentation for the engine
@@ -20,5 +20,5 @@ docs.engine: ## Generate documentation for the engine
 		--ignore .gitignore \
 		-o docs \
 		--comment-style "//" \
-		--name engine.training
+		--name engine
 	mv docs/tiny.docs.json docs/engine.tiny.docs.json
