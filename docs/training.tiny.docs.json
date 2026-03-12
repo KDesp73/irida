@@ -1,0 +1,2107 @@
+{
+    "name": "engine.training",
+    "timestamp": "2026-03-12 12:27:45",
+    "docs": [
+        {
+            "file": "training/__main__.py",
+            "docs": {
+                "marker": "module",
+                "type": "module",
+                "args": [
+                    "training.__main__"
+                ],
+                "line": 2,
+                "children": [
+                    {
+                        "marker": "desc",
+                        "type": "description",
+                        "args": [
+                            "Unified CLI for training and tuning. Dispatches to train, texel, texel-weights, data, convert, pgn2texel."
+                        ],
+                        "line": 3,
+                        "children": []
+                    }
+                ]
+            }
+        },
+        {
+            "file": "training/conversions/pgn2texel.py",
+            "docs": {
+                "marker": "module",
+                "type": "module",
+                "args": [
+                    "training.conversions.pgn2texel"
+                ],
+                "line": 2,
+                "children": [
+                    {
+                        "marker": "desc",
+                        "type": "description",
+                        "args": [
+                            "Extract fen,result CSV from PGN (one position per game at a fixed ply)."
+                        ],
+                        "line": 3,
+                        "children": []
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "result_to_white_score"
+                        ],
+                        "line": 28,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Map PGN Result header (1-0, 0-1, 1/2-1/2, etc.) to float 1.0, 0.0, 0.5 or None."
+                                ],
+                                "line": 29,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "result",
+                                    "PGN Result header string."
+                                ],
+                                "line": 30,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "float | None 1.0, 0.0, 0.5 or None if unrecognized."
+                                ],
+                                "line": 31,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "add_arguments"
+                        ],
+                        "line": 45,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Registers --pgn, --output, --ply, --max for the pgn2texel command."
+                                ],
+                                "line": 46,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "parser",
+                                    "ArgumentParser or subparser."
+                                ],
+                                "line": 47,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "None"
+                                ],
+                                "line": 48,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "run"
+                        ],
+                        "line": 57,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Read PGN, sample one position per game at --ply, write fen,result CSV."
+                                ],
+                                "line": 58,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "args",
+                                    "Parsed namespace from add_arguments."
+                                ],
+                                "line": 59,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "None"
+                                ],
+                                "line": 60,
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "file": "training/conversions/pt2nnue.py",
+            "docs": {
+                "marker": "module",
+                "type": "module",
+                "args": [
+                    "training.conversions.pt2nnue"
+                ],
+                "line": 2,
+                "children": [
+                    {
+                        "marker": "desc",
+                        "type": "description",
+                        "args": [
+                            "Convert .pt (from train) to legacy .nnue binary for this engine's nnue-probe."
+                        ],
+                        "line": 3,
+                        "children": []
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "write_uint32_le"
+                        ],
+                        "line": 55,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Write a 32-bit unsigned integer in little-endian to the binary file."
+                                ],
+                                "line": 56,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "f",
+                                    "Binary file handle open for writing."
+                                ],
+                                "line": 57,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "value",
+                                    "Value to write (32-bit)."
+                                ],
+                                "line": 58,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "None"
+                                ],
+                                "line": 59,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "write_int16_le"
+                        ],
+                        "line": 64,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Write a 16-bit signed integer in little-endian, clamped to int16 range."
+                                ],
+                                "line": 65,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "f",
+                                    "Binary file handle."
+                                ],
+                                "line": 66,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "value",
+                                    "Value to write."
+                                ],
+                                "line": 67,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "None"
+                                ],
+                                "line": 68,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "write_int8_le"
+                        ],
+                        "line": 73,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Write an 8-bit signed integer, clamped to [-128, 127]."
+                                ],
+                                "line": 74,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "f",
+                                    "Binary file handle."
+                                ],
+                                "line": 75,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "value",
+                                    "Value to write."
+                                ],
+                                "line": 76,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "None"
+                                ],
+                                "line": 77,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "write_int32_le"
+                        ],
+                        "line": 82,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Write a 32-bit signed integer in little-endian."
+                                ],
+                                "line": 83,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "f",
+                                    "Binary file handle."
+                                ],
+                                "line": 84,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "value",
+                                    "Value to write."
+                                ],
+                                "line": 85,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "None"
+                                ],
+                                "line": 86,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "_inv_permute_biases"
+                        ],
+                        "line": 91,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Inverse of nnue-probe permute_biases so that after load the engine sees our order."
+                                ],
+                                "line": 92,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "b",
+                                    "Bias array length multiple of 8."
+                                ],
+                                "line": 93,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "np.ndarray Reordered array (same shape)."
+                                ],
+                                "line": 94,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "quantize_scale"
+                        ],
+                        "line": 114,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Scale a float weight to int16 using 2^scale_bits (e.g. 6 for Stockfish)."
+                                ],
+                                "line": 115,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "w",
+                                    "Float weight."
+                                ],
+                                "line": 116,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "scale_bits",
+                                    "Scale factor exponent (default 6)."
+                                ],
+                                "line": 117,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "int Rounded integer weight."
+                                ],
+                                "line": 118,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "load_pt"
+                        ],
+                        "line": 124,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Load .pt file; return (state_dict, arch). arch is 'small_mlp' or 'halfkp'."
+                                ],
+                                "line": 125,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "path",
+                                    "Path to .pt file."
+                                ],
+                                "line": 126,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "tuple[dict, str] (state_dict, arch)."
+                                ],
+                                "line": 127,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "add_arguments"
+                        ],
+                        "line": 150,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Registers input, output, and --description for the convert command."
+                                ],
+                                "line": 151,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "parser",
+                                    "ArgumentParser or subparser."
+                                ],
+                                "line": 152,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "None"
+                                ],
+                                "line": 153,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "_write_legacy_nnue"
+                        ],
+                        "line": 165,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Write the legacy nnue-probe binary: header, transformer block, network block (with identity 32->32 and inverse bias permutation), and padding to LEGACY_FILE_SIZE."
+                                ],
+                                "line": 166,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "f",
+                                    "Binary file handle open for writing."
+                                ],
+                                "line": 168,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "ft_biases",
+                                    "int16 array length 256."
+                                ],
+                                "line": 169,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "ft_weights",
+                                    "int16 array shape (41024, 256)."
+                                ],
+                                "line": 170,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "fc2_w",
+                                    "fc2 weight matrix (32, 512)."
+                                ],
+                                "line": 171,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "fc2_b",
+                                    "fc2 bias (32,)."
+                                ],
+                                "line": 172,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "fc3_w",
+                                    "fc3 weight (1, 32)."
+                                ],
+                                "line": 173,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "fc3_b",
+                                    "fc3 bias scalar."
+                                ],
+                                "line": 174,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "description",
+                                    "String stored in .nnue header (padded/truncated to 177 bytes)."
+                                ],
+                                "line": 175,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "scale_bits",
+                                    "Quantization scale (default 6)."
+                                ],
+                                "line": 176,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "None"
+                                ],
+                                "line": 177,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "run"
+                        ],
+                        "line": 259,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Convert .pt to .nnue from parsed args: load state_dict, write legacy format."
+                                ],
+                                "line": 260,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "args",
+                                    "Parsed namespace from add_arguments."
+                                ],
+                                "line": 261,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "None"
+                                ],
+                                "line": 262,
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "file": "training/features/halfkp.py",
+            "docs": {
+                "marker": "module",
+                "type": "module",
+                "args": [
+                    "training.features.halfkp"
+                ],
+                "line": 11,
+                "children": [
+                    {
+                        "marker": "desc",
+                        "type": "description",
+                        "args": [
+                            "HalfKP feature indices: 41024 per half (64*641). Index = king_sq*641 + piece_sq*10 + piece_type."
+                        ],
+                        "line": 12,
+                        "children": []
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "_fen_to_board"
+                        ],
+                        "line": 26,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Parse FEN piece placement into list of (square, piece_type). Square 0-63, a8=0."
+                                ],
+                                "line": 27,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "fen",
+                                    "FEN string (at least piece placement)."
+                                ],
+                                "line": 28,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "list[tuple[int, int]] List of (square, piece_type) for each non-king piece."
+                                ],
+                                "line": 29,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "_find_kings"
+                        ],
+                        "line": 54,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Return (white_king_sq, black_king_sq) in 0..63 from FEN."
+                                ],
+                                "line": 55,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "fen",
+                                    "FEN string with both kings."
+                                ],
+                                "line": 56,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "tuple[int, int] (white_king_square, black_king_square)."
+                                ],
+                                "line": 57,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "halfkp_indices_from_fen"
+                        ],
+                        "line": 82,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Compute HalfKP feature indices for a position. Returns (white_half_indices, black_half_indices), each list of 11 indices (bias + 10 non-king pieces) in [0, 41023]."
+                                ],
+                                "line": 83,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "fen",
+                                    "FEN string with both kings."
+                                ],
+                                "line": 85,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "tuple[list[int], list[int]] (white_half_indices, black_half_indices)."
+                                ],
+                                "line": 86,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "halfkp_num_features"
+                        ],
+                        "line": 108,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Total HalfKP input features (both halves): 82048."
+                                ],
+                                "line": 109,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "int 2 * FEATURES_PER_HALF."
+                                ],
+                                "line": 110,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "class",
+                        "type": "class",
+                        "args": [
+                            "HalfKP"
+                        ],
+                        "line": 116,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Holds constants for the HalfKP feature set: FEATURES_PER_HALF (41024), STRIDE (641), TOTAL_FEATURES (82048)."
+                                ],
+                                "line": 117,
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "file": "training/generators/nnue_training_data.py",
+            "docs": {
+                "marker": "module",
+                "type": "module",
+                "args": [
+                    "training.generators.nnue_training_data"
+                ],
+                "line": 2,
+                "children": [
+                    {
+                        "marker": "desc",
+                        "type": "description",
+                        "args": [
+                            "Generate FEN,score_cp CSV by running the engine in UCI (go depth N) per position."
+                        ],
+                        "line": 3,
+                        "children": []
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "run_engine_score"
+                        ],
+                        "line": 26,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Run engine in UCI: position fen, go depth N; parse last info score cp/mate. Returns centipawn score (or large value for mate) or None on failure."
+                                ],
+                                "line": 27,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "engine_path",
+                                    "Path to engine executable."
+                                ],
+                                "line": 29,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "fen",
+                                    "Position FEN."
+                                ],
+                                "line": 30,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "depth",
+                                    "Search depth."
+                                ],
+                                "line": 31,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "int | None Centipawn score or None."
+                                ],
+                                "line": 32,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "add_arguments"
+                        ],
+                        "line": 73,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Registers --engine, --depth, --fen-file, --output for the data command."
+                                ],
+                                "line": 74,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "parser",
+                                    "ArgumentParser or subparser."
+                                ],
+                                "line": 75,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "None"
+                                ],
+                                "line": 76,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "run"
+                        ],
+                        "line": 85,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Generate FEN,score_cp CSV: read FENs, run engine per position, write CSV."
+                                ],
+                                "line": 86,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "args",
+                                    "Parsed namespace from add_arguments."
+                                ],
+                                "line": 87,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "None"
+                                ],
+                                "line": 88,
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "file": "training/texel/eval.py",
+            "docs": {
+                "marker": "module",
+                "type": "module",
+                "args": [
+                    "training.texel.eval"
+                ],
+                "line": 11,
+                "children": [
+                    {
+                        "marker": "desc",
+                        "type": "description",
+                        "args": [
+                            "PeSTO material + PST with game-phase interpolation; matches src/eval/pesto.c."
+                        ],
+                        "line": 12,
+                        "children": []
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "flip_sq"
+                        ],
+                        "line": 156,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Flip square for black's perspective (a8<->a1 etc.)."
+                                ],
+                                "line": 157,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "sq",
+                                    "Square index 0..63."
+                                ],
+                                "line": 158,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "int Flipped square index."
+                                ],
+                                "line": 159,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "build_tables"
+                        ],
+                        "line": 167,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Build mg_table[12][64] and eg_table[12][64] from piece values and PSTs (like pesto_init)."
+                                ],
+                                "line": 168,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "mg_value",
+                                    "Length-6 midgame piece values."
+                                ],
+                                "line": 169,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "eg_value",
+                                    "Length-6 endgame piece values."
+                                ],
+                                "line": 170,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "Tuple[np.ndarray, np.ndarray] (mg_table, eg_table)."
+                                ],
+                                "line": 171,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "fen_to_board"
+                        ],
+                        "line": 189,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Parse FEN; return (board 8x8 of piece chars or '.', white_to_move)."
+                                ],
+                                "line": 190,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "fen",
+                                    "FEN string."
+                                ],
+                                "line": 191,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "Tuple[list[list[str]], bool] (board, white_to_move)."
+                                ],
+                                "line": 192,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "eval_fen"
+                        ],
+                        "line": 217,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Eval position from White's perspective (positive = good for White). Material + PST with game-phase interpolation; matches src/eval/pesto.c structure."
+                                ],
+                                "line": 218,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "fen",
+                                    "FEN position."
+                                ],
+                                "line": 220,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "mg_value",
+                                    "Length-6 midgame piece values."
+                                ],
+                                "line": 221,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "eg_value",
+                                    "Length-6 endgame piece values."
+                                ],
+                                "line": 222,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "float Eval in centipawns (White perspective)."
+                                ],
+                                "line": 223,
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "file": "training/texel/tune_weights.py",
+            "docs": {
+                "marker": "module",
+                "type": "module",
+                "args": [
+                    "training.texel.tune_weights"
+                ],
+                "line": 2,
+                "children": [
+                    {
+                        "marker": "desc",
+                        "type": "description",
+                        "args": [
+                            "Tune PeSTO term weights (8 scale factors) from engine eval-breakdown-batch."
+                        ],
+                        "line": 3,
+                        "children": []
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "sigmoid"
+                        ],
+                        "line": 37,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "P(white wins) = 1 / (1 + exp(-k * x / 400)). x in centipawns."
+                                ],
+                                "line": 38,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "x",
+                                    "Combined eval (e.g. breakdown @ weights)."
+                                ],
+                                "line": 39,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "k",
+                                    "Sigmoid scale (default 1)."
+                                ],
+                                "line": 40,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "np.ndarray Probability per position."
+                                ],
+                                "line": 41,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "load_breakdown"
+                        ],
+                        "line": 50,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Run engine eval-breakdown-batch; return (N, 8) array of term values per position."
+                                ],
+                                "line": 51,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "engine_path",
+                                    "Path to engine executable."
+                                ],
+                                "line": 52,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "fens",
+                                    "List of FEN positions."
+                                ],
+                                "line": 53,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "np.ndarray Shape (N, 8) term values (White perspective)."
+                                ],
+                                "line": 54,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "add_arguments"
+                        ],
+                        "line": 83,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Registers --data, --engine, --output, --iter, --tune-k, --seed."
+                                ],
+                                "line": 84,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "parser",
+                                    "ArgumentParser or subparser."
+                                ],
+                                "line": 85,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "None"
+                                ],
+                                "line": 86,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "run"
+                        ],
+                        "line": 97,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Load fen,result; get breakdown from engine; minimize cross-entropy over 8 weights; write JSON."
+                                ],
+                                "line": 98,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "args",
+                                    "Parsed namespace from add_arguments."
+                                ],
+                                "line": 99,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "None"
+                                ],
+                                "line": 100,
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "file": "training/texel/tuning.py",
+            "docs": {
+                "marker": "module",
+                "type": "module",
+                "args": [
+                    "training.texel.tuning"
+                ],
+                "line": 2,
+                "children": [
+                    {
+                        "marker": "desc",
+                        "type": "description",
+                        "args": [
+                            "Texel tuning: minimize cross-entropy between sigmoid(eval) and game result; tune mg_value/eg_value."
+                        ],
+                        "line": 3,
+                        "children": []
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "sigmoid"
+                        ],
+                        "line": 40,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "P(white wins) = 1 / (1 + exp(-k * x / 400)). x in centipawns from White's view."
+                                ],
+                                "line": 41,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "x",
+                                    "Evaluations in centipawns (White's perspective)."
+                                ],
+                                "line": 42,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "k",
+                                    "Sigmoid scale factor."
+                                ],
+                                "line": 43,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "np.ndarray Probability per position (0..1)."
+                                ],
+                                "line": 44,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "_engine_evals"
+                        ],
+                        "line": 53,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Send one batch (params + FENs) to engine eval-batch; return array of scores (white cp)."
+                                ],
+                                "line": 54,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "pipe_in",
+                                    "Engine stdin (eval-batch protocol)."
+                                ],
+                                "line": 55,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "pipe_out",
+                                    "Engine stdout."
+                                ],
+                                "line": 56,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "fens",
+                                    "List of FEN positions."
+                                ],
+                                "line": 57,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "params",
+                                    "Current mg/eg (and optionally k) for engine."
+                                ],
+                                "line": 58,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "tune_k",
+                                    "Whether params includes k."
+                                ],
+                                "line": 59,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "np.ndarray One score per FEN (White cp)."
+                                ],
+                                "line": 60,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "cross_entropy_loss"
+                        ],
+                        "line": 93,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Negative sum of result*log(p) + (1-result)*log(1-p). Params are mg/eg values (and optionally k). If get_evals is set, use it; else use Python eval_fen."
+                                ],
+                                "line": 94,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "params",
+                                    "Piece values (and optionally k)."
+                                ],
+                                "line": 96,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "fens",
+                                    "List of position FENs."
+                                ],
+                                "line": 97,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "results",
+                                    "Game results (0, 0.5, 1)."
+                                ],
+                                "line": 98,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "tune_k",
+                                    "Whether to use/tune k."
+                                ],
+                                "line": 99,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "get_evals",
+                                    "Optional callable(params) -> evals; if None uses Python eval_fen."
+                                ],
+                                "line": 100,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "float Cross-entropy loss value."
+                                ],
+                                "line": 101,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "add_arguments"
+                        ],
+                        "line": 130,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Registers --data, --output, --iter, --tune-k, --engine, --seed for texel command."
+                                ],
+                                "line": 131,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "parser",
+                                    "ArgumentParser or subparser."
+                                ],
+                                "line": 132,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "None"
+                                ],
+                                "line": 133,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "run"
+                        ],
+                        "line": 144,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Load fen,result CSV; run Texel tuning (L-BFGS-B or coordinate descent); write JSON and print C snippet."
+                                ],
+                                "line": 145,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "args",
+                                    "Parsed namespace from add_arguments."
+                                ],
+                                "line": 146,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "None"
+                                ],
+                                "line": 147,
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "file": "training/train.py",
+            "docs": {
+                "marker": "module",
+                "type": "module",
+                "args": [
+                    "training.train"
+                ],
+                "line": 2,
+                "children": [
+                    {
+                        "marker": "desc",
+                        "type": "description",
+                        "args": [
+                            "Custom NNUE-style trainer. Reads CSV (fen, score_cp); supports mlp (768->256->32->1) and halfkp (HalfKP FT -> 512->32->1). Saves .pt for the convert command."
+                        ],
+                        "line": 3,
+                        "children": []
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "fen_to_board_tensor"
+                        ],
+                        "line": 49,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Convert FEN to a flat board vector of shape (768,). One-hot over 12*64; assumes FEN has at least the piece-placement field. Used only for the mlp architecture."
+                                ],
+                                "line": 50,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "fen",
+                                    "FEN string (at least piece placement)."
+                                ],
+                                "line": 52,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "torch.Tensor Shape (768,) float32 one-hot board vector."
+                                ],
+                                "line": 53,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "load_csv"
+                        ],
+                        "line": 76,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Load CSV with columns fen and score_cp. Returns list of board tensors and list of scores; skips invalid rows. Used when --arch mlp."
+                                ],
+                                "line": 77,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "path",
+                                    "Path to CSV file."
+                                ],
+                                "line": 79,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "tuple[list[torch.Tensor], list[float]] Board tensors and scores."
+                                ],
+                                "line": 80,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "class",
+                        "type": "class",
+                        "args": [
+                            "SmallNet"
+                        ],
+                        "line": 100,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "MLP for mlp architecture: 768 -> 256 -> 32 -> 1. Dense board input; converted .nnue has zero feature transformer."
+                                ],
+                                "line": 101,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "constructor",
+                        "type": "function",
+                        "args": [],
+                        "line": 106,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Builds fc1 (768->256), fc2 (256->32), fc3 (32->1)."
+                                ],
+                                "line": 107,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "forward"
+                        ],
+                        "line": 114,
+                        "children": [
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "x",
+                                    "Board tensor (batch, 768)."
+                                ],
+                                "line": 115,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "Predicted score (batch,)."
+                                ],
+                                "line": 116,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "class",
+                        "type": "class",
+                        "args": [
+                            "HalfKPNet"
+                        ],
+                        "line": 123,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "HalfKP NNUE: sparse indices -> two EmbeddingBags -> 512 -> 32 -> 1. Compatible with .nnue conversion when using --arch halfkp."
+                                ],
+                                "line": 124,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "constructor",
+                        "type": "function",
+                        "args": [],
+                        "line": 134,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Creates ft_white, ft_black EmbeddingBags and fc2, fc3."
+                                ],
+                                "line": 135,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "forward"
+                        ],
+                        "line": 147,
+                        "children": [
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "white_indices",
+                                    "Flattened white-half feature indices (11 per sample)."
+                                ],
+                                "line": 148,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "black_indices",
+                                    "Flattened black-half feature indices."
+                                ],
+                                "line": 149,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "white_offsets",
+                                    "Offsets into white_indices per sample (0, 11, 22, ...)."
+                                ],
+                                "line": 150,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "black_offsets",
+                                    "Offsets into black_indices per sample."
+                                ],
+                                "line": 151,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "Predicted score per sample, shape (batch,)."
+                                ],
+                                "line": 152,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "load_csv_halfkp"
+                        ],
+                        "line": 167,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Load CSV (fen, score_cp); return (white_indices, black_indices) per row and scores."
+                                ],
+                                "line": 168,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "path",
+                                    "Path to CSV file."
+                                ],
+                                "line": 169,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "tuple[list[tuple[list[int], list[int]]], list[float]] List of (white_indices, black_indices) and scores."
+                                ],
+                                "line": 170,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "add_arguments"
+                        ],
+                        "line": 191,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Registers --data, --arch, --epochs, --lr, --batch-size, --output, --val-frac."
+                                ],
+                                "line": 192,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "parser",
+                                    "ArgumentParser or subparser to add flags to."
+                                ],
+                                "line": 193,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "None"
+                                ],
+                                "line": 194,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "method",
+                        "type": "function",
+                        "args": [
+                            "run"
+                        ],
+                        "line": 206,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Train from args: load data, build model, run epochs, save .pt."
+                                ],
+                                "line": 207,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "args",
+                                    "Parsed namespace from add_arguments."
+                                ],
+                                "line": 208,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "None"
+                                ],
+                                "line": 209,
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}
