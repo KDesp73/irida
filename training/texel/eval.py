@@ -150,17 +150,11 @@ PIECE_MAP = {
 }
 
 
-}
-
-
 # @method flip_sq
 # @desc Flip square for black's perspective (a8<->a1 etc.).
 # @param sq Square index 0..63.
 # @returns int Flipped square index.
 def flip_sq(sq: int) -> int:
-    return sq ^ 56
-
-
     return sq ^ 56
 
 
@@ -180,9 +174,6 @@ def build_tables(mg_value: np.ndarray, eg_value: np.ndarray) -> Tuple[np.ndarray
             fsq = flip_sq(sq)
             mg_table[2 * p + 1][sq] = mg_value[p] + MG_PST[p][fsq]
             eg_table[2 * p + 1][sq] = eg_value[p] + EG_PST[p][fsq]
-    return mg_table, eg_table
-
-
     return mg_table, eg_table
 
 
@@ -208,9 +199,6 @@ def fen_to_board(fen: str) -> Tuple[list[list[str]], bool]:
         if r < 8 and f < 8:
             board[r][f] = c
         f += 1
-    return board, white_to_move
-
-
     return board, white_to_move
 
 

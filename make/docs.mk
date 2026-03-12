@@ -1,7 +1,6 @@
-.PHONY: docs 
+.PHONY: docs docs.training docs.engine
 
 docs: docs.training docs.engine ## Generate all docs
-
 
 docs.training: ## Generate documentation for the training module
 	tinydocs-cli \
