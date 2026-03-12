@@ -39,12 +39,13 @@ typedef struct {
 } SearchConfig;
 
 // @struct SearchStats
-// @desc Counters and diagnostics for the last search (nodes, qnodes, TT hits, selDepth).
+// @desc Counters and diagnostics for the last search (nodes, qnodes, TT hits, selDepth, tbhits).
 typedef struct {
     uint64_t nodes;
     uint64_t qnodes;
     uint64_t ttHits;
     uint64_t rootChildTtHits;  /* diagnostic: TT hits at ply 1 (root children) */
+    uint64_t tbHits;           /* Syzygy tablebase probe hits */
     int selDepth;
 } SearchStats;
 

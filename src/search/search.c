@@ -44,6 +44,7 @@ Move search_root(Board* board,
     g_searchStats.qnodes = 0;
     g_searchStats.selDepth = 0;
     g_searchStats.rootChildTtHits = 0;
+    g_searchStats.tbHits = 0;
 
     tt_clear();
     tt_inc_generation();  /* only use TT entries from this search */
@@ -179,19 +180,51 @@ Move search_root(Board* board,
     uint64_t nodes  = g_searchStats.nodes + g_searchStats.qnodes;
     uint64_t nps    = (timeMs > 0) ? (nodes * 1000ULL / timeMs) : 0;
 
-    char move[12];
-    castro_MoveToString(bestMove, move);
+    /* Build PV string by walking the TT from root (make/unmake on board) */
+    char pvBuf[1024];
+    size_t pvLen = 0;
+    Move pvMove = localBestMove;
+    int pvDepth = depth;
+    Move pvMoves[MAX_PLY];
+    int pvCount = 0;
+    while (pvDepth > 0 && pvLen < sizeof(pvBuf) - 8 && pvCount < MAX_PLY) {
+        char moveStr[12];
+        castro_MoveToString(pvMove, moveStr);
+        size_t len = strlen(moveStr);
+        if (pvLen + len + 2 > sizeof(pvBuf)) break;
+        if (pvLen) pvBuf[pvLen++] = ' ';
+        memcpy(pvBuf + pvLen, moveStr, len + 1);
+        pvLen += len;
+        if (!castro_MakeMove(board, pvMove)) break;
+        pvMoves[pvCount++] = pvMove;
+        pvDepth--;
+        if (!g_searchConfig.useTT || !tt_probe_pv(castro_CalculateZobristHash(board), &pvMove))
+            break;
+    }
+    while (pvCount > 0)
+        castro_UnmakeMove(board), pvCount--;
+    pvBuf[pvLen] = '\0';
+
+    /* Score: mate N or cp X */
+    const int mateThreshold = MATE_SCORE - MAX_PLY;
+    int hashfull = tt_hashfull();
 
     uci_stdout_lock();
-    printf("info depth %d seldepth %d score cp %d nodes %llu nps %llu time %llu pv %s\n",
-           depth,
-           g_searchStats.selDepth,
-           bestScore,
-           (unsigned long long)nodes,
-           (unsigned long long)nps,
-           (unsigned long long)timeMs,
-           move
-        );
+    if (bestScore > mateThreshold)
+        printf("info depth %d seldepth %d multipv 1 score mate %d nodes %llu nps %llu hashfull %d tbhits %llu time %llu pv %s\n",
+               depth, g_searchStats.selDepth, (MATE_SCORE - bestScore + 1) / 2,
+               (unsigned long long)nodes, (unsigned long long)nps, hashfull, (unsigned long long)g_searchStats.tbHits,
+               (unsigned long long)timeMs, pvBuf);
+    else if (bestScore < -mateThreshold)
+        printf("info depth %d seldepth %d multipv 1 score mate %d nodes %llu nps %llu hashfull %d tbhits %llu time %llu pv %s\n",
+               depth, g_searchStats.selDepth, -((MATE_SCORE + bestScore + 1) / 2),
+               (unsigned long long)nodes, (unsigned long long)nps, hashfull, (unsigned long long)g_searchStats.tbHits,
+               (unsigned long long)timeMs, pvBuf);
+    else
+        printf("info depth %d seldepth %d multipv 1 score cp %d nodes %llu nps %llu hashfull %d tbhits %llu time %llu pv %s\n",
+               depth, g_searchStats.selDepth, bestScore,
+               (unsigned long long)nodes, (unsigned long long)nps, hashfull, (unsigned long long)g_searchStats.tbHits,
+               (unsigned long long)timeMs, pvBuf);
     fflush(stdout);
     uci_stdout_unlock();
     }
@@ -249,8 +282,10 @@ int search(Board* board,
         && depth <= g_searchConfig.syzygyProbeDepth
         && syzygy_piece_count(board) <= (unsigned)g_searchConfig.syzygyProbeLimit) {
         int tb_score = syzygy_probe_wdl(board, g_searchConfig.syzygy50MoveRule);
-        if (tb_score != SYZYGY_PROBE_FAILED)
+        if (tb_score != SYZYGY_PROBE_FAILED) {
+            g_searchStats.tbHits++;
             return tb_score;
+        }
     }
 
     Moves moves = castro_GenerateMoves(board, MOVE_LEGAL);

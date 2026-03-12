@@ -117,6 +117,23 @@ bool tt_probe(uint64_t key,
     return false;
 }
 
+bool tt_probe_pv(uint64_t key, Move* outMove)
+{
+    if (!ttTable)
+        return false;
+
+    TTEntry* entry = &ttTable[tt_index(key)];
+
+    if (entry->key != key)
+        return false;
+
+    if (entry->generation != g_tt_generation)
+        return false;
+
+    *outMove = entry->bestMove;
+    return true;
+}
+
 static int tt_adjust_score(int score, int ply)
 {
     if (score > MATE_THRESHOLD)
@@ -153,4 +170,19 @@ void tt_store(uint64_t key,
         entry->bestMove = bestMove;
         entry->generation = g_tt_generation;
     }
+}
+
+int tt_hashfull(void)
+{
+    if (!ttTable || ttSize == 0)
+        return 0;
+    /* Sample up to 1000 entries to estimate fill (permill 0-1000) */
+    size_t step = (ttSize / 1000) ? (ttSize / 1000) : 1;
+    size_t count = 0;
+    size_t samples = 0;
+    for (size_t i = 0; i < ttSize && samples < 1000; i += step, samples++) {
+        if (ttTable[i].key != 0 && ttTable[i].generation == g_tt_generation)
+            count++;
+    }
+    return samples ? (int)(count * 1000 / samples) : 0;
 }

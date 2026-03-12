@@ -54,6 +54,11 @@ bool tt_probe(uint64_t key,
               int* outScore,
               Move* outMove);
 
+// @function tt_probe_pv
+// @desc For PV construction: return stored best move if key and generation match (ignore depth).
+// @returns bool True if entry exists and *outMove was set.
+bool tt_probe_pv(uint64_t key, Move* outMove);
+
 // @function tt_store
 // @param key Position key.
 // @param depth Depth of score.
@@ -68,5 +73,8 @@ void tt_store(uint64_t key,
               Move bestMove,
               int ply);
 
+// @function tt_hashfull
+// @desc Approximate TT fill for current search generation (permill 0-1000).
+int tt_hashfull(void);
 
 #endif // TT_H
