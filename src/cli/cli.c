@@ -12,6 +12,7 @@ Command parse_command(const char* str)
     else if(!strcmp("eval-batch", str)) return COMMAND_EVAL_BATCH;
     else if(!strcmp("eval-breakdown-batch", str)) return COMMAND_EVAL_BREAKDOWN_BATCH;
     else if(!strcmp("search", str)) return COMMAND_SEARCH;
+    else if(!strcmp("customize", str)) return COMMAND_CUSTOMIZE;
 
     return COMMAND_NONE;
 }

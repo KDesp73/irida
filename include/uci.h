@@ -124,7 +124,11 @@ bool GetUciOption(const UciState* state, char* name, UciOption* opt);
 #define COMMAND_UCI        "uci"
 #define COMMAND_UCINEWGAME "ucinewgame"
 
-int UciMain();
+int UciMain(void);
+
+/** Run the UCI command loop only (state and config must already be initialized). */
+int UciMainLoop(void);
+
 bool HandleCommand(UciState* state, const char *command);
 
 void uci_debug(UciState* state, const char* command);

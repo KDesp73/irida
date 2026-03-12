@@ -8,13 +8,14 @@
 // @desc CLI (non-UCI): command parsing, context, handlers, perft/eval/search entry points.
 
 // @enum Command
-// @desc CLI command: PERFT, EVAL, EVAL_BATCH, EVAL_BREAKDOWN_BATCH, SEARCH, NONE.
+// @desc CLI command: PERFT, EVAL, EVAL_BATCH, EVAL_BREAKDOWN_BATCH, SEARCH, CUSTOMIZE, NONE.
 typedef enum {
     COMMAND_PERFT,
     COMMAND_EVAL,
     COMMAND_EVAL_BATCH,
     COMMAND_EVAL_BREAKDOWN_BATCH,
     COMMAND_SEARCH,
+    COMMAND_CUSTOMIZE,
     COMMAND_NONE,
 } Command;
 
@@ -28,7 +29,7 @@ typedef enum {
 Command parse_command(const char* str);
 
 // @enum CliArgs
-// @desc Short option characters for getopt (h, v, F, d, E, S, N).
+// @desc Short option characters for getopt (h, v, F, d, E, S, N) and long-only customize options (128+).
 typedef enum {
    ARG_HELP = 'h',
    ARG_VERSION = 'v',
@@ -36,7 +37,18 @@ typedef enum {
    ARG_DEPTH = 'd',
    ARG_EVAL = 'E',
    ARG_SEARCH = 'S',
-   ARG_NNUE_PATH = 'N'
+   ARG_NNUE_PATH = 'N',
+   ARG_HASH = 128,
+   ARG_SYZYGY_PATH,
+   ARG_SYZYGY_PROBE_DEPTH,
+   ARG_SYZYGY_PROBE_LIMIT,
+   ARG_SYZYGY_50_RULE,
+   ARG_NULL_MOVE,
+   ARG_LMR,
+   ARG_ASPIRATION,
+   ARG_TT,
+   ARG_QUIESCENCE,
+   ARG_EVALFILE,
 } CliArgs;
 
 // @struct Context
@@ -115,6 +127,11 @@ bool eval_breakdown_batch_handler(Context context);
 // @param context CLI context.
 // @returns bool Success.
 bool search_handler(Context context);
+
+// @function customize_handler
+// @param context CLI context (eval, nnue_path and customize options set).
+// @returns bool Success; on success does not return until UCI exits.
+bool customize_handler(Context context);
 
 // @function help
 // @param command Command to show help for (or COMMAND_NONE for general).

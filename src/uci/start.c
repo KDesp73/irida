@@ -1,13 +1,11 @@
 #include "uci.h"
 #include "version.h"
 #include <stdio.h>
+#include <string.h>
 
-int UciMain()
+int UciMainLoop(void)
 {
     char input[1024];
-
-    InitState(&uci_state);
-    LoadUciConfig(&uci_state);
 
     uci_stdout_lock();
     printf("%s v%s by %s\n", engine.name, VERSION_STRING, engine.author);
@@ -31,4 +29,11 @@ int UciMain()
 
     uci_search_thread_join();
     return 0;
+}
+
+int UciMain(void)
+{
+    InitState(&uci_state);
+    LoadUciConfig(&uci_state);
+    return UciMainLoop();
 }
