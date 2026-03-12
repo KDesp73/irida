@@ -324,8 +324,8 @@ bool castro_MakeMove(Board* board, Move move)
     board->turn = !board->turn;
     board->hash ^= ep_hash(board);
 
-    if (board->turn == COLOR_BLACK)
-        board->hash ^= Random64[780];
+    /* Toggle side-to-move bit (we always flip turn, so always xor 780) */
+    board->hash ^= Random64[780];
 
     castro_UpdateHashTable(&board->history.positions, board->hash);
 
