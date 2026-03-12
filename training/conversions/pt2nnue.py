@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# @module conversions.pt2nnue
+# @desc Convert .pt (from train) to legacy .nnue binary for this engine's nnue-probe.
 """
 Convert a .pt model (from train.py) to the legacy .nnue binary format
 expected by this repo's nnue-probe (halfkp_256x2-32-32, 21022697 bytes).
@@ -47,22 +49,49 @@ FT_OUTPUT_PER_HALF = 256
 FT_IN_DIMS = HALFKP_FEATURES_PER_HALF
 
 
+FT_IN_DIMS = HALFKP_FEATURES_PER_HALF
+
+
+# @method write_uint32_le
+# @desc Write a 32-bit unsigned integer in little-endian to the binary file.
+# @param f Binary file handle open for writing.
+# @param value Value to write (32-bit).
+# @returns None
 def write_uint32_le(f: object, value: int) -> None:
     f.write(struct.pack("<I", value & 0xFFFFFFFF))
 
 
+# @method write_int16_le
+# @desc Write a 16-bit signed integer in little-endian, clamped to int16 range.
+# @param f Binary file handle.
+# @param value Value to write.
+# @returns None
 def write_int16_le(f: object, value: int) -> None:
     f.write(struct.pack("<h", max(-32768, min(32767, value))))
 
 
+# @method write_int8_le
+# @desc Write an 8-bit signed integer, clamped to [-128, 127].
+# @param f Binary file handle.
+# @param value Value to write.
+# @returns None
 def write_int8_le(f: object, value: int) -> None:
     f.write(struct.pack("<b", max(-128, min(127, value))))
 
 
+# @method write_int32_le
+# @desc Write a 32-bit signed integer in little-endian.
+# @param f Binary file handle.
+# @param value Value to write.
+# @returns None
 def write_int32_le(f: object, value: int) -> None:
     f.write(struct.pack("<i", value & 0xFFFFFFFF))
 
 
+# @method _inv_permute_biases
+# @desc Inverse of nnue-probe permute_biases so that after load the engine sees our order.
+# @param b Bias array length multiple of 8.
+# @returns np.ndarray Reordered array (same shape).
 def _inv_permute_biases(b: np.ndarray) -> np.ndarray:
     """Inverse of nnue-probe permute_biases so that after load they match our order."""
     out = np.empty_like(b)
@@ -82,11 +111,20 @@ def _inv_permute_biases(b: np.ndarray) -> np.ndarray:
     return out
 
 
+# @method quantize_scale
+# @desc Scale a float weight to int16 using 2^scale_bits (e.g. 6 for Stockfish).
+# @param w Float weight.
+# @param scale_bits Scale factor exponent (default 6).
+# @returns int Rounded integer weight.
 def quantize_scale(w: float, scale_bits: int = 6) -> int:
     """Scale float weight to int16 (Stockfish uses WeightScaleBits=6)."""
     return int(round(w * (1 << scale_bits)))
 
 
+# @method load_pt
+# @desc Load .pt file; return (state_dict, arch). arch is 'small_mlp' or 'halfkp'.
+# @param path Path to .pt file.
+# @returns tuple[dict,str] (state_dict, arch).
 def load_pt(path: str) -> tuple[dict, str]:
     """Load .pt; return (state_dict, arch). arch is 'small_mlp' or 'halfkp'."""
     data = torch.load(path, map_location="cpu", weights_only=False)
@@ -109,6 +147,10 @@ def load_pt(path: str) -> tuple[dict, str]:
     return sd, "small_mlp"
 
 
+# @method add_arguments
+# @desc Registers input, output, and --description for the convert command.
+# @param parser ArgumentParser or subparser.
+# @returns None
 def add_arguments(parser: argparse.ArgumentParser) -> None:
     """Add convert (.pt -> .nnue) arguments to a parser or subparser."""
     parser.add_argument("input", help="Input .pt file")
@@ -120,6 +162,19 @@ def add_arguments(parser: argparse.ArgumentParser) -> None:
     )
 
 
+# @method _write_legacy_nnue
+# @desc Write the legacy nnue-probe binary: header, transformer block, network block
+# (with identity 32->32 and inverse bias permutation), and padding to LEGACY_FILE_SIZE.
+# @param f Binary file handle open for writing.
+# @param ft_biases int16 array length 256.
+# @param ft_weights int16 array shape (41024, 256).
+# @param fc2_w fc2 weight matrix (32, 512).
+# @param fc2_b fc2 bias (32,).
+# @param fc3_w fc3 weight (1, 32).
+# @param fc3_b fc3 bias scalar.
+# @param description String stored in .nnue header (padded/truncated to 177 bytes).
+# @param scale_bits Quantization scale (default 6).
+# @returns None
 def _write_legacy_nnue(
     f: object,
     ft_biases: np.ndarray,
@@ -198,6 +253,13 @@ def _write_legacy_nnue(
     f.write(b"\x00" * (LEGACY_FILE_SIZE - written))
 
 
+    f.write(b"\x00" * (LEGACY_FILE_SIZE - written))
+
+
+# @method run
+# @desc Convert .pt to .nnue from parsed args: load state_dict, write legacy format.
+# @param args Parsed namespace from add_arguments.
+# @returns None
 def run(args: argparse.Namespace) -> None:
     """Convert .pt to .nnue from parsed arguments (from add_arguments)."""
     sd, arch = load_pt(args.input)

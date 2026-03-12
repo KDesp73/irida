@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# @module texel.tuning
+# @desc Texel tuning: minimize cross-entropy between sigmoid(eval) and game result; tune mg_value/eg_value.
 """
 Texel tuning: minimize cross-entropy between sigmoid(eval) and game result.
 
@@ -35,11 +37,27 @@ DEFAULT_MG = np.array([82, 337, 365, 477, 1025, 0], dtype=np.float64)
 DEFAULT_EG = np.array([94, 281, 297, 512, 936, 0], dtype=np.float64)
 
 
+# @method sigmoid
+# @desc P(white wins) = 1 / (1 + exp(-k * x / 400)). x in centipawns from White's view.
+# @param x Evaluations in centipawns (White's perspective).
+# @param k Sigmoid scale factor.
+# @returns np.ndarray Probability per position (0..1).
 def sigmoid(x: np.ndarray, k: float) -> np.ndarray:
     """P(white wins) = 1 / (1 + exp(-k * x / 400)). x in centipawns."""
     return 1.0 / (1.0 + np.exp(-k * x / 400.0))
 
 
+    return 1.0 / (1.0 + np.exp(-k * x / 400.0))
+
+
+# @method _engine_evals
+# @desc Send one batch (params + FENs) to engine eval-batch; return array of scores (white cp).
+# @param pipe_in Engine stdin (eval-batch protocol).
+# @param pipe_out Engine stdout.
+# @param fens List of FEN positions.
+# @param params Current mg/eg (and optionally k) for engine.
+# @param tune_k Whether params includes k.
+# @returns np.ndarray One score per FEN (White cp).
 def _engine_evals(
     pipe_in,
     pipe_out,
@@ -69,6 +87,18 @@ def _engine_evals(
     return np.array(scores, dtype=np.float64)
 
 
+    return np.array(scores, dtype=np.float64)
+
+
+# @method cross_entropy_loss
+# @desc Negative sum of result*log(p) + (1-result)*log(1-p). Params are mg/eg values (and
+# optionally k). If get_evals is set, use it; else use Python eval_fen.
+# @param params Piece values (and optionally k).
+# @param fens List of position FENs.
+# @param results Game results (0, 0.5, 1).
+# @param tune_k Whether to use/tune k.
+# @param get_evals Optional callable(params) -> evals; if None uses Python eval_fen.
+# @returns float Cross-entropy loss value.
 def cross_entropy_loss(
     params: np.ndarray,
     fens: list[str],
@@ -94,6 +124,13 @@ def cross_entropy_loss(
     return float(-np.sum(results * np.log(p) + (1 - results) * np.log(1 - p)))
 
 
+    return float(-np.sum(results * np.log(p) + (1 - results) * np.log(1 - p)))
+
+
+# @method add_arguments
+# @desc Registers --data, --output, --iter, --tune-k, --engine, --seed for texel command.
+# @param parser ArgumentParser or subparser.
+# @returns None
 def add_arguments(parser: argparse.ArgumentParser) -> None:
     """Add texel tuning arguments to a parser or subparser."""
     parser.add_argument("--data", "-d", required=True, help="CSV file: fen,result (result 0, 0.5, or 1)")
@@ -104,6 +141,10 @@ def add_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
 
 
+# @method run
+# @desc Load fen,result CSV; run Texel tuning (L-BFGS-B or coordinate descent); write JSON and print C snippet.
+# @param args Parsed namespace from add_arguments.
+# @returns None
 def run(args: argparse.Namespace) -> None:
     """Run Texel tuning from parsed arguments (from add_arguments)."""
     np.random.seed(args.seed)

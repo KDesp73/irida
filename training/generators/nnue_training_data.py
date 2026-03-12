@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# @module generators.nnue_training_data
+# @desc Generate FEN,score_cp CSV by running the engine in UCI (go depth N) per position.
 """
 Generate NNUE training data from this engine via UCI.
 
@@ -18,6 +20,16 @@ import sys
 import re
 
 
+import re
+
+
+# @method run_engine_score
+# @desc Run engine in UCI: position fen, go depth N; parse last info score cp/mate.
+# Returns centipawn score (or large value for mate) or None on failure.
+# @param engine_path Path to engine executable.
+# @param fen Position FEN.
+# @param depth Search depth.
+# @returns int|None Centipawn score or None.
 def run_engine_score(engine_path: str, fen: str, depth: int) -> int | None:
     """Send position and go depth to engine; return centipawn score or None on failure."""
     proc = subprocess.Popen(
@@ -55,6 +67,13 @@ def run_engine_score(engine_path: str, fen: str, depth: int) -> int | None:
     return last_cp
 
 
+    return last_cp
+
+
+# @method add_arguments
+# @desc Registers --engine, --depth, --fen-file, --output for the data command.
+# @param parser ArgumentParser or subparser.
+# @returns None
 def add_arguments(parser: argparse.ArgumentParser) -> None:
     """Add data-generation arguments to a parser or subparser."""
     parser.add_argument("--engine", required=True, help="Path to engine executable (UCI)")
@@ -63,6 +82,10 @@ def add_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--output", "-o", default="-", help="Output CSV file (default: stdout)")
 
 
+# @method run
+# @desc Generate FEN,score_cp CSV: read FENs, run engine per position, write CSV.
+# @param args Parsed namespace from add_arguments.
+# @returns None
 def run(args: argparse.Namespace) -> None:
     """Generate FEN,score CSV from parsed arguments (from add_arguments)."""
     fen_source = open(args.fen_file) if args.fen_file else sys.stdin

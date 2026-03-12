@@ -6,6 +6,7 @@ include make/dist.mk
 include make/build.mk
 include make/test.mk
 include make/training.mk
+include make/docs.mk
 
 .PHONY: help
 help: ## Show this help message

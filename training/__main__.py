@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# @module __main__
+# @desc Unified CLI for training and tuning. Dispatches to train, texel, texel-weights, data, convert, pgn2texel.
 """
 Unified CLI for training and tuning.
 

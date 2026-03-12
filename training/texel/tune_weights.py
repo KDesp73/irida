@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# @module texel.tune_weights
+# @desc Tune PeSTO term weights (8 scale factors) from engine eval-breakdown-batch.
 """
 Tune PeSTO term weights from eval breakdown.
 
@@ -32,11 +34,24 @@ TERM_NAMES = [
 ]
 
 
+# @method sigmoid
+# @desc P(white wins) = 1 / (1 + exp(-k * x / 400)). x in centipawns.
+# @param x Combined eval (e.g. breakdown @ weights).
+# @param k Sigmoid scale (default 1).
+# @returns np.ndarray Probability per position.
 def sigmoid(x: np.ndarray, k: float = 1.0) -> np.ndarray:
     """P(white wins) = 1 / (1 + exp(-k * x / 400)). x in centipawns."""
     return 1.0 / (1.0 + np.exp(-k * x / 400.0))
 
 
+    return 1.0 / (1.0 + np.exp(-k * x / 400.0))
+
+
+# @method load_breakdown
+# @desc Run engine eval-breakdown-batch; return (N, 8) array of term values per position.
+# @param engine_path Path to engine executable.
+# @param fens List of FEN positions.
+# @returns np.ndarray Shape (N, 8) term values (White perspective).
 def load_breakdown(engine_path: str, fens: list[str]) -> np.ndarray:
     """Run engine eval-breakdown-batch; return (N, 8) array of term values (white perspective)."""
     proc = subprocess.Popen(
@@ -62,6 +77,13 @@ def load_breakdown(engine_path: str, fens: list[str]) -> np.ndarray:
     return np.array(rows, dtype=np.float64)
 
 
+    return np.array(rows, dtype=np.float64)
+
+
+# @method add_arguments
+# @desc Registers --data, --engine, --output, --iter, --tune-k, --seed.
+# @param parser ArgumentParser or subparser.
+# @returns None
 def add_arguments(parser: argparse.ArgumentParser) -> None:
     """Add texel-weights arguments to a parser or subparser."""
     parser.add_argument("--data", "-d", required=True, help="CSV file: fen,result (result 0, 0.5, or 1)")
@@ -72,6 +94,10 @@ def add_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
 
 
+# @method run
+# @desc Load fen,result; get breakdown from engine; minimize cross-entropy over 8 weights; write JSON.
+# @param args Parsed namespace from add_arguments.
+# @returns None
 def run(args: argparse.Namespace) -> None:
     """Tune term weights from parsed arguments (from add_arguments)."""
     np.random.seed(args.seed)

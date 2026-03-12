@@ -8,6 +8,9 @@ Eval is returned from White's perspective (positive = good for White).
 
 from __future__ import annotations
 
+# @module texel.eval
+# @desc PeSTO material + PST with game-phase interpolation; matches src/eval/pesto.c.
+
 import numpy as np
 from typing import Tuple
 
@@ -147,10 +150,25 @@ PIECE_MAP = {
 }
 
 
+}
+
+
+# @method flip_sq
+# @desc Flip square for black's perspective (a8<->a1 etc.).
+# @param sq Square index 0..63.
+# @returns int Flipped square index.
 def flip_sq(sq: int) -> int:
     return sq ^ 56
 
 
+    return sq ^ 56
+
+
+# @method build_tables
+# @desc Build mg_table[12][64] and eg_table[12][64] from piece values and PSTs (like pesto_init).
+# @param mg_value Length-6 midgame piece values.
+# @param eg_value Length-6 endgame piece values.
+# @returns Tuple[np.ndarray,np.ndarray] (mg_table, eg_table).
 def build_tables(mg_value: np.ndarray, eg_value: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """Build mg_table[12][64] and eg_table[12][64] like pesto_init."""
     mg_table = np.zeros((12, 64), dtype=np.int32)
@@ -165,6 +183,13 @@ def build_tables(mg_value: np.ndarray, eg_value: np.ndarray) -> Tuple[np.ndarray
     return mg_table, eg_table
 
 
+    return mg_table, eg_table
+
+
+# @method fen_to_board
+# @desc Parse FEN; return (board 8x8 of piece chars or '.', white_to_move).
+# @param fen FEN string.
+# @returns Tuple[list[list[str]],bool] (board, white_to_move).
 def fen_to_board(fen: str) -> Tuple[list[list[str]], bool]:
     """Parse FEN; return (board 8x8, white_to_move). Board[r][f] = piece char or '.'."""
     parts = fen.split()
@@ -186,6 +211,16 @@ def fen_to_board(fen: str) -> Tuple[list[list[str]], bool]:
     return board, white_to_move
 
 
+    return board, white_to_move
+
+
+# @method eval_fen
+# @desc Eval position from White's perspective (positive = good for White). Material + PST
+# with game-phase interpolation; matches src/eval/pesto.c structure.
+# @param fen FEN position.
+# @param mg_value Length-6 midgame piece values.
+# @param eg_value Length-6 endgame piece values.
+# @returns float Eval in centipawns (White perspective).
 def eval_fen(fen: str, mg_value: np.ndarray, eg_value: np.ndarray) -> float:
     """
     Eval position from White's perspective (positive = good for White).

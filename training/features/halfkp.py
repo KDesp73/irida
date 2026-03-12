@@ -8,6 +8,9 @@ features per half. Index = king_sq * 641 + (piece_sq * 10 + piece_type). Piece t
 
 from __future__ import annotations
 
+# @module features.halfkp
+# @desc HalfKP feature indices: 41024 per half (64*641). Index = king_sq*641 + piece_sq*10 + piece_type.
+
 # 64 * (64*10 + 1) = 41024 per half
 HALFKP_FEATURES_PER_HALF = 64 * 641  # 41024
 HALFKP_STRIDE = 641  # 64*10 + 1 (BONA_PIECE_ZERO at 640)
@@ -20,6 +23,10 @@ _FEN_TO_PT = {
 }
 
 
+# @method _fen_to_board
+# @desc Parse FEN piece placement into list of (square, piece_type). Square 0-63, a8=0.
+# @param fen FEN string (at least piece placement).
+# @returns list[tuple[int,int]] List of (square, piece_type) for each non-king piece.
 def _fen_to_board(fen: str) -> list[tuple[int, int]]:
     """Parse FEN piece placement (first field) into (square, piece_type). Square 0-63, a8=0."""
     parts = fen.split()
@@ -44,6 +51,10 @@ def _fen_to_board(fen: str) -> list[tuple[int, int]]:
     return board
 
 
+# @method _find_kings
+# @desc Return (white_king_sq, black_king_sq) in 0..63 from FEN.
+# @param fen FEN string with both kings.
+# @returns tuple[int,int] (white_king_square, black_king_square).
 def _find_kings(fen: str) -> tuple[int, int]:
     """Return (white_king_sq, black_king_sq). Squares 0-63."""
     parts = fen.split()
@@ -68,6 +79,11 @@ def _find_kings(fen: str) -> tuple[int, int]:
     return (wk, bk)
 
 
+# @method halfkp_indices_from_fen
+# @desc Compute HalfKP feature indices for a position. Returns (white_half_indices,
+# black_half_indices), each list of 11 indices (bias + 10 non-king pieces) in [0, 41023].
+# @param fen FEN string with both kings.
+# @returns tuple[list[int],list[int]] (white_half_indices, black_half_indices).
 def halfkp_indices_from_fen(fen: str) -> tuple[list[int], list[int]]:
     """
     Compute HalfKP feature indices for a position.
@@ -89,11 +105,17 @@ def halfkp_indices_from_fen(fen: str) -> tuple[list[int], list[int]]:
     return (half_indices(wk_sq), half_indices(bk_sq))
 
 
+# @method halfkp_num_features
+# @desc Total HalfKP input features (both halves): 82048.
+# @returns int 2 * FEATURES_PER_HALF.
 def halfkp_num_features() -> int:
     """Total number of HalfKP input features (both halves)."""
     return 2 * HALFKP_FEATURES_PER_HALF  # 82048
 
 
+# @class HalfKP
+# @desc Holds constants for the HalfKP feature set: FEATURES_PER_HALF (41024),
+# STRIDE (641), TOTAL_FEATURES (82048).
 class HalfKP:
     """Constants for HalfKP feature set."""
     FEATURES_PER_HALF = HALFKP_FEATURES_PER_HALF

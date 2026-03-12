@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# @module train
+# @desc Custom NNUE-style trainer. Reads CSV (fen, score_cp); supports mlp (768->256->32->1)
+# and halfkp (HalfKP FT -> 512->32->1). Saves .pt for the convert command.
 """
 Custom NNUE-style trainer without nnue-pytorch.
 
@@ -43,6 +46,11 @@ FT_OUTPUT_PER_HALF = 256
 FT_OUTPUT_DIM = FT_OUTPUT_PER_HALF * 2  # 512
 
 
+# @method fen_to_board_tensor
+# @desc Convert FEN to a flat board vector of shape (768,). One-hot over 12*64;
+# assumes FEN has at least the piece-placement field. Used only for the mlp architecture.
+# @param fen FEN string (at least piece placement).
+# @returns torch.Tensor Shape (768,) float32 one-hot board vector.
 def fen_to_board_tensor(fen: str) -> torch.Tensor:
     """Convert FEN to a flat board vector (12*64). Assumes FEN has 6 fields."""
     parts = fen.split()
@@ -65,6 +73,11 @@ def fen_to_board_tensor(fen: str) -> torch.Tensor:
     return torch.tensor(board, dtype=torch.float32)
 
 
+# @method load_csv
+# @desc Load CSV with columns fen and score_cp. Returns list of board tensors and
+# list of scores; skips invalid rows. Used when --arch mlp.
+# @param path Path to CSV file.
+# @returns tuple[list[torch.Tensor],list[float]] Board tensors and scores.
 def load_csv(path: str) -> tuple[list[torch.Tensor], list[float]]:
     """Load (fen, score_cp) CSV; return list of board tensors and list of scores."""
     xs, ys = [], []
@@ -84,21 +97,32 @@ def load_csv(path: str) -> tuple[list[torch.Tensor], list[float]]:
     return xs, ys
 
 
+# @class SmallNet
+# @desc MLP for mlp architecture: 768 -> 256 -> 32 -> 1. Dense board input;
+# converted .nnue has zero feature transformer.
 class SmallNet(nn.Module):
     """Small MLP: BOARD_DIM -> HIDDEN -> 32 -> 1. Matches typical NNUE hidden sizes."""
 
+    # @constructor SmallNet
+    # @desc Builds fc1 (768->256), fc2 (256->32), fc3 (32->1).
     def __init__(self) -> None:
         super().__init__()
         self.fc1 = nn.Linear(BOARD_DIM, HIDDEN)
         self.fc2 = nn.Linear(HIDDEN, 32)
         self.fc3 = nn.Linear(32, OUTPUT)
 
+    # @method forward
+    # @param x Board tensor (batch, 768).
+    # @returns Predicted score (batch,).
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = torch.relu(self.fc1(x))
         x = torch.relu(self.fc2(x))
         return self.fc3(x).squeeze(-1)
 
 
+# @class HalfKPNet
+# @desc HalfKP NNUE: sparse indices -> two EmbeddingBags -> 512 -> 32 -> 1.
+# Compatible with .nnue conversion when using --arch halfkp.
 class HalfKPNet(nn.Module):
     """
     HalfKP NNUE: sparse feature indices -> feature transformer (512) -> 32 -> 1.
@@ -107,6 +131,8 @@ class HalfKPNet(nn.Module):
     we use two EmbeddingBags (one per half) so each half sums 11 rows to (256,). Concat -> 512.
     """
 
+    # @constructor HalfKPNet
+    # @desc Creates ft_white, ft_black EmbeddingBags and fc2, fc3.
     def __init__(self) -> None:
         super().__init__()
         self.ft_white = nn.EmbeddingBag(
@@ -118,6 +144,12 @@ class HalfKPNet(nn.Module):
         self.fc2 = nn.Linear(FT_OUTPUT_DIM, 32)
         self.fc3 = nn.Linear(32, OUTPUT)
 
+    # @method forward
+    # @param white_indices Flattened white-half feature indices (11 per sample).
+    # @param black_indices Flattened black-half feature indices.
+    # @param white_offsets Offsets into white_indices per sample (0, 11, 22, ...).
+    # @param black_offsets Offsets into black_indices per sample.
+    # @returns Predicted score per sample, shape (batch,).
     def forward(
         self,
         white_indices: torch.Tensor,
@@ -132,6 +164,10 @@ class HalfKPNet(nn.Module):
         return self.fc3(x).squeeze(-1)
 
 
+# @method load_csv_halfkp
+# @desc Load CSV (fen, score_cp); return (white_indices, black_indices) per row and scores.
+# @param path Path to CSV file.
+# @returns tuple[list[tuple[list[int],list[int]]],list[float]] List of (white_indices, black_indices) and scores.
 def load_csv_halfkp(path: str) -> tuple[list[tuple[list[int], list[int]]], list[float]]:
     """Load (fen, score_cp) CSV; return list of (white_indices, black_indices) and list of scores."""
     samples, ys = [], []
@@ -152,6 +188,10 @@ def load_csv_halfkp(path: str) -> tuple[list[tuple[list[int], list[int]]], list[
     return samples, ys
 
 
+# @method add_arguments
+# @desc Registers --data, --arch, --epochs, --lr, --batch-size, --output, --val-frac.
+# @param parser ArgumentParser or subparser to add flags to.
+# @returns None
 def add_arguments(parser: argparse.ArgumentParser) -> None:
     """Add train subcommand arguments to a parser or subparser."""
     parser.add_argument("--data", "-d", required=True, help="CSV file (fen, score_cp) from data command")
@@ -163,6 +203,10 @@ def add_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--val-frac", type=float, default=0.1, help="Fraction of data for validation (default: 0.1)")
 
 
+# @method run
+# @desc Train from args: load data, build model, run epochs, save .pt.
+# @param args Parsed namespace from add_arguments.
+# @returns None
 def run(args: argparse.Namespace) -> None:
     """Train from parsed arguments (from add_arguments)."""
     if args.arch == "mlp":

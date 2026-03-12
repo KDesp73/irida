@@ -1,0 +1,59 @@
+{
+    "prefix": "@",
+    "markers": [
+        {
+            "name": "module",
+            "type": "module",
+            "arg": "required",
+            "argc": 1
+        },
+        {
+            "name": "class",
+            "type": "class",
+            "arg": "required",
+            "argc": 1
+        },
+        {
+            "name": "enum",
+            "type": "class",
+            "arg": "required",
+            "argc": 1
+        },
+        {
+            "name": "method",
+            "type": "function",
+            "arg": "required",
+            "argc": 1
+        },
+        {
+            "name": "desc",
+            "type": "description",
+            "arg": "required",
+            "argc": 1
+        },
+        {
+            "name": "param",
+            "type": "parameter",
+            "arg": "required",
+            "argc": 2
+        },
+        {
+            "name": "constructor",
+            "type": "function",
+            "arg": "none",
+            "argc": 1
+        },
+        {
+            "name": "returns",
+            "type": "return",
+            "arg": "required",
+            "argc": 2
+        },
+        {
+            "name": "example",
+            "type": "example",
+            "arg": "required",
+            "argc": 1
+        }
+    ]
+}

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# @module conversions.pgn2texel
+# @desc Extract fen,result CSV from PGN (one position per game at a fixed ply).
 """
 Build a Texel tuning dataset from PGN: one FEN per game with the game result.
 
@@ -20,6 +22,13 @@ except ImportError:
     sys.exit(1)
 
 
+    sys.exit(1)
+
+
+# @method result_to_white_score
+# @desc Map PGN Result header (1-0, 0-1, 1/2-1/2, etc.) to float 1.0, 0.0, 0.5 or None.
+# @param result PGN Result header string.
+# @returns float|None 1.0, 0.0, 0.5 or None if unrecognized.
 def result_to_white_score(result: str) -> float | None:
     if result in ("1-0", "1–0"):
         return 1.0
@@ -30,6 +39,13 @@ def result_to_white_score(result: str) -> float | None:
     return None
 
 
+    return None
+
+
+# @method add_arguments
+# @desc Registers --pgn, --output, --ply, --max for the pgn2texel command.
+# @param parser ArgumentParser or subparser.
+# @returns None
 def add_arguments(parser: argparse.ArgumentParser) -> None:
     """Add pgn2texel arguments to a parser or subparser."""
     parser.add_argument("--pgn", "-p", required=True, help="Input PGN file")
@@ -38,6 +54,10 @@ def add_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--max", type=int, default=0, help="Max games to process (0 = all)")
 
 
+# @method run
+# @desc Read PGN, sample one position per game at --ply, write fen,result CSV.
+# @param args Parsed namespace from add_arguments.
+# @returns None
 def run(args: argparse.Namespace) -> None:
     """Extract fen,result CSV from PGN (from add_arguments)."""
     count = 0
