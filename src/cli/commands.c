@@ -74,7 +74,9 @@ bool eval_handler(Context context)
 
 #define BATCH_LINE_MAX 4096
 
-/* Read stdin: repeat [ N (count) ; params line (10 ints mg0..mg4 eg0..eg4) ; N FENs ]. Output N scores (white cp) per batch. */
+/* Read stdin: repeat [ N ; params line: 10 ints (mg0..eg4) or 18 ints (mg0..eg4 w0..w7) ; N FENs ].
+ * If 18 ints: full PeSTO eval with weighted terms (score = sum(term_i * weight_i)), white cp.
+ * If 10 ints: material+PST only (legacy), white cp. */
 bool eval_batch_handler(Context context)
 {
     (void)context;
@@ -83,6 +85,8 @@ bool eval_batch_handler(Context context)
     char line[BATCH_LINE_MAX];
     int mg[6], eg[6];
     mg[5] = eg[5] = 0;
+    int use_weights = 0;
+    int term_weights[8] = { 1, 1, 1, 1, 1, 1, 1, 1 };
 
     while (fgets(line, (int)sizeof(line), stdin) != NULL) {
         int n = atoi(line);
@@ -90,11 +94,29 @@ bool eval_batch_handler(Context context)
             break;
         if (fgets(line, (int)sizeof(line), stdin) == NULL)
             break;
-        int nread = sscanf(line, "%d %d %d %d %d %d %d %d %d %d",
+        int w0, w1, w2, w3, w4, w5, w6, w7;
+        int nread = sscanf(line, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
+                           &mg[0], &mg[1], &mg[2], &mg[3], &mg[4],
+                           &eg[0], &eg[1], &eg[2], &eg[3], &eg[4],
+                           &w0, &w1, &w2, &w3, &w4, &w5, &w6, &w7);
+        if (nread == 18) {
+            term_weights[0] = w0;
+            term_weights[1] = w1;
+            term_weights[2] = w2;
+            term_weights[3] = w3;
+            term_weights[4] = w4;
+            term_weights[5] = w5;
+            term_weights[6] = w6;
+            term_weights[7] = w7;
+            use_weights = 1;
+        } else {
+            nread = sscanf(line, "%d %d %d %d %d %d %d %d %d %d",
                            &mg[0], &mg[1], &mg[2], &mg[3], &mg[4],
                            &eg[0], &eg[1], &eg[2], &eg[3], &eg[4]);
-        if (nread != 10)
-            break;
+            if (nread != 10)
+                break;
+            use_weights = 0;
+        }
         pesto_set_tune_values(mg, eg);
 
         for (int i = 0; i < n; i++) {
@@ -105,9 +127,21 @@ bool eval_batch_handler(Context context)
                 line[--len] = '\0';
             Board board = {0};
             castro_BoardInitFen(&board, line);
-            int score = pesto_material_pst_eval_white(&board);
+            int score;
+            if (use_weights) {
+                EvalBreakdown b;
+                (void)pesto_eval_breakdown(&board, &b);
+                int weighted = term_weights[0] * b.material_pst + term_weights[1] * b.pawn_structure
+                             + term_weights[2] * b.mobility + term_weights[3] * b.king_safety
+                             + term_weights[4] * b.piece_activity + term_weights[5] * b.space
+                             + term_weights[6] * b.threats + term_weights[7] * b.endgame;
+                score = board.turn ? weighted : -weighted;
+            } else {
+                score = pesto_material_pst_eval_white(&board);
+            }
             castro_BoardFree(&board);
             printf("%d\n", score);
+            fflush(stdout);
         }
     }
     return true;

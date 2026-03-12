@@ -44,9 +44,6 @@ def sigmoid(x: np.ndarray, k: float = 1.0) -> np.ndarray:
     return 1.0 / (1.0 + np.exp(-k * x / 400.0))
 
 
-    return 1.0 / (1.0 + np.exp(-k * x / 400.0))
-
-
 # @method load_breakdown
 # @desc Run engine eval-breakdown-batch; return (N, 8) array of term values per position.
 # @param engine_path Path to engine executable.
@@ -74,9 +71,6 @@ def load_breakdown(engine_path: str, fens: list[str]) -> np.ndarray:
         if len(parts) >= 8:
             rows.append([int(parts[i]) for i in range(8)])
     proc.wait()
-    return np.array(rows, dtype=np.float64)
-
-
     return np.array(rows, dtype=np.float64)
 
 

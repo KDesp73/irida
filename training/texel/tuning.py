@@ -1,19 +1,16 @@
-#!/usr/bin/env python3
-# @module texel.tuning
-# @desc Texel tuning: minimize cross-entropy between sigmoid(eval) and game result; tune mg_value/eg_value.
 """
 Texel tuning: minimize cross-entropy between sigmoid(eval) and game result.
 
 Dataset: CSV with columns fen,result (result from White's view: 1=white wins,
 0.5=draw, 0=black wins). We tune mg_value[0..5] and eg_value[0..5] (piece values
-for material+PST). King (index 5) is fixed at 0.
+for material+PST). King (index 5) is fixed at 0. With --tune-weights, also tune
+the 8 PeSTO term scale factors (material_pst, pawn_structure, mobility, ...).
 
-Use --engine PATH to call the C engine's eval-batch (no Python eval clone).
-Otherwise uses the Python eval in texel/eval.py.
+Uses the C engine's eval-batch only (no Python eval clone). Build the engine first.
 
 Usage:
-  python3 -m training texel --data positions.csv --output params.json
-  python3 -m training texel --data positions.csv --engine ./engine --iter 1000
+  python3 -m training texel --data positions.csv --engine ./engine --output params.json
+  python3 -m training texel --data positions.csv --engine ./engine --tune-weights --iter 1000
 """
 
 from __future__ import annotations
@@ -30,49 +27,43 @@ try:
 except ImportError:
     HAS_SCIPY = False
 
-from .eval import eval_fen
-
 # Default (PeSTO) piece values; king = 0
 DEFAULT_MG = np.array([82, 337, 365, 477, 1025, 0], dtype=np.float64)
 DEFAULT_EG = np.array([94, 281, 297, 512, 936, 0], dtype=np.float64)
 
+TERM_NAMES = [
+    "material_pst", "pawn_structure", "mobility", "king_safety",
+    "piece_activity", "space", "threats", "endgame",
+]
 
-# @method sigmoid
-# @desc P(white wins) = 1 / (1 + exp(-k * x / 400)). x in centipawns from White's view.
-# @param x Evaluations in centipawns (White's perspective).
-# @param k Sigmoid scale factor.
-# @returns np.ndarray Probability per position (0..1).
+
 def sigmoid(x: np.ndarray, k: float) -> np.ndarray:
     """P(white wins) = 1 / (1 + exp(-k * x / 400)). x in centipawns."""
     return 1.0 / (1.0 + np.exp(-k * x / 400.0))
 
 
-    return 1.0 / (1.0 + np.exp(-k * x / 400.0))
-
-
 # @method _engine_evals
 # @desc Send one batch (params + FENs) to engine eval-batch; return array of scores (white cp).
-# @param pipe_in Engine stdin (eval-batch protocol).
-# @param pipe_out Engine stdout.
-# @param fens List of FEN positions.
-# @param params Current mg/eg (and optionally k) for engine.
-# @param tune_k Whether params includes k.
-# @returns np.ndarray One score per FEN (White cp).
+# Protocol: N, then one line with 10 ints (mg0..eg4) or 18 ints (mg0..eg4 w0..w7), then N FENs.
 def _engine_evals(
     pipe_in,
     pipe_out,
     fens: list[str],
     params: np.ndarray,
     tune_k: bool,
+    tune_weights: bool,
 ) -> np.ndarray:
-    """Send one batch (params + FENs) to engine eval-batch; return array of scores (white cp)."""
+    """Send one batch to engine eval-batch; return array of scores (white cp)."""
+    n = len(fens)
     mg = np.zeros(6)
     eg = np.zeros(6)
     mg[:5] = params[:5]
     eg[:5] = params[5:10]
-    n = len(fens)
-    # Protocol: N\n  mg0 mg1 mg2 mg3 mg4 eg0 eg1 eg2 eg3 eg4\n  FEN1\n ... FENn\n
-    param_line = " ".join(str(int(round(x))) for x in list(mg[:5]) + list(eg[:5]))
+    if tune_weights:
+        w = np.clip(np.round(params[10:18]), 1, 1000).astype(int)
+        param_line = " ".join(str(int(round(x))) for x in list(mg[:5]) + list(eg[:5]) + list(w))
+    else:
+        param_line = " ".join(str(int(round(x))) for x in list(mg[:5]) + list(eg[:5]))
     pipe_in.write(f"{n}\n")
     pipe_in.write(param_line + "\n")
     for fen in fens:
@@ -87,43 +78,22 @@ def _engine_evals(
     return np.array(scores, dtype=np.float64)
 
 
-    return np.array(scores, dtype=np.float64)
-
-
 # @method cross_entropy_loss
-# @desc Negative sum of result*log(p) + (1-result)*log(1-p). Params are mg/eg values (and
-# optionally k). If get_evals is set, use it; else use Python eval_fen.
-# @param params Piece values (and optionally k).
-# @param fens List of position FENs.
-# @param results Game results (0, 0.5, 1).
-# @param tune_k Whether to use/tune k.
-# @param get_evals Optional callable(params) -> evals; if None uses Python eval_fen.
-# @returns float Cross-entropy loss value.
+# @desc Negative sum of result*log(p) + (1-result)*log(1-p). Uses get_evals(params) for scores.
 def cross_entropy_loss(
     params: np.ndarray,
     fens: list[str],
     results: np.ndarray,
     tune_k: bool,
-    get_evals=None,
+    get_evals,
 ) -> float:
-    """Params: [mg0..mg5, eg0..eg5] or [mg0..mg5, eg0..eg5, k]. King mg5=eg5=0 fixed.
-    If get_evals is set, call get_evals(params) to get evals; else use Python eval_fen."""
-    mg = np.zeros(6)
-    eg = np.zeros(6)
-    mg[:5] = params[:5]
-    eg[:5] = params[5:10]
-    k = params[10] if tune_k else 1.0
+    """Cross-entropy between sigmoid(evals) and results. get_evals(params) returns white cp array."""
+    k = params[-1] if tune_k else 1.0
     if tune_k and (k <= 0.01 or k > 10.0):
         return 1e10
-    if get_evals is not None:
-        evals = get_evals(params)
-    else:
-        evals = np.array([eval_fen(fen, mg, eg) for fen in fens], dtype=np.float64)
+    evals = get_evals(params)
     p = sigmoid(evals, k)
     p = np.clip(p, 1e-6, 1 - 1e-6)
-    return float(-np.sum(results * np.log(p) + (1 - results) * np.log(1 - p)))
-
-
     return float(-np.sum(results * np.log(p) + (1 - results) * np.log(1 - p)))
 
 
@@ -136,7 +106,8 @@ def add_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--output", "-o", help="Write tuned params to JSON (and C snippet to stdout)")
     parser.add_argument("--iter", "-n", type=int, default=1000, help="Max optimization iterations (default 1000)")
     parser.add_argument("--tune-k", action="store_true", help="Also tune sigmoid K (default: K=1)")
-    parser.add_argument("--engine", "-e", metavar="PATH", help="Use engine eval-batch (no Python eval); e.g. ./engine")
+    parser.add_argument("--tune-weights", action="store_true", help="Also tune 8 PeSTO term scale factors (uses full C eval)")
+    parser.add_argument("--engine", "-e", required=True, metavar="PATH", help="Engine binary for eval-batch (e.g. ./engine)")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
 
 
@@ -172,41 +143,42 @@ def run(args: argparse.Namespace) -> None:
         sys.exit(1)
     print(f"Loaded {len(fens)} positions from {args.data}", file=sys.stderr)
 
-    engine_proc = None
-    get_evals = None
-    if args.engine:
-        engine_proc = subprocess.Popen(
-            [args.engine, "eval-batch"],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            text=True,
-            bufsize=1,
+    engine_proc = subprocess.Popen(
+        [args.engine, "eval-batch"],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        text=True,
+        bufsize=1,
+    )
+
+    def get_evals_fn(params: np.ndarray) -> np.ndarray:
+        n_engine = 10 + (8 if args.tune_weights else 0)
+        params_for_engine = params[:n_engine]
+        return _engine_evals(
+            engine_proc.stdin,
+            engine_proc.stdout,
+            fens,
+            params_for_engine,
+            args.tune_k,
+            args.tune_weights,
         )
 
-        def get_evals_fn(params: np.ndarray) -> np.ndarray:
-            return _engine_evals(
-                engine_proc.stdin,
-                engine_proc.stdout,
-                fens,
-                params,
-                args.tune_k,
-            )
+    print(f"Using engine for eval: {args.engine}", file=sys.stderr)
+    if args.tune_weights:
+        print("Tuning mg/eg + 8 term weights (full PeSTO eval).", file=sys.stderr)
 
-        get_evals = get_evals_fn
-        print(f"Using engine for eval: {args.engine}", file=sys.stderr)
-    else:
-        print("Using Python eval (use --engine ./engine to use C engine).", file=sys.stderr)
-
-    # Initial point: default PeSTO values (only tune pawn..queen; king=0)
+    # Initial point and bounds
     x0 = np.concatenate([DEFAULT_MG[:5], DEFAULT_EG[:5]])
+    bounds = [(1, 2000)] * 5 + [(1, 2000)] * 5
+    if args.tune_weights:
+        x0 = np.concatenate([x0, np.ones(8)])
+        bounds.extend([(0.01, 10.0)] * 8)
     if args.tune_k:
         x0 = np.append(x0, 1.0)
-    bounds = [(1, 2000)] * 5 + [(1, 2000)] * 5  # mg pawn..queen, eg pawn..queen
-    if args.tune_k:
         bounds.append((0.1, 10.0))
 
     def obj(x: np.ndarray) -> float:
-        return cross_entropy_loss(x, fens, results, tune_k=args.tune_k, get_evals=get_evals)
+        return cross_entropy_loss(x, fens, results, tune_k=args.tune_k, get_evals=get_evals_fn)
 
     if HAS_SCIPY:
         res = scipy_minimize(
@@ -221,7 +193,6 @@ def run(args: argparse.Namespace) -> None:
         x_best = res.x
         loss_best = res.fun
     else:
-        # Fallback: coordinate descent (no scipy). Install scipy for faster L-BFGS-B.
         print("scipy not found; using coordinate-descent fallback (install scipy for L-BFGS-B).", file=sys.stderr)
         x_best = x0.copy()
         loss_best = obj(x_best)
@@ -242,34 +213,46 @@ def run(args: argparse.Namespace) -> None:
                 break
         res = type('Res', (), {'fun': loss_best, 'x': x_best})()
 
-    if engine_proc is not None:
-        engine_proc.stdin.close()
-        engine_proc.wait()
+    engine_proc.stdin.close()
+    engine_proc.wait()
 
     mg = np.zeros(6)
     eg = np.zeros(6)
     mg[:5] = res.x[:5]
     eg[:5] = res.x[5:10]
-    k = float(res.x[10]) if args.tune_k else 1.0
+    off = 10
+    weights = None
+    if args.tune_weights:
+        weights = np.array(res.x[off:off + 8], dtype=np.float64)
+        off = 18
+    k = float(res.x[off]) if args.tune_k else 1.0
+
     print(f"\nFinal loss: {res.fun:.2f}", file=sys.stderr)
     print("Tuned mg_value (pawn..king):", np.round(mg).astype(int).tolist(), file=sys.stderr)
     print("Tuned eg_value (pawn..king):", np.round(eg).astype(int).tolist(), file=sys.stderr)
+    if args.tune_weights:
+        print("Tuned term weights:", file=sys.stderr)
+        for i, name in enumerate(TERM_NAMES):
+            print(f"  {name}: {weights[i]:.4f}", file=sys.stderr)
     if args.tune_k:
         print(f"Tuned K: {k:.4f}", file=sys.stderr)
 
     out = {
         "mg_value": [int(round(x)) for x in mg],
         "eg_value": [int(round(x)) for x in eg],
-        "k": k,
         "loss": float(res.fun),
         "n_positions": len(fens),
     }
+    if args.tune_weights:
+        out["term_weights"] = {name: float(weights[i]) for i, name in enumerate(TERM_NAMES)}
+    if args.tune_k:
+        out["k"] = k
     if args.output:
         with open(args.output, "w") as f:
             json.dump(out, f, indent=2)
         print(f"Wrote {args.output}", file=sys.stderr)
 
-    # Print C snippet for pesto.c
+    # Print C snippet for pesto.c (mg/eg only; term weights are used in eval-batch)
     print("\n/* Paste into src/eval/pesto.c (replace static const int mg_value[6] / eg_value[6]) */")
     print("static const int mg_value[6] = {", ", ".join(str(int(round(x))) for x in mg), "};")
     print("static const int eg_value[6] = {", ", ".join(str(int(round(x))) for x in eg), "};")

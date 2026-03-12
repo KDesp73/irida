@@ -35,7 +35,7 @@ void default_help()
     HEADER("COMMANDS");
     INDENT("perft                   Run PERFT on a specific fen");
     INDENT("eval                    Run an evaluation on a position");
-    INDENT("eval-batch              Texel: read params + FENs from stdin, output material+PST scores");
+    INDENT("eval-batch              Texel: read N, params (10 or 18 ints: mg,eg or +term weights), N FENs; output scores (white cp)");
     INDENT("eval-breakdown-batch    Read N and N FENs from stdin, output N lines of 8 term values");
     INDENT("search                  Find the best move in a position");
     PRINT("");
