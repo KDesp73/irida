@@ -37,7 +37,7 @@ def main() -> None:
     texel_tuning.add_arguments(subparsers.add_parser("texel", help="Texel tuning: tune PeSTO mg_value/eg_value from fen,result CSV"))
     texel_tune_weights.add_arguments(subparsers.add_parser("texel-weights", help="Tune PeSTO term weights from eval breakdown"))
     data_gen.add_arguments(subparsers.add_parser("data", help="Generate FEN,score_cp CSV from engine via UCI"))
-    convert_mod.add_arguments(subparsers.add_parser("convert", help="Convert .pt model to Stockfish .nnue format"))
+    convert_mod.add_arguments(subparsers.add_parser("convert", help="Convert .pt model to legacy .nnue format (for this engine)"))
     pgn2texel_mod.add_arguments(subparsers.add_parser("pgn2texel", help="Extract fen,result CSV from PGN for Texel tuning"))
 
     args = parser.parse_args()
