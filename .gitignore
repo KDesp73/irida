@@ -17,6 +17,7 @@ check.dSYM
 check
 nn
 engine.dSYM
+tinker.dSYM
 
 # NNUE training outputs
 training/out/*.pt
@@ -28,3 +29,4 @@ vendor/fathom/libfathom.so
 vendor/nnue-probe/src/libnnueprobe.so
 vendor/nvim-laravel
 .DS_Store
+tinker

@@ -16,6 +16,10 @@ build.shared: $(BUILD_DIR) $(OBJ_FILES) ## Build the dynamic library
 	@echo "[INFO] Building shared library: $(SO_NAME)"
 	@$(CC) $(SO_LDFLAGS) -o $(SO_NAME) $(OBJ_FILES)
 
+tinker: build.static ## Build the tinker executable
+	@echo "[INFO] Building tinker executable: tinker"
+	$(CC) $(CFLAGS) src/tinker.c -o tinker $(LDFLAGS_ENGINE) $(LDFLAGS_CASTRO) $(LDFLAGS) 
+
 .PHONY: build.verbose
 build.verbose: CFLAGS += -DVERBOSE
 build.verbose: all ## Build the project in verbose mode

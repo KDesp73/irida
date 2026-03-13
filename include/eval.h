@@ -13,6 +13,7 @@ typedef int (*EvalFn)(Board*) ;
 // @struct EvalBreakdown
 // @desc Per-term breakdown for PeSTO eval (centipawns, side-to-move). total equals pesto_eval when convention matches.
 typedef struct EvalBreakdown {
+    int material;
     int material_pst;     /* Material + piece-square tables (phase-interpolated) */
     int pawn_structure;
     int mobility;
@@ -44,8 +45,8 @@ int pesto_eval_breakdown(Board* board, EvalBreakdown* out);
 
 // @function pesto_log_breakdown
 // @desc Logs eval breakdown to stderr (e.g. for debugging).
-// @param board Board to evaluate.
-void pesto_log_breakdown(Board* board);
+// @param b EvalBreakdown
+void pesto_log_breakdown(EvalBreakdown b);
 
 // @function pesto_init
 // @desc Initialize PeSTO tables. Call once at startup.

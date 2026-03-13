@@ -56,7 +56,7 @@ else
 endif
 
 # Sources
-SRC_FILES := $(shell find $(SRC_DIR) -name '*.c' ! -name 'main.c')
+SRC_FILES := $(shell find $(SRC_DIR) -name '*.c' ! -name 'main.c' ! -name 'tinker.c')
 OBJ_FILES := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRC_FILES))
 
 .DEFAULT_GOAL := help

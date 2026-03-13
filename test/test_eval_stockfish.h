@@ -6,8 +6,8 @@
 int test_eval_stockfish(const char* fen, int max_cp_diff);
 
 #define TEST_test_eval_stockfish \
-	test_eval_stockfish("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 250), \
-	test_eval_stockfish("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", 250), \
-	test_eval_stockfish("4k3/8/8/8/8/8/8/4K3 w - - 0 1", 50)
+	test_eval_stockfish("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 20), \
+	test_eval_stockfish("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", 20), \
+	test_eval_stockfish("4k3/8/8/8/8/8/8/4K3 w - - 0 1", 20)
 
 #endif
