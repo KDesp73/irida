@@ -1,15 +1,3 @@
-/*
- * Theory: PeSTO-style evaluation (chessprogramming.org/PeSTO's_Evaluation_Function).
- *
- * The score is a linear combination of terms, interpolated by game phase (0 = endgame,
- * 24 = midgame). Terms include: material + piece-square tables (mg_value/eg_value
- * and PSTs per piece type), pawn structure (doubled, isolated, passed), mobility
- * (squares attacked), king safety, piece activity, space, threats, and endgame
- * specifics. All terms are in centipawns from the side-to-move perspective; the
- * board is flipped for black so we always evaluate "for white" and negate when
- * it's black's turn where needed. Tuneable mg_value/eg_value and PSTs support
- * Texel tuning.
- */
 // www.chessprogramming.org/PeSTO's_Evaluation_Function
 
 #include "IncludeOnly/logging.h"
@@ -32,9 +20,9 @@
 
 #define EMPTY 12
 
-#define THREAT_WEIGHT 1
+#define THREAT_WEIGHT 3
 #define SPACE_WEIGHT 2
-#define MOBILITY_WEIGHT 2
+#define MOBILITY_WEIGHT 4
 
 static inline int piece_color(int pc) {
     return pc & 1;
@@ -328,6 +316,55 @@ static int evaluate_pawn_structure(Board* board)
     return score;
 }
 
+static int evaluate_rooks(Board* board)
+{
+    int score = 0;
+
+    for (int r = 0; r < 8; r++) {
+        for (int f = 0; f < 8; f++) {
+
+            char c = board->grid[r][f];
+
+            if (c != 'R' && c != 'r')
+                continue;
+
+            int sign = (c == 'R') ? 1 : -1;
+
+            /* rook on 7th / 8th rank */
+            if (c == 'R' && r >= 6)
+                score += 80;
+            if (c == 'r' && r <= 1)
+                score -= 80;
+
+            /* rook on open file */
+            int file_blocked = 0;
+            for (int rr = 0; rr < 8; rr++) {
+                char t = board->grid[rr][f];
+                if (t == 'P' || t == 'p') {
+                    file_blocked = 1;
+                    break;
+                }
+            }
+
+            if (!file_blocked)
+                score += sign * 35;
+
+            /* rook near enemy king file */
+            for (int rr = 0; rr < 8; rr++) {
+                char t = board->grid[rr][f];
+
+                if (c == 'R' && t == 'k')
+                    score += 120;
+
+                if (c == 'r' && t == 'K')
+                    score -= 120;
+            }
+        }
+    }
+
+    return score;
+}
+
 static inline int knight_mobility(Board* board, int r, int f, char me)
 {
     static const int offsets[8][2] = {
@@ -492,13 +529,35 @@ static int evaluate_king_safety(Board* board, int game_phase)
 {
     int score = 0;
 
-    if (game_phase > 10) {
-        for (int sq = 0; sq < 64; sq++) {
-            int r = sq / 8;
-            int f = sq % 8;
+    int wk_r = -1, wk_f = -1;
+    int bk_r = -1, bk_f = -1;
+
+    for (int r = 0; r < 8; r++) {
+        for (int f = 0; f < 8; f++) {
             char c = board->grid[r][f];
-            if (c == 'K' && (f == 3 || f == 4) && r <= 2) score -= 16;
-            if (c == 'k' && (f == 3 || f == 4) && r >= 5) score += 16;
+            if (c == 'K') { wk_r = r; wk_f = f; }
+            if (c == 'k') { bk_r = r; bk_f = f; }
+        }
+    }
+
+    for (int r = 0; r < 8; r++) {
+        for (int f = 0; f < 8; f++) {
+
+            char c = board->grid[r][f];
+
+            if (is_white_piece_char(c)) {
+
+                int dist = abs(r - bk_r) + abs(f - bk_f);
+                if (dist <= 2)
+                    score += 30;
+            }
+
+            if (is_black_piece_char(c)) {
+
+                int dist = abs(r - wk_r) + abs(f - wk_f);
+                if (dist <= 2)
+                    score -= 30;
+            }
         }
     }
 
@@ -823,9 +882,18 @@ static int pesto_eval_impl(Board* board, EvalBreakdown* out)
     int space = evaluate_space(board);
     int threats = evaluate_threats(board);
     int endgame = evaluate_endgame_terms(board, game_phase);
+    int rook_activity = evaluate_rooks(board);
 
-    int score_white = material + material_pst + pawn_structure + mobility + king_safety
-                    + piece_activity + space + threats + endgame;
+    int score_white = material 
+                    + material_pst 
+                    + pawn_structure 
+                    + rook_activity 
+                    + mobility 
+                    + king_safety
+                    + piece_activity
+                    + space 
+                    + threats 
+                    + endgame;
     int score = board->turn == COLOR_WHITE ? score_white : -score_white;
 
     if (out) {
