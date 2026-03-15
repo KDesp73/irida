@@ -9,10 +9,11 @@ deps.check: ## Check that all dependencies are available
 UNAME_S := $(shell uname -s)
 NNUE_COMP := $(if $(filter Darwin,$(UNAME_S)),clang,gcc)
 
-deps.fetch: nn vendor/IncludeOnly vendor/castro vendor/nnue-probe vendor/fathom ## Fetch dependency sources
+deps.fetch: nn vendor/IncludeOnly vendor/castro vendor/nnue-probe vendor/fathom vendor/tb ## Fetch dependency sources
 	cd vendor/castro && rm -rf .git
 	cd vendor/nnue-probe && rm -rf .git
 	cd vendor/fathom && rm -rf .git
+	cd vendor/tb && rm -rf .git
 
 define fetchio
 	curl -s -f https://raw.githubusercontent.com/KDesp73/IncludeOnly/refs/heads/main/libs/$1.h -o vendor/IncludeOnly/$1.h
@@ -79,3 +80,8 @@ vendor/BayesianElo:
 	@git clone --depth=1 https://github.com/ddugovic/BayesianElo.git vendor/BayesianElo
 	@cd vendor/BayesianElo/src && make
 	@mkdir -p bin && cp vendor/BayesianElo/src/bayeselo bin/
+
+vendor/tb:
+	@git clone --depth=1 https://github.com/syzygy1/tb.git vendor/tb
+	@cd vendor/tb/src && make 
+	@mkdir -p bin && cp vendor/tb/src/rtbgen bin

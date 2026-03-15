@@ -30,3 +30,7 @@ vendor/nnue-probe/src/libnnueprobe.so
 vendor/nvim-laravel
 .DS_Store
 tinker
+
+bin/*
+!bin/books/
+!bin/past/
