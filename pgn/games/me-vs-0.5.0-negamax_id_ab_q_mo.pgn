@@ -1,0 +1,15 @@
+[Event "?"]
+[Site "?"]
+[Date "2026.03.15"]
+[Round "?"]
+[White "White"]
+[Black "Black"]
+[Result "1-0"]
+
+1. e4 d6 2. d4 Nf6 3. Nc3 Nbd7 4. Nf3 e5 5. d5 Nc5 {EV: 43.6%} 6. Bg5 h6 {EV:
+38.1%} 7. Bxf6 Qxf6 {EV: 43.7%} 8. Be2 Bg4 {EV: 56.0%} 9. O-O O-O-O {EV: 67.3%}
+10. a4 Be7 {EV: 87.6%} 11. a5 Rhg8 {EV: 88.7%} 12. b4 Nd7 {EV: 93.7%} 13. b5
+Bxf3 {EV: 95.5%} 14. Bxf3 Nc5 {EV: 93.6%} 15. b6 cxb6 {EV: 93.7%} 16. axb6 axb6
+{EV: 89.3%} 17. Bg4+ Kb8 {EV: 89.9%} 18. Nb5 Nxe4 {EV: 95.8%} 19. Ra8+ Kxa8 {EV:
+100.0%} 20. Qa1+ Kb8 {EV: 100.0%} 21. Qa7# 1-0
+

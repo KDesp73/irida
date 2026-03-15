@@ -14,8 +14,6 @@
 #include "moveordering.h"
 #include "search.h"
 
-#define MAX_DEPTH 64
-
 int quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, OrderFn order)
 {
     g_searchStats.qnodes++;
@@ -32,7 +30,9 @@ int quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, OrderFn 
     // Delta Pruning: A queen is worth ~900. If we are down by 1000, 
     // even taking a queen won't save us.
     if (stand_pat < alpha - 900) { 
-         // Note: Only do this if not in check!
+         if (!castro_IsInCheck(board)) {
+            return alpha;
+         }
     }
 
     if (stand_pat > alpha)
