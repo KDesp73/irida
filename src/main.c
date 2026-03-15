@@ -28,10 +28,9 @@ SearchConfig g_searchConfig = {
 
 int main(int argc, char** argv)
 {
-
     EngineInit(&engine, ENGINE_NAME, ENGINE_AUTHOR);
     engine.eval = nnue_eval;
-    engine.search = negamax;
+    engine.search = negamax_id_ab_q_mo;
     engine.order = order_moves;
 
     // Load the nnue if possible

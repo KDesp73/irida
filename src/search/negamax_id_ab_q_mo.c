@@ -1,15 +1,15 @@
 #include "castro.h"
 #include "eval.h"
+#include "moveordering.h"
 #include "search.h"
 #include "uci.h"
 #include "utils.h"
 #include <limits.h>
 
-static int negamax_rec(Board* board, EvalFn evaluate, int depth, int alpha, int beta);
+static int negamax_rec(Board* board, EvalFn evaluate, OrderFn order, int depth, int alpha, int beta);
 
-Move negamax(Board* board, EvalFn eval, OrderFn order, SearchConfig* config) 
+Move negamax_id_ab_q_mo(Board* board, EvalFn eval, OrderFn order, SearchConfig* config) 
 {
-    UNUSED(order);
     Move best_move = NULL_MOVE;
     g_searchStats.nodes = 0;
 
@@ -21,7 +21,7 @@ Move negamax(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 
         Moves legal = castro_GenerateLegalMoves(board);
         
-        // TODO: Move ordering here
+        order(board, legal.list, legal.count, 1);
 
         int alpha = -INF;
         int beta = INF;
@@ -30,7 +30,7 @@ Move negamax(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 
         for (size_t i = 0; i < legal.count; i++) {
             castro_MakeMove(board, legal.list[i]);
-            int score = -negamax_rec(board, eval, currentDepth - 1, -beta, -alpha);
+            int score = -negamax_rec(board, eval, order, currentDepth - 1, -beta, -alpha);
             castro_UnmakeMove(board);
 
             // If time ran out during the recursive call, discard this depth
@@ -58,7 +58,7 @@ Move negamax(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
     return best_move;
 }
 
-static int negamax_rec(Board* board, EvalFn evaluate, int depth, int alpha, int beta)
+static int negamax_rec(Board* board, EvalFn evaluate, OrderFn order, int depth, int alpha, int beta)
 {
     if (search_should_stop()) return 0;
 
@@ -73,14 +73,14 @@ static int negamax_rec(Board* board, EvalFn evaluate, int depth, int alpha, int 
 
     // 2. Base Case
     if (depth <= 0) {
-        return evaluate(board); 
+        return quiescence(board, alpha, beta, depth, evaluate, order);
     }
 
     int max_eval = -INF;
 
     for (size_t i = 0; i < legal.count; i++) {
         castro_MakeMove(board, legal.list[i]);
-        int score = -negamax_rec(board, evaluate, depth - 1, -beta, -alpha);
+        int score = -negamax_rec(board, evaluate, order, depth - 1, -beta, -alpha);
         castro_UnmakeMove(board);
 
         if (search_should_stop()) return 0;

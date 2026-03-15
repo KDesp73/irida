@@ -56,15 +56,14 @@ typedef Move (*SearchFn)(Board* board,
                          OrderFn order,
                          SearchConfig* config);
 
+// NOTE: Implementation Encoding
+// id: Iterative Deepening
+// ab: Alpha-Beta Pruning
+// q: Quiescence
+// mo: Move Ordering
 
-// @function negamax
-// @desc Implementation of the negamax algorithm.
-// SearchFn signature
-// Includes:
-// - Iterative Deepening
-// - Alpha-Beta Pruning
-// @returns Move The best move
-Move negamax(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
+Move negamax_id_ab(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
+Move negamax_id_ab_q_mo(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 
 // @function negamax
 // @desc v0.4.0 search implementation (Many mistakes)

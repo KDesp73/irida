@@ -3,8 +3,10 @@
 #include "eval.h"
 #include "moveordering.h"
 #include "version.h"
+#include <stdlib.h>
 #include <string.h>
 #include "kv.h"
+#include "IncludeOnly/ansi.h"
 
 void print_moves(Moves moves)
 {
@@ -22,9 +24,9 @@ void moves_diff(Moves m1, Moves m2) {
         castro_MoveToString(m1.list[i], buf1);
         castro_MoveToString(m2.list[i], buf2);
 
-        if(strncmp(buf1, buf2, 12) == 0) printf("== ");
-        if(strncmp(buf1, buf2, 12) != 0) printf("!= ");
-        printf("%s %s\n", buf1, buf2);
+        if(strncmp(buf1, buf2, 12) == 0) printf("%s== ", ANSI_GREEN);
+        if(strncmp(buf1, buf2, 12) != 0) printf("%s!= ", ANSI_RED);
+        printf("%s %s%s\n", buf1, buf2, ANSI_RESET);
     }
 
     if(m1.count != m2.count) {
@@ -58,7 +60,7 @@ int main(int argc, char** argv)
     EngineInit(&engine, ENGINE_NAME, ENGINE_AUTHOR);
 
     const char* fen = kv_get("fen", NULL);
-    int ply = atoi(kv_get("ply", "1"));
+    int ply = strtol(kv_get("ply", "1"), NULL, 10);
 
     printf("fen=%s\n", fen);
     printf("ply=%d\n", ply);
