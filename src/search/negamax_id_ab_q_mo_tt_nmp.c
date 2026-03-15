@@ -21,8 +21,7 @@ Move negamax_id_ab_q_mo_tt_nmp(Board* board, EvalFn eval, OrderFn order, SearchC
         
         if (search_time_up()) break;
 
-        // NOTE: Generating pseudo-legal moves for faster generation
-        Moves legal = castro_GenerateMoves(board, MOVE_PSEUDO);
+        Moves legal = castro_GenerateMoves(board, MOVE_LEGAL);
         
         // Use the order function with ply 0 at the root
         order(board, legal.list, legal.count, 0);
@@ -82,7 +81,7 @@ static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int 
     // Periodically check timer every 2048 nodes
     if ((g_searchStats.nodes & 2047) == 0) {
         if (search_time_up()) {
-            // Logic to signal search_should_stop() goes here
+            uci_state.stopRequested = true;
         }
     }
     if (search_should_stop()) return 0;
@@ -90,7 +89,7 @@ static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int 
     g_searchStats.nodes++;
 
     // 1. Terminal Check
-    Moves pseudo = castro_GenerateMoves(board, MOVE_PSEUDO);
+    Moves legal = castro_GenerateMoves(board, MOVE_LEGAL);
 
     // 2. Base Case: Transition to Quiescence Search
     if (depth <= 0) {
@@ -121,12 +120,11 @@ static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int 
     int legal_moves_count = 0;
 
     // Use tt_move for ordering if it exists (it's the most likely move to cause a cutoff)
-    // NOTE: Might need to adjust order function signature to accept tt_move.
-    order(board, pseudo.list, pseudo.count, ply); 
+    order(board, legal.list, legal.count, ply, tt_move); 
 
     int max_eval = -INF;
-    for (size_t i = 0; i < pseudo.count; i++) {
-        if(!castro_MakeMove(board, pseudo.list[i])) continue;
+    for (size_t i = 0; i < legal.count; i++) {
+        if(!castro_MakeMove(board, legal.list[i])) continue;
 
         legal_moves_count++;
         int score = -negamax_rec(board, eval, order, depth - 1, ply + 1, -beta, -alpha);
@@ -136,7 +134,7 @@ static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int 
 
         if (score > max_eval) {
             max_eval = score;
-            best_move_found = pseudo.list[i];
+            best_move_found = legal.list[i];
         }
 
         if (score > alpha) alpha = score;

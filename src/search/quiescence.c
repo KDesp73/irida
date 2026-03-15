@@ -10,7 +10,6 @@
  */
 #include "castro.h"
 #include "eval.h"
-#include "eval_cache.h"
 #include "moveordering.h"
 #include "search.h"
 
@@ -19,9 +18,9 @@ int quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, OrderFn 
     g_searchStats.qnodes++;
 
     if (ply >= MAX_PLY)
-        return eval_cached(board, eval);
+        return eval(board);
 
-    int stand_pat = eval_cached(board, eval);
+    int stand_pat = eval(board);
 
     // Standing Pat: If current position is good enough to cause a cutoff, stop.
     if (stand_pat >= beta)
@@ -49,7 +48,6 @@ int quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, OrderFn 
     for (size_t i = 0; i < moves.count; i++) {
         Move move = moves.list[i];
 
-        // Legality check via MakeMove
         if (!castro_MakeMove(board, move))
             continue;
 

@@ -76,48 +76,57 @@ static Move killer2[MAX_PLY];
 // History heuristic table
 static int history[64][64]; // from -> to squares
 
-static Move tt_move;
-
-// Score a single move
-static inline int score_move(Board *board, Move m, int ply)
+static inline int score_move(Board *board, Move m, int ply, Move tt_move)
 {
+    // 1. TT Move (The highest priority - a move that worked before)
     if (m == tt_move) {
         return 1000000;
     }
 
+    // 2. Captures (MVV-LVA)
+    // We want to capture the Most Valuable Victim with our Least Valuable Attacker
     if (castro_IsCapture(board, m)) {
-        return 500000 + mvv_lva_score(board, m); // MVV-LVA
+        return 500000 + mvv_lva_score(board, m); 
     }
 
+    // 3. Killer Moves (Quiet moves that caused a cutoff at this ply in other branches)
     if (m == killer1[ply]) return 400000;
     if (m == killer2[ply]) return 390000;
 
+    // 4. History Heuristic (Quiet moves that historically caused cutoffs)
     int from = castro_GetFrom(m);
     int to   = castro_GetTo(m);
     return history[from][to];
 }
 
-// Partial selection sort for move picking
-void order_moves(Board *board, Move moves[], size_t count, size_t ply)
+void order_moves(Board *board, Move moves[], size_t count, size_t ply, Move tt_move)
 {
+    int scores[MAX_MOVES];
+
+    // Pre-calculate scores so we don't call score_move() O(N^2) times
+    for (size_t i = 0; i < count; i++) {
+        scores[i] = score_move(board, moves[i], ply, tt_move);
+    }
+
+    // Simple Selection Sort
     for (size_t i = 0; i < count; i++) {
         size_t best_idx = i;
-        int best_score = score_move(board, moves[i], ply);
 
         for (size_t j = i + 1; j < count; j++) {
-            int s = score_move(board, moves[j], ply);
-            if (s > best_score) {
-                best_score = s;
+            if (scores[j] > scores[best_idx]) {
                 best_idx = j;
             }
         }
 
-        // swap moves[i] <-> moves[best_idx]
-        if (best_idx != i) {
-            Move tmp = moves[i];
-            moves[i] = moves[best_idx];
-            moves[best_idx] = tmp;
-        }
+        // Swap the moves
+        Move tmp_move = moves[i];
+        moves[i] = moves[best_idx];
+        moves[best_idx] = tmp_move;
+
+        // Swap the pre-calculated scores too!
+        int tmp_score = scores[i];
+        scores[i] = scores[best_idx];
+        scores[best_idx] = tmp_score;
     }
 }
 

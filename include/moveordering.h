@@ -8,7 +8,7 @@
 
 // @type OrderFn
 // @desc Function pointer: order moves in place (board, moves, count, ply).
-typedef void (*OrderFn)(Board* board, Move moves[], size_t count, size_t ply);
+typedef void (*OrderFn)(Board* board, Move moves[], size_t count, size_t ply, Move tt_move);
 
 // @function init_mvv_lva
 void init_mvv_lva(void);
@@ -24,7 +24,7 @@ int mvv_lva_score(Board *board, Move m);
 // @param moves Array of moves to order (modified in place).
 // @param count Number of moves.
 // @param ply Current ply.
-void order_moves(Board *board, Move moves[], size_t count, size_t ply);
+void order_moves(Board *board, Move moves[], size_t count, size_t ply, Move tt_move);
 
 // @function set_tt_move
 // @desc Set the transposition table move for the next order_moves call (search it first).

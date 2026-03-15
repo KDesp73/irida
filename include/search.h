@@ -73,12 +73,6 @@ Move negamax_id_ab_q_mo(Board* board, EvalFn eval, OrderFn order, SearchConfig* 
 Move negamax_id_ab_q_mo_tt(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 Move negamax_id_ab_q_mo_tt_nmp(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 
-// @function negamax
-// @desc v0.4.0 search implementation (Many mistakes)
-// SearchFn signature
-// @returns Move The ~ok~ move
-Move search_v040(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
-
 // @function quiescence
 // @desc Quiescence search (captures only).
 // @param board Board position.

@@ -1,3 +1,4 @@
+#include "castro.h"
 #include "core.h"
 #include "tt.h"
 #include "version.h"
@@ -9,6 +10,7 @@ void EngineInit(Engine* engine)
     strncpy(engine->author, ENGINE_AUTHOR, sizeof(engine->author));
 
     castro_InitMasks();
+    castro_InitMagic();
     pesto_init();
     init_mvv_lva();
     tt_init(16);

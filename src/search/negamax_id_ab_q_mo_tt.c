@@ -107,8 +107,7 @@ static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int 
     Move best_move_found = NULL_MOVE;
 
     // Use tt_move for ordering if it exists (it's the most likely move to cause a cutoff)
-    // NOTE: Might need to adjust order function signature to accept tt_move.
-    order(board, legal.list, legal.count, ply); 
+    order(board, legal.list, legal.count, ply, tt_move); 
 
     int max_eval = -INF;
     for (size_t i = 0; i < legal.count; i++) {

@@ -93,7 +93,7 @@ static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int 
         return quiescence(board, alpha, beta, ply, eval, order);
     }
 
-    order(board, legal.list, legal.count, ply);
+    order(board, legal.list, legal.count, ply, NULL_MOVE);
 
     int max_eval = -INF;
     for (size_t i = 0; i < legal.count; i++) {
