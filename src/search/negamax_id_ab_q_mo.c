@@ -66,8 +66,6 @@ Move negamax_id_ab_q_mo(Board* board, EvalFn eval, OrderFn order, SearchConfig* 
     return best_move;
 }
 
-/* * Recursive Negamax with Alpha-Beta Pruning
- */
 static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int ply, int alpha, int beta)
 {
     // Periodically check timer every 2048 nodes
@@ -113,4 +111,3 @@ static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int 
     }
     return max_eval;
 }
-

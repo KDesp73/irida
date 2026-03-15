@@ -9,7 +9,7 @@
 
 static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int ply, int alpha, int beta);
 
-Move negamax_id_ab_q_mo_tt(Board* board, EvalFn eval, OrderFn order, SearchConfig* config) 
+Move negamax_id_ab_q_mo_tt_nmp(Board* board, EvalFn eval, OrderFn order, SearchConfig* config) 
 {
     Move best_move = NULL_MOVE;
     g_searchStats.nodes = 0;
@@ -100,6 +100,24 @@ static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int 
     // 2. Base Case: Transition to Quiescence Search
     if (depth <= 0) {
         return quiescence(board, alpha, beta, ply, eval, order);
+    }
+
+    if (
+        depth >= 3
+        && !castro_IsInCheck(board)
+        // TODO:
+        // && HasNonPawnMaterial(board) // To avoid Zugzwang
+    ) {
+        castro_MakeNullMove(board);
+        // Using a reduced depth (R=3) and a null window (-beta, -beta + 1)
+        int nullScore = -negamax_rec(board, eval, order, depth - 1 - 3, ply + 1, -beta, -beta + 1);
+        castro_UnmakeNullMove(board);
+
+        if (nullScore >= beta) {
+            // Clamp mate scores: we can't prove a mate via NMP
+            if (nullScore > MATE_SCORE) nullScore = beta;
+            return nullScore; 
+        }
     }
 
     // --- Before Search ---
