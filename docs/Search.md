@@ -2,19 +2,19 @@
 
 ## Foundation
 
-~~- [ ] 1. Minimax~~
+- [ ] ~~1. Minimax~~
 - [x] 2. Negamax
 - [x] 3. Alpha-Beta Pruning
 
 ## Stability
 
-- [ ] 3. Quiescence
+- [x] 3. Quiescence
 - [x] 4. Iterative Deepening
 
 ## Efficiency
 
 - [ ] 5. Trasposition Tables
-- [ ] 6. Move Ordering
+- [x] 6. Move Ordering
 
 ## Aggressive Pruning
 

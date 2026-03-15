@@ -61,6 +61,7 @@ typedef Move (*SearchFn)(Board* board,
 // ab: Alpha-Beta Pruning
 // q: Quiescence
 // mo: Move Ordering
+// tt: Transposition Table
 
 Move negamax_id_ab(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 Move negamax_id_ab_q_mo(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
