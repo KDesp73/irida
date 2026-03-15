@@ -13,7 +13,7 @@
 
 ## Efficiency
 
-- [ ] 5. Trasposition Tables
+- [x] 5. Trasposition Tables
 - [x] 6. Move Ordering
 
 ## Aggressive Pruning

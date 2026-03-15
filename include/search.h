@@ -62,6 +62,11 @@ typedef Move (*SearchFn)(Board* board,
 // q: Quiescence
 // mo: Move Ordering
 // tt: Transposition Table
+// nmp: Null Move Pruning
+// lmr: Late Move Reductions
+// cme: Check Move Extensions
+// aw: Aspiration Windows
+// pvs: Principal Variation Search
 
 Move negamax_id_ab(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 Move negamax_id_ab_q_mo(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
