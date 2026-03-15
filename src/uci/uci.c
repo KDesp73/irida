@@ -31,6 +31,10 @@ bool HandleCommand(UciState* uci_state, const char *command)
         uci_debug(uci_state, command);
     } else if (IS_COMMAND(command, COMMAND_DISPLAY)) {
         uci_display(uci_state);
+    } else if (IS_COMMAND(command, COMMAND_SETEVAL)) {
+        uci_seteval(uci_state, command);
+    } else if (IS_COMMAND(command, COMMAND_SETSEARCH)) {
+        uci_setsearch(uci_state, command);
     } else {
         printf("info string Unknown command: %s\n", command);
         return false;

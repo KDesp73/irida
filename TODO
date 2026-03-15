@@ -3,11 +3,12 @@ TODO: pick a name
 TODO: texel tuning
 TODO: syzygy tablebase (optional Fathom)
 TODO: better traditional evaluation
-DONE: aspiration windows
+TODO: aspiration windows
+TODO: transposition tables
+TODO: move ordering
+TODO: search
 DONE: engine testing
 DONE: cache
-DONE: transposition tables
-DONE: move ordering
 DONE: tests
 DONE: move generation
 DONE: perft testing

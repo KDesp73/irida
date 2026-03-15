@@ -56,36 +56,21 @@ typedef Move (*SearchFn)(Board* board,
                          OrderFn order,
                          SearchConfig* config);
 
-// @function search_root
-// @desc Root search (iterative deepening entry).
-// @param board Board position.
-// @param eval Evaluation function.
-// @param order Move ordering function.
-// @param config Search config.
-// @returns Move Best move from root.
-Move search_root(Board* board,
-                 EvalFn eval,
-                 OrderFn order,
-                 SearchConfig* config);
 
+// @function negamax
+// @desc Implementation of the negamax algorithm.
+// SearchFn signature
+// Includes:
+// - Iterative Deepening
+// - Alpha-Beta Pruning
+// @returns Move The best move
+Move negamax(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 
-// @function search
-// @desc Principal Variation Search (PVS).
-// @param board Board position.
-// @param depth Remaining depth.
-// @param alpha Alpha bound.
-// @param beta Beta bound.
-// @param ply Current ply.
-// @param eval Evaluation function.
-// @param order Move ordering function.
-// @returns int Score (centipawns or mate).
-int search(Board* board,
-           int depth,
-           int alpha,
-           int beta,
-           int ply,
-           EvalFn eval,
-           OrderFn order);
+// @function negamax
+// @desc v0.4.0 search implementation (Many mistakes)
+// SearchFn signature
+// @returns Move The ~ok~ move
+Move search_v040(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 
 // @function quiescence
 // @desc Quiescence search (captures only).

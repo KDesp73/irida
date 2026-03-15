@@ -1,3 +1,4 @@
+#include "eval.h"
 #include "search.h"
 #include "uci.h"
 #include "core.h"
@@ -264,19 +265,6 @@ void uci_uci(UciState* state)
 
     PrintUciOptions(state);
 
-    /* Load default EvalFile so NNUE is used without GUI sending setoption. */
-    for (size_t i = 0; i < state->uciOptionCount; i++) {
-        if (strcmp(state->uciOptions[i].name, "EvalFile") == 0
-            && state->uciOptions[i].value.string[0] != '\0') {
-            const char* path = state->uciOptions[i].value.string;
-            if (nnue_load(path))
-                printf("info string EvalFile loaded: %s\n", path);
-            else
-                printf("info string Failed to load EvalFile '%s' (using PeSTO evaluation)\n", path);
-            break;
-        }
-    }
-
     printf("uciok\n");
 }
 
@@ -313,4 +301,63 @@ void uci_display(UciState* state)
 {
     UNUSED(state);
     castro_BoardPrint(&engine.board, 64);
+}
+
+void uci_seteval(UciState* state, const char* command)
+{
+    UNUSED(state);
+
+    if(strlen(command) <= strlen(COMMAND_SETEVAL) + 1) {
+        fprintf(stderr, "error Provide a valid evaluation function name: ");
+        fprintf(stderr, "pesto, nnue, material\n");
+        return;
+    }
+
+    const char* eval_name = command + strlen(COMMAND_SETEVAL) + 1; // +1 for the space
+
+    if(!strcmp(eval_name, "pesto")) {
+        engine.eval = pesto_eval;
+    } else if (!strcmp(eval_name, "nnue")) {
+        for (size_t i = 0; i < state->uciOptionCount; i++) {
+            if (strcmp(state->uciOptions[i].name, "EvalFile") == 0
+                && state->uciOptions[i].value.string[0] != '\0') {
+                const char* path = state->uciOptions[i].value.string;
+                if (nnue_load(path))
+                    printf("info string EvalFile loaded: %s\n", path);
+                else
+                    printf("info string Failed to load EvalFile '%s' (using PeSTO evaluation)\n", path);
+                break;
+            }
+        }
+        engine.eval = nnue_eval;
+    } else if (!strcmp(eval_name, "material")) {
+        engine.eval = material_eval;
+    } else {
+        fprintf(stderr, "error Invalid evaluation function name\n");
+        return;
+    }
+
+    printf("info Set %s as the evaluation function\n", eval_name);
+}
+
+void uci_setsearch(UciState* state, const char* command)
+{
+    UNUSED(state);
+
+    if(strlen(command) <= strlen(COMMAND_SETSEARCH) + 1) {
+        fprintf(stderr, "error Provide a valid search function name: ");
+        fprintf(stderr, "negamax\n");
+        return;
+    }
+
+    const char* search_name = command + strlen(COMMAND_SETSEARCH) + 1; // +1 for the space
+
+    if(!strcmp(search_name, "negamax")) {
+        engine.search = negamax;
+    } else {
+        fprintf(stderr, "error Invalid search function name\n");
+        return;
+    }
+
+    printf("info Set %s as the search function\n", search_name);
 }

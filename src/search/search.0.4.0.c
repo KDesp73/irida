@@ -10,9 +10,6 @@
 #include <stdint.h>
 #include <string.h>
 
-static bool search_should_stop(void) {
-    return search_time_up() || uci_state.stopRequested;
-}
 
 /* Helper to verify if a move is actually legal in the current position */
 static bool is_move_legal(Board* board, Move move) {
@@ -25,7 +22,10 @@ static bool is_move_legal(Board* board, Move move) {
 
 #define MAX_ID_DEPTH 64
 
-Move search_root(Board* board, EvalFn eval, OrderFn order, SearchConfig* config) {
+static int search(Board* board, int depth, int alpha, int beta, int ply, EvalFn eval, OrderFn order);
+
+Move search_v040(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
+{
     Move bestMove = {0};
     int bestScore = -INF;
 
@@ -173,7 +173,8 @@ Move search_root(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
     return bestMove;
 }
 
-int search(Board* board, int depth, int alpha, int beta, int ply, EvalFn eval, OrderFn order) {
+static int search(Board* board, int depth, int alpha, int beta, int ply, EvalFn eval, OrderFn order)
+{
     if ((g_searchStats.nodes++ & 2047) == 0 && search_should_stop()) return 0;
 
     if (ply > g_searchStats.selDepth) g_searchStats.selDepth = ply;

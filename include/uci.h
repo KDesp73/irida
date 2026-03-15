@@ -112,9 +112,7 @@ void StatePrint(const UciState* state);
 // @returns bool True if option found.
 bool GetUciOption(const UciState* state, char* name, UciOption* opt);
 
-// @const COMMAND_DEBUG
 #define COMMAND_DEBUG      "debug"
-#define COMMAND_DISPLAY    "d"
 #define COMMAND_GO         "go"
 #define COMMAND_ISREADY    "isready"
 #define COMMAND_POSITION   "position"
@@ -124,6 +122,10 @@ bool GetUciOption(const UciState* state, char* name, UciOption* opt);
 #define COMMAND_UCI        "uci"
 #define COMMAND_UCINEWGAME "ucinewgame"
 
+#define COMMAND_DISPLAY    "d"
+#define COMMAND_SETEVAL    "seteval"
+#define COMMAND_SETSEARCH  "setsearch"
+
 int UciMain(void);
 
 /** Run the UCI command loop only (state and config must already be initialized). */
@@ -132,7 +134,6 @@ int UciMainLoop(void);
 bool HandleCommand(UciState* state, const char *command);
 
 void uci_debug(UciState* state, const char* command);
-void uci_display(UciState* state);
 void uci_go(UciState* state, const char* command);
 void uci_isready(UciState* state);
 void uci_position(UciState* state, const char* command);
@@ -141,6 +142,12 @@ void uci_setoption(UciState* state, const char *command);
 void uci_stop(UciState* state);
 void uci_uci(UciState* state);
 void uci_ucinewgame(UciState* state);
+
+// Custom commands
+void uci_display(UciState* state);
+void uci_seteval(UciState* state, const char* command);
+void uci_setsearch(UciState* state, const char* command);
+
 
 // @function uci_stdout_lock
 // @desc Lock before writing to stdout from any thread.
@@ -165,6 +172,10 @@ void uci_search_thread_start(void);
 // @desc Ask the search thread to exit and wait for it. Call before process exit.
 void uci_search_thread_join(void);
 
+// @function uci_report_search
+// @desc UCI-compatible search process logging
+void uci_report_search(int depth, int bestScore, uint64_t nodes, uint64_t timeMs, const char* pvBuf);
+
 // @function StateSetStartPos
 // @desc Set start position FEN and init board.
 // @param state UciState.
@@ -182,6 +193,11 @@ static inline void StateSetStartPos(UciState* state, const char* startpos)
 static inline void InitState(UciState* state)
 {
     StateSetStartPos(state, STARTING_FEN);
+}
+
+static inline bool search_should_stop(void)
+{
+    return search_time_up() || uci_state.stopRequested;
 }
 
 #endif // ENGINE_UCI_H

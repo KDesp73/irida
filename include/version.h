@@ -14,7 +14,7 @@ extern "C" {
 
 // @const VERSION_MINOR
 // @desc Minor version number.
-#define VERSION_MINOR 4
+#define VERSION_MINOR 5
 
 // @const VERSION_PATCH
 // @desc Patch version number.
@@ -36,6 +36,9 @@ extern "C" {
 #ifndef ENGINE_NAME
 #define ENGINE_NAME "chess-engine"
 #endif
+
+// @const ENGINE_AUTHOR
+#define ENGINE_AUTHOR "Konstantinos Despoinidis (KDesp73)"
 
 // @function version
 // @desc Fills in the provided pointers with the current version numbers.

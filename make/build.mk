@@ -1,5 +1,5 @@
 .PHONY: build.all
-build.all: deps.check $(BUILD_DIR) build.castro build.nnue-probe build.fathom build.static build.shared $(TARGET) ## Build the entire project
+build.all: deps.check $(BUILD_DIR) build.castro build.static build.shared $(TARGET) ## Build the entire project
 	@echo "Build complete."
 
 $(TARGET): build.static ## Build the main executable

@@ -28,15 +28,20 @@ SearchConfig g_searchConfig = {
 
 int main(int argc, char** argv)
 {
-    castro_InitMasks();
-    pesto_init();
-    init_mvv_lva();
-    tt_init(16);
 
-    EngineInit(&engine, ENGINE_NAME, "KDesp73");
+    EngineInit(&engine, ENGINE_NAME, ENGINE_AUTHOR);
     engine.eval = nnue_eval;
-    engine.search = search_root;
+    engine.search = negamax;
     engine.order = order_moves;
+
+    // Load the nnue if possible
+    for (size_t i = 0; i < uci_state.uciOptionCount; i++) {
+        if (strcmp(uci_state.uciOptions[i].name, "EvalFile") == 0
+            && uci_state.uciOptions[i].value.string[0] != '\0') {
+            const char* path = uci_state.uciOptions[i].value.string;
+            nnue_load(path);
+        }
+    }
 
     if(argc > 1) return CliMain(argc, argv);
 
