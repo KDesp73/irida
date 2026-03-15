@@ -18,4 +18,6 @@ bool nnue_load(const char* path);
 // @returns bool True if NNUE is loaded.
 bool nnue_available(void);
 
+#define NNUE_DEFAULT_PATH "nn/nn-04cf2b4ed1da.nnue"
+
 #endif

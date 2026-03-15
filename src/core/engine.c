@@ -1,11 +1,12 @@
 #include "core.h"
 #include "tt.h"
+#include "version.h"
 #include <string.h>
 
-void EngineInit(Engine* engine, char* name, char* author)
+void EngineInit(Engine* engine)
 {
-    strncpy(engine->name, name, sizeof(engine->name));
-    strncpy(engine->author, author, sizeof(engine->author));
+    strncpy(engine->name, ENGINE_NAME, sizeof(engine->name));
+    strncpy(engine->author, ENGINE_AUTHOR, sizeof(engine->author));
 
     castro_InitMasks();
     pesto_init();

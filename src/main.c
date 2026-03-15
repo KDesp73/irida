@@ -7,7 +7,6 @@
 #include "search.h"
 #include "uci.h"
 #include "cli.h"
-#include "version.h"
 
 Engine engine;
 UciState uci_state;
@@ -39,9 +38,9 @@ int main(int argc, char** argv)
         }
     }
 
-    EngineInit(&engine, ENGINE_NAME, ENGINE_AUTHOR);
+    EngineInit(&engine);
     engine.eval = nnue_eval;
-    engine.search = negamax_id_ab_q_mo_tt;
+    engine.search = negamax_id_ab_q_mo_tt_nmp;
     engine.order = order_moves;
 
 

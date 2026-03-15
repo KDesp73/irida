@@ -28,9 +28,7 @@ typedef struct {
 // @function EngineInit
 // @desc Initialize engine with name and author; set function pointers and board state.
 // @param engine Engine to initialize.
-// @param name Engine name string.
-// @param author Author string.
-void EngineInit(Engine* engine, char* name, char* author);
+void EngineInit(Engine* engine);
 
 // @var engine
 // @desc Global engine instance; expected to be defined in main or startup.

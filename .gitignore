@@ -34,3 +34,4 @@ tinker
 bin/*
 !bin/books/
 !bin/past/
+benchmark

@@ -21,7 +21,8 @@ Move negamax_id_ab_q_mo_tt_nmp(Board* board, EvalFn eval, OrderFn order, SearchC
         
         if (search_time_up()) break;
 
-        Moves legal = castro_GenerateMoves(board, MOVE_LEGAL);
+        // NOTE: Generating pseudo-legal moves for faster generation
+        Moves legal = castro_GenerateMoves(board, MOVE_PSEUDO);
         
         // Use the order function with ply 0 at the root
         order(board, legal.list, legal.count, 0);
@@ -32,7 +33,7 @@ Move negamax_id_ab_q_mo_tt_nmp(Board* board, EvalFn eval, OrderFn order, SearchC
         Move currentBestMove = NULL_MOVE;
 
         for (size_t i = 0; i < legal.count; i++) {
-            castro_MakeMove(board, legal.list[i]);
+            if(!castro_MakeMove(board, legal.list[i])) continue;
             
             // Initial call to recursion: depth is currentDepth-1, ply is 1
             int score = -negamax_rec(board, eval, order, currentDepth - 1, 1, -beta, -alpha);
@@ -89,13 +90,7 @@ static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int 
     g_searchStats.nodes++;
 
     // 1. Terminal Check
-    Moves legal = castro_GenerateMoves(board, MOVE_LEGAL);
-    if (legal.count == 0) {
-        if (castro_IsInCheck(board)) {
-            return -INF + ply; 
-        }
-        return 0; // Stalemate
-    }
+    Moves pseudo = castro_GenerateMoves(board, MOVE_PSEUDO);
 
     // 2. Base Case: Transition to Quiescence Search
     if (depth <= 0) {
@@ -123,14 +118,17 @@ static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int 
     // --- Before Search ---
     int original_alpha = alpha;
     Move best_move_found = NULL_MOVE;
+    int legal_moves_count = 0;
 
     // Use tt_move for ordering if it exists (it's the most likely move to cause a cutoff)
     // NOTE: Might need to adjust order function signature to accept tt_move.
-    order(board, legal.list, legal.count, ply); 
+    order(board, pseudo.list, pseudo.count, ply); 
 
     int max_eval = -INF;
-    for (size_t i = 0; i < legal.count; i++) {
-        castro_MakeMove(board, legal.list[i]);
+    for (size_t i = 0; i < pseudo.count; i++) {
+        if(!castro_MakeMove(board, pseudo.list[i])) continue;
+
+        legal_moves_count++;
         int score = -negamax_rec(board, eval, order, depth - 1, ply + 1, -beta, -alpha);
         castro_UnmakeMove(board);
 
@@ -138,13 +136,20 @@ static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int 
 
         if (score > max_eval) {
             max_eval = score;
-            best_move_found = legal.list[i];
+            best_move_found = pseudo.list[i];
         }
 
         if (score > alpha) alpha = score;
 
         // Alpha-Beta Cutoff
         if (alpha >= beta) break; 
+    }
+
+    if (legal_moves_count == 0) {
+        if (castro_IsInCheck(board)) {
+            return -INF + ply; 
+        }
+        return 0; // Stalemate
     }
 
     // Determine the type of node we just searched:
