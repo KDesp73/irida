@@ -43,7 +43,7 @@ int quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, OrderFn 
     if (moves.count == 0)
         return alpha;
 
-    order(board, moves.list, moves.count, ply);
+    order(board, moves.list, moves.count, ply, NULL_MOVE);
 
     for (size_t i = 0; i < moves.count; i++) {
         Move move = moves.list[i];

@@ -24,7 +24,7 @@ Move negamax_id_ab_q_mo_tt_nmp(Board* board, EvalFn eval, OrderFn order, SearchC
         Moves legal = castro_GenerateMoves(board, MOVE_LEGAL);
         
         // Use the order function with ply 0 at the root
-        order(board, legal.list, legal.count, 0);
+        order(board, legal.list, legal.count, 0, NULL_MOVE);
 
         int alpha = -INF;
         int beta = INF;
