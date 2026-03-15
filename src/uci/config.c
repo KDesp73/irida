@@ -103,22 +103,6 @@ void LoadUciConfig(UciState* state)
         },
         .default_value = "7"
     };
-
-    if(state->uciOptionCount >= MAX_UCI_OPTIONS) return;
-    state->uciOptions[state->uciOptionCount++] = (UciOption) {
-        .name = "DebugInputLogFile",
-        .type = UCI_STRING,
-        .value.string = "/tmp/in.engine.log",
-        .default_value = "/tmp/in.engine.log"
-    };
-
-    if(state->uciOptionCount >= MAX_UCI_OPTIONS) return;
-    state->uciOptions[state->uciOptionCount++] = (UciOption) {
-        .name = "DebugOutputLogFile",
-        .type = UCI_STRING,
-        .value.string = "/tmp/out.engine.log",
-        .default_value = "/tmp/out.engine.log"
-    };
 }
 
 void PrintUciOptions(UciState* state)

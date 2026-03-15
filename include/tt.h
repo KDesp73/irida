@@ -31,6 +31,9 @@ typedef struct {
 void tt_init(size_t mb);
 
 // @function tt_clear
+// @desc Completely clears the transposition table.
+// Typically called at the start of a new game or when 
+// requested by the GUI to reset engine state.
 void tt_clear(void);
 
 // @function tt_inc_generation
@@ -74,7 +77,19 @@ void tt_store(uint64_t key,
               int ply);
 
 // @function tt_hashfull
-// @desc Approximate TT fill for current search generation (permill 0-1000).
+// @desc Returns the "hashfull" value for UCI.
+// Measures how many slots in the first 1000 entries are occupied 
+// by the current search generation. Returns a value from 0 to 1000.
 int tt_hashfull(void);
+
+// @function tt_adjust_score
+// @desc Converts a search score (relative to the root) into a 
+// position-independent score for storage in the TT.
+int tt_adjust_score(int stored, int ply);
+
+// @function tt_unadjust_score
+// @desc Converts a stored TT score (position-independent) back into 
+// a search score relative to the current search ply.
+int tt_unadjust_score(int stored, int ply);
 
 #endif // TT_H

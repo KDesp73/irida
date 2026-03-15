@@ -1,3 +1,4 @@
+#include "tt.h"
 #include "uci.h"
 
 void uci_report_search(int depth, int bestScore, uint64_t nodes, uint64_t timeMs, const char* pvBuf)
@@ -5,8 +6,7 @@ void uci_report_search(int depth, int bestScore, uint64_t nodes, uint64_t timeMs
     const int mateThreshold = MATE_SCORE - MAX_PLY;
     uint64_t nps = timeMs > 0 ? (nodes * 1000) / timeMs : 0;
     
-    // TODO: Calculate hashfull from TT
-    int hashfull = 0; 
+    int hashfull = tt_hashfull(); 
 
     uci_stdout_lock();
     printf("info depth %d seldepth %d score ", depth, g_searchStats.selDepth);

@@ -2,10 +2,8 @@ TODO: pick a license
 TODO: pick a name
 TODO: texel tuning
 TODO: syzygy tablebase (optional Fathom)
-TODO: better traditional evaluation
 TODO: aspiration windows
 TODO: transposition tables
-TODO: move ordering
 TODO: search
 DONE: engine testing
 DONE: cache
@@ -19,3 +17,5 @@ DONE: book moves database
 DONE: refactor move generation into its own library
 DONE: movegen documentation
 DONE: nnue evaluation (optional nnue-probe)
+DONE: move ordering
+DONE: better traditional evaluation

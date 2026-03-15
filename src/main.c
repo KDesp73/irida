@@ -1,10 +1,10 @@
 #include "castro.h"
+#include "IncludeOnly/logging.h"
 #include "core.h"
 #include "eval.h"
 #include "moveordering.h"
 #include "nnue.h"
 #include "search.h"
-#include "tt.h"
 #include "uci.h"
 #include "cli.h"
 #include "version.h"
@@ -28,19 +28,22 @@ SearchConfig g_searchConfig = {
 
 int main(int argc, char** argv)
 {
-    EngineInit(&engine, ENGINE_NAME, ENGINE_AUTHOR);
-    engine.eval = nnue_eval;
-    engine.search = negamax_id_ab_q_mo;
-    engine.order = order_moves;
-
     // Load the nnue if possible
     for (size_t i = 0; i < uci_state.uciOptionCount; i++) {
         if (strcmp(uci_state.uciOptions[i].name, "EvalFile") == 0
             && uci_state.uciOptions[i].value.string[0] != '\0') {
             const char* path = uci_state.uciOptions[i].value.string;
-            nnue_load(path);
+            if(!nnue_load(path)){
+                ERRO("Could not load nnue %s\n", path);
+            }
         }
     }
+
+    EngineInit(&engine, ENGINE_NAME, ENGINE_AUTHOR);
+    engine.eval = nnue_eval;
+    engine.search = negamax_id_ab_q_mo_tt;
+    engine.order = order_moves;
+
 
     if(argc > 1) return CliMain(argc, argv);
 

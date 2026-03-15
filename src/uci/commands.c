@@ -276,6 +276,7 @@ void uci_isready(UciState* state)
 
 void uci_ucinewgame(UciState* state)
 {
+    tt_clear();
     InitState(state);
     printf("info New game started.\n");
 }

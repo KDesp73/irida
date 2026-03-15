@@ -65,6 +65,7 @@ typedef Move (*SearchFn)(Board* board,
 
 Move negamax_id_ab(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 Move negamax_id_ab_q_mo(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
+Move negamax_id_ab_q_mo_tt(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 
 // @function negamax
 // @desc v0.4.0 search implementation (Many mistakes)

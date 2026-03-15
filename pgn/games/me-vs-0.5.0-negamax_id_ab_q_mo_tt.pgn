@@ -1,0 +1,23 @@
+[Event "?"]
+[Site "?"]
+[Date "2026.03.15"]
+[Round "?"]
+[White "White"]
+[Black "Black"]
+[Result "0-1"]
+
+1. e4 c5 2. d4 cxd4 3. Qxd4 Nc6 {EV: 45.6%} 4. Qd3 Nf6 {EV: 57.7%} 5. Nc3 Nb4
+{EV: 70.5%} 6. Qd2 Qa5 {EV: 68.5%} 7. Nf3 Nxe4 {EV: 96.3%} 8. Nxe4 Nxc2+ {EV:
+92.9%} 9. Kd1 Qxd2+ {EV: 90.7%} 10. Nfxd2 Nxa1 {EV: 93.8%} 11. Bc4 e6 {EV:
+97.4%} 12. Nc3 Bb4 {EV: 97.6%} 13. Nf3 O-O {EV: 97.8%} 14. Bf4 Bxc3 {EV: 97.3%}
+15. bxc3 d5 {EV: 91.5%} 16. Be2 e5 {EV: 91.1%} 17. Bxe5 Bf5 {EV: 92.6%} 18. Nd4
+Rfe8 {EV: 97.2%} 19. f4 Be4 {EV: 97.9%} 20. Bf3 f6 {EV: 97.7%} 21. Bd6 Rad8 {EV:
+98.3%} 22. Ba3 g5 {EV: 87.3%} 23. fxg5 Kf7 {EV: 73.0%} 24. Kd2 Bxf3 {EV: 67.0%}
+25. gxf3 Rg8 {EV: 51.2%} 26. Rxa1 Rxg5 {EV: 54.6%} 27. Re1 Rg2+ {EV: 74.0%} 28.
+Re2 Rdg8 {EV: 71.4%} 29. Bd6 Rxe2+ {EV: 72.7%} 30. Nxe2 Rg2 {EV: 72.2%} 31. Bg3
+h5 {EV: 61.9%} 32. Kd3 h4 {EV: 59.9%} 33. Bxh4 Rxh2 {EV: 71.5%} 34. Bg3 Rh1 {EV:
+58.7%} 35. a3 Ra1 {EV: 71.3%} 36. Bd6 Rd1+ {EV: 70.3%} 37. Kc2 Re1 {EV: 66.1%}
+38. Nd4 Rg1 {EV: 57.7%} 39. Bb8 a6 {EV: 57.0%} 40. Bc7 Rf1 {EV: 59.0%} 41. Kb3
+Rb1+ {EV: 59.0%} 42. Ka4 Ke7 {EV: 62.5%} 43. Ba5 b5+ {EV: 0.0%} 44. Nxb5 axb5#
+{EV: 0.0%} 0-1
+
