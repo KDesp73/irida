@@ -3,7 +3,6 @@ TODO: pick a name
 TODO: texel tuning
 TODO: syzygy tablebase (optional Fathom)
 TODO: aspiration windows
-TODO: transposition tables
 TODO: search
 DONE: engine testing
 DONE: cache
@@ -19,3 +18,4 @@ DONE: movegen documentation
 DONE: nnue evaluation (optional nnue-probe)
 DONE: move ordering
 DONE: better traditional evaluation
+DONE: transposition tables

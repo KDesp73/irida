@@ -1,6 +1,6 @@
 {
     "name": "engine",
-    "timestamp": "2026-03-12 13:43:32",
+    "timestamp": "2026-03-16 15:01:22",
     "docs": [
         {
             "file": "include/cli.h",
@@ -641,26 +641,6 @@
                                 ],
                                 "line": 30,
                                 "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "name",
-                                    "Engine name string."
-                                ],
-                                "line": 31,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "author",
-                                    "Author string."
-                                ],
-                                "line": 32,
-                                "children": []
                             }
                         ]
                     },
@@ -670,7 +650,7 @@
                         "args": [
                             "engine"
                         ],
-                        "line": 35,
+                        "line": 33,
                         "children": [
                             {
                                 "marker": "desc",
@@ -678,7 +658,7 @@
                                 "args": [
                                     "Global engine instance; expected to be defined in main or startup."
                                 ],
-                                "line": 36,
+                                "line": 34,
                                 "children": []
                             }
                         ]
@@ -810,7 +790,7 @@
                         "args": [
                             "material_eval"
                         ],
-                        "line": 28,
+                        "line": 29,
                         "children": [
                             {
                                 "marker": "param",
@@ -819,7 +799,7 @@
                                     "board",
                                     "Board to evaluate."
                                 ],
-                                "line": 29,
+                                "line": 30,
                                 "children": []
                             },
                             {
@@ -829,7 +809,7 @@
                                     "int",
                                     "Material-only eval (centipawns)."
                                 ],
-                                "line": 30,
+                                "line": 31,
                                 "children": []
                             }
                         ]
@@ -840,7 +820,7 @@
                         "args": [
                             "pesto_eval"
                         ],
-                        "line": 33,
+                        "line": 34,
                         "children": [
                             {
                                 "marker": "param",
@@ -849,7 +829,7 @@
                                     "board",
                                     "Board to evaluate."
                                 ],
-                                "line": 34,
+                                "line": 35,
                                 "children": []
                             },
                             {
@@ -859,7 +839,7 @@
                                     "int",
                                     "PeSTO eval (centipawns, side-to-move)."
                                 ],
-                                "line": 35,
+                                "line": 36,
                                 "children": []
                             }
                         ]
@@ -870,7 +850,7 @@
                         "args": [
                             "pesto_eval_breakdown"
                         ],
-                        "line": 38,
+                        "line": 39,
                         "children": [
                             {
                                 "marker": "desc",
@@ -878,7 +858,7 @@
                                 "args": [
                                     "Fills *out with per-term breakdown; returns same value as pesto_eval."
                                 ],
-                                "line": 39,
+                                "line": 40,
                                 "children": []
                             },
                             {
@@ -888,7 +868,7 @@
                                     "board",
                                     "Board to evaluate."
                                 ],
-                                "line": 40,
+                                "line": 41,
                                 "children": []
                             },
                             {
@@ -898,7 +878,7 @@
                                     "out",
                                     "Output breakdown struct."
                                 ],
-                                "line": 41,
+                                "line": 42,
                                 "children": []
                             },
                             {
@@ -908,7 +888,7 @@
                                     "int",
                                     "PeSTO eval (centipawns)."
                                 ],
-                                "line": 42,
+                                "line": 43,
                                 "children": []
                             }
                         ]
@@ -919,7 +899,7 @@
                         "args": [
                             "pesto_log_breakdown"
                         ],
-                        "line": 45,
+                        "line": 46,
                         "children": [
                             {
                                 "marker": "desc",
@@ -927,17 +907,17 @@
                                 "args": [
                                     "Logs eval breakdown to stderr (e.g. for debugging)."
                                 ],
-                                "line": 46,
+                                "line": 47,
                                 "children": []
                             },
                             {
                                 "marker": "param",
                                 "type": "parameter",
                                 "args": [
-                                    "board",
-                                    "Board to evaluate."
+                                    "b",
+                                    "EvalBreakdown"
                                 ],
-                                "line": 47,
+                                "line": 48,
                                 "children": []
                             }
                         ]
@@ -948,7 +928,7 @@
                         "args": [
                             "pesto_init"
                         ],
-                        "line": 50,
+                        "line": 51,
                         "children": [
                             {
                                 "marker": "desc",
@@ -956,7 +936,7 @@
                                 "args": [
                                     "Initialize PeSTO tables. Call once at startup."
                                 ],
-                                "line": 51,
+                                "line": 52,
                                 "children": []
                             }
                         ]
@@ -967,7 +947,7 @@
                         "args": [
                             "pesto_set_tune_values"
                         ],
-                        "line": 54,
+                        "line": 55,
                         "children": [
                             {
                                 "marker": "desc",
@@ -975,7 +955,7 @@
                                 "args": [
                                     "For Texel tuning: set mg_value[6], eg_value[6] and rebuild tables."
                                 ],
-                                "line": 55,
+                                "line": 56,
                                 "children": []
                             },
                             {
@@ -985,7 +965,7 @@
                                     "mg_value",
                                     "Midgame piece values (pawn..king)."
                                 ],
-                                "line": 56,
+                                "line": 57,
                                 "children": []
                             },
                             {
@@ -995,7 +975,7 @@
                                     "eg_value",
                                     "Endgame piece values."
                                 ],
-                                "line": 57,
+                                "line": 58,
                                 "children": []
                             }
                         ]
@@ -1006,7 +986,7 @@
                         "args": [
                             "pesto_material_pst_eval_white"
                         ],
-                        "line": 60,
+                        "line": 61,
                         "children": [
                             {
                                 "marker": "desc",
@@ -1014,7 +994,7 @@
                                 "args": [
                                     "Material + PST only, from white's perspective (centipawns)."
                                 ],
-                                "line": 61,
+                                "line": 62,
                                 "children": []
                             },
                             {
@@ -1024,7 +1004,7 @@
                                     "board",
                                     "Board to evaluate."
                                 ],
-                                "line": 62,
+                                "line": 63,
                                 "children": []
                             },
                             {
@@ -1034,7 +1014,7 @@
                                     "int",
                                     "Centipawns (white perspective)."
                                 ],
-                                "line": 63,
+                                "line": 64,
                                 "children": []
                             }
                         ]
@@ -1045,7 +1025,7 @@
                         "args": [
                             "nnue_eval"
                         ],
-                        "line": 66,
+                        "line": 67,
                         "children": [
                             {
                                 "marker": "desc",
@@ -1053,7 +1033,7 @@
                                 "args": [
                                     "Evaluate position. Uses NNUE if loaded; otherwise returns 0 (caller should use PeSTO)."
                                 ],
-                                "line": 67,
+                                "line": 68,
                                 "children": []
                             },
                             {
@@ -1063,7 +1043,7 @@
                                     "board",
                                     "Board to evaluate."
                                 ],
-                                "line": 68,
+                                "line": 69,
                                 "children": []
                             },
                             {
@@ -1073,185 +1053,7 @@
                                     "int",
                                     "Centipawns or 0 if NNUE not loaded."
                                 ],
-                                "line": 69,
-                                "children": []
-                            }
-                        ]
-                    }
-                ]
-            }
-        },
-        {
-            "file": "include/eval_cache.h",
-            "docs": {
-                "marker": "module",
-                "type": "module",
-                "args": [
-                    "eval_cache"
-                ],
-                "line": 8,
-                "children": [
-                    {
-                        "marker": "desc",
-                        "type": "description",
-                        "args": [
-                            "Eval cache: clear, probe, store, cached eval wrapper."
-                        ],
-                        "line": 9,
-                        "children": []
-                    },
-                    {
-                        "marker": "function",
-                        "type": "function",
-                        "args": [
-                            "eval_cache_clear"
-                        ],
-                        "line": 11,
-                        "children": [
-                            {
-                                "marker": "desc",
-                                "type": "description",
-                                "args": [
-                                    "Clear the eval cache. Call at the start of each search."
-                                ],
-                                "line": 12,
-                                "children": []
-                            }
-                        ]
-                    },
-                    {
-                        "marker": "function",
-                        "type": "function",
-                        "args": [
-                            "eval_cache_probe"
-                        ],
-                        "line": 15,
-                        "children": [
-                            {
-                                "marker": "desc",
-                                "type": "description",
-                                "args": [
-                                    "Probe cache by Zobrist key. Returns true and sets *out_score if hit."
-                                ],
-                                "line": 16,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "key",
-                                    "Zobrist key."
-                                ],
-                                "line": 17,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "out_score",
-                                    "Output score (set on hit)."
-                                ],
-                                "line": 18,
-                                "children": []
-                            },
-                            {
-                                "marker": "returns",
-                                "type": "return",
-                                "args": [
-                                    "bool",
-                                    "True if cache hit."
-                                ],
-                                "line": 19,
-                                "children": []
-                            }
-                        ]
-                    },
-                    {
-                        "marker": "function",
-                        "type": "function",
-                        "args": [
-                            "eval_cache_store"
-                        ],
-                        "line": 22,
-                        "children": [
-                            {
-                                "marker": "desc",
-                                "type": "description",
-                                "args": [
-                                    "Store (key, score) in the cache."
-                                ],
-                                "line": 23,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "key",
-                                    "Zobrist key."
-                                ],
-                                "line": 24,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "score",
-                                    "Score to store."
-                                ],
-                                "line": 25,
-                                "children": []
-                            }
-                        ]
-                    },
-                    {
-                        "marker": "function",
-                        "type": "function",
-                        "args": [
-                            "eval_cached"
-                        ],
-                        "line": 28,
-                        "children": [
-                            {
-                                "marker": "desc",
-                                "type": "description",
-                                "args": [
-                                    "Evaluate position with cache: probe first, on miss call eval(board) and store result."
-                                ],
-                                "line": 29,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "board",
-                                    "Board to evaluate."
-                                ],
-                                "line": 30,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "eval",
-                                    "Evaluation function."
-                                ],
-                                "line": 31,
-                                "children": []
-                            },
-                            {
-                                "marker": "returns",
-                                "type": "return",
-                                "args": [
-                                    "int",
-                                    "Score (centipawns)."
-                                ],
-                                "line": 32,
+                                "line": 70,
                                 "children": []
                             }
                         ]
@@ -1703,7 +1505,7 @@
                                 "marker": "desc",
                                 "type": "description",
                                 "args": [
-                                    "Counters and diagnostics for the last search (nodes, qnodes, TT hits, selDepth)."
+                                    "Counters and diagnostics for the last search (nodes, qnodes, TT hits, selDepth, tbhits)."
                                 ],
                                 "line": 42,
                                 "children": []
@@ -1716,7 +1518,7 @@
                         "args": [
                             "SearchFn"
                         ],
-                        "line": 51,
+                        "line": 52,
                         "children": [
                             {
                                 "marker": "desc",
@@ -1724,175 +1526,7 @@
                                 "args": [
                                     "Function pointer: root search (board, eval, order, config) -> best Move."
                                 ],
-                                "line": 52,
-                                "children": []
-                            }
-                        ]
-                    },
-                    {
-                        "marker": "function",
-                        "type": "function",
-                        "args": [
-                            "search_root"
-                        ],
-                        "line": 58,
-                        "children": [
-                            {
-                                "marker": "desc",
-                                "type": "description",
-                                "args": [
-                                    "Root search (iterative deepening entry)."
-                                ],
-                                "line": 59,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "board",
-                                    "Board position."
-                                ],
-                                "line": 60,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "eval",
-                                    "Evaluation function."
-                                ],
-                                "line": 61,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "order",
-                                    "Move ordering function."
-                                ],
-                                "line": 62,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "config",
-                                    "Search config."
-                                ],
-                                "line": 63,
-                                "children": []
-                            },
-                            {
-                                "marker": "returns",
-                                "type": "return",
-                                "args": [
-                                    "Move",
-                                    "Best move from root."
-                                ],
-                                "line": 64,
-                                "children": []
-                            }
-                        ]
-                    },
-                    {
-                        "marker": "function",
-                        "type": "function",
-                        "args": [
-                            "search"
-                        ],
-                        "line": 71,
-                        "children": [
-                            {
-                                "marker": "desc",
-                                "type": "description",
-                                "args": [
-                                    "Principal Variation Search (PVS)."
-                                ],
-                                "line": 72,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "board",
-                                    "Board position."
-                                ],
-                                "line": 73,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "depth",
-                                    "Remaining depth."
-                                ],
-                                "line": 74,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "alpha",
-                                    "Alpha bound."
-                                ],
-                                "line": 75,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "beta",
-                                    "Beta bound."
-                                ],
-                                "line": 76,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "ply",
-                                    "Current ply."
-                                ],
-                                "line": 77,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "eval",
-                                    "Evaluation function."
-                                ],
-                                "line": 78,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "order",
-                                    "Move ordering function."
-                                ],
-                                "line": 79,
-                                "children": []
-                            },
-                            {
-                                "marker": "returns",
-                                "type": "return",
-                                "args": [
-                                    "int",
-                                    "Score (centipawns or mate)."
-                                ],
-                                "line": 80,
+                                "line": 53,
                                 "children": []
                             }
                         ]
@@ -1903,7 +1537,7 @@
                         "args": [
                             "quiescence"
                         ],
-                        "line": 89,
+                        "line": 76,
                         "children": [
                             {
                                 "marker": "desc",
@@ -1911,7 +1545,7 @@
                                 "args": [
                                     "Quiescence search (captures only)."
                                 ],
-                                "line": 90,
+                                "line": 77,
                                 "children": []
                             },
                             {
@@ -1921,7 +1555,7 @@
                                     "board",
                                     "Board position."
                                 ],
-                                "line": 91,
+                                "line": 78,
                                 "children": []
                             },
                             {
@@ -1931,7 +1565,7 @@
                                     "alpha",
                                     "Alpha bound."
                                 ],
-                                "line": 92,
+                                "line": 79,
                                 "children": []
                             },
                             {
@@ -1941,7 +1575,7 @@
                                     "beta",
                                     "Beta bound."
                                 ],
-                                "line": 93,
+                                "line": 80,
                                 "children": []
                             },
                             {
@@ -1951,7 +1585,7 @@
                                     "ply",
                                     "Current ply."
                                 ],
-                                "line": 94,
+                                "line": 81,
                                 "children": []
                             },
                             {
@@ -1961,7 +1595,7 @@
                                     "eval",
                                     "Evaluation function."
                                 ],
-                                "line": 95,
+                                "line": 82,
                                 "children": []
                             },
                             {
@@ -1971,7 +1605,7 @@
                                     "order",
                                     "Move ordering function."
                                 ],
-                                "line": 96,
+                                "line": 83,
                                 "children": []
                             },
                             {
@@ -1981,7 +1615,7 @@
                                     "int",
                                     "Score."
                                 ],
-                                "line": 97,
+                                "line": 84,
                                 "children": []
                             }
                         ]
@@ -1992,7 +1626,7 @@
                         "args": [
                             "search_start_timer"
                         ],
-                        "line": 106,
+                        "line": 93,
                         "children": [
                             {
                                 "marker": "param",
@@ -2001,7 +1635,7 @@
                                     "timeLimitMs",
                                     "Time limit in milliseconds (0 = no limit)."
                                 ],
-                                "line": 107,
+                                "line": 94,
                                 "children": []
                             }
                         ]
@@ -2012,7 +1646,7 @@
                         "args": [
                             "search_time_up"
                         ],
-                        "line": 110,
+                        "line": 97,
                         "children": [
                             {
                                 "marker": "returns",
@@ -2021,7 +1655,7 @@
                                     "bool",
                                     "True if time limit exceeded."
                                 ],
-                                "line": 111,
+                                "line": 98,
                                 "children": []
                             }
                         ]
@@ -2032,7 +1666,7 @@
                         "args": [
                             "search_elapsed_ms"
                         ],
-                        "line": 114,
+                        "line": 101,
                         "children": [
                             {
                                 "marker": "returns",
@@ -2041,7 +1675,7 @@
                                     "uint64_t",
                                     "Elapsed milliseconds since timer start."
                                 ],
-                                "line": 115,
+                                "line": 102,
                                 "children": []
                             }
                         ]
@@ -2052,7 +1686,7 @@
                         "args": [
                             "g_searchStats"
                         ],
-                        "line": 118,
+                        "line": 105,
                         "children": [
                             {
                                 "marker": "desc",
@@ -2060,7 +1694,7 @@
                                 "args": [
                                     "Global search statistics for last search."
                                 ],
-                                "line": 119,
+                                "line": 106,
                                 "children": []
                             }
                         ]
@@ -2071,7 +1705,7 @@
                         "args": [
                             "g_searchConfig"
                         ],
-                        "line": 122,
+                        "line": 109,
                         "children": [
                             {
                                 "marker": "desc",
@@ -2079,7 +1713,7 @@
                                 "args": [
                                     "Global search config (set by UCI go command)."
                                 ],
-                                "line": 123,
+                                "line": 110,
                                 "children": []
                             }
                         ]
@@ -2446,7 +2080,17 @@
                             "tt_clear"
                         ],
                         "line": 33,
-                        "children": []
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Completely clears the transposition table. Typically called at the start of a new game or when requested by the GUI to reset engine state."
+                                ],
+                                "line": 34,
+                                "children": []
+                            }
+                        ]
                     },
                     {
                         "marker": "function",
@@ -2454,7 +2098,7 @@
                         "args": [
                             "tt_inc_generation"
                         ],
-                        "line": 36,
+                        "line": 39,
                         "children": [
                             {
                                 "marker": "desc",
@@ -2462,7 +2106,7 @@
                                 "args": [
                                     "Call at start of each search_root."
                                 ],
-                                "line": 37,
+                                "line": 40,
                                 "children": []
                             }
                         ]
@@ -2473,7 +2117,7 @@
                         "args": [
                             "tt_probe"
                         ],
-                        "line": 40,
+                        "line": 43,
                         "children": [
                             {
                                 "marker": "param",
@@ -2482,7 +2126,7 @@
                                     "key",
                                     "Position key."
                                 ],
-                                "line": 41,
+                                "line": 44,
                                 "children": []
                             },
                             {
@@ -2492,7 +2136,7 @@
                                     "depth",
                                     "Stored depth."
                                 ],
-                                "line": 42,
+                                "line": 45,
                                 "children": []
                             },
                             {
@@ -2502,7 +2146,7 @@
                                     "alpha",
                                     "Alpha bound."
                                 ],
-                                "line": 43,
+                                "line": 46,
                                 "children": []
                             },
                             {
@@ -2512,7 +2156,7 @@
                                     "beta",
                                     "Beta bound."
                                 ],
-                                "line": 44,
+                                "line": 47,
                                 "children": []
                             },
                             {
@@ -2522,7 +2166,7 @@
                                     "ply",
                                     "Current ply."
                                 ],
-                                "line": 45,
+                                "line": 48,
                                 "children": []
                             },
                             {
@@ -2532,7 +2176,7 @@
                                     "outScore",
                                     "Output score (if hit)."
                                 ],
-                                "line": 46,
+                                "line": 49,
                                 "children": []
                             },
                             {
@@ -2542,7 +2186,7 @@
                                     "outMove",
                                     "Output best move (if hit)."
                                 ],
-                                "line": 47,
+                                "line": 50,
                                 "children": []
                             },
                             {
@@ -2552,7 +2196,36 @@
                                     "bool",
                                     "True if probe hit and score/move are valid."
                                 ],
-                                "line": 48,
+                                "line": 51,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "function",
+                        "type": "function",
+                        "args": [
+                            "tt_probe_pv"
+                        ],
+                        "line": 60,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "For PV construction: return stored best move if key and generation match (ignore depth)."
+                                ],
+                                "line": 61,
+                                "children": []
+                            },
+                            {
+                                "marker": "returns",
+                                "type": "return",
+                                "args": [
+                                    "bool",
+                                    "True if entry exists and *outMove was set."
+                                ],
+                                "line": 62,
                                 "children": []
                             }
                         ]
@@ -2563,7 +2236,7 @@
                         "args": [
                             "tt_store"
                         ],
-                        "line": 57,
+                        "line": 65,
                         "children": [
                             {
                                 "marker": "param",
@@ -2572,7 +2245,7 @@
                                     "key",
                                     "Position key."
                                 ],
-                                "line": 58,
+                                "line": 66,
                                 "children": []
                             },
                             {
@@ -2582,7 +2255,7 @@
                                     "depth",
                                     "Depth of score."
                                 ],
-                                "line": 59,
+                                "line": 67,
                                 "children": []
                             },
                             {
@@ -2592,7 +2265,7 @@
                                     "score",
                                     "Score to store."
                                 ],
-                                "line": 60,
+                                "line": 68,
                                 "children": []
                             },
                             {
@@ -2602,7 +2275,7 @@
                                     "type",
                                     "TT_EXACT, TT_LOWERBOUND, or TT_UPPERBOUND."
                                 ],
-                                "line": 61,
+                                "line": 69,
                                 "children": []
                             },
                             {
@@ -2612,7 +2285,7 @@
                                     "bestMove",
                                     "Best move at this node."
                                 ],
-                                "line": 62,
+                                "line": 70,
                                 "children": []
                             },
                             {
@@ -2622,7 +2295,64 @@
                                     "ply",
                                     "Current ply (for generation)."
                                 ],
-                                "line": 63,
+                                "line": 71,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "function",
+                        "type": "function",
+                        "args": [
+                            "tt_hashfull"
+                        ],
+                        "line": 79,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Returns the \"hashfull\" value for UCI. Measures how many slots in the first 1000 entries are occupied by the current search generation. Returns a value from 0 to 1000."
+                                ],
+                                "line": 80,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "function",
+                        "type": "function",
+                        "args": [
+                            "tt_adjust_score"
+                        ],
+                        "line": 85,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Converts a search score (relative to the root) into a position-independent score for storage in the TT."
+                                ],
+                                "line": 86,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "function",
+                        "type": "function",
+                        "args": [
+                            "tt_unadjust_score"
+                        ],
+                        "line": 90,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Converts a stored TT score (position-independent) back into a search score relative to the current search ply."
+                                ],
+                                "line": 91,
                                 "children": []
                             }
                         ]
@@ -2893,47 +2623,10 @@
                         ]
                     },
                     {
-                        "marker": "const",
-                        "type": "any",
-                        "args": [
-                            "COMMAND_DEBUG"
-                        ],
-                        "line": 115,
-                        "children": []
-                    },
-                    {
                         "marker": "function",
                         "type": "function",
                         "args": [
                             "uci_stdout_lock"
-                        ],
-                        "line": 145,
-                        "children": [
-                            {
-                                "marker": "desc",
-                                "type": "description",
-                                "args": [
-                                    "Lock before writing to stdout from any thread."
-                                ],
-                                "line": 146,
-                                "children": []
-                            }
-                        ]
-                    },
-                    {
-                        "marker": "function",
-                        "type": "function",
-                        "args": [
-                            "uci_stdout_unlock"
-                        ],
-                        "line": 149,
-                        "children": []
-                    },
-                    {
-                        "marker": "function",
-                        "type": "function",
-                        "args": [
-                            "uci_search_wait_done"
                         ],
                         "line": 152,
                         "children": [
@@ -2941,7 +2634,7 @@
                                 "marker": "desc",
                                 "type": "description",
                                 "args": [
-                                    "Block until the search thread is idle."
+                                    "Lock before writing to stdout from any thread."
                                 ],
                                 "line": 153,
                                 "children": []
@@ -2952,9 +2645,37 @@
                         "marker": "function",
                         "type": "function",
                         "args": [
-                            "uci_search_start"
+                            "uci_stdout_unlock"
                         ],
                         "line": 156,
+                        "children": []
+                    },
+                    {
+                        "marker": "function",
+                        "type": "function",
+                        "args": [
+                            "uci_search_wait_done"
+                        ],
+                        "line": 159,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Block until the search thread is idle."
+                                ],
+                                "line": 160,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "function",
+                        "type": "function",
+                        "args": [
+                            "uci_search_start"
+                        ],
+                        "line": 163,
                         "children": [
                             {
                                 "marker": "desc",
@@ -2962,7 +2683,7 @@
                                 "args": [
                                     "Signal the search thread to run search (called from uci_go)."
                                 ],
-                                "line": 157,
+                                "line": 164,
                                 "children": []
                             }
                         ]
@@ -2973,7 +2694,7 @@
                         "args": [
                             "uci_search_thread_start"
                         ],
-                        "line": 160,
+                        "line": 167,
                         "children": [
                             {
                                 "marker": "desc",
@@ -2981,7 +2702,7 @@
                                 "args": [
                                     "Start the search worker thread. Call once from UciMain before the command loop."
                                 ],
-                                "line": 161,
+                                "line": 168,
                                 "children": []
                             }
                         ]
@@ -2992,7 +2713,7 @@
                         "args": [
                             "uci_search_thread_join"
                         ],
-                        "line": 164,
+                        "line": 171,
                         "children": [
                             {
                                 "marker": "desc",
@@ -3000,7 +2721,26 @@
                                 "args": [
                                     "Ask the search thread to exit and wait for it. Call before process exit."
                                 ],
-                                "line": 165,
+                                "line": 172,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "function",
+                        "type": "function",
+                        "args": [
+                            "uci_report_search"
+                        ],
+                        "line": 175,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "UCI-compatible search process logging"
+                                ],
+                                "line": 176,
                                 "children": []
                             }
                         ]
@@ -3011,52 +2751,13 @@
                         "args": [
                             "StateSetStartPos"
                         ],
-                        "line": 168,
-                        "children": [
-                            {
-                                "marker": "desc",
-                                "type": "description",
-                                "args": [
-                                    "Set start position FEN and init board."
-                                ],
-                                "line": 169,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "state",
-                                    "UciState."
-                                ],
-                                "line": 170,
-                                "children": []
-                            },
-                            {
-                                "marker": "param",
-                                "type": "parameter",
-                                "args": [
-                                    "startpos",
-                                    "FEN string (e.g. \"startpos\" or full FEN)."
-                                ],
-                                "line": 171,
-                                "children": []
-                            }
-                        ]
-                    },
-                    {
-                        "marker": "function",
-                        "type": "function",
-                        "args": [
-                            "InitState"
-                        ],
                         "line": 179,
                         "children": [
                             {
                                 "marker": "desc",
                                 "type": "description",
                                 "args": [
-                                    "Initialize state with starting position."
+                                    "Set start position FEN and init board."
                                 ],
                                 "line": 180,
                                 "children": []
@@ -3069,6 +2770,45 @@
                                     "UciState."
                                 ],
                                 "line": 181,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "startpos",
+                                    "FEN string (e.g. \"startpos\" or full FEN)."
+                                ],
+                                "line": 182,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "marker": "function",
+                        "type": "function",
+                        "args": [
+                            "InitState"
+                        ],
+                        "line": 190,
+                        "children": [
+                            {
+                                "marker": "desc",
+                                "type": "description",
+                                "args": [
+                                    "Initialize state with starting position."
+                                ],
+                                "line": 191,
+                                "children": []
+                            },
+                            {
+                                "marker": "param",
+                                "type": "parameter",
+                                "args": [
+                                    "state",
+                                    "UciState."
+                                ],
+                                "line": 192,
                                 "children": []
                             }
                         ]
@@ -3289,12 +3029,21 @@
                         ]
                     },
                     {
+                        "marker": "const",
+                        "type": "any",
+                        "args": [
+                            "ENGINE_AUTHOR"
+                        ],
+                        "line": 40,
+                        "children": []
+                    },
+                    {
                         "marker": "function",
                         "type": "function",
                         "args": [
                             "version"
                         ],
-                        "line": 40,
+                        "line": 43,
                         "children": [
                             {
                                 "marker": "desc",
@@ -3302,7 +3051,7 @@
                                 "args": [
                                     "Fills in the provided pointers with the current version numbers."
                                 ],
-                                "line": 41,
+                                "line": 44,
                                 "children": []
                             },
                             {
@@ -3312,7 +3061,7 @@
                                     "major",
                                     "Pointer to store major version (or NULL)."
                                 ],
-                                "line": 42,
+                                "line": 45,
                                 "children": []
                             },
                             {
@@ -3322,7 +3071,7 @@
                                     "minor",
                                     "Pointer to store minor version (or NULL)."
                                 ],
-                                "line": 43,
+                                "line": 46,
                                 "children": []
                             },
                             {
@@ -3332,7 +3081,7 @@
                                     "patch",
                                     "Pointer to store patch version (or NULL)."
                                 ],
-                                "line": 44,
+                                "line": 47,
                                 "children": []
                             }
                         ]
