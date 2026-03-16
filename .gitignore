@@ -1,37 +1,56 @@
-build
-compile_commands.json
-.cache
-
-__pycache__
-
+# --- Compiled Binaries & Objects ---
 *.o
-
-.changelog
-tmp
-*.log
-
-libengine.*
-engine
-
-check
-nn
-*.dSYM
-
-# NNUE training outputs
-training/out/*.pt
-training/out/*.nnue
-
-# Vendor
-vendor/fathom/obj
-vendor/fathom/libfathom.so
-vendor/fathom/libfathom.a
-vendor/nnue-probe/src/libnnueprobe.so
-vendor/nnue-probe/src/libnnueprobe.a
-vendor/nvim-laravel
-.DS_Store
-tinker
-
+*.obj
+*.so
+*.a
+*.lib
+*.dll
+*.exe
+*.dSYM/
 bin/*
 !bin/books/
 !bin/past/
-benchmark
+
+# --- Project Specific Build Artifacts ---
+/build/
+/compile_commands.json
+/engine
+/libengine.*
+/check
+/nn
+/benchmark
+/tinker
+/tmp/
+
+# --- Python & Cache ---
+__pycache__/
+.cache/
+*.py[cod]
+*$py.class
+
+# --- Logs & Debugging ---
+*.log
+.changelog
+
+# --- Machine Learning / NNUE ---
+# Prevents committing large model weights accidentally
+training/out/*.pt
+training/out/*.nnue
+*.onnx
+
+# --- Vendor / Dependencies ---
+# Using wildcards to catch various build artifacts in dependencies
+vendor/fathom/obj/
+vendor/fathom/*.so
+vendor/fathom/*.a
+vendor/nnue-probe/src/*.so
+vendor/nnue-probe/src/*.a
+vendor/nvim-laravel/
+
+# --- OS & IDE Files ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
