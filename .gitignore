@@ -13,11 +13,9 @@ tmp
 libengine.*
 engine
 
-check.dSYM
 check
 nn
-engine.dSYM
-tinker.dSYM
+*.dSYM
 
 # NNUE training outputs
 training/out/*.pt
@@ -26,7 +24,9 @@ training/out/*.nnue
 # Vendor
 vendor/fathom/obj
 vendor/fathom/libfathom.so
+vendor/fathom/libfathom.a
 vendor/nnue-probe/src/libnnueprobe.so
+vendor/nnue-probe/src/libnnueprobe.a
 vendor/nvim-laravel
 .DS_Store
 tinker

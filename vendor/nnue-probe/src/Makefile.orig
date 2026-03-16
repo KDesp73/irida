@@ -2,6 +2,7 @@
 # Target executable and files
 ############################
 EXE = libnnueprobe.so
+STATIC = libnnueprobe.a
 RM = rm -rf
 OBJ = misc.o nnue.o
 HPP = misc.h nnue.h
@@ -14,11 +15,6 @@ HPP = misc.h nnue.h
 DEFINES =
 DEFINES += -DIS_64BIT 
 ifeq ($(COMP),$(filter $(COMP),gcc clang win icpc))
-# arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64:   DEFINES += -DUSE_AVX2 -mavx2
-# arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64:   DEFINES += -DUSE_SSE41 -msse4.1
-# arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64:   DEFINES += -DUSE_SSE3 -msse3
-# arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64:   DEFINES += -DUSE_SSE2 -msse2
-# arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64: # arm64:   DEFINES += -DUSE_SSE -msse
 endif
 
 ############################
@@ -125,6 +121,7 @@ endif
 
 default:
 	$(MAKE) $(EXE) strip
+	$(MAKE) $(STATIC) strip
 
 clean:
 	$(RM) $(OBJ) $(EXE) core.* cluster.* *.gcda
@@ -160,6 +157,9 @@ help:
 
 $(EXE): $(OBJ)
 	$(CXX) -o $@ $(OBJ) $(LXXFLAGS) -shared 
+
+$(STATIC): $(OBJ)
+	ar rcs $(STATIC) $(OBJ)
 
 %.o: %.cpp $(HPP)
 	$(CXX) $(CXXFLAGS) $(DEFINES) -c -fPIC -o $@ $<

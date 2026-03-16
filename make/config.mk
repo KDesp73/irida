@@ -28,15 +28,15 @@ ifeq ($(UNAME_S),Darwin)
     SO_LDFLAGS := -dynamiclib -undefined dynamic_lookup
     LDFLAGS_ENGINE   := $(A_NAME)
     LDFLAGS_CASTRO   := vendor/castro/libcastro.a
-    LDFLAGS_NNUE_PROBE := -Lvendor/nnue-probe/src -lnnueprobe -Wl,-rpath,@executable_path/vendor/nnue-probe/src
-    LDFLAGS_FATHOM   := -Lvendor/fathom -lfathom -Wl,-rpath,@executable_path/vendor/fathom
+    LDFLAGS_NNUE_PROBE := vendor/nnue-probe/src/libnnueprobe.a
+    LDFLAGS_FATHOM   := vendor/fathom/libfathom.a
 else
     SO_NAME  := lib$(LIBRARY_NAME).so
     SO_LDFLAGS := -shared
     LDFLAGS_ENGINE   := -L. -l:$(A_NAME)
     LDFLAGS_CASTRO   := -Lvendor/castro -l:libcastro.a
-    LDFLAGS_NNUE_PROBE := -Lvendor/nnue-probe/src -lnnueprobe -Wl,-rpath,$(shell pwd)/vendor/nnue-probe/src
-    LDFLAGS_FATHOM   := -Lvendor/fathom -lfathom -Wl,-rpath,$(shell pwd)/vendor/fathom
+	LDFLAGS_NNUE_PROBE := -Lvendor/nnue-probe/src -l:libnnueprobe.a
+	LDFLAGS_FATHOM   := -Lvendor/fathom -l:libfathom.a
 endif
 
 WARNINGS = -Wall -Wextra

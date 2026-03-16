@@ -13,6 +13,9 @@ INCDIR  = $(PREFIX)/include
 libfathom.so: obj/tbprobe.o
 	$(CC) $(LDFLAGS) -shared $^ -o $@
 
+libfathom.a: obj/tbprobe.o
+	ar rcs $@ $^
+
 obj/tbprobe.o: src/tbprobe.c src/tbchess.c src/stdendian.h src/tbprobe.h
 	@$(MKDIR_P) obj
 	$(CC) $(CFLAGS) -fPIC -c $< -o $@
