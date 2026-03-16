@@ -1,5 +1,5 @@
 /*
- * Theory: NNUE (Efficiently Updatable Neural Network) evaluation.
+ * NNUE (Efficiently Updatable Neural Network) evaluation.
  *
  * The engine loads a neural net from a .nnue file (via nnue-probe). Evaluation
  * is done by exporting the board to FEN and calling the probe; the score is

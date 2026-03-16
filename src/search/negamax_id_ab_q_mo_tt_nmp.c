@@ -1,4 +1,5 @@
 #include "castro.h"
+#include "castro_additions.h"
 #include "eval.h"
 #include "search.h"
 #include "uci.h"
@@ -96,11 +97,11 @@ static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int 
         return quiescence(board, alpha, beta, ply, eval, order);
     }
 
+    // NMP
     if (
         depth >= 3
         && !castro_IsInCheck(board)
-        // TODO:
-        // && HasNonPawnMaterial(board) // To avoid Zugzwang
+        && castro_HasNonPawnMaterial(board) // To avoid Zugzwang
     ) {
         castro_MakeNullMove(board);
         // Using a reduced depth (R=3) and a null window (-beta, -beta + 1)

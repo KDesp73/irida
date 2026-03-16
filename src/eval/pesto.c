@@ -1,9 +1,9 @@
 // www.chessprogramming.org/PeSTO's_Evaluation_Function
 
-#include "IncludeOnly/logging.h"
 #include "castro.h"
 #include "eval.h"
 #include <stdio.h>
+#include "utils.h"
 
 #define WHITE_PAWN_ENCODING    (2*PAWN   + COLOR_WHITE)
 #define BLACK_PAWN_ENCODING    (2*PAWN   + COLOR_BLACK)
@@ -527,6 +527,7 @@ static int evaluate_mobility(Board* board)
 
 static int evaluate_king_safety(Board* board, int game_phase)
 {
+    UNUSED(game_phase);
     int score = 0;
 
     int wk_r = -1, wk_f = -1;

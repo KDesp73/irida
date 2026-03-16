@@ -1,11 +1,9 @@
 #include "castro.h"
 #include "core.h"
-#include "eval.h"
 #include "moveordering.h"
-#include "version.h"
 #include <stdlib.h>
 #include <string.h>
-#include "kv.h"
+#include "IncludeOnly/kv.h"
 #include "IncludeOnly/ansi.h"
 
 void print_moves(Moves moves)

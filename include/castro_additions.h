@@ -4,13 +4,15 @@
 #include "castro.h"
 #include <stdbool.h>
 
-// @module draws
-// @desc Draw detection: 50-move, threefold, insufficient material.
+// @module castro_additions
+// @desc Methods that should be added to castro.h
 
-// @function is_draw
+// @function HasNonPawnMaterial 
 // @desc Returns true if the position is a draw by 50-move rule, threefold repetition, or insufficient material.
 // @param board Board to check.
 // @returns bool True if draw.
-bool is_draw(Board* board);
+bool castro_IsDraw(Board* board);
+
+bool castro_HasNonPawnMaterial(Board* board);
 
 #endif

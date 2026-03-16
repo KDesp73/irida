@@ -1,5 +1,5 @@
 /*
- * Theory: Material-only evaluation.
+ * Material-only evaluation.
  *
  * The score is the difference in piece values (white total minus black total)
  * using a fixed value per piece type (pawn, knight, bishop, rook, queen; king
