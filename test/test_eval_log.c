@@ -4,7 +4,6 @@ int test_eval_log(const char* fen);
 #include "IncludeOnly/test.h"
 #include "castro.h"
 #include "eval.h"
-#include <string.h>
 #include <stdio.h>
 
 int test_eval_log(const char* fen)
@@ -12,7 +11,9 @@ int test_eval_log(const char* fen)
     Board board;
     castro_BoardInitFen(&board, fen);
     fprintf(stderr, "[eval] FEN: %s\n", fen);
-    pesto_log_breakdown(&board);
+    EvalBreakdown b = {0};
+    pesto_eval_breakdown(&board, &b);
+    pesto_log_breakdown(b);
     castro_BoardFree(&board);
     SUCC("logged breakdown");
     return 1;

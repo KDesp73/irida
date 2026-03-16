@@ -25,7 +25,7 @@ int test_search(const char* fen, int depth_limit)
         .syzygyProbeLimit = 7,
         .syzygy50MoveRule = true,
     };
-    Move move = search_root(&board, pesto_eval, order_moves, &config);
+    Move move = negamax_id_ab_q_mo_tt_nmp(&board, pesto_eval, order_moves, &config);
     castro_BoardFree(&board);
     (void)move;
     SUCC("search_root depth %d completed", depth_limit);
