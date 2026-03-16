@@ -28,14 +28,8 @@ SearchConfig g_searchConfig = {
 int main(int argc, char** argv)
 {
     // Load the nnue if possible
-    for (size_t i = 0; i < uci_state.uciOptionCount; i++) {
-        if (strcmp(uci_state.uciOptions[i].name, "EvalFile") == 0
-            && uci_state.uciOptions[i].value.string[0] != '\0') {
-            const char* path = uci_state.uciOptions[i].value.string;
-            if(!nnue_load(path)){
-                ERRO("Could not load nnue %s\n", path);
-            }
-        }
+    if(!nnue_load(NNUE_DEFAULT_PATH)){
+        ERRO("Could not load nnue %s\n", NNUE_DEFAULT_PATH);
     }
 
     EngineInit(&engine);

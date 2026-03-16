@@ -57,7 +57,7 @@ SearchConfig g_searchConfig = {
 int main(int argc, char** argv)
 {
     kv_parse(argc, argv);
-    EngineInit(&engine, ENGINE_NAME, ENGINE_AUTHOR);
+    EngineInit(&engine);
 
     const char* fen = kv_get("fen", NULL);
     int ply = strtol(kv_get("ply", "1"), NULL, 10);
@@ -70,7 +70,7 @@ int main(int argc, char** argv)
     
     Moves moves = castro_GenerateMoves(&board, MOVE_LEGAL);
     Moves orig = moves;
-    order_moves(&board, moves.list, moves.count, ply);
+    order_moves(&board, moves.list, moves.count, ply, NULL_MOVE);
 
     moves_diff(orig, moves);
 

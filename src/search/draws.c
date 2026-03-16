@@ -1,12 +1,3 @@
-/*
- * Theory: Draw detection.
- *
- * A position is a draw if: (1) the 50-move rule applies (halfmove >= 100),
- * (2) the position has occurred three times (threefold repetition), or
- * (3) neither side has enough material to deliver checkmate (insufficient
- * material). The board and castro provide halfmove count and repetition
- * detection; we combine them here for the search to prune drawn positions.
- */
 #include "draws.h"
 #include "castro.h"
 #include <stdbool.h>

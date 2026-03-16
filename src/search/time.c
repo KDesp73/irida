@@ -1,5 +1,5 @@
 /*
- * Theory: Search time control.
+ * Search time control.
  *
  * We use a monotonic clock (CLOCK_MONOTONIC) so that elapsed time is not
  * affected by system clock changes. When the search starts we record the
