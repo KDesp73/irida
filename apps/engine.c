@@ -27,16 +27,10 @@ SearchConfig g_searchConfig = {
 
 int main(int argc, char** argv)
 {
-    // Load the nnue if possible
-    if(!nnue_load(NNUE_DEFAULT_PATH)){
-        ERRO("Could not load nnue %s\n", NNUE_DEFAULT_PATH);
-    }
-
     EngineInit(&engine);
     engine.eval = nnue_eval;
     engine.search = negamax_id_ab_q_mo_tt_nmp;
     engine.order = order_moves;
-
 
     if(argc > 1) return CliMain(argc, argv);
 

@@ -18,7 +18,7 @@ training.deps: ## Install Python deps for NNUE training (pip install torch)
 training.data: $(TARGET) ## Generate training CSV from engine. Override: FEN_FILE=path DATA_CSV=out.csv ENGINE_PATH=./engine
 	@test -f "$(FEN_FILE)" || (echo "Create $(FEN_FILE) with one FEN per line, or set FEN_FILE=..."; exit 1)
 	mkdir -p $(NNUE_DIR)/out
-	python3 -m $(NNUE_DIR) data --engine "$(ENGINE_PATH)" --depth 6 --fen-file "$(FEN_FILE)" --output "$(DATA_CSV)"
+	python3 -m $(NNUE_DIR) data --engine "stockfish" --depth 6 --fen-file "$(FEN_FILE)" --output "$(DATA_CSV)"
 	@echo "[INFO] Data written to $(DATA_CSV)"
 
 .PHONY: training.train

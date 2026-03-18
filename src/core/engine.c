@@ -9,6 +9,7 @@ void EngineInit(Engine* engine)
     strncpy(engine->name, ENGINE_NAME, sizeof(engine->name));
     strncpy(engine->author, ENGINE_AUTHOR, sizeof(engine->author));
 
+    // TODO: bake masks and magic into castro
     castro_InitMasks();
     castro_InitMagic();
     pesto_init();

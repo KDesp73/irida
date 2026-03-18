@@ -7,6 +7,7 @@
 *.dll
 *.exe
 *.dSYM/
+bench
 bin/*
 !bin/books/
 !bin/past/
@@ -18,8 +19,6 @@ bin/*
 /libengine.*
 /check
 /nn
-/benchmark
-/tinker
 /tmp/
 
 # --- Python & Cache ---

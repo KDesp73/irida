@@ -18,9 +18,7 @@ import argparse
 import subprocess
 import sys
 import re
-
-
-import re
+from tqdm import tqdm
 
 
 # @method run_engine_score
@@ -85,21 +83,33 @@ def add_arguments(parser: argparse.ArgumentParser) -> None:
 # @desc Generate FEN,score_cp CSV: read FENs, run engine per position, write CSV.
 # @param args Parsed namespace from add_arguments.
 def run(args: argparse.Namespace) -> None:
-    """Generate FEN,score CSV from parsed arguments (from add_arguments)."""
     fen_source = open(args.fen_file) if args.fen_file else sys.stdin
     out = open(args.output, "w") if args.output != "-" else sys.stdout
 
+    # Get total lines for the progress bar if reading from a file
+    total_lines = None
+    if args.fen_file:
+        total_lines = sum(1 for _ in open(args.fen_file))
+
     try:
         out.write("fen,score_cp\n")
-        for line in fen_source:
+
+        # Wrap the source in tqdm
+        # desc: Label on the left, unit: what we are counting
+        pbar = tqdm(fen_source, total=total_lines, desc="Analyzing FENs", unit="fen")
+
+        for line in pbar:
             fen = line.strip()
             if not fen or fen.startswith("#"):
                 continue
+
             score = run_engine_score(args.engine, fen, args.depth)
+
             if score is not None:
                 out.write(f'"{fen}",{score}\n')
-            else:
-                sys.stderr.write(f"Warning: no score for FEN: {fen[:50]}...\n")
+                # Flush ensures data is written immediately if you're tailing the file
+                out.flush()
+
     finally:
         if args.fen_file:
             fen_source.close()
