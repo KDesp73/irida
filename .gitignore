@@ -23,7 +23,9 @@ check
 /compile_commands.json
 /libengine.*
 /nn
+/tb
 /tmp/
+download.txt
 
 # --- Python & Cache ---
 __pycache__/

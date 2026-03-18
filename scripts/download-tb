@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+LIST_URL="https://tablebase.lichess.ovh/tables/standard/download.txt"
+LIST_FILE="download.txt"
+
+if [ ! -f "$LIST_FILE" ]; then
+    echo "Fetching master file list..."
+    wget -q $LIST_URL
+fi
+
+mkdir -p tb/wdl
+mkdir -p tb/dtz
+
+echo "Syncing 3, 4, and 5-piece tablebases..."
+
+# 3. Download WDL files (.rtbw) - Skipping existing
+cat "$LIST_FILE" | grep -E '^.*[345].*$' | grep ".rtbw" | while read -r url; do
+    wget -nc -nv -P tb/wdl "$url"
+done
+
+# 4. Download DTZ files (.rtbz) - Skipping existing
+cat "$LIST_FILE" | grep -E '^.*[345].$*' | grep ".rtbz" | while read -r url; do
+    wget -nc -nv -P tb/dtz "$url"
+done
+
+rm $LIST_FILE
+
+echo "Done! Your tablebases are in ./tb/wdl and ./tb/dtz"

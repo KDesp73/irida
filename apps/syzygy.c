@@ -14,23 +14,23 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    Board board = {0};
-    castro_BoardInitFen(&board, fen);
-
-
     if(!syzygy_init(path)) {
         ERRO("Could not initialize syzygy");
         return 1;
     }
+
     if(!syzygy_available()) {
         ERRO("Syzygy is not available");
         return 2;
     }
 
-
+    Board board = {0};
+    castro_BoardInitFen(&board, fen);
     Move best;
+
     if(!syzygy_probe_root(&board, true, &best)){
         ERRO("Could not probe best move");
+        castro_BoardFree(&board);
         return 3;
     }
 
