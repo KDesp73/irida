@@ -77,11 +77,12 @@ def write_int8_le(f: object, value: int) -> None:
 
 
 # @method write_int32_le
-# @desc Write a 32-bit signed integer in little-endian.
+# @desc Write a 32-bit signed integer in little-endian. Clamps to int32 range.
 # @param f Binary file handle.
 # @param value Value to write.
 def write_int32_le(f: object, value: int) -> None:
-    f.write(struct.pack("<i", value & 0xFFFFFFFF))
+    v = max(-2147483648, min(2147483647, value))
+    f.write(struct.pack("<i", v))
 
 
 # @method _inv_permute_biases
