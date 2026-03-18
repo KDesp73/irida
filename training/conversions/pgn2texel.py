@@ -22,9 +22,6 @@ except ImportError:
     sys.exit(1)
 
 
-    sys.exit(1)
-
-
 # @method result_to_white_score
 # @desc Map PGN Result header (1-0, 0-1, 1/2-1/2, etc.) to float 1.0, 0.0, 0.5 or None.
 # @param result PGN Result header string.
@@ -36,9 +33,6 @@ def result_to_white_score(result: str) -> float | None:
         return 0.0
     if result in ("1/2-1/2", "½-½", "0.5-0.5"):
         return 0.5
-    return None
-
-
     return None
 
 

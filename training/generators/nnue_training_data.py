@@ -19,6 +19,7 @@ import subprocess
 import sys
 import re
 from tqdm import tqdm
+import concurrent.futures
 
 
 # @method run_engine_score
@@ -40,6 +41,7 @@ def run_engine_score(engine_path: str, fen: str, depth: int) -> int | None:
     )
     # UCI handshake
     proc.stdin.write("uci\n")
+    proc.stdin.write("setoption name Hash value 16\n")
     proc.stdin.write("isready\n")
     proc.stdin.write(f"position fen {fen}\n")
     proc.stdin.write(f"go depth {depth}\n")
@@ -77,44 +79,48 @@ def add_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--depth", type=int, default=6, help="Search depth for each position (default: 6)")
     parser.add_argument("--fen-file", help="Input file with one FEN per line (default: stdin)")
     parser.add_argument("--output", "-o", default="-", help="Output CSV file (default: stdout)")
+    parser.add_argument("--threads", type=int, default=4, help="Number of engines to run in parallel")
 
 
 # @method run
 # @desc Generate FEN,score_cp CSV: read FENs, run engine per position, write CSV.
 # @param args Parsed namespace from add_arguments.
 def run(args: argparse.Namespace) -> None:
+    # Set up source and output
     fen_source = open(args.fen_file) if args.fen_file else sys.stdin
     out = open(args.output, "w") if args.output != "-" else sys.stdout
 
-    # Get total lines for the progress bar if reading from a file
-    total_lines = None
-    if args.fen_file:
-        total_lines = sum(1 for _ in open(args.fen_file))
+    # Pre-filter FENs to avoid sending empty lines to the executor
+    fens = [line.strip() for line in fen_source if line.strip() and not line.startswith("#")]
 
     try:
         out.write("fen,score_cp\n")
 
-        # Wrap the source in tqdm
-        # desc: Label on the left, unit: what we are counting
-        pbar = tqdm(fen_source, total=total_lines, desc="Analyzing FENs", unit="fen")
+        # We use ProcessPoolExecutor to manage the engine instances
+        with concurrent.futures.ProcessPoolExecutor(max_workers=args.threads) as executor:
+            # Map the work: run_engine_score(engine_path, fen, depth)
+            # We use a lambda or partial to pass constant arguments
+            futures = {
+                executor.submit(run_engine_score, args.engine, fen, args.depth): fen 
+                for fen in fens
+            }
 
-        for line in pbar:
-            fen = line.strip()
-            if not fen or fen.startswith("#"):
-                continue
+            pbar = tqdm(concurrent.futures.as_completed(futures),
+                        total=len(fens), desc="Analyzing FENs", unit="fen")
 
-            score = run_engine_score(args.engine, fen, args.depth)
-
-            if score is not None:
-                out.write(f'"{fen}",{score}\n')
-                # Flush ensures data is written immediately if you're tailing the file
-                out.flush()
+            for future in pbar:
+                fen = futures[future]
+                try:
+                    score = future.result()
+                    if score is not None:
+                        out.write(f'"{fen}",{score}\n')
+                        out.flush()
+                except Exception as e:
+                    tqdm.write(f"Error processing FEN {fen[:20]}: {e}")
 
     finally:
-        if args.fen_file:
-            fen_source.close()
-        if args.output != "-":
-            out.close()
+        if args.fen_file: fen_source.close()
+        if args.output != "-": out.close()
 
 
 def main() -> None:
