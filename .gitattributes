@@ -1,1 +1,3 @@
 *.h linguist-language=C
+docs/*.html linguist-documentation
+vendor/castro/docs/*.html linguist-documentation
