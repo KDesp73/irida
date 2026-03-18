@@ -1,5 +1,5 @@
 include make/config.mk
-include make/rules.mk
+include make/targets.mk
 include make/utils.mk
 include make/deps.mk
 include make/dist.mk
