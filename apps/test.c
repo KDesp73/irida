@@ -32,6 +32,7 @@ SearchConfig g_searchConfig = {
 int main(int argc, char** argv)
 {
     castro_InitMasks();
+    castro_InitMagic();
     pesto_init();
     init_mvv_lva();
     tt_init(16);
