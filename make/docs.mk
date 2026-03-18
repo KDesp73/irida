@@ -1,6 +1,7 @@
 .PHONY: docs docs.training docs.engine
 
 docs: docs.training docs.engine ## Generate all docs
+	rm docs/tiny.docs.json
 
 docs.training: ## Generate documentation for the training module
 	tinydocs-cli \
@@ -10,7 +11,7 @@ docs.training: ## Generate documentation for the training module
 		-o docs \
 		--comment-style "#" \
 		--name training
-	mv docs/tiny.docs.json docs/training.tiny.docs.json
+	python3 -c "import json; print(json.dumps(json.load(open('docs/tiny.docs.json')), separators=(',', ':')))" > docs/training.tiny.docs.json
 
 docs.engine: ## Generate documentation for the engine
 	tinydocs-cli \
@@ -20,4 +21,4 @@ docs.engine: ## Generate documentation for the engine
 		-o docs \
 		--comment-style "//" \
 		--name engine
-	mv docs/tiny.docs.json docs/engine.tiny.docs.json
+	python3 -c "import json; print(json.dumps(json.load(open('docs/tiny.docs.json')), separators=(',', ':')))" > docs/engine.tiny.docs.json
