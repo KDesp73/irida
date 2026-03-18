@@ -25,12 +25,20 @@
                 darkMode: localStorage.getItem('theme') === 'dark',
                 search: '',
                 projectData: { name: '', docs: [], timestamp: '' },
-                docSet: localStorage.getItem('docSet') || 'training',
+                docSet: localStorage.getItem('docSet') || 'engine',
 
                 async loadDocs() {
+                    console.log(`[DEBUG] Attempting to load: ${this.docSet}.tiny.docs.json`);
                     try {
-                        const response = await fetch(`${this.docSet}.tiny.docs.json`);
+                        const filename = `${this.docSet}.tiny.docs.json`;
+                        const response = await fetch(filename);
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
                         this.projectData = await response.json();
+                        console.log("[DEBUG] Successfully loaded data:", this.projectData);
                     } catch (e) {
                         console.error("Failed to load documentation JSON", e);
                         this.projectData = { name: this.docSet, docs: [], timestamp: '', error: true };
@@ -109,7 +117,7 @@
         <strong>Could not load <span x-text="`${docSet}.tiny.docs.json`" class="font-mono"></span>.</strong> Make sure the file exists in the docs folder (e.g. generate it from the markers).
     </div>
     <div class="space-y-12">
-        <template x-for="item in projectData.docs" :key="item.file">
+        <template x-for="(item, index) in projectData.docs" :key="index">
             <section x-show="shouldShowModule(item)" x-cloak class="relative">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 group">
                     <div class="space-y-1">
