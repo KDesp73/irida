@@ -1,12 +1,9 @@
 #include "castro.h"
-#include "IncludeOnly/logging.h"
 #include "core.h"
 #include "eval.h"
 #include "moveordering.h"
-#include "nnue.h"
 #include "search.h"
 #include "uci.h"
-#include "cli.h"
 
 Engine engine;
 UciState uci_state;
@@ -25,14 +22,12 @@ SearchConfig g_searchConfig = {
     .syzygy50MoveRule = true,
 };
 
-int main(int argc, char** argv)
+int main(void)
 {
     EngineInit(&engine);
     engine.eval = nnue_eval;
     engine.search = negamax_id_ab_q_mo_tt_nmp;
     engine.order = order_moves;
-
-    if(argc > 1) return CliMain(argc, argv);
 
     UciMain();
 

@@ -1,5 +1,13 @@
 .PHONY: build.all
-build.all: deps.check deps.build $(BUILD_DIR) build.static build.shared $(TARGET) bench ## Build the entire project
+build.all: ## Build the entire project
+	@make deps.check
+	@make deps.build
+	@make $(BUILD_DIR)
+	@make build.static
+	@make build.shared
+	@make $(TARGET)
+	@make bench
+	@make test.build 
 	@echo "Build complete."
 
 .PHONY: build.static
