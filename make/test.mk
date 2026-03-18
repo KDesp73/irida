@@ -1,5 +1,5 @@
 TEST_DIR   := test
-TEST_FILES := $(TEST_DIR)/main.c $(wildcard $(TEST_DIR)/test_*.c)
+TEST_FILES := apps/test.c $(wildcard $(TEST_DIR)/test_*.c)
 TEST_BIN   := check
 
 .PHONY: test.generate
