@@ -13,6 +13,8 @@ bin/*
 
 bench
 nnue
+tinker
+syzygy
 engine
 check
 
@@ -47,6 +49,7 @@ vendor/fathom/*.a
 vendor/nnue-probe/src/*.so
 vendor/nnue-probe/src/*.a
 vendor/nvim-laravel/
+vendor/tb/
 
 # --- OS & IDE Files ---
 .DS_Store
