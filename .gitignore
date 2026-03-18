@@ -7,17 +7,19 @@
 *.dll
 *.exe
 *.dSYM/
-bench
 bin/*
 !bin/books/
 !bin/past/
 
+bench
+nnue
+engine
+check
+
 # --- Project Specific Build Artifacts ---
 /build/
 /compile_commands.json
-/engine
 /libengine.*
-/check
 /nn
 /tmp/
 
