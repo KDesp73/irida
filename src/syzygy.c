@@ -192,8 +192,7 @@ bool syzygy_probe_root(Board* board, bool use_rule50, Move* best_move_out)
     unsigned promotion = TB_MOVE_PROMOTES(rm->move);
 
     // TODO: check that fathom's promotion encoding matches ours
-    Move move = castro_MoveEncode(from, to, promotion, FLAG_NORMAL);
-    *best_move_out = move;
+    *best_move_out = castro_MoveEncode(from, to, promotion, FLAG_NORMAL);
 
     return true;
 }

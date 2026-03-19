@@ -1,10 +1,10 @@
 TODO: pick a license
 TODO: pick a name
 TODO: texel tuning
-TODO: syzygy tablebase (optional Fathom)
 TODO: aspiration windows
-TODO: search
 TODO: engine executable download nnue files
+TODO: late move reductions
+TODO: principal variation search
 DONE: engine testing
 DONE: cache
 DONE: tests
@@ -20,3 +20,4 @@ DONE: nnue evaluation (optional nnue-probe)
 DONE: move ordering
 DONE: better traditional evaluation
 DONE: transposition tables
+DONE: syzygy tablebase (optional Fathom)
