@@ -45,13 +45,6 @@ extern "C" {
 // @param major Pointer to store major version (or NULL).
 // @param minor Pointer to store minor version (or NULL).
 // @param patch Pointer to store patch version (or NULL).
-/**
- * @brief Fills in the provided pointers with the current version numbers.
- * 
- * @param major Pointer to an int to store the major version
- * @param minor Pointer to an int to store the minor version
- * @param patch Pointer to an int to store the patch version
- */
 static inline void version(int* major, int* minor, int* patch) {
     if (major) *major = VERSION_MAJOR;
     if (minor) *minor = VERSION_MINOR;

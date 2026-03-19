@@ -116,11 +116,10 @@ int main(int argc, char** argv)
     SearchFn searchfn = NULL;
     EvalFn evalfn = NULL;
 
-    if(!strcmp("id_ab", search)) searchfn = negamax_id_ab;
-    else if(!strcmp("id_ab_q_mo", search)) searchfn = negamax_id_ab_q_mo;
-    else if(!strcmp("id_ab_q_mo_tt", search)) searchfn = negamax_id_ab_q_mo_tt;
-    else if(!strcmp("id_ab_q_mo_tt_nmp", search)) searchfn = negamax_id_ab_q_mo_tt_nmp;
-    else searchfn = negamax_id_ab_q_mo_tt_nmp;
+    for(size_t i = 0; i < sizeof(search_variants) / sizeof(search_variants[0]); ++i) {
+        if(strcmp(search, search_variants[i].name))
+            searchfn = search_variants[i].fn;
+    }
 
     if(!strcmp("nnue", eval)) evalfn = nnue_eval;
     else if(!strcmp("pesto", eval)) evalfn = evaluation;

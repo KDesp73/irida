@@ -362,14 +362,15 @@ void uci_setsearch(UciState* state, const char* command)
 
     const char* search_name = command + strlen(COMMAND_SETSEARCH) + 1; // +1 for the space
 
-    if(!strcmp(search_name, "id_ab")) {
-        engine.search = negamax_id_ab;
-    } else if(!strcmp(search_name, "id_ab_q_mo")) {
-        engine.search = negamax_id_ab_q_mo;
-    } else {
+    SearchFn searchfn = NULL;
+    for(size_t i = 0; i < sizeof(search_variants) / sizeof(search_variants[0]); ++i) {
+        if(strcmp(search_name, search_variants[i].name))
+            searchfn = search_variants[i].fn;
+    }
+    if(!searchfn) {
         fprintf(stderr, "error Invalid search function name\n");
         return;
     }
-
+    engine.search = searchfn;
     printf("info Set %s as the search function\n", search_name);
 }

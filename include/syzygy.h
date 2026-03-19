@@ -2,7 +2,6 @@
 #define SYZYGY_H
 
 #include "castro.h"
-#include "search.h"
 #include <stdbool.h>
 
 // @module syzygy

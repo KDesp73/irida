@@ -1,8 +1,8 @@
-# Evaluation (PeSTO and NNUE)
+# Evaluation (Hand-crafted and NNUE)
 
 ## Current PeSTO terms
 
-The hand-crafted eval (`pesto_eval`) combines:
+The hand-crafted eval (`evaluation`) combines:
 
 - **Material + piece-square tables** (phase-interpolated MG/EG)
 - **Pawn structure**: passed pawns, doubled pawns, isolated pawns
@@ -13,7 +13,7 @@ The hand-crafted eval (`pesto_eval`) combines:
 - **Threats**: bonus for attacking enemy pieces (by piece value)
 - **Endgame**: bishop pair, extra pawn weight in late endgame
 
-Use `pesto_eval_breakdown()` / `pesto_log_breakdown()` to see per-term values.
+Use `eval_breakdown()` / `log_breakdown()` to see per-term values.
 
 ## Possible improvements (symmetric under board mirror)
 
@@ -40,7 +40,7 @@ The engine can use an NNUE net (UCI option **EvalFile**). At startup it tries to
 
 If loading fails:
 
-1. Run the engine from the **repository root** so the relative path `nn/` is valid, or  
+1. Run the engine from the **repository root** so the relative path `data/nn/` is valid, or  
 2. Set **EvalFile** to an **absolute path**:  
    `setoption name EvalFile value /path/to/net.nnue`
 
