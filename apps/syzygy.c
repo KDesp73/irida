@@ -1,3 +1,9 @@
+/*
+ * syzygy.c
+ *
+ * Usage: ./syzygy [path=<PATH-TO-TB>] fen="ENDGAME-FEN"
+ */
+
 #include "syzygy.h"
 #include "IncludeOnly/kv.h"
 #include "IncludeOnly/logging.h"
@@ -7,7 +13,7 @@ int main(int argc, char** argv)
 {
     kv_parse(argc, argv);
     const char* fen = kv_get("fen", STARTING_FEN);
-    const char* path = kv_get("path", NULL);
+    const char* path = kv_get("path", "./tb/wdl:./tb/dtz");
 
     if(!path) {
         ERRO("Please provide a tb path");

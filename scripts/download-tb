@@ -2,27 +2,47 @@
 
 LIST_URL="https://tablebase.lichess.ovh/tables/standard/download.txt"
 LIST_FILE="download.txt"
+THREADS=4
+RETRIES=3
+WDL_DIR="tb/wdl"
+DTZ_DIR="tb/dtz"
 
-if [ ! -f "$LIST_FILE" ]; then
-    echo "Fetching master file list..."
-    wget -q $LIST_URL
+# Check for dependencies
+if ! command -v parallel &> /dev/null; then
+    echo "Error: 'parallel' (GNU Parallel) is not installed. Install it via brew/apt."
+    exit 1
 fi
 
-mkdir -p tb/wdl
-mkdir -p tb/dtz
+# 1. Fetch the master list if it doesn't exist
+if [ ! -f "$LIST_FILE" ]; then
+    echo "Fetching master file list..."
+    wget -q "$LIST_URL" -O "$LIST_FILE"
+fi
 
-echo "Syncing 3, 4, and 5-piece tablebases..."
+mkdir -p "$WDL_DIR" "$DTZ_DIR"
 
-# 3. Download WDL files (.rtbw) - Skipping existing
-cat "$LIST_FILE" | grep -E '^.*[345].*$' | grep ".rtbw" | while read -r url; do
-    wget -nc -nv -P tb/wdl "$url"
-done
+echo "Starting parallel sync for 3, 4, and 5-piece tablebases..."
 
-# 4. Download DTZ files (.rtbz) - Skipping existing
-cat "$LIST_FILE" | grep -E '^.*[345].$*' | grep ".rtbz" | while read -r url; do
-    wget -nc -nv -P tb/dtz "$url"
-done
+# 2. Extract URLs into temporary files to keep logic clean
+grep -E '^.*[345].*\.rtbw$' "$LIST_FILE" > wdl_links.tmp
+grep -E '^.*[345].*\.rtbz$' "$LIST_FILE" > dtz_links.tmp
 
-rm $LIST_FILE
+# 3. Execute Parallel Downloads
+# --jobs: Parallel instances
+# --resume: Continues if the job was interrupted
+# wget -nc: Skip if file exists
+# wget -nv: Non-verbose (keeps the terminal clean)
 
-echo "Done! Your tablebases are in ./tb/wdl and ./tb/dtz"
+echo "Downloading WDL files..."
+parallel --jobs "$THREADS" --progress \
+    "wget -nc -nv --tries=$RETRIES -P $WDL_DIR {}" < wdl_links.tmp
+
+echo "Downloading DTZ files..."
+parallel --jobs "$THREADS" --progress \
+    "wget -nc -nv --tries=$RETRIES -P $DTZ_DIR {}" < dtz_links.tmp
+
+# Clean up
+rm "$LIST_FILE" wdl_links.tmp dtz_links.tmp
+
+echo "-------------------------------------------------------"
+echo "Done! Tablebases are in $WDL_DIR and $DTZ_DIR"

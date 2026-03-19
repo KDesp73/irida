@@ -11,6 +11,7 @@
  * the TB move back to the engine's move format.
  */
 #include "syzygy.h"
+#include "IncludeOnly/logging.h"
 #include "castro.h"
 #include <string.h>
 
@@ -153,10 +154,12 @@ int syzygy_probe_wdl(Board* board, bool use_rule50)
 
 bool syzygy_probe_root(Board* board, bool use_rule50, Move* best_move_out)
 {
-    if (!g_syzygy_loaded || !best_move_out)
+    if (!g_syzygy_loaded || !best_move_out) {
         return false;
-    if (board->castling_rights != 0)
+    }
+    if (board->castling_rights != 0) {
         return false;
+    }
 
     struct TbRootMoves root_moves;
     memset(&root_moves, 0, sizeof(root_moves));
@@ -178,18 +181,19 @@ bool syzygy_probe_root(Board* board, bool use_rule50, Move* best_move_out)
         use_rule50,
         &root_moves);
 
-    if (!ok || root_moves.size == 0)
+    if (!ok || root_moves.size == 0){
         return false;
+    }
 
     /* Pick first (best) root move. TbRootMove has TbMove move (from/to encoded). */
     struct TbRootMove* rm = &root_moves.moves[0];
     unsigned from = TB_MOVE_FROM(rm->move);
     unsigned to   = TB_MOVE_TO(rm->move);
-    /* Convert to castro Move. Castro Move is uint32_t - we need to build from from/to.
-     * Castro may have a constructor; otherwise we need to match castro's encoding. */
-    (void)from;
-    (void)to;
-    /* For now we don't decode TbMove to castro Move - would need castro's move encoding.
-     * So return false and let search find the move. */
-    return false;
+    unsigned promotion = TB_MOVE_PROMOTES(rm->move);
+
+    // TODO: check that fathom's promotion encoding matches ours
+    Move move = castro_MoveEncode(from, to, promotion, FLAG_NORMAL);
+    *best_move_out = move;
+
+    return true;
 }
