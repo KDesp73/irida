@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+mkdir -p data/nn
+
+NETWORKS=(
+    nn-04cf2b4ed1da.nnue
+    nn-112bb1c8cdb5.nnue
+)
+
+BASE_URL="https://github.com/FireFather/halfkp_256x2-32-32-nets/raw/refs/heads/main/sf%20master"
+
+for net in "${NETWORKS[@]}"; do
+    TARGET="data/nn/$net"
+    
+    if [ -f "$TARGET" ]; then
+        echo "File $net already exists, skipping."
+    else
+        echo "Fetching $net..."
+        curl -sSfL -o "$TARGET" "$BASE_URL/$net"
+        
+        if [ $? -eq 0 ]; then
+            echo "Successfully downloaded $net"
+        else
+            echo "Failed to download $net"
+        fi
+    fi
+done

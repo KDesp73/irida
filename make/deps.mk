@@ -22,13 +22,11 @@ endef
 
 .PHONY: nn
 deps.nn: ## Fetch halfkp_256x2-32-32-nets
-	@mkdir -p data/nn
-	@curl -sSfL -o data/nn/nn-04cf2b4ed1da.nnue https://github.com/FireFather/halfkp_256x2-32-32-nets/raw/refs/heads/main/sf%20master/nn-04cf2b4ed1da.nnue
-	@curl -sSfL -o data/nn/nn-112bb1c8cdb5.nnue https://github.com/FireFather/halfkp_256x2-32-32-nets/raw/refs/heads/main/sf%20master/nn-112bb1c8cdb5.nnue
+	@bash ./scripts/download/nets
 
 .PHONY: tb
 deps.tb: ## Fetch lichess syzygy tablebase
-	@bash ./scripts/download-tb
+	@bash ./scripts/download/tablebase
 
 # Build targets (used by build.all and deps.build)
 build.castro: vendor/castro ## Build castro move-generation library
@@ -59,8 +57,6 @@ build.fathom: vendor/fathom ## Build Fathom Syzygy library
 
 deps.build: build.castro build.nnue-probe build.fathom ## Build all vendored dependencies
 
-# === Fetching Vendored Dependencies === #
-
 vendor/castro:
 	@(git clone https://github.com/KDesp73/castro vendor/castro 2>/dev/null || true) && \
 		[ -d vendor/castro ] && (cd vendor/castro && git fetch -t 2>/dev/null) || true
@@ -77,19 +73,3 @@ vendor/nnue-probe:
 
 vendor/fathom:
 	@git clone --depth=1 https://github.com/jdart1/Fathom.git vendor/fathom || true
-
-# Optional tools (Ordo, BayesianElo) — not required for engine build
-vendor/Ordo:
-	@git clone --depth=1 https://github.com/michiguel/Ordo.git vendor/Ordo
-	@cd vendor/Ordo && make
-	@mkdir -p bin && cp vendor/Ordo/ordo bin/
-
-vendor/BayesianElo:
-	@git clone --depth=1 https://github.com/ddugovic/BayesianElo.git vendor/BayesianElo
-	@cd vendor/BayesianElo/src && make
-	@mkdir -p bin && cp vendor/BayesianElo/src/bayeselo bin/
-
-vendor/tb:
-	@git clone --depth=1 https://github.com/syzygy1/tb.git vendor/tb
-	@cd vendor/tb/src && make 
-	@mkdir -p bin && cp vendor/tb/src/rtbgen bin

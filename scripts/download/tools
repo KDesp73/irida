@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Tools Downloader
+
+# Ensure the global bin directory exists from the start
+mkdir -p bin
+BASE_DIR=$(pwd)
+
+# 1. Build Ordo
+git clone --depth=1 https://github.com/michiguel/Ordo.git
+cd Ordo || exit
+make
+cp ordo "$BASE_DIR/bin/"
+cd "$BASE_DIR" && rm -rf Ordo
+
+# 2. Build BayesianElo
+git clone --depth=1 https://github.com/ddugovic/BayesianElo.git
+cd BayesianElo/src || exit
+make
+cp bayeselo "$BASE_DIR/bin/"
+cd "$BASE_DIR" && rm -rf BayesianElo
+
+# 3. Build Syzygy Tablebase Tools (rtbgen)
+git clone --depth=1 https://github.com/syzygy1/tb.git
+cd tb/src || exit
+make
+cp rtbgen "$BASE_DIR/bin/"
+cd "$BASE_DIR" && rm -rf tb
