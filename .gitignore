@@ -26,6 +26,7 @@ data/nn
 data/tb
 /tmp/
 download.txt
+dist/
 
 # --- Python & Cache ---
 __pycache__/

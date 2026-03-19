@@ -1,5 +1,6 @@
 .PHONY: build.all
 build.all: ## Build the entire project
+	@echo "TODO: list generated files"
 	@make deps.check
 	@make deps.build
 	@make $(BUILD_DIR)

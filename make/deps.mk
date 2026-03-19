@@ -4,6 +4,7 @@
 deps.check: ## Check that all dependencies are available
 	@command -v $(CC) >/dev/null 2>&1 || { echo "[ERRO] $(CC) missing."; exit 1; }
 	@command -v bear >/dev/null 2>&1 || { echo "[WARN] bear not installed."; }
+	@echo "TODO: check for the availability of all dependencies. (Use script)"
 
 # OS detection for vendor builds (nnue-probe: clang on macOS, gcc on Linux)
 UNAME_S := $(shell uname -s)
@@ -19,27 +20,15 @@ define fetchio
 	curl -s -f https://raw.githubusercontent.com/KDesp73/IncludeOnly/refs/heads/main/libs/$1.h -o vendor/IncludeOnly/$1.h
 endef
 
-nn:
-	@mkdir -p nn
-	@curl -sSfL -o nn/nn-04cf2b4ed1da.nnue https://github.com/FireFather/halfkp_256x2-32-32-nets/raw/refs/heads/main/sf%20master/nn-04cf2b4ed1da.nnue
-	@curl -sSfL -o nn/nn-112bb1c8cdb5.nnue https://github.com/FireFather/halfkp_256x2-32-32-nets/raw/refs/heads/main/sf%20master/nn-112bb1c8cdb5.nnue
+.PHONY: nn
+deps.nn: ## Fetch halfkp_256x2-32-32-nets
+	@mkdir -p data/nn
+	@curl -sSfL -o data/nn/nn-04cf2b4ed1da.nnue https://github.com/FireFather/halfkp_256x2-32-32-nets/raw/refs/heads/main/sf%20master/nn-04cf2b4ed1da.nnue
+	@curl -sSfL -o data/nn/nn-112bb1c8cdb5.nnue https://github.com/FireFather/halfkp_256x2-32-32-nets/raw/refs/heads/main/sf%20master/nn-112bb1c8cdb5.nnue
 
-vendor/castro:
-	@(git clone https://github.com/KDesp73/castro vendor/castro 2>/dev/null || true) && \
-		[ -d vendor/castro ] && (cd vendor/castro && git fetch -t 2>/dev/null) || true
-
-vendor/IncludeOnly:
-	@mkdir -p vendor/IncludeOnly
-	@$(call fetchio,ansi)
-	@$(call fetchio,cli)
-	@$(call fetchio,logging)
-	@$(call fetchio,test)
-
-vendor/nnue-probe:
-	@git clone --depth=1 https://github.com/dshawul/nnue-probe.git vendor/nnue-probe || true
-
-vendor/fathom:
-	@git clone --depth=1 https://github.com/jdart1/Fathom.git vendor/fathom || true
+.PHONY: tb
+deps.tb: ## Fetch lichess syzygy tablebase
+	@bash ./scripts/download-tb
 
 # Build targets (used by build.all and deps.build)
 build.castro: vendor/castro ## Build castro move-generation library
@@ -69,6 +58,25 @@ build.fathom: vendor/fathom ## Build Fathom Syzygy library
 		([ "$(UNAME_S)" = Darwin ] && make clean && make LDFLAGS="-std=gnu99 -O2 -Wall -Wshadow -Isrc -Wl,-install_name,@rpath/libfathom.so" || make)
 
 deps.build: build.castro build.nnue-probe build.fathom ## Build all vendored dependencies
+
+# === Fetching Vendored Dependencies === #
+
+vendor/castro:
+	@(git clone https://github.com/KDesp73/castro vendor/castro 2>/dev/null || true) && \
+		[ -d vendor/castro ] && (cd vendor/castro && git fetch -t 2>/dev/null) || true
+
+vendor/IncludeOnly:
+	@mkdir -p vendor/IncludeOnly
+	@$(call fetchio,ansi)
+	@$(call fetchio,cli)
+	@$(call fetchio,logging)
+	@$(call fetchio,test)
+
+vendor/nnue-probe:
+	@git clone --depth=1 https://github.com/dshawul/nnue-probe.git vendor/nnue-probe || true
+
+vendor/fathom:
+	@git clone --depth=1 https://github.com/jdart1/Fathom.git vendor/fathom || true
 
 # Optional tools (Ordo, BayesianElo) — not required for engine build
 vendor/Ordo:

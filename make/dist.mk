@@ -1,4 +1,4 @@
-DIST_INCLUDE = $(SRC_DIR) $(INCLUDE_DIR) $(SO_NAME) $(A_NAME) $(TARGET)
+DIST_INCLUDE = $(INCLUDE_DIR) $(SO_NAME) $(A_NAME) $(TARGET)
 
 .PHONY: dist
 dist: build.all ## Create a tarball of the project

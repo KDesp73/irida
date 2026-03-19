@@ -123,7 +123,7 @@ int main(int argc, char** argv)
     else searchfn = negamax_id_ab_q_mo_tt_nmp;
 
     if(!strcmp("nnue", eval)) evalfn = nnue_eval;
-    else if(!strcmp("pesto", eval)) evalfn = pesto_eval;
+    else if(!strcmp("pesto", eval)) evalfn = evaluation;
     else if(!strcmp("material", eval)) evalfn = material_eval;
     else evalfn = nnue_eval;
 

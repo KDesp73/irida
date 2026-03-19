@@ -21,8 +21,7 @@ VERSION_MINOR := $(shell sed -n -e 's/\#define VERSION_MINOR \([0-9]*\)/\1/p' $(
 VERSION_PATCH := $(shell sed -n -e 's/\#define VERSION_PATCH \([0-9]*\)/\1/p' $(version_file))
 VERSION       := $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 
-# macOS: use clang and platform-specific settings (BSD ld, .dylib)
-ifeq ($(UNAME_S),Darwin)
+ifeq ($(UNAME_S),Darwin) # macOS
     CC       := clang
     SO_NAME  := lib$(LIBRARY_NAME).dylib
     SO_LDFLAGS := -dynamiclib -undefined dynamic_lookup
@@ -46,6 +45,8 @@ INCLUDES = -I$(INCLUDE_DIR) -Ivendor/castro/src -Ivendor -Ivendor/nnue-probe -Iv
 CFLAGS  := -fPIC $(WARNINGS) $(INCLUDES) -DUSE_FATHOM
 LDFLAGS := -lpthread $(LDFLAGS_FATHOM) $(LDFLAGS_NNUE_PROBE)
 
+type := DEBUG
+
 # Build type
 ifeq ($(type), RELEASE)
     CFLAGS += -O3
@@ -56,7 +57,7 @@ else
 endif
 
 # Sources
-SRC_FILES := $(shell find $(SRC_DIR) -name '*.c' ! -name 'main.c' ! -name 'tinker.c')
+SRC_FILES := $(shell find $(SRC_DIR) -name '*.c')
 OBJ_FILES := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRC_FILES))
 
 .DEFAULT_GOAL := help

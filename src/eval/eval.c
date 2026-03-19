@@ -927,7 +927,7 @@ static int pesto_eval_impl(Board* board, EvalBreakdown* out)
     return score;
 }
 
-int pesto_eval(Board* board)
+int evaluation(Board* board)
 {
     return pesto_eval_impl(board, NULL);
 }

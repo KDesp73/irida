@@ -4,8 +4,8 @@ LIST_URL="https://tablebase.lichess.ovh/tables/standard/download.txt"
 LIST_FILE="download.txt"
 THREADS=4
 RETRIES=3
-WDL_DIR="tb/wdl"
-DTZ_DIR="tb/dtz"
+WDL_DIR="data/tb/wdl"
+DTZ_DIR="data/tb/dtz"
 
 # Check for dependencies
 if ! command -v parallel &> /dev/null; then

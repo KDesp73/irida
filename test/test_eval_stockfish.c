@@ -63,7 +63,7 @@ int test_eval_stockfish(const char* fen, int max_cp_diff)
     }
     Board board;
     castro_BoardInitFen(&board, fen);
-    int our_cp = pesto_eval(&board);
+    int our_cp = evaluation(&board);
     castro_BoardFree(&board);
     int sf_cp = stockfish_eval_cp(fen, sf);
     if (sf_cp == 99999) {

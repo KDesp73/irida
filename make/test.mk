@@ -17,10 +17,6 @@ test.build: build.castro build.nnue-probe build.fathom build.static test.generat
 test: test.build ## Build and run all tests
 	@./$(TEST_BIN)
 
-.PHONY: test.batch
-test.batch: test.build ## Run a single test batch: make test.batch n=1
-	@./$(TEST_BIN) -n $(or $(n),1)
-
 # Gauntlet (engine-vs-engine strength / regression testing). Requires cutechess-cli.
 # Optional: REF_ENGINE=/path/to/engine GAMES=50 TC=10+0.1. Build with type=RELEASE for meaningful results.
 REF_ENGINE ?=
@@ -28,7 +24,7 @@ GAMES ?= 50
 TC ?= 10+0.1
 
 .PHONY: gauntlet
-gauntlet: $(TARGET) ## Run gauntlet (cutechess-cli). Optional: REF_ENGINE=path GAMES=N TC=10+0.1
+test.gauntlet: $(TARGET) ## Run gauntlet (cutechess-cli). Optional: REF_ENGINE=path GAMES=N TC=10+0.1
 	@./scripts/run-gauntlet $(REF_ENGINE) $(GAMES) $(TC)
 
 .PHONY: test.engine

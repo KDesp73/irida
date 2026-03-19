@@ -10,7 +10,7 @@ int test_eval_breakdown(const char* fen)
 {
     Board board;
     castro_BoardInitFen(&board, fen);
-    int score = pesto_eval(&board);
+    int score = evaluation(&board);
     EvalBreakdown b;
     int score2 = eval_breakdown(&board, &b);
     castro_BoardFree(&board);

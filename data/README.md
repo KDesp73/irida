@@ -8,6 +8,8 @@ Books taken from: [https://github.com/peteschaefer/jose](https://github.com/pete
 
 ## pgn/
 
+Games and openings in pgn format
+
 ## nn/
 
 Run `make nn` to fetch 2 sample nnue files

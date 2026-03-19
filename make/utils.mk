@@ -1,7 +1,8 @@
 .PHONY: clean
 clean: ## Remove all build files, libraries, executable and test binary
 	@echo "[INFO] Cleaning build artifacts"
-	@rm -rf $(BUILD_DIR) $(TARGET) $(SO_NAME) $(A_NAME) check bench tinker
+	@rm -rf $(BUILD_DIR) $(TARGET) $(SO_NAME) $(A_NAME) 
+	@rm -rf check bench tinker nnue syzygy *.dSYM .cache
 
 compile_commands.json: ## Generate and merge compile commands
 	@bear -- make test.build

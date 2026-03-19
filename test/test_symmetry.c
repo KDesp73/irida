@@ -53,11 +53,11 @@ int test_symmetry(const char* fen)
     char mirrored_fen_str[256];
 
     castro_BoardInitFen(&board, fen);
-    int eval_orig = pesto_eval(&board);
+    int eval_orig = evaluation(&board);
 
     mirror_fen(fen, mirrored_fen_str);
     castro_BoardInitFen(&mirrored_board, mirrored_fen_str);
-    int eval_mirrored = pesto_eval(&mirrored_board);
+    int eval_mirrored = evaluation(&mirrored_board);
 
     if (eval_orig != eval_mirrored) {
         FAIL("Symmetry mismatch! FEN: %s (Eval: %d), Mirrored: %s (Eval: %d)", 
