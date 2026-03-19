@@ -1,3 +1,13 @@
+/*
+ * test.c
+ *
+ * test.h's entrypoint
+ *
+ * Usage: ./check [-n <BATCH-N>]
+ *
+ * See https://github.com/KDesp73/IncludeOnly/blob/main/libs/test.h
+ */
+
 #include "castro.h"
 #include "eval.h"
 #include "moveordering.h"

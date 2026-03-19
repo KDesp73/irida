@@ -1,6 +1,9 @@
 /*
  * syzygy.c
  *
+ * Get syzygy result for a specific endgame position
+ * NOTE: run ./scripts/download-tb first
+ *
  * Usage: ./syzygy [path=<PATH-TO-TB>] fen="ENDGAME-FEN"
  */
 

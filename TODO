@@ -1,3 +1,8 @@
+TODO: Check move extensions
+TODO: wire killer/history updates into search
+TODO: Verify syzygy promotion encoding
+TODO: Bake masks into castro
+TODO: Add castro_additions.h into castro
 TODO: pick a license
 TODO: pick a name
 TODO: texel tuning

@@ -1,3 +1,12 @@
+/*
+ * nnue.c
+ *
+ * This app runs nnue files and provides the resulting evaluation
+ * Useful for validating custom nnue models
+ *
+ * Usage: ./nnue path=<NNUE-PATH> fen=<FEN>
+ */
+
 #include "nnue.h"
 #include "IncludeOnly/kv.h"
 #include "IncludeOnly/logging.h"

@@ -1,3 +1,12 @@
+/*
+ * tinker.c
+ *
+ * This file is meant for quick experimentation and testing.
+ * It will and should change frequently
+ * 
+ * NOTE: remove once the engine reaches 1.0.0
+ */
+
 #include "castro.h"
 #include "core.h"
 #include "moveordering.h"
