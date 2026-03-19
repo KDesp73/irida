@@ -22,8 +22,8 @@ check
 /build/
 /compile_commands.json
 /libengine.*
-/nn
-/tb
+data/nn
+data/tb
 /tmp/
 download.txt
 
