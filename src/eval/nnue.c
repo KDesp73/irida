@@ -48,7 +48,7 @@ bool nnue_available(void)
 int nnue_eval(Board* board)
 {
     // Fallback
-    if (!g_nnue_loaded) return pesto_eval(board);
+    if (!g_nnue_loaded) return evaluation(board);
 
     char fen[FEN_BUFFER_SIZE];
     castro_FenExport(board, fen);

@@ -932,12 +932,12 @@ int pesto_eval(Board* board)
     return pesto_eval_impl(board, NULL);
 }
 
-int pesto_eval_breakdown(Board* board, EvalBreakdown* out)
+int eval_breakdown(Board* board, EvalBreakdown* out)
 {
     return pesto_eval_impl(board, out);
 }
 
-void pesto_log_breakdown(EvalBreakdown b)
+void log_breakdown(EvalBreakdown b)
 {
     fprintf(stderr, "Evaluation Breakdown\n");
     fprintf(stderr, "\t| Material: %d\n", b.material);

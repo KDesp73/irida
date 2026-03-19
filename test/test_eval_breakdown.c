@@ -12,7 +12,7 @@ int test_eval_breakdown(const char* fen)
     castro_BoardInitFen(&board, fen);
     int score = pesto_eval(&board);
     EvalBreakdown b;
-    int score2 = pesto_eval_breakdown(&board, &b);
+    int score2 = eval_breakdown(&board, &b);
     castro_BoardFree(&board);
     if (score != score2) {
         FAIL("pesto_eval %d != pesto_eval_breakdown %d", score, score2);

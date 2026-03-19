@@ -326,7 +326,7 @@ void uci_seteval(UciState* state, const char* command)
     const char* eval_name = command + strlen(COMMAND_SETEVAL) + 1; // +1 for the space
 
     if(!strcmp(eval_name, "pesto")) {
-        engine.eval = pesto_eval;
+        engine.eval = evaluation;
     } else if (!strcmp(eval_name, "nnue")) {
         for (size_t i = 0; i < state->uciOptionCount; i++) {
             if (strcmp(state->uciOptions[i].name, "EvalFile") == 0

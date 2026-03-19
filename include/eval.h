@@ -31,22 +31,22 @@ typedef struct EvalBreakdown {
 // @returns int Material-only eval (centipawns).
 int material_eval(Board* board);
 
-// @function pesto_eval
+// @function evaluation
 // @param board Board to evaluate.
 // @returns int PeSTO eval (centipawns, side-to-move).
-int pesto_eval(Board* board);
+int evaluation(Board* board);
 
-// @function pesto_eval_breakdown
+// @function eval_breakdown
 // @desc Fills *out with per-term breakdown; returns same value as pesto_eval.
 // @param board Board to evaluate.
 // @param out Output breakdown struct.
 // @returns int PeSTO eval (centipawns).
-int pesto_eval_breakdown(Board* board, EvalBreakdown* out);
+int eval_breakdown(Board* board, EvalBreakdown* out);
 
-// @function pesto_log_breakdown
+// @function log_breakdown
 // @desc Logs eval breakdown to stderr (e.g. for debugging).
 // @param b EvalBreakdown
-void pesto_log_breakdown(EvalBreakdown b);
+void log_breakdown(EvalBreakdown b);
 
 // @function pesto_init
 // @desc Initialize PeSTO tables. Call once at startup.

@@ -12,8 +12,8 @@ int test_eval_log(const char* fen)
     castro_BoardInitFen(&board, fen);
     fprintf(stderr, "[eval] FEN: %s\n", fen);
     EvalBreakdown b = {0};
-    pesto_eval_breakdown(&board, &b);
-    pesto_log_breakdown(b);
+    eval_breakdown(&board, &b);
+    log_breakdown(b);
     castro_BoardFree(&board);
     SUCC("logged breakdown");
     return 1;
