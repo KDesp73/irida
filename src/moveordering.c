@@ -1,5 +1,5 @@
 /*
- * Theory: Move ordering for alpha-beta.
+ * Move ordering for alpha-beta.
  *
  * We try the transposition table move first, then captures ordered by MVV-LVA
  * (most valuable victim – least valuable attacker), then killer moves (two per

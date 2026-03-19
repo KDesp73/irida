@@ -26,11 +26,6 @@ int mvv_lva_score(Board *board, Move m);
 // @param ply Current ply.
 void order_moves(Board *board, Move moves[], size_t count, size_t ply, Move tt_move);
 
-// @function set_tt_move
-// @desc Set the transposition table move for the next order_moves call (search it first).
-// @param move TT best move.
-void set_tt_move(Move move);
-
 // @function update_killer
 // @desc Killer moves heuristic.
 // @param move Move to record as killer.
