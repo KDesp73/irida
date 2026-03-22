@@ -15,7 +15,7 @@ bench
 nnue
 tinker
 syzygy
-engine
+irida
 check
 
 # --- Project Specific Build Artifacts ---

@@ -26,16 +26,16 @@ ifeq ($(UNAME_S),Darwin) # macOS
     SO_NAME  := lib$(LIBRARY_NAME).dylib
     SO_LDFLAGS := -dynamiclib -undefined dynamic_lookup
     LDFLAGS_ENGINE   := $(A_NAME)
-    LDFLAGS_CASTRO   := vendor/castro/libcastro.a
-    LDFLAGS_NNUE_PROBE := vendor/nnue-probe/src/libnnueprobe.a
-    LDFLAGS_FATHOM   := vendor/fathom/libfathom.a
+    LDFLAGS_CASTRO   := deps/lib/libcastro.a
+    LDFLAGS_NNUE_PROBE := deps/lib/libnnueprobe.a
+    LDFLAGS_FATHOM   := deps/lib/libfathom.a
 else
     SO_NAME  := lib$(LIBRARY_NAME).so
     SO_LDFLAGS := -shared
     LDFLAGS_ENGINE   := -L. -l:$(A_NAME)
-    LDFLAGS_CASTRO   := -Lvendor/castro -l:libcastro.a
-	LDFLAGS_NNUE_PROBE := -Lvendor/nnue-probe/src -l:libnnueprobe.a
-	LDFLAGS_FATHOM   := -Lvendor/fathom -l:libfathom.a
+    LDFLAGS_CASTRO   := -l:libcastro.a
+	LDFLAGS_NNUE_PROBE := -l:libnnueprobe.a
+	LDFLAGS_FATHOM   := -l:libfathom.a
 endif
 
 WARNINGS = -Wall -Wextra
@@ -43,7 +43,7 @@ INCLUDES = -I$(INCLUDE_DIR) -Ivendor/castro/src -Ivendor -Ivendor/nnue-probe -Iv
 
 # Flags
 CFLAGS  := -fPIC $(WARNINGS) $(INCLUDES) -DUSE_FATHOM
-LDFLAGS := -lpthread $(LDFLAGS_FATHOM) $(LDFLAGS_NNUE_PROBE)
+LDFLAGS := -lpthread -Ldeps/lib $(LDFLAGS_FATHOM) $(LDFLAGS_NNUE_PROBE)
 
 type := DEBUG
 
