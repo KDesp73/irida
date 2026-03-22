@@ -37,6 +37,7 @@ bool nnue_load(const char* path)
         return false;
     }
     g_nnue_loaded = true;
+    printf("info NNUE %s loaded\n", path);
     return true;
 }
 

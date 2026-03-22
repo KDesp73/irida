@@ -43,7 +43,6 @@ DEPENDENCIES=(
     make
     gcc
     bear
-    fastchess
 )
 
 # ANSI color codes

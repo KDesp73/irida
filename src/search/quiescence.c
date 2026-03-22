@@ -1,12 +1,10 @@
 /*
  * Theory: Quiescence search.
  *
- * To avoid evaluating noisy positions (e.g. in the middle of a capture sequence),
- * we only consider capture moves. We evaluate the standing pat (current position);
- * if it fails high we return beta. Otherwise we generate captures, order them,
- * and search with negamax alpha-beta. The search is recursive until no captures
- * remain or we hit max ply. Mate scores are distance-adjusted so they stay
- * consistent across plies.
+ * Off check, we evaluate a standing pat and only expand captures (plus delta
+ * pruning). In check there is no legal stand-pat: we expand all legal moves so
+ * non-capture evasions are not missed. Checkmate leaf matches main search:
+ * -INF + ply.
  */
 #include "castro.h"
 #include "eval.h"
@@ -20,28 +18,33 @@ int quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, OrderFn 
     if (ply >= MAX_PLY)
         return eval(board);
 
-    int stand_pat = eval(board);
+    const bool in_check = castro_IsInCheck(board);
 
-    // Standing Pat: If current position is good enough to cause a cutoff, stop.
-    if (stand_pat >= beta)
-        return beta;
+    if (!in_check) {
+        int stand_pat = eval(board);
 
-    // Delta Pruning: A queen is worth ~900. If we are down by 1000, 
-    // even taking a queen won't save us.
-    if (stand_pat < alpha - 900) { 
-         if (!castro_IsInCheck(board)) {
+        if (stand_pat >= beta)
+            return beta;
+
+        // Delta pruning: a queen is worth ~900; if we are down by ~1000,
+        // even taking a queen will not reach alpha.
+        if (stand_pat < alpha - 900)
             return alpha;
-         }
+
+        if (stand_pat > alpha)
+            alpha = stand_pat;
     }
 
-    if (stand_pat > alpha)
-        alpha = stand_pat;
-
-    Moves moves = castro_GenerateMoves(board, MOVE_CAPTURE);
-
-    // If no captures are available, we return the standing pat
-    if (moves.count == 0)
-        return alpha;
+    Moves moves;
+    if (in_check) {
+        moves = castro_GenerateMoves(board, MOVE_LEGAL);
+        if (moves.count == 0)
+            return -INF + ply;
+    } else {
+        moves = castro_GenerateMoves(board, MOVE_CAPTURE);
+        if (moves.count == 0)
+            return alpha;
+    }
 
     order(board, moves.list, moves.count, ply, NULL_MOVE);
 

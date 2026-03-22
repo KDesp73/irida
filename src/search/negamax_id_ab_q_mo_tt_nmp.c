@@ -101,7 +101,7 @@ static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int 
     if (
         depth >= 3
         && !castro_IsInCheck(board)
-        && castro_HasNonPawnMaterial(board) // To avoid Zugzwang
+        && castro_HasNonPawnMaterial(board)
     ) {
         castro_MakeNullMove(board);
         // Using a reduced depth (R=3) and a null window (-beta, -beta + 1)
