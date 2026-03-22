@@ -31,15 +31,6 @@ extern "C" {
 // @desc Version as single integer (major*10000 + minor*100 + patch).
 #define VERSION_HEX ((VERSION_MAJOR * 10000) + (VERSION_MINOR * 100) + VERSION_PATCH)
 
-// @const ENGINE_NAME
-// @desc Default engine name; override with -DENGINE_NAME=\"YourName\" when compiling.
-#ifndef ENGINE_NAME
-#define ENGINE_NAME "chess-engine"
-#endif
-
-// @const ENGINE_AUTHOR
-#define ENGINE_AUTHOR "Konstantinos Despoinidis (KDesp73)"
-
 // @function version
 // @desc Fills in the provided pointers with the current version numbers.
 // @param major Pointer to store major version (or NULL).

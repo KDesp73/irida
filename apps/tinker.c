@@ -52,6 +52,7 @@ SearchConfig g_searchConfig = {
     .maxDepth = 100,
     .timeLimitMs = 0, // No limit unless provided by the gui
     .useAspiration = true,
+    .usePVS = true,
     .useLMR = true,
     .useNullMove = true,
     .useTT = true,

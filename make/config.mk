@@ -10,7 +10,7 @@ BUILD_DIR    := build
 DIST_DIR     := dist
 
 # Library naming
-LIBRARY_NAME := engine
+LIBRARY_NAME := irida
 A_NAME       := lib$(LIBRARY_NAME).a
 TARGET       := $(LIBRARY_NAME)
 

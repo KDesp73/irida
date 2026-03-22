@@ -19,8 +19,8 @@
 ## Aggressive Pruning
 
 - [x] 7. Null Move Pruning
-- [ ] 8. Late Move Reductions
-- [ ] 9. Check Move Extensions
+- [x] 8. Late Move Reductions
+- [x] 9. Check Move Extensions
 
 ## Optimizations
 

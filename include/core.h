@@ -8,6 +8,12 @@
 // @module core
 // @desc Engine core: Engine struct, init, and global engine instance.
 
+// @const ENGINE_NAME
+#define ENGINE_NAME "irida"
+
+// @const ENGINE_AUTHOR
+#define ENGINE_AUTHOR "Konstantinos Despoinidis (KDesp73)"
+
 // @const PIECE_VALUES
 // @desc Piece values (0–5 = PAWN..KING) for display or tuning.
 static const int PIECE_VALUES[6] = {100, 320, 330, 500, 900, 0};

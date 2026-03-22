@@ -19,6 +19,7 @@ int test_search(const char* fen, int depth_limit)
         .useNullMove = true,
         .useLMR = true,
         .useAspiration = true,
+        .usePVS = true,
         .useTT = true,
         .useQuiescence = true,
         .syzygyProbeDepth = 1,

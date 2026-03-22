@@ -30,6 +30,7 @@ SearchConfig g_searchConfig = {
     .maxDepth = 6,
     .timeLimitMs = 0,
     .useAspiration = true,
+    .usePVS = true,
     .useLMR = true,
     .useNullMove = true,
     .useTT = true,

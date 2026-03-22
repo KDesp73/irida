@@ -31,6 +31,7 @@ typedef struct {
     bool useNullMove;
     bool useLMR;
     bool useAspiration;
+    bool usePVS;
     bool useTT;
     bool useQuiescence;
     int syzygyProbeDepth;
@@ -74,6 +75,8 @@ Move negamax_id_ab_q_mo_tt(Board* board, EvalFn eval, OrderFn order, SearchConfi
 Move negamax_id_ab_q_mo_tt_nmp(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 Move negamax_id_ab_q_mo_tt_nmp_lmr(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 Move negamax_id_ab_q_mo_tt_nmp_lmr_cme(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
+Move negamax_id_ab_q_mo_tt_nmp_lmr_cme_aw(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
+Move negamax_id_ab_q_mo_tt_nmp_lmr_cme_aw_pvs(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 
 static const struct { const char *name; SearchFn fn; } search_variants[] = {
     { "id_ab",             negamax_id_ab },
@@ -82,6 +85,8 @@ static const struct { const char *name; SearchFn fn; } search_variants[] = {
     { "id_ab_q_mo_tt_nmp", negamax_id_ab_q_mo_tt_nmp },
     { "id_ab_q_mo_tt_nmp_lmr", negamax_id_ab_q_mo_tt_nmp_lmr },
     { "id_ab_q_mo_tt_nmp_lmr_cme", negamax_id_ab_q_mo_tt_nmp_lmr_cme },
+    { "id_ab_q_mo_tt_nmp_lmr_cme_aw", negamax_id_ab_q_mo_tt_nmp_lmr_cme_aw },
+    { "id_ab_q_mo_tt_nmp_lmr_cme_aw_pvs", negamax_id_ab_q_mo_tt_nmp_lmr_cme_aw_pvs },
 };
 
 // @function quiescence
