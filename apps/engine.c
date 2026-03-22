@@ -26,7 +26,7 @@ int main(void)
 {
     EngineInit(&engine);
     engine.eval = nnue_eval;
-    engine.search = negamax_id_ab_q_mo_tt_nmp;
+    engine.search = negamax_id_ab_q_mo_tt_nmp_lmr_cme;
     engine.order = order_moves;
 
     UciMain();

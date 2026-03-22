@@ -72,12 +72,16 @@ Move negamax_id_ab(Board* board, EvalFn eval, OrderFn order, SearchConfig* confi
 Move negamax_id_ab_q_mo(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 Move negamax_id_ab_q_mo_tt(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 Move negamax_id_ab_q_mo_tt_nmp(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
+Move negamax_id_ab_q_mo_tt_nmp_lmr(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
+Move negamax_id_ab_q_mo_tt_nmp_lmr_cme(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 
 static const struct { const char *name; SearchFn fn; } search_variants[] = {
     { "id_ab",             negamax_id_ab },
     { "id_ab_q_mo",        negamax_id_ab_q_mo },
     { "id_ab_q_mo_tt",     negamax_id_ab_q_mo_tt },
     { "id_ab_q_mo_tt_nmp", negamax_id_ab_q_mo_tt_nmp },
+    { "id_ab_q_mo_tt_nmp_lmr", negamax_id_ab_q_mo_tt_nmp_lmr },
+    { "id_ab_q_mo_tt_nmp_lmr_cme", negamax_id_ab_q_mo_tt_nmp_lmr_cme },
 };
 
 // @function quiescence
