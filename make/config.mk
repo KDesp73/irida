@@ -39,13 +39,13 @@ else
 endif
 
 WARNINGS = -Wall -Wextra
-INCLUDES = -I$(INCLUDE_DIR) -Ivendor/castro/src -Ivendor -Ivendor/nnue-probe -Ivendor/fathom/src
+INCLUDES = -I$(INCLUDE_DIR) -Ideps/include -Ideps/include/fathom -Ideps/include/nnue-probe
 
 # Flags
-CFLAGS  := -fPIC $(WARNINGS) $(INCLUDES) -DUSE_FATHOM
+CFLAGS  := -fPIC $(WARNINGS) $(INCLUDES)
 LDFLAGS := -lpthread -Ldeps/lib $(LDFLAGS_FATHOM) $(LDFLAGS_NNUE_PROBE)
 
-type := DEBUG
+type := RELEASE
 
 # Build type
 ifeq ($(type), RELEASE)
