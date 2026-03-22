@@ -1,14 +1,11 @@
-TODO: Check move extensions
 TODO: wire killer/history updates into search
 TODO: Verify syzygy promotion encoding
 TODO: Bake masks into castro
 TODO: Add castro_additions.h into castro
 TODO: pick a license
-TODO: pick a name
 TODO: texel tuning
 TODO: aspiration windows
 TODO: engine executable download nnue files
-TODO: late move reductions
 TODO: principal variation search
 DONE: engine testing
 DONE: cache
@@ -26,3 +23,6 @@ DONE: move ordering
 DONE: better traditional evaluation
 DONE: transposition tables
 DONE: syzygy tablebase (optional Fathom)
+DONE: Check move extensions
+DONE: pick a name
+DONE: late move reductions
