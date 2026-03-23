@@ -1,8 +1,6 @@
 # --- Compiled Binaries & Objects ---
 *.o
 *.obj
-*.so
-*.a
 *.lib
 *.dll
 *.exe
@@ -21,7 +19,7 @@ check
 # --- Project Specific Build Artifacts ---
 /build/
 /compile_commands.json
-/libengine.*
+/libirida.*
 data/nn
 data/tb
 /tmp/
