@@ -1,3 +1,10 @@
+/*
+ * Iterative deepening + negamax + alpha-beta + quiescence + move ordering.
+ *
+ * At depth 0 the search switches to quiescence() instead of a raw eval, which
+ * reduces horizon effect by extending tactical sequences (captures; in check,
+ * all evasions). Move ordering (MVV-LVA, killers, history) improves cutoffs.
+ */
 #include "castro.h"
 #include "eval.h"
 #include "search.h"
@@ -66,6 +73,7 @@ Move negamax_id_ab_q_mo(Board* board, EvalFn eval, OrderFn order, SearchConfig* 
     return best_move;
 }
 
+/* Negamax + alpha-beta; depth 0 -> quiescence; terminal leaves mate/stalemate. */
 static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int ply, int alpha, int beta)
 {
     // Periodically check timer every 2048 nodes

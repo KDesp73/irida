@@ -28,6 +28,7 @@
 typedef struct {
     int maxDepth;
     int timeLimitMs;      // 0 = no limit
+    int threads;
     bool useNullMove;
     bool useLMR;
     bool useAspiration;
@@ -57,17 +58,19 @@ typedef Move (*SearchFn)(Board* board,
                          OrderFn order,
                          SearchConfig* config);
 
-// NOTE: Implementation Encoding
-// id: Iterative Deepening
-// ab: Alpha-Beta Pruning
-// q: Quiescence
-// mo: Move Ordering
-// tt: Transposition Table
-// nmp: Null Move Pruning
-// lmr: Late Move Reductions
-// cme: Check Move Extensions
-// aw: Aspiration Windows
-// pvs: Principal Variation Search
+/* Search variant naming (function name suffixes):
+ *   id  — iterative deepening at the root (successive depths until time/depth)
+ *   ab  — alpha-beta (negamax formulation with [alpha,beta] pruning)
+ *   q   — quiescence at leaves instead of raw eval
+ *   mo  — move ordering (MVV-LVA, killers, history, TT move)
+ *   tt  — transposition table (hash probes/stores)
+ *   nmp — null-move pruning
+ *   lmr — late move reductions (scout + re-search)
+ *   cme — extend one ply when move gives check
+ *   aw  — aspiration windows at root (narrow alpha/beta around previous score)
+ *   pvs — principal variation search (zero-window scouts off the PV)
+ * Later names extend earlier ones (e.g. id_ab_q_mo_tt adds TT to id_ab_q_mo).
+ */
 
 Move random_move(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 

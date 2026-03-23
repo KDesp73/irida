@@ -29,6 +29,7 @@ SearchStats g_searchStats = {0};
 SearchConfig g_searchConfig = {
     .maxDepth = 6,
     .timeLimitMs = 0,
+    .threads = 1,
     .useAspiration = true,
     .usePVS = true,
     .useLMR = true,

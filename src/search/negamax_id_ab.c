@@ -1,3 +1,13 @@
+/*
+ * Root search: iterative deepening + negamax + alpha-beta (minimal variant).
+ *
+ * Iterative deepening runs depth 1, 2, … so the engine always has a best move if
+ * time expires mid-search. Each depth is a full-window search at the root.
+ *
+ * negamax_rec() uses plain alpha-beta (no quiescence): at depth 0 it returns a
+ * static eval, so tactical noise can distort scores—see id_ab_q_mo and later
+ * variants for quiescence and stronger pruning.
+ */
 #include "castro.h"
 #include "eval.h"
 #include "search.h"
@@ -5,6 +15,7 @@
 #include "utils.h"
 #include <limits.h>
 
+/* Recursive negamax: fail-soft alpha-beta; mate leaves use -INF+ply style margin. */
 static int negamax_rec(Board* board, EvalFn evaluate, int depth, int alpha, int beta);
 
 Move negamax_id_ab(Board* board, EvalFn eval, OrderFn order, SearchConfig* config) 
@@ -58,6 +69,7 @@ Move negamax_id_ab(Board* board, EvalFn eval, OrderFn order, SearchConfig* confi
     return best_move;
 }
 
+/* Plain negamax; depth 0 uses static eval (no quiescence in this variant). */
 static int negamax_rec(Board* board, EvalFn evaluate, int depth, int alpha, int beta)
 {
     if (search_should_stop()) return 0;

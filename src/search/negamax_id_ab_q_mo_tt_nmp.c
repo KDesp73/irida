@@ -1,3 +1,12 @@
+/*
+ * Adds null-move pruning (NMP): at non-check positions with sufficient material,
+ * we try passing (null move) and search a reduced tree with a null window.
+ *
+ * If even that refutes the position (score >= beta), the real position is likely
+ * a cut-node (beta cutoff) and we can skip full move generation—major speedup in
+ * quiet positions. In check or zugzwang-prone endgames NMP is skipped; mate scores
+ * from NMP are clamped because NMP does not prove mates.
+ */
 #include "castro.h"
 #include "castro_additions.h"
 #include "eval.h"
@@ -68,6 +77,7 @@ Move negamax_id_ab_q_mo_tt_nmp(Board* board, EvalFn eval, OrderFn order, SearchC
     return best_move;
 }
 
+/* TT + quiescence + NMP; legal terminal handling after move loop (mate/stalemate). */
 static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int ply, int alpha, int beta)
 {
     // 0. TT Probe

@@ -1,3 +1,11 @@
+/*
+ * Adds a transposition table (TT) on top of id_ab_q_mo.
+ *
+ * Positions are keyed by Zobrist hash; entries store depth, bound type (exact /
+ * lower / upper), score, and best move for ordering. Probes before expanding
+ * nodes avoid duplicate work; stores after search cache results for reuse.
+ * Mate scores are adjusted by ply when storing so probes stay valid across depths.
+ */
 #include "castro.h"
 #include "eval.h"
 #include "search.h"
@@ -67,6 +75,7 @@ Move negamax_id_ab_q_mo_tt(Board* board, EvalFn eval, OrderFn order, SearchConfi
     return best_move;
 }
 
+/* TT probe/store around the same negamax + quiescence core as id_ab_q_mo. */
 static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int ply, int alpha, int beta)
 {
     // 0. TT Probe

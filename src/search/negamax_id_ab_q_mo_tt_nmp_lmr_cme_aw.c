@@ -1,5 +1,14 @@
-// FIXME: Faulty implementation
-
+/*
+ * Aspiration windows (AW) at the root: after depth 1, alpha/beta are narrowed
+ * around the previous iteration’s score instead of [-INF, INF].
+ *
+ * Fewer nodes fail inside the window, so search is faster. If the score falls
+ * outside the window (fail-low / fail-high), the iteration is re-run with full
+ * bounds until the result lies inside or full window is used.
+ *
+ * Note: this file’s aspiration interaction with TT bounds is still under review
+ * (historical FIXME); use the non-aw variant for maximum robustness until fixed.
+ */
 #include "castro.h"
 #include "castro_additions.h"
 #include "eval.h"
@@ -9,6 +18,7 @@
 #include "tt.h"
 #include <stdio.h>
 
+/* Aspiration only when the previous score looks like a normal cp score, not mate. */
 static int aspiration_prev_ok(int prevScore)
 {
     return prevScore > -MATE_SCORE / 2 && prevScore < MATE_SCORE / 2;
@@ -106,6 +116,7 @@ Move negamax_id_ab_q_mo_tt_nmp_lmr_cme_aw(Board* board, EvalFn eval, OrderFn ord
     return best_move;
 }
 
+/* Same tree search as cme variant; root aspiration only affects window, not this. */
 static int negamax_rec(Board* board,
                        EvalFn eval,
                        OrderFn order,

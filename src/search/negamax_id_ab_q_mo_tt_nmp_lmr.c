@@ -1,3 +1,12 @@
+/*
+ * Adds late move reductions (LMR): quiet moves ordered late at the same node are
+ * searched with reduced depth first.
+ *
+ * If the reduced search fails high or produces a cutoff, we may re-search at full
+ * depth. Rationale: in many positions early moves contain the best reply; later
+ * moves are statistically weaker, so less depth saves nodes while preserving
+ * correctness via re-search when the scout result is suspicious.
+ */
 #include "castro.h"
 #include "castro_additions.h"
 #include "eval.h"
@@ -69,6 +78,10 @@ Move negamax_id_ab_q_mo_tt_nmp_lmr(Board* board, EvalFn eval, OrderFn order, Sea
     return best_move;
 }
 
+/*
+ * Core negamax: TT probe, quiescence at horizon, NMP, LMR on late quiet moves,
+ * mate/stalemate leaves, TT store with bound type.
+ */
 static int negamax_rec(Board* board,
                        EvalFn eval,
                        OrderFn order,

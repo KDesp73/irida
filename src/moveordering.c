@@ -8,6 +8,9 @@
  * searched in that order to maximize alpha-beta cutoffs. The ordering is
  * implemented as a partial selection sort so we can pick the next best move
  * incrementally if needed (here we fully sort the array).
+ *
+ * Killer/history tables are per-thread (_Thread_local) so parallel root search
+ * does not corrupt shared heuristic state between workers.
  */
 #include <stddef.h>
 #include <stdint.h>
@@ -99,6 +102,7 @@ static inline int score_move(Board *board, Move m, int ply, Move tt_move)
     return history[from][to];
 }
 
+/* Sort `moves[0..count)` in place by descending score_move() priority. */
 void order_moves(Board *board, Move moves[], size_t count, size_t ply, Move tt_move)
 {
     int scores[MAX_MOVES];

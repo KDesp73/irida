@@ -45,6 +45,7 @@ bool search_time_up(void)
     return (now - g_startTimeMs) >= g_timeLimitMs;
 }
 
+/* Elapsed ms since search_start_timer; used for UCI nps/time reporting. */
 uint64_t search_elapsed_ms(void)
 {
     if (g_timeLimitMs == 0)

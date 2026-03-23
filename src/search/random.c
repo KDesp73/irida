@@ -1,3 +1,7 @@
+/*
+ * Trivial “search”: pick a uniform random legal move. Used for testing or
+ * weakest play; does not run minimax.
+ */
 #include "castro.h"
 #include "search.h"
 #include "utils.h"

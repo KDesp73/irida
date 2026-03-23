@@ -7,6 +7,10 @@
  * search. Mate scores are adjusted by ply when storing and unadjusted when
  * probing so they remain valid at any depth. Entries store depth, score type
  * (exact, lower bound, upper bound), and best move for ordering.
+ *
+ * Probes: we may still return bestMove for move ordering when stored depth is
+ * below the requested depth (score cutoff only when depth is sufficient).
+ * Replacement favors deeper/newer/same-key updates per the policy in tt_store.
  */
 #include <stdlib.h>
 #include <string.h>

@@ -1,3 +1,11 @@
+/*
+ * Adds check extensions (CME): when a move gives check, the child search gets
+ * an extra ply of depth (next_depth = depth - 1 + 1).
+ *
+ * Checks are tactically sharp; extending avoids premature cutoff in lines where
+ * one side keeps the king under fire. LMR is not applied when the move gives
+ * check, since those moves are not treated as “late quiet” moves.
+ */
 #include "castro.h"
 #include "castro_additions.h"
 #include "eval.h"
@@ -69,6 +77,7 @@ Move negamax_id_ab_q_mo_tt_nmp_lmr_cme(Board* board, EvalFn eval, OrderFn order,
     return best_move;
 }
 
+/* Same as nmp_lmr negamax_rec, with extra ply when the child move gives check. */
 static int negamax_rec(Board* board,
                        EvalFn eval,
                        OrderFn order,

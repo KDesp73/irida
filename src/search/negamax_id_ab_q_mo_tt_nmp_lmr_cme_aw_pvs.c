@@ -1,5 +1,13 @@
-// FIXME: Faulty implementation
-
+/*
+ * Aspiration windows (root) plus principal variation search (PVS) at the root
+ * and in negamax_rec.
+ *
+ * PVS: after the first ordered move (PV candidate), try a zero-window search
+ * (-alpha-1, -alpha); if it fails high, re-search with the full window. Cuts
+ * nodes in non-PV lines where the position is likely worse than the first move.
+ *
+ * See negamax_id_ab_q_mo_tt_nmp_lmr_cme_aw.c for aspiration caveats.
+ */
 #include "castro.h"
 #include "castro_additions.h"
 #include "eval.h"
@@ -117,6 +125,7 @@ Move negamax_id_ab_q_mo_tt_nmp_lmr_cme_aw_pvs(Board* board, EvalFn eval, OrderFn
     return best_move;
 }
 
+/* PVS in the move loop: zero-window scout for non-PV moves, full window on re-search. */
 static int negamax_rec(Board* board,
                        EvalFn eval,
                        OrderFn order,

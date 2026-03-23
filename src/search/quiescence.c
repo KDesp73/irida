@@ -1,16 +1,19 @@
 /*
- * Theory: Quiescence search.
+ * Quiescence search extends the main search past depth 0 so evaluation is not
+ * applied in the middle of a tactical sequence (horizon effect).
  *
- * Off check, we evaluate a standing pat and only expand captures (plus delta
- * pruning). In check there is no legal stand-pat: we expand all legal moves so
- * non-capture evasions are not missed. Checkmate leaf matches main search:
- * -INF + ply.
+ * Not in check: standing pat (eval) establishes a floor; only captures are
+ * expanded (with delta pruning: if we are far below alpha, no capture fixes it).
+ * In check: there is no legal stand-pat, so all legal moves are searched—
+ * otherwise mate threats after “quiet” positions would be missed.
+ * Terminal: no moves in check is mate (-INF + ply); stalemate returns 0.
  */
 #include "castro.h"
 #include "eval.h"
 #include "moveordering.h"
 #include "search.h"
 
+/* Negamax quiescence with alpha-beta; same eval/ordering hooks as main search. */
 int quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, OrderFn order)
 {
     g_searchStats.qnodes++;

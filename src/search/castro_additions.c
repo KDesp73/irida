@@ -1,4 +1,4 @@
-// TODO: add to castro.h
+/* Search helpers not yet merged into castro.h (see TODO). */
 
 #include "castro_additions.h"
 #include "castro.h"
@@ -7,6 +7,7 @@
 #define FIFTY_MOVE_LIMIT 100
 
 
+/* Draw for search pruning / repetition: 50-move, threefold, insufficient material. */
 bool castro_IsDraw(Board* board)
 {
     if (board->halfmove >= FIFTY_MOVE_LIMIT)
@@ -21,6 +22,10 @@ bool castro_IsDraw(Board* board)
     return false;
 }
 
+/*
+ * True if side has knight, bishop, rook, or queen—used to gate null-move pruning
+ * (NMP is unsafe in KPK etc. where zugzwang matters).
+ */
 bool castro_HasNonPawnMaterial(Board* board)
 {
     for(size_t i = INDEX_KNIGHT; i < INDEX_KING; i++) {

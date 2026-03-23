@@ -51,6 +51,7 @@ SearchStats g_searchStats = {0};
 SearchConfig g_searchConfig = {
     .maxDepth = 100,
     .timeLimitMs = 0, // No limit unless provided by the gui
+    .threads = 1,
     .useAspiration = true,
     .usePVS = true,
     .useLMR = true,
