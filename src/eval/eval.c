@@ -32,10 +32,6 @@ static inline int flip_sq(int sq) {
     return sq ^ 56;
 }
 
-static inline int other(int c) {
-    return c ^ 1;
-}
-
 static inline int is_white_piece_char(char c) {
     return c >= 'A' && c <= 'Z';
 }
