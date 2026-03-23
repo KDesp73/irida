@@ -3,6 +3,7 @@
 #include "tt.h"
 #include "version.h"
 #include <string.h>
+#include <time.h>
 
 void EngineInit(Engine* engine)
 {
@@ -15,4 +16,6 @@ void EngineInit(Engine* engine)
     pesto_init();
     init_mvv_lva();
     tt_init(16);
+
+    srand(time(NULL));
 }

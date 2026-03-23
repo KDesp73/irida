@@ -69,6 +69,8 @@ typedef Move (*SearchFn)(Board* board,
 // aw: Aspiration Windows
 // pvs: Principal Variation Search
 
+Move random_move(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
+
 Move negamax_id_ab(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 Move negamax_id_ab_q_mo(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 Move negamax_id_ab_q_mo_tt(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
