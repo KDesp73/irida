@@ -131,7 +131,7 @@ int UciMain(void);
 /** Run the UCI command loop only (state and config must already be initialized). */
 int UciMainLoop(void);
 
-bool HandleCommand(UciState* state, const char *command);
+bool UciHandleCommand(UciState* state, const char *command);
 
 void uci_debug(UciState* state, const char* command);
 void uci_go(UciState* state, const char* command);
