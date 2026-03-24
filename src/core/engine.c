@@ -11,8 +11,8 @@ void EngineInit(Engine* engine)
     strncpy(engine->author, ENGINE_AUTHOR, sizeof(engine->author));
 
     // TODO: bake masks and magic into castro
-    castro_InitMasks();
-    castro_InitMagic();
+    // castro_InitMasks();
+    // castro_InitMagic();
     pesto_init();
     init_mvv_lva();
     tt_init(16);

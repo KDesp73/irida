@@ -9,7 +9,7 @@
     (strncmp(command, check, strlen(check)) == 0 && \
     (command[strlen(check)] == '\0' || command[strlen(check)] == ' '))
 
-bool HandleCommand(UciState* uci_state, const char *command)
+bool UciHandleCommand(UciState* uci_state, const char *command)
 {
     if (IS_COMMAND(command, COMMAND_UCI)) {
         uci_uci(uci_state);

@@ -22,7 +22,7 @@ int UciMainLoop(void)
         input[strcspn(input, "\n")] = '\0';
 
         uci_stdout_lock();
-        HandleCommand(&uci_state, input);
+        UciHandleCommand(&uci_state, input);
         fflush(stdout);
         uci_stdout_unlock();
     }
