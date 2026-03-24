@@ -1,36 +1,27 @@
-/*
- * Iterative deepening + negamax + alpha-beta + quiescence + move ordering.
- *
- * At depth 0 the search switches to quiescence() instead of a raw eval, which
- * reduces horizon effect by extending tactical sequences (captures; in check,
- * all evasions). Move ordering (MVV-LVA, killers, history) improves cutoffs.
- */
 #include "castro.h"
 #include "eval.h"
 #include "search.h"
 #include "uci.h"
-#include "moveordering.h"
 #include <limits.h>
-#include <stdio.h>
 
-static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int ply, int alpha, int beta);
+static int negamax_rec(Board* board, EvalFn evaluate, OrderFn order, int depth, int ply, int alpha, int beta);
 
 Move negamax_id_ab_q_mo(Board* board, EvalFn eval, OrderFn order, SearchConfig* config) 
 {
     Move best_move = NULL_MOVE;
     g_searchStats.nodes = 0;
-    g_searchStats.qnodes = 0;
 
     search_start_timer(config->timeLimitMs);
 
+    // Iterative Deepening
     for (int currentDepth = 1; currentDepth <= config->maxDepth; currentDepth++) {
         
         if (search_time_up()) break;
 
-        Moves legal = castro_GenerateMoves(board, MOVE_LEGAL);
-        
-        // Use the order function with ply 0 at the root
-        order(board, legal.list, legal.count, 0, NULL_MOVE);
+        // 1. Generate moves once at the root
+        Moves legal = castro_GenerateLegalMoves(board);
+
+        order(board, legal.list, legal.count, 0, best_move);
 
         int alpha = -INF;
         int beta = INF;
@@ -38,13 +29,13 @@ Move negamax_id_ab_q_mo(Board* board, EvalFn eval, OrderFn order, SearchConfig* 
         Move currentBestMove = NULL_MOVE;
 
         for (size_t i = 0; i < legal.count; i++) {
-            castro_MakeMove(board, legal.list[i]);
-            
-            // Initial call to recursion: depth is currentDepth-1, ply is 1
+            if (!castro_MakeMove(board, legal.list[i])) continue;
+
+            // 3. Pass ply = 1 to the first recursive call
             int score = -negamax_rec(board, eval, order, currentDepth - 1, 1, -beta, -alpha);
-            
             castro_UnmakeMove(board);
 
+            // If time ran out, discard results from this depth to avoid playing a blunder
             if (search_should_stop()) break;
 
             if (score > bestScore) {
@@ -54,16 +45,15 @@ Move negamax_id_ab_q_mo(Board* board, EvalFn eval, OrderFn order, SearchConfig* 
             if (score > alpha) alpha = score;
         }
 
-        // Only update best_move if the search at this depth completed fully
+        // Only update the global best_move if we completed the depth (or at least the first move)
         if (!search_should_stop()) {
             best_move = currentBestMove;
+            
             char moveBuf[10];
             castro_MoveToString(best_move, moveBuf);
+            uci_report_search(currentDepth, bestScore, g_searchStats.nodes, search_elapsed_ms(), moveBuf);
             
-            // Report progress to the GUI
-            uci_report_search(currentDepth, bestScore, g_searchStats.nodes + g_searchStats.qnodes, search_elapsed_ms(), moveBuf);
-            
-            // Exit if we found a forced checkmate
+            // If we found a mate, no need to search deeper
             if (bestScore > (INF - MAX_PLY)) break; 
         } else {
             break; 
@@ -73,49 +63,49 @@ Move negamax_id_ab_q_mo(Board* board, EvalFn eval, OrderFn order, SearchConfig* 
     return best_move;
 }
 
-/* Negamax + alpha-beta; depth 0 -> quiescence; terminal leaves mate/stalemate. */
-static int negamax_rec(Board* board, EvalFn eval, OrderFn order, int depth, int ply, int alpha, int beta)
+static int negamax_rec(Board* board, EvalFn evaluate, OrderFn order, int depth, int ply, int alpha, int beta)
 {
-    // Periodically check timer every 2048 nodes
-    if ((g_searchStats.nodes & 2047) == 0) {
-        if (search_time_up()) {
-            // Signal search_should_stop() to return true
-        }
-    }
     if (search_should_stop()) return 0;
+
+    // 1. Base Case (Horizon reached)
+    // Instead of a static evaluation, we enter Quiescence Search to 
+    // resolve any "noisy" tactical sequences (captures).
+    if (depth <= 0) {
+        return quiescence(board, alpha, beta, ply, evaluate, order_moves);
+    }
 
     g_searchStats.nodes++;
 
-    // 1. Terminal Check
-    Moves legal = castro_GenerateMoves(board, MOVE_LEGAL);
-    if (legal.count == 0) {
-        if (castro_IsInCheck(board)) {
-            // Return mate score relative to current ply
-            return -INF + ply; 
-        }
-        return 0; // Stalemate
-    }
+    // 2. Move Generation & Ordering
+    Moves moves = castro_GenerateMoves(board, MOVE_PSEUDO); 
+    order(board, moves.list, moves.count, ply, NULL_MOVE);
 
-    // 2. Base Case: Transition to Quiescence Search
-    if (depth <= 0) {
-        return quiescence(board, alpha, beta, ply, eval, order);
-    }
-
-    order(board, legal.list, legal.count, ply, NULL_MOVE);
-
+    int legal_moves_count = 0;
     int max_eval = -INF;
-    for (size_t i = 0; i < legal.count; i++) {
-        castro_MakeMove(board, legal.list[i]);
-        int score = -negamax_rec(board, eval, order, depth - 1, ply + 1, -beta, -alpha);
+
+    for (size_t i = 0; i < moves.count; i++) {
+        if (!castro_MakeMove(board, moves.list[i])) continue;
+        
+        legal_moves_count++;
+        
+        int score = -negamax_rec(board, evaluate, order, depth - 1, ply + 1, -beta, -alpha);
         castro_UnmakeMove(board);
 
         if (search_should_stop()) return 0;
 
         if (score > max_eval) max_eval = score;
         if (score > alpha)    alpha = score;
-
+        
         // Alpha-Beta Cutoff
         if (alpha >= beta) break; 
     }
+
+    // 3. Terminal Case (Checkmate / Stalemate)
+    if (legal_moves_count == 0) {
+        if (castro_IsInCheck(board)) 
+            return -INF + ply; // Mate score adjusted by distance from root
+        return 0; // Stalemate
+    }
+
     return max_eval;
 }

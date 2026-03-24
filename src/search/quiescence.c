@@ -1,71 +1,68 @@
 /*
- * Quiescence search extends the main search past depth 0 so evaluation is not
- * applied in the middle of a tactical sequence (horizon effect).
+ * Quiescence search.
  *
- * Not in check: standing pat (eval) establishes a floor; only captures are
- * expanded (with delta pruning: if we are far below alpha, no capture fixes it).
- * In check: there is no legal stand-pat, so all legal moves are searched—
- * otherwise mate threats after “quiet” positions would be missed.
- * Terminal: no moves in check is mate (-INF + ply); stalemate returns 0.
+ * To avoid evaluating noisy positions (e.g. in the middle of a capture sequence),
+ * we only consider capture moves. We evaluate the standing pat (current position);
+ * if it fails high we return beta. Otherwise we generate captures, order them,
+ * and search with negamax alpha-beta. The search is recursive until no captures
+ * remain or we hit max ply. Mate scores are distance-adjusted so they stay
+ * consistent across plies.
+ *
+ * See https://www.chessprogramming.org/Quiescence_Search
  */
 #include "castro.h"
 #include "eval.h"
 #include "moveordering.h"
 #include "search.h"
 
-/* Negamax quiescence with alpha-beta; same eval/ordering hooks as main search. */
 int quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, OrderFn order)
 {
     g_searchStats.qnodes++;
 
+    // Pseudocode doesn't define MAX_PLY, but we keep it for safety
     if (ply >= MAX_PLY)
         return eval(board);
 
-    const bool in_check = castro_IsInCheck(board);
+    // int static_eval = Evaluate();
+    int static_eval = eval(board);
 
-    if (!in_check) {
-        int stand_pat = eval(board);
+    // Stand Pat
+    int best_value = static_eval;
 
-        if (stand_pat >= beta)
-            return beta;
+    // if( best_value >= beta ) return best_value;
+    if (best_value >= beta)
+        return best_value;
 
-        // Delta pruning: a queen is worth ~900; if we are down by ~1000,
-        // even taking a queen will not reach alpha.
-        if (stand_pat < alpha - 900)
-            return alpha;
+    // if( best_value > alpha ) alpha = best_value;
+    if (best_value > alpha)
+        alpha = best_value;
 
-        if (stand_pat > alpha)
-            alpha = stand_pat;
-    }
-
-    Moves moves;
-    if (in_check) {
-        moves = castro_GenerateMoves(board, MOVE_LEGAL);
-        if (moves.count == 0)
-            return -INF + ply;
-    } else {
-        moves = castro_GenerateMoves(board, MOVE_CAPTURE);
-        if (moves.count == 0)
-            return alpha;
-    }
-
+    Moves moves = castro_GenerateMoves(board, MOVE_CAPTURE);
     order(board, moves.list, moves.count, ply, NULL_MOVE);
 
+    // until( every_capture_has_been_examined )
     for (size_t i = 0; i < moves.count; i++) {
         Move move = moves.list[i];
 
         if (!castro_MakeMove(board, move))
             continue;
 
+        // score = -Quiesce( -beta, -alpha );
         int score = -quiescence(board, -beta, -alpha, ply + 1, eval, order);
         castro_UnmakeMove(board);
 
+        // if( score >= beta ) return score;
         if (score >= beta)
-            return beta;
+            return score;
 
+        // if( score > best_value ) best_value = score;
+        if (score > best_value)
+            best_value = score;
+
+        // if( score > alpha ) alpha = score;
         if (score > alpha)
             alpha = score;
     }
 
-    return alpha;
+    return best_value;
 }

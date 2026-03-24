@@ -26,10 +26,13 @@ bool castro_IsDraw(Board* board)
  * True if side has knight, bishop, rook, or queen—used to gate null-move pruning
  * (NMP is unsafe in KPK etc. where zugzwang matters).
  */
-bool castro_HasNonPawnMaterial(Board* board)
+bool castro_HasNonPawnMaterial(Board* board, int sideToMove)
 {
-    for(size_t i = INDEX_KNIGHT; i < INDEX_KING; i++) {
-        if(board->bitboards[i] != 0ULL) return true;
+    int start = (sideToMove == COLOR_WHITE) ? INDEX_WHITE_KNIGHT : INDEX_BLACK_KNIGHT;
+    int end   = (sideToMove == COLOR_WHITE) ? INDEX_WHITE_KING   : INDEX_BLACK_KING;
+
+    for (int i = start; i < end; i++) {
+        if (board->bitboards[i] != 0ULL) return true;
     }
     return false;
 }

@@ -267,9 +267,14 @@ void uci_uci(UciState* state)
 
     for(size_t i = 0; i < state->uciOptionCount; i++) {
         UciOption option = state->uciOptions[i];
+
         if(!strcmp(option.name, "EvalFile")) {
             if(!nnue_load(option.value.string)){
-                printf("error Could not load nnue %s\n", NNUE_DEFAULT_PATH);
+                printf("error Could not load nnue %s\n", option.value.string);
+            }
+        } else if(!strcmp(option.name, "SyzygyPath")) {
+            if(!syzygy_init(option.value.string)) {
+                printf("error Could not load syzygy tablebase from %s\n", option.value.string);
             }
         }
     }

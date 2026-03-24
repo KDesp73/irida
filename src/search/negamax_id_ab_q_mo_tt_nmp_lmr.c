@@ -29,7 +29,6 @@ Move negamax_id_ab_q_mo_tt_nmp_lmr(Board* board, EvalFn eval, OrderFn order, Sea
 {
     Move best_move = NULL_MOVE;
     g_searchStats.nodes = 0;
-    g_searchStats.qnodes = 0;
 
     search_start_timer(config->timeLimitMs);
 
@@ -37,38 +36,42 @@ Move negamax_id_ab_q_mo_tt_nmp_lmr(Board* board, EvalFn eval, OrderFn order, Sea
 
         if (search_time_up()) break;
 
-        Moves legal = castro_GenerateMoves(board, MOVE_LEGAL);
+        Moves legal = castro_GenerateLegalMoves(board);
 
-        order(board, legal.list, legal.count, 0, NULL_MOVE);
+        // Order using the best move from the previous iteration as the TT hint.
+        // On the first iteration best_move is NULL_MOVE, which is fine.
+        order(board, legal.list, legal.count, 0, best_move);
 
-        int alpha = -INF;
-        int beta = INF;
-        int bestScore = -INF;
+        int alpha      = -INF;
+        int beta       = INF;
+        int bestScore  = -INF;
         Move currentBestMove = NULL_MOVE;
 
         for (size_t i = 0; i < legal.count; i++) {
             if (!castro_MakeMove(board, legal.list[i])) continue;
 
             int score = -negamax_rec(board, eval, order, currentDepth - 1, 1, -beta, -alpha, config);
-
             castro_UnmakeMove(board);
 
+            // If time ran out during this move, discard the whole depth's results
+            // to avoid playing a blunder caused by an incomplete search.
             if (search_should_stop()) break;
 
             if (score > bestScore) {
-                bestScore = score;
-                currentBestMove = legal.list[i];
+                bestScore        = score;
+                currentBestMove  = legal.list[i];
             }
             if (score > alpha) alpha = score;
         }
 
         if (!search_should_stop()) {
             best_move = currentBestMove;
+
             char moveBuf[10];
             castro_MoveToString(best_move, moveBuf);
+            uci_report_search(currentDepth, bestScore, g_searchStats.nodes, search_elapsed_ms(), moveBuf);
 
-            uci_report_search(currentDepth, bestScore, g_searchStats.nodes + g_searchStats.qnodes, search_elapsed_ms(), moveBuf);
-
+            // Found a forced mate; no point searching deeper.
             if (bestScore > (INF - MAX_PLY)) break;
         } else {
             break;
@@ -78,90 +81,85 @@ Move negamax_id_ab_q_mo_tt_nmp_lmr(Board* board, EvalFn eval, OrderFn order, Sea
     return best_move;
 }
 
-/*
- * Core negamax: TT probe, quiescence at horizon, NMP, LMR on late quiet moves,
- * mate/stalemate leaves, TT store with bound type.
- */
-static int negamax_rec(Board* board,
-                       EvalFn eval,
-                       OrderFn order,
-                       int depth,
-                       int ply,
-                       int alpha,
-                       int beta,
-                       SearchConfig* config)
+static int negamax_rec(Board* board, EvalFn evaluate, OrderFn order, int depth, int ply, int alpha, int beta, SearchConfig* config)
 {
+    // 1. Periodic timer check & TT Probe
+    if ((g_searchStats.nodes & 2047) == 0) {
+        search_time_up(); 
+    }
+    if (search_should_stop()) return 0;
+
+    if (depth <= 0) {
+        return quiescence(board, alpha, beta, ply, evaluate, order);
+    }
+
     int tt_score = 0;
     Move tt_move = NULL_MOVE;
     if (tt_probe(board->hash, depth, alpha, beta, ply, &tt_score, &tt_move)) {
         return tt_score;
     }
 
-    if ((g_searchStats.nodes & 2047) == 0) {
-        if (search_time_up()) {
-            uci_state.stopRequested = true;
-        }
-    }
-    if (search_should_stop()) return 0;
-
     g_searchStats.nodes++;
 
-    Moves legal = castro_GenerateMoves(board, MOVE_LEGAL);
-
-    if (depth <= 0) {
-        return quiescence(board, alpha, beta, ply, eval, order);
-    }
-
-    if (depth >= 3 && !castro_IsInCheck(board) && castro_HasNonPawnMaterial(board)) {
+    // 2. Null Move Pruning (NMP)
+    if (depth >= 3 && !castro_IsInCheck(board) && castro_HasNonPawnMaterial(board, board->turn)) {
         castro_MakeNullMove(board);
-        int nullScore = -negamax_rec(board, eval, order, depth - 1 - 3, ply + 1, -beta, -beta + 1, config);
+        // Standard R=3 reduction for NMP
+        int nullScore = -negamax_rec(board, evaluate, order, depth - 1 - 3, ply + 1, -beta, -beta + 1, config);
         castro_UnmakeNullMove(board);
 
         if (nullScore >= beta) {
             if (nullScore > MATE_SCORE) nullScore = beta;
-            return nullScore;
+            return nullScore; 
         }
     }
 
+    // 3. Move Generation and Ordering
+    Moves moves = castro_GenerateMoves(board, MOVE_LEGAL);
+    order(board, moves.list, moves.count, ply, tt_move);
+
     int original_alpha = alpha;
+    int max_eval = -INF;
     Move best_move_found = NULL_MOVE;
     int legal_moves_count = 0;
     const bool parent_in_check = castro_IsInCheck(board);
 
-    order(board, legal.list, legal.count, ply, tt_move);
-
-    int max_eval = -INF;
-    for (size_t i = 0; i < legal.count; i++) {
-        Move move = legal.list[i];
+    for (size_t i = 0; i < moves.count; i++) {
+        Move move = moves.list[i];
         bool is_capture = castro_IsCapture(board, move);
 
-        if (!castro_MakeMove(board, move)) continue;
-
+        if (!castro_MakeMove(board, move)) continue; 
         legal_moves_count++;
-        const size_t move_index = (size_t)legal_moves_count - 1;
-        const bool gives_check = castro_IsInCheck(board);
-
+        
+        // --- Defined missing variables for LMR ---
+        int move_index = legal_moves_count - 1; // 0-based index of legal moves
         int next_depth = depth - 1;
-
+        bool gives_check = castro_IsInCheck(board);
         int score;
-        const bool use_lmr = config->useLMR && depth >= 3 && !parent_in_check && !is_capture
-            && !gives_check && move_index >= 4;
+
+        // 4. Late Move Reductions (LMR)
+        // Only reduce quiet moves (not captures/checks) searched late in the list
+        bool use_lmr = config->useLMR && depth >= 3 && move_index >= 4 
+                       && !parent_in_check && !is_capture && !gives_check;
 
         if (use_lmr) {
-            int R = 1;
+            int R = 1; // Base reduction
             if (depth >= 6 && move_index >= 6) R++;
-            if (depth >= 10 && move_index >= 10) R++;
+            if (depth >= 10 && move_index >= 12) R++; // Deeper reduction for very late moves
 
             int reduced_depth = next_depth - R;
             if (reduced_depth < 0) reduced_depth = 0;
 
-            score = -negamax_rec(board, eval, order, reduced_depth, ply + 1, -beta, -alpha, config);
+            // Search with a reduced depth and a null window
+            score = -negamax_rec(board, evaluate, order, reduced_depth, ply + 1, -(alpha + 1), -alpha, config);
 
-            if (reduced_depth < next_depth && (score > alpha || score >= beta)) {
-                score = -negamax_rec(board, eval, order, next_depth, ply + 1, -beta, -alpha, config);
+            // Re-search: If the reduced search suggests the move is actually good, search again at full depth
+            if (score > alpha) {
+                score = -negamax_rec(board, evaluate, order, next_depth, ply + 1, -beta, -alpha, config);
             }
         } else {
-            score = -negamax_rec(board, eval, order, next_depth, ply + 1, -beta, -alpha, config);
+            // Standard Full Depth Search
+            score = -negamax_rec(board, evaluate, order, next_depth, ply + 1, -beta, -alpha, config);
         }
 
         castro_UnmakeMove(board);
@@ -172,24 +170,21 @@ static int negamax_rec(Board* board,
             max_eval = score;
             best_move_found = move;
         }
-
         if (score > alpha) alpha = score;
-
-        if (alpha >= beta) break;
+        if (alpha >= beta) break; // Beta cutoff
     }
 
+    // 5. Terminal check (Mate/Stalemate)
     if (legal_moves_count == 0) {
-        if (castro_IsInCheck(board)) {
-            return -INF + ply;
-        }
+        if (castro_IsInCheck(board)) return -INF + ply;
         return 0;
     }
 
+    // 6. TT Store
     TTNodeType type = TT_EXACT;
     if (max_eval <= original_alpha) type = TT_UPPERBOUND;
-    else if (max_eval >= beta) type = TT_LOWERBOUND;
+    else if (max_eval >= beta)      type = TT_LOWERBOUND;
 
     tt_store(board->hash, depth, max_eval, type, best_move_found, ply);
-
     return max_eval;
 }

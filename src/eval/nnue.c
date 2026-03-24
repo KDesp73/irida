@@ -29,15 +29,31 @@ bool nnue_load(const char* path)
         return false;
     }
 
-    strncpy(g_nnue_path, path, sizeof(g_nnue_path) - 1);
+    char expanded[1024];
+
+    if (path[0] == '~') {
+        const char* home = getenv("HOME");
+        if (!home) {
+            g_nnue_loaded = false;
+            return false;
+        }
+
+        snprintf(expanded, sizeof(expanded), "%s%s", home, path + 1);
+    } else {
+        strncpy(expanded, path, sizeof(expanded) - 1);
+        expanded[sizeof(expanded) - 1] = '\0';
+    }
+
+    strncpy(g_nnue_path, expanded, sizeof(g_nnue_path) - 1);
     g_nnue_path[sizeof(g_nnue_path) - 1] = '\0';
 
     if (nnue_init(g_nnue_path) != 0) {
         g_nnue_loaded = false;
         return false;
     }
+
     g_nnue_loaded = true;
-    printf("info NNUE %s loaded\n", path);
+    printf("info NNUE %s loaded\n", g_nnue_path);
     return true;
 }
 

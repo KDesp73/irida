@@ -47,4 +47,6 @@ bool syzygy_probe_root(Board* board, bool use_rule50, Move* best_move_out);
 // @returns unsigned Piece count.
 unsigned syzygy_piece_count(Board* board);
 
+#define SYZYGY_DEFAULT_PATH "~/.irida/tb/dtz:~/.irida/tb/wdl"
+
 #endif

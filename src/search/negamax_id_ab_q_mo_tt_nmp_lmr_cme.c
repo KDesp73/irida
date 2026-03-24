@@ -108,7 +108,7 @@ static int negamax_rec(Board* board,
         return quiescence(board, alpha, beta, ply, eval, order);
     }
 
-    if (depth >= 3 && !castro_IsInCheck(board) && castro_HasNonPawnMaterial(board)) {
+    if (depth >= 3 && !castro_IsInCheck(board) && castro_HasNonPawnMaterial(board, board->turn)) {
         castro_MakeNullMove(board);
         int nullScore = -negamax_rec(board, eval, order, depth - 1 - 3, ply + 1, -beta, -beta + 1, config);
         castro_UnmakeNullMove(board);

@@ -32,10 +32,10 @@ ifeq ($(UNAME_S),Darwin) # macOS
 else
     SO_NAME  := lib$(LIBRARY_NAME).so
     SO_LDFLAGS := -shared
-    LDFLAGS_ENGINE   := -L. -l:$(A_NAME)
-    LDFLAGS_CASTRO   := -l:libcastro.a
-	LDFLAGS_NNUE_PROBE := -l:libnnueprobe.a
-	LDFLAGS_FATHOM   := -l:libfathom.a
+    LDFLAGS_ENGINE     := -l:$(A_NAME)
+	LDFLAGS_CASTRO     := -l:libcastro.a
+	LDFLAGS_NNUE_PROBE := -lnnueprobe
+	LDFLAGS_FATHOM     := -lfathom
 endif
 
 WARNINGS = -Wall -Wextra
@@ -43,7 +43,7 @@ INCLUDES = -I$(INCLUDE_DIR) -Ideps/include -Ideps/include/fathom -Ideps/include/
 
 # Flags
 CFLAGS  := -fPIC $(WARNINGS) $(INCLUDES)
-LDFLAGS := -lpthread -Ldeps/lib $(LDFLAGS_FATHOM) $(LDFLAGS_NNUE_PROBE)
+LDFLAGS := -lpthread -L. -L./deps/lib $(LDFLAGS_CASTRO) $(LDFLAGS_FATHOM) $(LDFLAGS_NNUE_PROBE) -Wl,-rpath,$(shell pwd)/deps/lib
 
 type := RELEASE
 

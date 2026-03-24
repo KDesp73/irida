@@ -1,4 +1,5 @@
 #include "castro.h"
+#include "syzygy.h"
 #include "uci.h"
 #include "nnue.h"
 #include <string.h>
@@ -68,8 +69,8 @@ void LoadUciConfig(UciState* state)
     state->uciOptions[state->uciOptionCount++] = (UciOption) {
         .name = "SyzygyPath",
         .type = UCI_STRING,
-        .value.string = "",
-        .default_value = ""
+        .value.string = SYZYGY_DEFAULT_PATH,
+        .default_value = SYZYGY_DEFAULT_PATH
     };
 
     if(state->uciOptionCount >= MAX_UCI_OPTIONS) return;

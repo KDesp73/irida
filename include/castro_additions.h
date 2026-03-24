@@ -13,6 +13,6 @@
 // @returns bool True if draw.
 bool castro_IsDraw(Board* board);
 
-bool castro_HasNonPawnMaterial(Board* board);
+bool castro_HasNonPawnMaterial(Board* board, int sideToMove);
 
 #endif
