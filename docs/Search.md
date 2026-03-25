@@ -20,9 +20,8 @@
 
 - [x] 7. Null Move Pruning
 - [x] 8. Late Move Reductions
-- [x] 9. Check Move Extensions
 
 ## Optimizations
 
-- [ ] 10. Aspiration Windows
-- [ ] 11. Principal Variation Search
+- [ ] 9. Aspiration Windows
+- [ ] 10. Principal Variation Search

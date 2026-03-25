@@ -6,6 +6,7 @@
 //   + Move Ordering
 //   + Transposition Table
 //   + Null Move Pruning
+//   + Late Move Reductions
 //   + Syzygy
 
 #include "search.h"
@@ -108,6 +109,10 @@ static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply,
     if (config->useTT && tt_probe(board->hash, depth, alpha, beta, ply, &tt_score, &tt_move)) {
         return tt_score;
     }
+
+    int mated_score = -INF + ply;
+    if (alpha < mated_score) alpha = mated_score;
+    if (beta <= alpha) return alpha;
 
     if ((g_searchStats.nodes & 2047) == 0) {
         if (search_time_up()) {

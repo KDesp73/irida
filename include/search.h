@@ -69,7 +69,6 @@ typedef Move (*SearchFn)(Board* board,
  *   tt  — transposition table (hash probes/stores)
  *   nmp — null-move pruning
  *   lmr — late move reductions (scout + re-search)
- *   cme — extend one ply when move gives check
  *   aw  — aspiration windows at root (narrow alpha/beta around previous score)
  *   pvs — principal variation search (zero-window scouts off the PV)
  * Later names extend earlier ones (e.g. id_ab_q_mo_tt adds TT to id_ab_q_mo).
@@ -78,22 +77,12 @@ typedef Move (*SearchFn)(Board* board,
 Move random_move(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 
-Move negamax_id_ab(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
-Move negamax_id_ab_q_mo(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
-Move negamax_id_ab_q_mo_tt(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
-Move negamax_id_ab_q_mo_tt_nmp(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
-Move negamax_id_ab_q_mo_tt_nmp_lmr(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
-Move negamax_id_ab_q_mo_tt_nmp_lmr_cme(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 Move negamax_id_ab_q_mo_tt_nmp_lmr_cme_aw(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 Move negamax_id_ab_q_mo_tt_nmp_lmr_cme_aw_pvs(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 
 static const struct { const char *name; SearchFn fn; } search_variants[] = {
-    { "id_ab",             negamax_id_ab },
-    { "id_ab_q_mo",        negamax_id_ab_q_mo },
-    { "id_ab_q_mo_tt",     negamax_id_ab_q_mo_tt },
-    { "id_ab_q_mo_tt_nmp", negamax_id_ab_q_mo_tt_nmp },
-    { "id_ab_q_mo_tt_nmp_lmr", negamax_id_ab_q_mo_tt_nmp_lmr },
-    { "id_ab_q_mo_tt_nmp_lmr_cme", negamax_id_ab_q_mo_tt_nmp_lmr_cme },
+    { "random", random_move },
+    { "search", search },
     { "id_ab_q_mo_tt_nmp_lmr_cme_aw", negamax_id_ab_q_mo_tt_nmp_lmr_cme_aw },
     { "id_ab_q_mo_tt_nmp_lmr_cme_aw_pvs", negamax_id_ab_q_mo_tt_nmp_lmr_cme_aw_pvs },
 };

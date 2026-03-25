@@ -32,12 +32,12 @@ SearchConfig g_searchConfig = {
     .threads = 1,
     .useAspiration = true,
     .usePVS = true,
-    .useLMR = true,
-    .useNullMove = true,
+    .useLMR = false,
+    .useNMP = true,
     .useTT = true,
     .useQuiescence = true,
     .syzygyProbeDepth = 1,
-    .syzygyProbeLimit = 7,
+    .syzygyProbeLimit = 4,
     .syzygy50MoveRule = true,
 };
 
@@ -126,7 +126,7 @@ int main(int argc, char** argv)
     if(!strcmp("nnue", eval)) evalfn = nnue_eval;
     else if(!strcmp("pesto", eval)) evalfn = evaluation;
     else if(!strcmp("material", eval)) evalfn = material_eval;
-    else evalfn = nnue_eval;
+    else evalfn = evaluation;
 
     engine.search = searchfn;
     engine.eval = evalfn;
