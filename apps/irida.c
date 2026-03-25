@@ -20,7 +20,7 @@ SearchConfig g_searchConfig = {
     .useNMP = true,
     .useTT = true,
     .useQuiescence = true,
-    .useSyzygy = true,
+    .useSyzygy = false,
 
     .syzygyProbeDepth = 1,
     .syzygyProbeLimit = 4,

@@ -38,6 +38,7 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 
     Move best_move = NULL_MOVE;
     g_searchStats.nodes = 0;
+    g_searchStats.qnodes = 0;
 
     search_start_timer(config->timeLimitMs);
 
@@ -107,6 +108,15 @@ static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply,
     if (config->useTT && tt_probe(board->hash, depth, a, b, ply, &tt_score, &tt_move)) {
         return tt_score;
     }
+
+    if ((g_searchStats.nodes & 2047) == 0) {
+        if (search_time_up()) {
+            uci_state.stopRequested = true;
+        }
+    }
+    if (search_should_stop()) return 0;
+
+    g_searchStats.nodes++;
 
     // 3. Syzygy Probe: Only if TT didn't give us a result.
     int piece_count = castro_PieceCount(board);
