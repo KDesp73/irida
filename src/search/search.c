@@ -21,7 +21,7 @@ static int negamax(
 
 Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 {
-    printf("info using new search\n");
+    printf("info using new search with three-fold repetition check\n");
     Move best_move = NULL_MOVE;
     g_searchStats.nodes = 0;
 
@@ -75,6 +75,10 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 
 static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply, int a, int b, SearchConfig* config)
 {
+    if (ply > 0 && castro_IsThreefoldRepetition(board)) {
+        return 0;
+    } 
+
     g_searchStats.nodes++;
     int original_alpha = a;
 
