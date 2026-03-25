@@ -25,7 +25,7 @@ static int negamax(
 
 Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 {
-    printf("info using new search with Syzygy\n");
+    printf("info using new search with LMR\n");
 
     Move tb_move = NULL_MOVE;
     size_t piece_count = castro_PieceCount(board);
@@ -95,7 +95,7 @@ static int wdl_to_score(int wdl, int ply) {
     return 0; // Draw
 }
 
-static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply, int a, int b, SearchConfig* config)
+static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply, int alpha, int beta, SearchConfig* config)
 {
     // 1. Static Checks (Repetition / 50-move rule)
     if (ply > 0 && (castro_IsThreefoldRepetition(board) || board->halfmove >= 100)) {
@@ -105,7 +105,7 @@ static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply,
     // 2. TT Probe: Fastest check, do this first.
     Move tt_move = NULL_MOVE;
     int tt_score = 0;
-    if (config->useTT && tt_probe(board->hash, depth, a, b, ply, &tt_score, &tt_move)) {
+    if (config->useTT && tt_probe(board->hash, depth, alpha, beta, ply, &tt_score, &tt_move)) {
         return tt_score;
     }
 
@@ -130,22 +130,22 @@ static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply,
     }
 
     // 4. Base Case: Leaf Node
-    if (depth <= 0) return config->useQuiescence ? quiescence(board, a, b, ply, eval, order) : 0;
+    if (depth <= 0) return config->useQuiescence ? quiescence(board, alpha, beta, ply, eval, order) : 0;
 
     // 5. Null Move Pruning
     if (config->useNMP && depth >= 3 && !castro_IsInCheck(board) && castro_HasNonPawnMaterial(board, board->turn)) {
         castro_MakeNullMove(board);
-        int score = -negamax(board, eval, order, depth - 1 - 3, ply + 1, -b, -b + 1, config);
+        int score = -negamax(board, eval, order, depth - 1 - 3, ply + 1, -beta, -beta + 1, config);
         castro_UnmakeNullMove(board);
 
-        if (score >= b) {
+        if (score >= beta) {
             // Prune if the null move search fails high
-            return (score >= MATE_SCORE) ? b : score; 
+            return (score >= MATE_SCORE) ? beta : score; 
         }
     }
 
     // 6. Move Generation and Search
-    int original_alpha = a;
+    int original_alpha = alpha;
     Moves legal = castro_GenerateLegalMoves(board);
     if (legal.count == 0) {
         if (castro_IsInCheck(board)) return -INF + ply;
@@ -156,11 +156,40 @@ static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply,
 
     Move bestMove = NULL_MOVE;
     int bestScore = -INF;
+    const bool parent_in_check = castro_IsInCheck(board);
 
     for (size_t i = 0; i < legal.count; ++i) {
         if (!castro_MakeMove(board, legal.list[i])) continue;
+        bool is_capture = castro_IsCapture(board, legal.list[i]);
+        bool gives_check = castro_IsInCheck(board);
         
-        int score = -negamax(board, eval, order, depth - 1, ply + 1, -b, -a, config);
+        // Only reduce quiet moves (not captures/checks) searched late in the list
+        bool use_lmr = config->useLMR && depth >= 3 && i >= 4 
+                       && !parent_in_check && !is_capture && !gives_check;
+
+        int score = 0;
+        if (use_lmr) {
+            int R = 1 + (depth / 6) + (i / 10); // Standard linear-ish reduction
+            int reduced_depth = depth - 1 - R;
+            if (reduced_depth < 1) reduced_depth = 1; // Don't reduce into Quiescence
+
+            // 1. Reduced Depth, Null Window Search
+            score = -negamax(board, eval, order, reduced_depth, ply + 1, -(alpha + 1), -alpha, config);
+
+            // 2. If it still looks promising, re-search at Full Depth, Null Window
+            if (score > alpha && reduced_depth < depth - 1) {
+                score = -negamax(board, eval, order, depth - 1, ply + 1, -(alpha + 1), -alpha, config);
+            }
+
+            // 3. If it's STILL better than alpha, finally do a Full Depth, Full Window search
+            if (score > alpha) {
+                score = -negamax(board, eval, order, depth - 1, ply + 1, -beta, -alpha, config);
+            }
+        } else {
+            // Standard Full Depth Search
+            score = -negamax(board, eval, order, depth - 1, ply + 1, -beta, -alpha, config);
+        }
+
         castro_UnmakeMove(board);
 
         if (search_should_stop()) return 0;
@@ -170,14 +199,14 @@ static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply,
             bestMove = legal.list[i];
         }
 
-        if (score > a) a = score;
-        if (a >= b) break; 
+        if (score > alpha) alpha = score;
+        if (alpha >= beta) break; 
     }
 
     // 7. Store Result
     if (config->useTT) {
         TTNodeType type = (bestScore <= original_alpha) ? TT_UPPERBOUND : 
-            (bestScore >= b) ? TT_LOWERBOUND : TT_EXACT;
+            (bestScore >= beta) ? TT_LOWERBOUND : TT_EXACT;
 
         tt_store(board->hash, depth, bestScore, type, bestMove, ply);
     }
