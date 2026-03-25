@@ -5,8 +5,10 @@
 //   + Quiescence
 //   + Move Ordering
 //   + Transposition Table
+//   + Null Move Pruning
 
 #include "search.h"
+#include "castro_additions.h"
 #include "tt.h"
 #include "uci.h"
 
@@ -21,7 +23,7 @@ static int negamax(
 
 Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 {
-    printf("info using new search with three-fold repetition check\n");
+    printf("info using new search with NMP\n");
     Move best_move = NULL_MOVE;
     g_searchStats.nodes = 0;
 
@@ -75,15 +77,35 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 
 static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply, int a, int b, SearchConfig* config)
 {
-    if (ply > 0 && castro_IsThreefoldRepetition(board)) {
+    // 1. Static Checks (Repetition / 50-move rule)
+    if (ply > 0 && (castro_IsThreefoldRepetition(board) || board->halfmove >= 100)) {
         return 0;
-    } 
+    }
 
-    g_searchStats.nodes++;
-    int original_alpha = a;
-
+    // 2. TT Probe (MUST be before NMP)
     Move tt_move = NULL_MOVE;
     int tt_score = 0;
+    if (tt_probe(board->hash, depth, a, b, ply, &tt_score, &tt_move)) {
+        return tt_score;
+    }
+
+    // 3. Base Case
+    if (depth <= 0) return quiescence(board, a, b, ply, eval, order);
+
+    // 4. Null Move Pruning
+    if (depth >= 3 && !castro_IsInCheck(board) && castro_HasNonPawnMaterial(board, board->turn)) {
+        castro_MakeNullMove(board);
+        // reduction R=2 or 3 is standard
+        int score = -negamax(board, eval, order, depth - 1 - 3, ply + 1, -b, -b + 1, config);
+        castro_UnmakeNullMove(board);
+
+        if (score >= b) {
+            // Avoid returning mate scores from null move
+            return (score >= MATE_SCORE) ? b : score; 
+        }
+    }
+
+    int original_alpha = a;
     if (tt_probe(board->hash, depth, a, b, ply, &tt_score, &tt_move)) {
         return tt_score;
     }
