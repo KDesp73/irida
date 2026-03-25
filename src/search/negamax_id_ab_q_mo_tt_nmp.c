@@ -77,16 +77,8 @@ Move negamax_id_ab_q_mo_tt_nmp(Board* board, EvalFn eval, OrderFn order, SearchC
 
 static int negamax_rec(Board* board, EvalFn evaluate, OrderFn order, int depth, int ply, int alpha, int beta)
 {
-    // -------------------------------------------------------------------
-    // 1. Periodic timer check.
-    //    Without this, a time limit that expires deep in the tree will not
-    //    be noticed until we unwind all the way back to the root, wasting
-    //    potentially large amounts of time in slow/deep positions.
-    // -------------------------------------------------------------------
-    if ((g_searchStats.nodes & 2047) == 0) {
-        search_time_up(); // updates the internal should_stop flag
-    }
-    if (search_should_stop()) return 0;
+    if (search_should_stop())
+        return alpha;
 
     // -------------------------------------------------------------------
     // 2. TT Probe.
@@ -138,10 +130,15 @@ static int negamax_rec(Board* board, EvalFn evaluate, OrderFn order, int depth, 
         int nullScore = -negamax_rec(board, evaluate, order, depth - 1 - 3, ply + 1, -beta, -beta + 1);
         castro_UnmakeNullMove(board);
 
+        // Do not prune on NMP if the null search aborted: with window
+        // (-beta,-beta+1) an early stop often returns a bogus bound == beta.
+        if (search_should_stop())
+            return alpha;
+
         if (nullScore >= beta) {
             // Clamp mate scores: we can't prove a mate via NMP
             if (nullScore > MATE_SCORE) nullScore = beta;
-            return nullScore; 
+            return nullScore;
         }
     }
 
@@ -158,7 +155,8 @@ static int negamax_rec(Board* board, EvalFn evaluate, OrderFn order, int depth, 
         castro_UnmakeMove(board);
 
         // Do not store partial results in the TT if time expired.
-        if (search_should_stop()) return 0;
+        if (search_should_stop())
+            return alpha;
 
         if (score > max_eval) {
             max_eval        = score;

@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+# --- Configuration ---
+ENGINE_BIN="./irida"
+SEARCH_TIME=10000               # 10 seconds in milliseconds
+FLAMEGRAPH_DIR="$HOME/FlameGraph"   # Path to Brendan Gregg's scripts
+
+# --- 1. Run Perf Record ---
+# -F 99: Sample at 99Hz (avoids syncing with system timers)
+# -g: Capture call-graph (stack traces)
+echo "--- Running Profiler ($((SEARCH_TIME/1000)) seconds) ---"
+perf record -F 99 -g -- $ENGINE_BIN <<EOF
+uci
+position startpos
+go movetime $SEARCH_TIME
+quit
+EOF
+
+# --- 3. Generate Reports ---
+echo "--- Generating Text Report (top 10 functions) ---"
+perf report --stdio -n --children | head -n 30 > profile_summary.txt
+echo "Summary saved to profile_summary.txt"
+
+# --- 4. Generate Flame Graph (Optional) ---
+if [ -d "$FLAMEGRAPH_DIR" ]; then
+    echo "--- Generating Flame Graph ---"
+    perf script | "$FLAMEGRAPH_DIR/stackcollapse-perf.pl" > out.perf-folded
+    "$FLAMEGRAPH_DIR/flamegraph.pl" out.perf-folded > profile.svg
+    echo "Flame Graph generated: profile.svg"
+else
+    echo "Skipping Flame Graph (FlameGraph directory not found)."
+fi
+
+# --- 5. Micro-architecture Stats ---
+echo "--- Running Hardware Counters (Cache/Branches) ---"
+perf stat -e branches,branch-misses,cache-references,cache-misses -- $ENGINE_BIN <<EOF
+uci
+position startpos
+go movetime 3000
+quit
+EOF

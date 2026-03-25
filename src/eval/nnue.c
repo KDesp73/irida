@@ -13,6 +13,7 @@
 #include "castro.h"
 #include <string.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #define FEN_BUFFER_SIZE 256
 
@@ -21,6 +22,85 @@ static bool g_nnue_loaded = false;
 
 extern int nnue_init(const char* filename);
 extern int nnue_evaluate_fen(const char* fen);
+
+static bool fen_basic_valid(const char* fen)
+{
+    if (!fen || fen[0] == '\0')
+        return false;
+
+    char placement[96];
+    char castling[8];
+    char ep[8];
+    char side;
+    int halfmove = 0;
+    int fullmove = 0;
+
+    // FEN: <piece placement> <side to move> <castling> <ep> <halfmove> <fullmove>
+    if (sscanf(fen, "%95s %c %7s %7s %d %d", placement, &side, castling, ep, &halfmove, &fullmove) != 6)
+        return false;
+
+    if (side != 'w' && side != 'b')
+        return false;
+
+    // Validate castling rights: "-" or any subset of KQkq.
+    if (castling[0] != '-') {
+        size_t n = strlen(castling);
+        if (n == 0 || n > 4)
+            return false;
+        for (size_t i = 0; i < n; i++) {
+            char c = castling[i];
+            if (c != 'K' && c != 'Q' && c != 'k' && c != 'q')
+                return false;
+        }
+    }
+
+    // Validate en passant: "-" or [a-h][3-6]
+    if (ep[0] != '-') {
+        if (strlen(ep) != 2)
+            return false;
+        char file = ep[0];
+        char rank = ep[1];
+        if (file < 'a' || file > 'h')
+            return false;
+        if (rank < '3' || rank > '6')
+            return false;
+    }
+
+    // Validate piece placement: 8 ranks separated by '/'.
+    int ranks = 0;
+    const char* p = placement;
+    int white_kings = 0;
+    int black_kings = 0;
+    while (*p) {
+        int squares_in_rank = 0;
+        while (*p && *p != '/') {
+            if (*p >= '1' && *p <= '8') {
+                squares_in_rank += (*p - '0');
+            } else {
+                char c = *p;
+                if (c != 'p' && c != 'r' && c != 'n' && c != 'b' && c != 'q' && c != 'k' &&
+                    c != 'P' && c != 'R' && c != 'N' && c != 'B' && c != 'Q' && c != 'K') {
+                    return false;
+                }
+                if (c == 'K')
+                    white_kings++;
+                else if (c == 'k')
+                    black_kings++;
+                squares_in_rank += 1;
+            }
+            p++;
+            if (squares_in_rank > 8)
+                return false;
+        }
+        if (squares_in_rank != 8)
+            return false;
+        ranks++;
+        if (*p == '/')
+            p++;
+    }
+    // NNUE evaluation expects both kings to be present.
+    return ranks == 8 && white_kings > 0 && black_kings > 0;
+}
 
 bool nnue_load(const char* path)
 {
@@ -68,7 +148,15 @@ int nnue_eval(Board* board)
     if (!g_nnue_loaded) return evaluation(board);
 
     char fen[FEN_BUFFER_SIZE];
+    fen[0] = '\0';
     castro_FenExport(board, fen);
+    fen[FEN_BUFFER_SIZE - 1] = '\0';
+
+    // The NNUE probe is a black box and has been crashing on malformed inputs.
+    // If the exported FEN is malformed, fall back to the PeSTO evaluator.
+    if (!fen_basic_valid(fen))
+        return evaluation(board);
+
     int score = nnue_evaluate_fen(fen);
     if (!board->turn)  // black to move
         score = -score;
