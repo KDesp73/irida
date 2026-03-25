@@ -13,12 +13,15 @@ SearchConfig g_searchConfig = {
     .maxDepth = 100,
     .timeLimitMs = 0, // No limit unless provided by the gui
     .threads = 1,
+
     .useAspiration = true,
     .usePVS = true,
     .useLMR = true,
-    .useNullMove = true,
+    .useNMP = true,
     .useTT = true,
     .useQuiescence = true,
+    .useSyzygy = true,
+
     .syzygyProbeDepth = 1,
     .syzygyProbeLimit = 4,
     .syzygy50MoveRule = true,

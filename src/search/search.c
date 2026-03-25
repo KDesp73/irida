@@ -29,8 +29,8 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 
     Move tb_move = NULL_MOVE;
     size_t piece_count = castro_PieceCount(board);
-    if (piece_count <= config->syzygyProbeLimit) {
-        if (syzygy_probe_root(board, true, &tb_move)) {
+    if (config->useSyzygy && piece_count <= config->syzygyProbeLimit) {
+        if (syzygy_probe_root(board, config->syzygy50MoveRule, &tb_move)) {
             printf("info string tablebase hit\n");
             return tb_move; 
         }
@@ -104,26 +104,26 @@ static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply,
     // 2. TT Probe: Fastest check, do this first.
     Move tt_move = NULL_MOVE;
     int tt_score = 0;
-    if (tt_probe(board->hash, depth, a, b, ply, &tt_score, &tt_move)) {
+    if (config->useTT && tt_probe(board->hash, depth, a, b, ply, &tt_score, &tt_move)) {
         return tt_score;
     }
 
     // 3. Syzygy Probe: Only if TT didn't give us a result.
     int piece_count = castro_PieceCount(board);
-    if (ply > 0 && piece_count <= config->syzygyProbeLimit) {
+    if (config->useSyzygy && ply > 0 && piece_count <= config->syzygyProbeLimit) {
         int wdl;
         if (syzygy_probe_wdl(board, &wdl)) {
             int score = wdl_to_score(wdl, ply);
-            tt_store(board->hash, depth, score, TT_EXACT, NULL_MOVE, ply);
+            if(config->useTT) tt_store(board->hash, depth, score, TT_EXACT, NULL_MOVE, ply);
             return score;
         }
     }
 
     // 4. Base Case: Leaf Node
-    if (depth <= 0) return quiescence(board, a, b, ply, eval, order);
+    if (depth <= 0) return config->useQuiescence ? quiescence(board, a, b, ply, eval, order) : 0;
 
     // 5. Null Move Pruning
-    if (depth >= 3 && !castro_IsInCheck(board) && castro_HasNonPawnMaterial(board, board->turn)) {
+    if (config->useNMP && depth >= 3 && !castro_IsInCheck(board) && castro_HasNonPawnMaterial(board, board->turn)) {
         castro_MakeNullMove(board);
         int score = -negamax(board, eval, order, depth - 1 - 3, ply + 1, -b, -b + 1, config);
         castro_UnmakeNullMove(board);
@@ -165,10 +165,12 @@ static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply,
     }
 
     // 7. Store Result
-    TTNodeType type = (bestScore <= original_alpha) ? TT_UPPERBOUND : 
-                      (bestScore >= b) ? TT_LOWERBOUND : TT_EXACT;
-    
-    tt_store(board->hash, depth, bestScore, type, bestMove, ply);
+    if (config->useTT) {
+        TTNodeType type = (bestScore <= original_alpha) ? TT_UPPERBOUND : 
+            (bestScore >= b) ? TT_LOWERBOUND : TT_EXACT;
+
+        tt_store(board->hash, depth, bestScore, type, bestMove, ply);
+    }
 
     return bestScore;
 }

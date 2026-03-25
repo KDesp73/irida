@@ -29,12 +29,15 @@ typedef struct {
     int maxDepth;
     int timeLimitMs;      // 0 = no limit
     int threads;
-    bool useNullMove;
+
+    bool useNMP;
     bool useLMR;
     bool useAspiration;
     bool usePVS;
     bool useTT;
     bool useQuiescence;
+    bool useSyzygy;
+
     int syzygyProbeDepth;
     int syzygyProbeLimit;
     bool syzygy50MoveRule;
