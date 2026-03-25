@@ -28,13 +28,43 @@ bool syzygy_init(const char* path)
         return false;
     }
 
-    strncpy(g_syzygy_path, path, sizeof(g_syzygy_path) - 1);
+    const char* home = getenv("HOME");
+    char expanded_path[sizeof(g_syzygy_path)];
+    size_t out_pos = 0;
+
+    if (home) {
+        size_t home_len = strlen(home);
+
+        for (size_t i = 0; path[i] != '\0'; ++i) {
+            if (path[i] == '~') {
+                // Copy HOME into output
+                if (out_pos + home_len >= sizeof(expanded_path))
+                    break; // prevent overflow
+
+                memcpy(expanded_path + out_pos, home, home_len);
+                out_pos += home_len;
+            } else {
+                if (out_pos + 1 >= sizeof(expanded_path))
+                    break; // prevent overflow
+
+                expanded_path[out_pos++] = path[i];
+            }
+        }
+        expanded_path[out_pos] = '\0';
+    } else {
+        // Fallback: just copy original path
+        strncpy(expanded_path, path, sizeof(expanded_path) - 1);
+        expanded_path[sizeof(expanded_path) - 1] = '\0';
+    }
+
+    strncpy(g_syzygy_path, expanded_path, sizeof(g_syzygy_path) - 1);
     g_syzygy_path[sizeof(g_syzygy_path) - 1] = '\0';
 
     if (!tb_init(g_syzygy_path)) {
         g_syzygy_loaded = false;
         return false;
     }
+
     g_syzygy_loaded = true;
     return true;
 }

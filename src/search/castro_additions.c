@@ -36,3 +36,13 @@ bool castro_HasNonPawnMaterial(Board* board, int sideToMove)
     }
     return false;
 }
+
+size_t castro_PieceCount(Board* board)
+{
+    size_t count = 0;
+    for(size_t i = 0; i < 12; ++i) {
+        Bitboard bb = board->bitboards[i];
+        count += popcount(bb);
+    }
+    return count;
+}

@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 {
     kv_parse(argc, argv);
     const char* fen = kv_get("fen", STARTING_FEN);
-    const char* path = kv_get("path", "./tb/wdl:./tb/dtz");
+    const char* path = kv_get("path", SYZYGY_DEFAULT_PATH);
 
     if(!path) {
         ERRO("Please provide a tb path");

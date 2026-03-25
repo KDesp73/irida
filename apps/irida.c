@@ -20,7 +20,7 @@ SearchConfig g_searchConfig = {
     .useTT = true,
     .useQuiescence = true,
     .syzygyProbeDepth = 1,
-    .syzygyProbeLimit = 7,
+    .syzygyProbeLimit = 4,
     .syzygy50MoveRule = true,
 };
 

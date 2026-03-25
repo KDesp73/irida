@@ -15,4 +15,6 @@ bool castro_IsDraw(Board* board);
 
 bool castro_HasNonPawnMaterial(Board* board, int sideToMove);
 
+size_t castro_PieceCount(Board* board);
+
 #endif

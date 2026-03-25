@@ -6,9 +6,11 @@
 //   + Move Ordering
 //   + Transposition Table
 //   + Null Move Pruning
+//   + Syzygy
 
 #include "search.h"
 #include "castro_additions.h"
+#include "syzygy.h"
 #include "tt.h"
 #include "uci.h"
 
@@ -23,7 +25,17 @@ static int negamax(
 
 Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 {
-    printf("info using new search with NMP\n");
+    printf("info using new search with Syzygy\n");
+
+    Move tb_move = NULL_MOVE;
+    size_t piece_count = castro_PieceCount(board);
+    if (piece_count <= config->syzygyProbeLimit) {
+        if (syzygy_probe_root(board, true, &tb_move)) {
+            printf("info string tablebase hit\n");
+            return tb_move; 
+        }
+    }
+
     Move best_move = NULL_MOVE;
     g_searchStats.nodes = 0;
 
@@ -75,6 +87,13 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
     return best_move;
 }
 
+#include "fathom/tbprobe.h"
+static int wdl_to_score(int wdl, int ply) {
+    if (wdl == TB_WIN)  return  MATE_SCORE - ply;
+    if (wdl == TB_LOSS) return -MATE_SCORE + ply;
+    return 0; // Draw
+}
+
 static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply, int a, int b, SearchConfig* config)
 {
     // 1. Static Checks (Repetition / 50-move rule)
@@ -82,36 +101,41 @@ static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply,
         return 0;
     }
 
-    // 2. TT Probe (MUST be before NMP)
+    // 2. TT Probe: Fastest check, do this first.
     Move tt_move = NULL_MOVE;
     int tt_score = 0;
     if (tt_probe(board->hash, depth, a, b, ply, &tt_score, &tt_move)) {
         return tt_score;
     }
 
-    // 3. Base Case
+    // 3. Syzygy Probe: Only if TT didn't give us a result.
+    int piece_count = castro_PieceCount(board);
+    if (ply > 0 && piece_count <= config->syzygyProbeLimit) {
+        int wdl;
+        if (syzygy_probe_wdl(board, &wdl)) {
+            int score = wdl_to_score(wdl, ply);
+            tt_store(board->hash, depth, score, TT_EXACT, NULL_MOVE, ply);
+            return score;
+        }
+    }
+
+    // 4. Base Case: Leaf Node
     if (depth <= 0) return quiescence(board, a, b, ply, eval, order);
 
-    // 4. Null Move Pruning
+    // 5. Null Move Pruning
     if (depth >= 3 && !castro_IsInCheck(board) && castro_HasNonPawnMaterial(board, board->turn)) {
         castro_MakeNullMove(board);
-        // reduction R=2 or 3 is standard
         int score = -negamax(board, eval, order, depth - 1 - 3, ply + 1, -b, -b + 1, config);
         castro_UnmakeNullMove(board);
 
         if (score >= b) {
-            // Avoid returning mate scores from null move
+            // Prune if the null move search fails high
             return (score >= MATE_SCORE) ? b : score; 
         }
     }
 
+    // 6. Move Generation and Search
     int original_alpha = a;
-    if (tt_probe(board->hash, depth, a, b, ply, &tt_score, &tt_move)) {
-        return tt_score;
-    }
-
-    if (depth <= 0) return quiescence(board, a, b, ply, eval, order);
-
     Moves legal = castro_GenerateLegalMoves(board);
     if (legal.count == 0) {
         if (castro_IsInCheck(board)) return -INF + ply;
@@ -137,9 +161,10 @@ static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply,
         }
 
         if (score > a) a = score;
-        if (a >= b) break; // Cutoff
+        if (a >= b) break; 
     }
 
+    // 7. Store Result
     TTNodeType type = (bestScore <= original_alpha) ? TT_UPPERBOUND : 
                       (bestScore >= b) ? TT_LOWERBOUND : TT_EXACT;
     
