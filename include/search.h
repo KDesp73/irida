@@ -73,6 +73,7 @@ typedef Move (*SearchFn)(Board* board,
  */
 
 Move random_move(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
+Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 
 Move negamax_id_ab(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 Move negamax_id_ab_q_mo(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
