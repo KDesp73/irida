@@ -18,4 +18,3 @@ $(SO_NAME): $(BUILD_DIR) $(OBJ_FILES) ## Build the dynamic library
 %: apps/%.c $(A_NAME)
 	@echo "[INFO] Building executable: $@"
 	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS_ENGINE) $(LDFLAGS_CASTRO) $(LDFLAGS)
-

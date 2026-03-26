@@ -1,13 +1,14 @@
+include make/build.mk
 include make/config.mk
-include make/targets.mk
-include make/utils.mk
 include make/deps.mk
 include make/dist.mk
-include make/build.mk
-include make/test.mk
-include make/training.mk
 include make/docs.mk
 include make/install.mk
+include make/models.mk
+include make/targets.mk
+include make/test.mk
+include make/training.mk
+include make/utils.mk
 
 .PHONY: help
 help: ## Show this help message

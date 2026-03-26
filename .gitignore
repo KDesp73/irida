@@ -21,6 +21,7 @@ check
 /compile_commands.json
 /libirida.*
 data/nn
+data/models
 data/tb
 /tmp/
 download.txt

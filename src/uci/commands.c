@@ -179,8 +179,8 @@ static void parse_go_command(const char* command)
     }
 
     /* If still no time limit (plain "go" or no time params), use 10s default so we don't hang */
-    if (timeLimitMs <= 0 && !go_infinite)
-        timeLimitMs = 10000;
+    // if (timeLimitMs <= 0 && !go_infinite)
+    //     timeLimitMs = 10000;
 
     g_searchConfig.maxDepth = maxDepth;
     g_searchConfig.timeLimitMs = timeLimitMs;

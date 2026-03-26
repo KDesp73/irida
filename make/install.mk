@@ -39,6 +39,6 @@ uninstall: ## Removes all installed artifacts
 	sudo rm -rf $(IRIDA_DAT_DIR) $(IRIDA_INC_DIR)
 	sudo rm $(LIB_DIR)/libnnueprobe.so
 	sudo rm $(LIB_DIR)/libfathom.so
-	sudo rm $(LIB_DIR)/libirida.so
-	sudo rm $(LIB_DIR)/libirida.a
+	sudo rm $(LIB_DIR)/$(SO_NAME)
+	sudo rm $(LIB_DIR)/$(A_NAME)
 	sudo rm $(BIN_DIR)/$(TARGET)
