@@ -35,9 +35,9 @@ class ChessEngineWrapper:
                 break # Timeout reached
         return lines
 
-    def get_best_move(self, fen):
+    def get_best_move(self, fen, depth: int = 6):
         self.send_command(f"position fen {fen}")
-        self.send_command("go depth 6")
+        self.send_command(f"go depth {depth}")
         
         engine_stats = {
             "move": None,

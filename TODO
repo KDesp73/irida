@@ -9,6 +9,7 @@ TODO: engine executable download nnue files
 TODO: principal variation search
 TODO: MoveOverhead uci option
 TODO: opening list for llm
+TODO: move translation before prompting
 DONE: engine testing
 DONE: cache
 DONE: tests

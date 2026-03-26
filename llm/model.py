@@ -1,14 +1,17 @@
 from llama_cpp import Llama
+from .translator import translate_move
 
 class LLM():
     def __init__(self, gguf: str = "./data/models/Llama-3.2-1B-Instruct-Q3_K_M.gguf"):
         self.llm = Llama(
             model_path=gguf,
             n_ctx=2048,
-            n_threads=4
+            n_threads=4,
+            verbose=False
         )
         
     def explain(self, fen, move, score, pv):
+        readable_move = translate_move(fen, move)
         side_to_move = "White" if " w " in fen else "Black"
         
         prompt = f"""<|start_header_id|>system<|end_header_id|>
@@ -21,7 +24,7 @@ Rules:
 <|start_header_id|>user<|end_header_id|>
 Explain this move briefly:
 FEN: {fen}
-Move: {move}
+Move: {readable_move}
 Side: {side_to_move}
 Engine Evaluation: {score}
 Predicted Line: {pv}

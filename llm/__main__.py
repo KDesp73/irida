@@ -10,6 +10,7 @@ def parse_cli():
     parser.add_argument("--engine", default="./irida", type=str, help="Specify the engine we will use")
     return parser.parse_args()
 
+
 def main():
     args = parse_cli()
 
