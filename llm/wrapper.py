@@ -15,7 +15,6 @@ class ChessEngineWrapper:
     def send_command(self, command):
         """Sends a string command to the C engine."""
         if self.engine.poll() is None:  # Check if process is still running
-            print(f"> {command}")
             self.engine.stdin.write(f"{command}\n")
             self.engine.stdin.flush()
 
@@ -50,8 +49,6 @@ class ChessEngineWrapper:
             if not line:
                 continue
                 
-            print(f"< {line}") # Debugging: watch irida think
-            
             if line.startswith("info"):
                 parts = line.split()
                 # Capture score

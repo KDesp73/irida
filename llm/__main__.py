@@ -1,3 +1,4 @@
+import json
 import argparse
 from .wrapper import ChessEngineWrapper
 from .model import LLM
@@ -17,11 +18,14 @@ def main():
     fen = args.fen
     bridge = ChessEngineWrapper(args.engine)
     move = bridge.get_best_move(fen)
-    print(f"Engine says: {move}")
 
     llm = LLM()
     explanation = llm.explain(fen, move["move"], move["score"], move["pv"])
-    print(f"LLM says: {explanation}")
+
+    print(json.dumps({
+        "bestmove": move,
+        "explanation": explanation
+    }, indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":
