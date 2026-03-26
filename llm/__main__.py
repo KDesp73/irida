@@ -1,12 +1,27 @@
-from .bridge import ChessEngineWrapper
-from .model import get_llm_explanation
+import argparse
+from .wrapper import ChessEngineWrapper
+from .model import LLM
 
-if __name__ == "__main__":
-    fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-    bridge = ChessEngineWrapper("./irida")
+STARTING_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
+def parse_cli():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--fen", default=STARTING_FEN, type=str, help="Specify the fen position")
+    parser.add_argument("--engine", default="./irida", type=str, help="Specify the engine we will use")
+    return parser.parse_args()
+
+def main():
+    args = parse_cli()
+
+    fen = args.fen
+    bridge = ChessEngineWrapper(args.engine)
     move = bridge.get_best_move(fen)
     print(f"Engine says: {move}")
 
-    explanation = get_llm_explanation(fen, move["move"], move["score"], move["pv"])
+    llm = LLM()
+    explanation = llm.explain(fen, move["move"], move["score"], move["pv"])
     print(f"LLM says: {explanation}")
 
+
+if __name__ == "__main__":
+    main()
