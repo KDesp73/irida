@@ -12,31 +12,29 @@ class LLM():
         side_to_move = "White" if " w " in fen else "Black"
         
         prompt = f"""<|start_header_id|>system<|end_header_id|>
-You are an elite Chess Grandmaster and world-class coach. 
-Your task is to provide high-level strategic commentary based on engine analysis.
-Avoid stating the obvious. Instead, translate the evaluation score and the 
-Principal Variation (PV) into human concepts like 'king safety', 'pawn structure', 
-'tempo', and 'piece activity'.<|eot_id|>
+You are a direct, no-nonsense Chess Coach. 
+Rules:
+1. Do not use flowery language like "masterstroke" or "testament".
+2. Use exactly 2 or 3 short sentences.
+3. If the move is a simple development or trade, say so plainly.
+4. Do not mention "points" or "engine score" in the text.<|eot_id|>
 <|start_header_id|>user<|end_header_id|>
-Context for Analysis:
-- **Board State (FEN):** {fen}
-- **Engine Recommendation:** {move}
-- **Evaluation:** {score}
-- **Engine's Calculated Line (PV):** {pv}
-- **Player to Move:** {side_to_move}
+Explain this move briefly:
+FEN: {fen}
+Move: {move}
+Side: {side_to_move}
+Engine Evaluation: {score}
+Predicted Line: {pv}
 
-In a single, professional paragraph, explain the strategic "why" behind {move}. 
-Connect the move to the predicted continuation {pv}. 
-Speak with the authority and conciseness of a Grandmaster.<|eot_id|>
+Why is this move played?<|eot_id|>
 <|start_header_id|>assistant<|end_header_id|>"""
         
-        # Change stop token to <|eot_id|> for Llama 3.2
         response = self.llm(
             prompt,
             max_tokens=256,
             stop=["<|eot_id|>"],
             echo=False,
-            temperature=0.7
+            temperature=0.2
         )
 
         return response['choices'][0]['text'].strip()
