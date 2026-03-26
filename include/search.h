@@ -77,14 +77,9 @@ typedef Move (*SearchFn)(Board* board,
 Move random_move(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 
-Move negamax_id_ab_q_mo_tt_nmp_lmr_cme_aw(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
-Move negamax_id_ab_q_mo_tt_nmp_lmr_cme_aw_pvs(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
-
 static const struct { const char *name; SearchFn fn; } search_variants[] = {
     { "random", random_move },
     { "search", search },
-    { "id_ab_q_mo_tt_nmp_lmr_cme_aw", negamax_id_ab_q_mo_tt_nmp_lmr_cme_aw },
-    { "id_ab_q_mo_tt_nmp_lmr_cme_aw_pvs", negamax_id_ab_q_mo_tt_nmp_lmr_cme_aw_pvs },
 };
 
 // @function quiescence

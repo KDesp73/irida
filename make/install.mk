@@ -3,6 +3,12 @@ BIN_DIR = /usr/local/bin
 IRIDA_DAT_DIR = ${HOME}/.irida
 IRIDA_INC_DIR = /usr/local/include/irida
 
+ifeq ($(UNAME_S),Darwin) # macOS
+	PLATFORM = macos
+else
+	PLATFORM = linux
+endif
+
 .PHONY: install
 install: $(TARGET) install.deps install.lib install.data ## Installs irida executable, library and dependencies
 	@echo "Installing irida executable"
@@ -18,8 +24,8 @@ install.lib: $(A_NAME) $(SO_NAME) ## Installs the irida library (libirida.* and 
 .PHONY: install.deps
 install.deps: ## Installs irida's dependencies
 	@echo "Installing dependencies in $(LIB_DIR)"
-	@sudo cp deps/lib/libnnueprobe.so $(LIB_DIR)
-	@sudo cp deps/lib/libfathom.so $(LIB_DIR)
+	@sudo cp deps/lib/$(PLATFORM)/libnnueprobe.so $(LIB_DIR)
+	@sudo cp deps/lib/$(PLATFORM)/libfathom.so $(LIB_DIR)
 
 .PHONY: install.data
 install.data: ## Installs necessary data to ~/.irida
