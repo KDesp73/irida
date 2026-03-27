@@ -5,6 +5,7 @@
 #include "tt.h"
 #include "nnue.h"
 #include "syzygy.h"
+#include "version.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
@@ -260,6 +261,7 @@ void uci_uci(UciState* state)
     state->uciMode = true;
     printf("id name %s\n", engine.name);
     printf("id author %s\n", engine.author);
+    printf("id version %s\n", VERSION_STRING);
 
     printf("\n");
 

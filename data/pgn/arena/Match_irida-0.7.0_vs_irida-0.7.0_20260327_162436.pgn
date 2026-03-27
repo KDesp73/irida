@@ -1,0 +1,10 @@
+[Event "Castro Engine Match"]
+[Site "Local Arena"]
+[Date "2026.03.27"]
+[Round "1"]
+[White "irida 0.7.0"]
+[Black "irida 0.7.0"]
+[Result "0-1"]
+
+1. Nc3 Nc6 2. Nf3 Nf6 3. e3 e6 4. Bb5 Bb4 5. Ke2 Ke7 6. Kd3 Ng4 7. Ke2 Nf6 8. Kd3 Na5 9. Ne4 Nxe4 10. Kxe4 Qe8 11. Kd3 Bc5 12. c3 f6 13. Nh4 c6 14. Ba4 g5 15. Nf3 Qg6+ 16. Ke2 g4 17. Nd4 Re8 18. Re1 Kf7 19. Qc2 Nc4 20. Qxg6+ Kxg6 21. Bc2+ Kg7 22. Bd3 Ne5 23. Be4 f5 24. Bc2 Bxd4 25. exd4 Ng6 26. Kf1 Kf6 27. Kg1 Nf4 28. d3 Nd5 29. Bb3 Kg6 30. Bxd5 cxd5 31. Bf4 Rg8 32. Re5 b6 33. Kf1 Ba6 34. Ke2 Rge8 35. Rg1 Rac8 36. Kd2 Red8 37. Bg3 Kh5 38. Rh1 Kg5 39. Rhe1 d6 40. Rxe6 f4 41. Bxf4+ Kxf4 42. Re7 Ra8 43. Rxh7 Rh8 44. Ree7 Rxh7 45. Rxh7 Kf5 46. Rg7 Bb5 47. Kc2 Rh8 48. h3 gxh3 49. g3 h2 50. Rf7+ Kg6 51. Rxa7 h1=Q 52. Re7 Qf3 53. Re6+ Kf7 54. Rxd6 Qxd3+ 55. Kb3 Qd1+ 56. Ka3 Qa4# 0-1
+
