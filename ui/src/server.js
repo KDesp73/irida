@@ -25,7 +25,7 @@ console.log("UCI bridge listening on", PORT);
 wss.on("connection", (ws) => {
   let engine = null;
   let currentFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-  
+
   let lastScore = "0.0";
   let lastPv = "";
 
@@ -54,7 +54,7 @@ wss.on("connection", (ws) => {
 
         engine.stdout.on("data", async (data) => {
           const lines = data.toString().split("\n");
-          
+
           for (let l of lines) {
             const trimmed = l.trim();
             if (!trimmed) continue;
@@ -71,7 +71,7 @@ wss.on("connection", (ws) => {
 
             if (trimmed.startsWith("bestmove ")) {
               const bestMove = trimmed.split(" ")[1];
-              
+
               ws.send(trimmed);
 
               try {

@@ -7,7 +7,7 @@ class LLM():
         gguf: str = "./data/models/Llama-3.2-1B-Instruct-Q3_K_M.gguf",
         n_ctx: int = 2048,
         n_threads: int = 4,
-        temperature: float = 0.2
+        temperature: float = 0.4
     ):
         self.llm = Llama(
             model_path=gguf,
@@ -16,13 +16,13 @@ class LLM():
             verbose=False
         )
         self.temperature = temperature
-        
+
     def explain(self, fen, move, score, pv):
         readable_move = translate_move(fen, move)
         side_to_move = "White" if " w " in fen else "Black"
-        
+
         prompt = f"""<|start_header_id|>system<|end_header_id|>
-You are a direct, no-nonsense Chess Coach.
+You are a direct, no-nonsense Chess Coach and your name is Irida.
 Rules:
 1. Do not use flowery language like "masterstroke" or "testament".
 2. Use exactly 2 or 3 short sentences.
@@ -36,9 +36,9 @@ Side: {side_to_move}
 Engine Evaluation: {score}
 Predicted Line: {pv}
 
-Why is this move played?<|eot_id|>
+What is the purpose of this move?<|eot_id|>
 <|start_header_id|>assistant<|end_header_id|>"""
-        
+
         response = self.llm(
             prompt,
             max_tokens=256,

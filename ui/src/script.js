@@ -72,6 +72,7 @@ function connect() {
           if(obj.type === "explanation") {
             const el = document.getElementById("llm-explanation");
             el.innerHTML = obj.text;
+            return;
           }
         } catch (e) {}
 
