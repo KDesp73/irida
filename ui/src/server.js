@@ -74,22 +74,24 @@ wss.on("connection", (ws) => {
 
               ws.send(trimmed);
 
-              try {
-                const llmResponse = await axios.post(`${CONFIG.llm.prefix}/analyze`, {
-                  fen: currentFen,
-                  move: bestMove,
-                  score: lastScore,
-                  pv: lastPv
-                });
+              if (CONFIG.llm.enabled) {
+                try {
+                  const llmResponse = await axios.post(`${CONFIG.llm.prefix}/analyze`, {
+                    fen: currentFen,
+                    move: bestMove,
+                    score: lastScore,
+                    pv: lastPv
+                  });
 
-                ws.send(JSON.stringify({
-                  type: "explanation",
-                  move: bestMove,
-                  text: llmResponse.data.explanation,
-                  score: lastScore
-                }));
-              } catch (err) {
-                console.error("LLM API Error:", err.message);
+                  ws.send(JSON.stringify({
+                    type: "explanation",
+                    move: bestMove,
+                    text: llmResponse.data.explanation,
+                    score: lastScore
+                  }));
+                } catch (err) {
+                  console.error("LLM API Error:", err.message);
+                }
               }
               continue; // Don't send the raw bestmove twice
             }
