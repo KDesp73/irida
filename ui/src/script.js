@@ -100,8 +100,9 @@ function updateOrientation() {
 }
 
 function loadEngine() {
-    const engine = document.getElementById("engineSelect").value;
-    send(`load ${engine}`);
+    const selectElement = document.getElementById("engineSelect");
+    const engineName = selectElement.options[selectElement.selectedIndex].text;
+    send(`load ${engineName}`);
     send("uci");
     send("isready");
 }

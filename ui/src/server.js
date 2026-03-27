@@ -35,8 +35,9 @@ wss.on("connection", (ws) => {
 
     // Load engine
     if (line.startsWith("load ")) {
-      const filename = line.slice(5)
-      const enginePath = filename;
+      const name = line.slice(5)
+      const enginePath = engines.filter((e) => e.name == name)[0].path;
+      console.log(`[INFO] Loading ${name} (${enginePath})`);
 
       if (engine) {
         engine.kill()
