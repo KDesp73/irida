@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern UCI Chess Interface</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<div class="container" id="main-container">
+    <div id="board"></div>
+
+    <div class="panel">
+        <div class="header-row">
+            <h3>UCI Engine</h3>
+            <div id="status-light">IDLE</div>
+        </div>
+
+        <div id="console"></div>
+
+        <div class="control-group">
+            <div class="input-row">
+                <select id="engineSelect" style="flex-grow: 1;"></select>
+                <button onclick="loadEngine()">Load</button>
+            </div>
+
+            <div class="input-row">
+                <select id="playerSide" onchange="updateOrientation()" style="flex-grow: 1;">
+                    <option value="white">Play as White</option>
+                    <option value="black">Play as Black</option>
+                </select>
+                <input id="depth" type="number" value="6" style="width: 50px;" title="Search Depth">
+                <button class="secondary-btn" onclick="resetGame()">Reset</button>
+            </div>
+
+            <div class="input-row">
+                <input id="raw" placeholder="Command..." style="flex-grow: 1;">
+                <button class="secondary-btn" onclick="sendRaw()">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="./script.js"></script>
+
+</body>
+</html>
