@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
+#!/usr/bin/env python3
+
 import chess
 import chess.engine
+import chess.pgn  # Added for PGN generation
 import argparse
 import sys
 import logging
@@ -10,16 +13,13 @@ from colorama import Fore, init
 init(autoreset=True)
 
 def play_match(engine1_path, engine2_path, num_games, time_limit, debug=False):
-    # 1. Setup Logging - This captures the raw talk between Python and the Engines
     if debug:
-        # This will print all UCI traffic to the console in a basic format
         logging.basicConfig(format='%(levelname)s:%(name)s:%(message)s', level=logging.DEBUG)
 
     results = {"E1": 0, "E2": 0, "Draws": 0}
     e1, e2 = None, None
     
     try:
-        # 2. Start Engines
         e1 = chess.engine.SimpleEngine.popen_uci(engine1_path)
         e2 = chess.engine.SimpleEngine.popen_uci(engine2_path)
         
@@ -31,25 +31,33 @@ def play_match(engine1_path, engine2_path, num_games, time_limit, debug=False):
         for game_num in range(1, num_games + 1):
             board = chess.Board()
             
-            # Alternate colors
+            # 1. Setup PGN Header
+            game = chess.pgn.Game()
+            game.headers["Event"] = "Castro Engine Match"
+            game.headers["Round"] = str(game_num)
+            
             if game_num % 2 != 0:
                 white_engine, black_engine = e1, e2
                 white_label, black_label = "E1", "E2"
+                game.headers["White"], game.headers["Black"] = name1, name2
             else:
                 white_engine, black_engine = e2, e1
                 white_label, black_label = "E2", "E1"
+                game.headers["White"], game.headers["Black"] = name2, name1
 
             print(f"{Fore.WHITE}Game {game_num:02d} | {Fore.LIGHTWHITE_EX}{white_label}(W) vs {black_label}(B)")
 
             aborted = False
+            node = game # Pointer for building the PGN tree
+            
             while not board.is_game_over() and not aborted:
                 current_engine = white_engine if board.turn == chess.WHITE else black_engine
                 
                 try:
-                    # Request the move
                     result = current_engine.play(board, chess.engine.Limit(time=time_limit))
                     
                     if result.move and result.move in board.legal_moves:
+                        node = node.add_main_variation(result.move) # Add move to PGN
                         board.push(result.move)
                     else:
                         print(f"{Fore.RED}Illegal Move or Engine Refused: {result.move}")
@@ -58,24 +66,32 @@ def play_match(engine1_path, engine2_path, num_games, time_limit, debug=False):
                     print(f"{Fore.RED}Engine Critical Error: {e}")
                     aborted = True
 
-            # 3. Finalize Result
+            # 2. Finalize Result and Scoring
             outcome = board.outcome()
             if aborted:
-                # Logic to determine who gets the point on a forfeit
                 winner_label = "E2" if (board.turn == chess.WHITE and white_label == "E1") or (board.turn == chess.BLACK and white_label == "E2") else "E1"
                 results[winner_label] += 1
                 status = f"Forfeit -> {winner_label} wins"
+                game.headers["Result"] = "1-0" if winner_label == white_label else "0-1"
             elif outcome is None:
                 status = "Aborted"
+                game.headers["Result"] = "*"
             elif outcome.winner is None:
                 results["Draws"] += 1
                 status = "½-½"
+                game.headers["Result"] = "1/2-1/2"
             else:
                 e1_won = (outcome.winner == chess.WHITE and white_label == "E1") or (outcome.winner == chess.BLACK and white_label == "E2")
                 results["E1" if e1_won else "E2"] += 1
                 status = "1-0 (E1)" if e1_won else "0-1 (E2)"
+                game.headers["Result"] = outcome.result()
             
-            print(f"{Fore.YELLOW}RESULT: {status} ({len(board.move_stack)} moves)\n")
+            print(f"{Fore.YELLOW}RESULT: {status} ({len(board.move_stack)} moves)")
+            
+            # 3. Print the PGN
+            print(f"{Fore.LIGHTBLACK_EX}{'-'*40}")
+            print(game)
+            print(f"{Fore.LIGHTBLACK_EX}{'-'*40}\n")
 
     finally:
         if e1: e1.quit()

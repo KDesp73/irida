@@ -174,7 +174,7 @@ void uci_search_thread_join(void);
 
 // @function uci_report_search
 // @desc UCI-compatible search process logging
-void uci_report_search(int depth, int bestScore, uint64_t nodes, uint64_t timeMs, const char* pvBuf);
+void uci_report_search(int depth, int bestScore, uint64_t timeMs, const char* pvBuf);
 
 // @function StateSetStartPos
 // @desc Set start position FEN and init board.

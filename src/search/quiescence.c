@@ -18,6 +18,8 @@
 int quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, OrderFn order)
 {
     g_searchStats.qnodes++;
+    if (ply > g_searchStats.selDepth)
+        g_searchStats.selDepth = ply;
 
     // Pseudocode doesn't define MAX_PLY, but we keep it for safety
     if (ply >= MAX_PLY)

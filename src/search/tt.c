@@ -8,8 +8,9 @@
  * probing so they remain valid at any depth. Entries store depth, score type
  * (exact, lower bound, upper bound), and best move for ordering.
  *
- * Probes: we may still return bestMove for move ordering when stored depth is
- * below the requested depth (score cutoff only when depth is sufficient).
+ * Probes: entries must match g_tt_generation (bumped each root search). We may
+ * still return bestMove for move ordering when stored depth is below the requested
+ * depth (score cutoff only when depth is sufficient).
  * Replacement favors deeper/newer/same-key updates per the policy in tt_store.
  */
 #include <stdlib.h>
@@ -52,6 +53,7 @@ bool tt_probe(uint64_t key, int depth, int alpha, int beta, int ply, int* outSco
 
     TTEntry* entry = &ttTable[tt_index(key)];
     if (entry->key != key) return false;
+    if (entry->generation != g_tt_generation) return false;
 
     // We ALWAYS want the bestMove for move ordering, even if depth is insufficient
     *outMove = entry->bestMove;

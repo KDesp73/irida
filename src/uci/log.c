@@ -1,10 +1,11 @@
 #include "tt.h"
 #include "uci.h"
 
-void uci_report_search(int depth, int bestScore, uint64_t nodes, uint64_t timeMs, const char* pvBuf)
+void uci_report_search(int depth, int bestScore, uint64_t timeMs, const char* pvBuf)
 {
     const int mateThreshold = MATE_SCORE - MAX_PLY;
-    uint64_t nps = timeMs > 0 ? (nodes * 1000) / timeMs : 0;
+    uint64_t total_nodes = g_searchStats.nodes + g_searchStats.qnodes;
+    uint64_t nps = timeMs > 0 ? (total_nodes * 1000) / timeMs : 0;
     
     int hashfull = tt_hashfull(); 
 
@@ -21,7 +22,7 @@ void uci_report_search(int depth, int bestScore, uint64_t nodes, uint64_t timeMs
     }
 
     printf("nodes %llu nps %llu hashfull %d tbhits %llu time %llu pv %s\n",
-           (unsigned long long)nodes, (unsigned long long)nps, hashfull, 
+           (unsigned long long)total_nodes, (unsigned long long)nps, hashfull,
            (unsigned long long)g_searchStats.tbHits, (unsigned long long)timeMs, pvBuf);
     
     fflush(stdout);

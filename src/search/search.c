@@ -26,7 +26,7 @@ static int negamax(
 
 Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 {
-    printf("info using new search with LMR\n");
+    tt_inc_generation();
 
     Move tb_move = NULL_MOVE;
     size_t piece_count = castro_PieceCount(board);
@@ -40,6 +40,7 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
     Move best_move = NULL_MOVE;
     g_searchStats.nodes = 0;
     g_searchStats.qnodes = 0;
+    g_searchStats.selDepth = 0;
 
     search_start_timer(config->timeLimitMs);
 
@@ -77,7 +78,7 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
             
             char moveBuf[10];
             castro_MoveToString(best_move, moveBuf);
-            uci_report_search(currentDepth, bestScore, g_searchStats.nodes, search_elapsed_ms(), moveBuf);
+            uci_report_search(currentDepth, bestScore, search_elapsed_ms(), moveBuf);
             
             // If we found a mate, no need to search deeper
             if (bestScore > (INF - MAX_PLY)) break; 
@@ -115,6 +116,8 @@ static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply,
     if (search_should_stop()) return 0;
 
     g_searchStats.nodes++;
+    if (ply > g_searchStats.selDepth)
+        g_searchStats.selDepth = ply;
 
     // 3. Syzygy Probe: Only if TT didn't give us a result.
     int piece_count = castro_PieceCount(board);
@@ -158,8 +161,8 @@ static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply,
     const bool parent_in_check = castro_IsInCheck(board);
 
     for (size_t i = 0; i < legal.count; ++i) {
-        if (!castro_MakeMove(board, legal.list[i])) continue;
         bool is_capture = castro_IsCapture(board, legal.list[i]);
+        if (!castro_MakeMove(board, legal.list[i])) continue;
         bool gives_check = castro_IsInCheck(board);
         
         // Only reduce quiet moves (not captures/checks) searched late in the list
