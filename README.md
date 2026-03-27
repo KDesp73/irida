@@ -55,6 +55,6 @@ Currently closed-source
 
 ## Author
 
-Konstantinos Despoindis [KDesp73](https://github.com/KDesp73)
+Konstantinos Despoindis ([KDesp73](https://github.com/KDesp73))
 
 > This engine is a work-in-progress, developed for learning, experimentation, and future research.

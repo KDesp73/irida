@@ -89,13 +89,6 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
     return best_move;
 }
 
-#include "fathom/tbprobe.h"
-static int wdl_to_score(int wdl, int ply) {
-    if (wdl == TB_WIN)  return  MATE_SCORE - ply;
-    if (wdl == TB_LOSS) return -MATE_SCORE + ply;
-    return 0; // Draw
-}
-
 static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply, int alpha, int beta, SearchConfig* config)
 {
     // 1. Static Checks (Repetition / 50-move rule)
@@ -126,11 +119,12 @@ static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply,
     // 3. Syzygy Probe: Only if TT didn't give us a result.
     int piece_count = castro_PieceCount(board);
     if (config->useSyzygy && ply > 0 && piece_count <= config->syzygyProbeLimit) {
-        int wdl;
-        if (syzygy_probe_wdl(board, &wdl)) {
-            int score = wdl_to_score(wdl, ply);
-            if(config->useTT) tt_store(board->hash, depth, score, TT_EXACT, NULL_MOVE, ply);
-            return score;
+        int tb_score = syzygy_probe_wdl(board, config->syzygy50MoveRule);
+        if (tb_score != SYZYGY_PROBE_FAILED) {
+            if (config->useTT)
+                tt_store(board->hash, depth, tb_score, TT_EXACT, NULL_MOVE, ply);
+            g_searchStats.tbHits++;
+            return tb_score;
         }
     }
 

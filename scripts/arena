@@ -1,0 +1,98 @@
+#!/usr/bin/env python3
+
+import chess
+import chess.engine
+import argparse
+import sys
+import logging
+from colorama import Fore, init
+
+init(autoreset=True)
+
+def play_match(engine1_path, engine2_path, num_games, time_limit, debug=False):
+    # 1. Setup Logging - This captures the raw talk between Python and the Engines
+    if debug:
+        # This will print all UCI traffic to the console in a basic format
+        logging.basicConfig(format='%(levelname)s:%(name)s:%(message)s', level=logging.DEBUG)
+
+    results = {"E1": 0, "E2": 0, "Draws": 0}
+    e1, e2 = None, None
+    
+    try:
+        # 2. Start Engines
+        e1 = chess.engine.SimpleEngine.popen_uci(engine1_path)
+        e2 = chess.engine.SimpleEngine.popen_uci(engine2_path)
+        
+        name1 = e1.id.get("name", "Engine 1")
+        name2 = e2.id.get("name", "Engine 2")
+
+        print(f"{Fore.CYAN}Match: {Fore.GREEN}{name1} {Fore.CYAN}vs {Fore.MAGENTA}{name2}\n")
+
+        for game_num in range(1, num_games + 1):
+            board = chess.Board()
+            
+            # Alternate colors
+            if game_num % 2 != 0:
+                white_engine, black_engine = e1, e2
+                white_label, black_label = "E1", "E2"
+            else:
+                white_engine, black_engine = e2, e1
+                white_label, black_label = "E2", "E1"
+
+            print(f"{Fore.WHITE}Game {game_num:02d} | {Fore.LIGHTWHITE_EX}{white_label}(W) vs {black_label}(B)")
+
+            aborted = False
+            while not board.is_game_over() and not aborted:
+                current_engine = white_engine if board.turn == chess.WHITE else black_engine
+                
+                try:
+                    # Request the move
+                    result = current_engine.play(board, chess.engine.Limit(time=time_limit))
+                    
+                    if result.move and result.move in board.legal_moves:
+                        board.push(result.move)
+                    else:
+                        print(f"{Fore.RED}Illegal Move or Engine Refused: {result.move}")
+                        aborted = True
+                except Exception as e:
+                    print(f"{Fore.RED}Engine Critical Error: {e}")
+                    aborted = True
+
+            # 3. Finalize Result
+            outcome = board.outcome()
+            if aborted:
+                # Logic to determine who gets the point on a forfeit
+                winner_label = "E2" if (board.turn == chess.WHITE and white_label == "E1") or (board.turn == chess.BLACK and white_label == "E2") else "E1"
+                results[winner_label] += 1
+                status = f"Forfeit -> {winner_label} wins"
+            elif outcome is None:
+                status = "Aborted"
+            elif outcome.winner is None:
+                results["Draws"] += 1
+                status = "½-½"
+            else:
+                e1_won = (outcome.winner == chess.WHITE and white_label == "E1") or (outcome.winner == chess.BLACK and white_label == "E2")
+                results["E1" if e1_won else "E2"] += 1
+                status = "1-0 (E1)" if e1_won else "0-1 (E2)"
+            
+            print(f"{Fore.YELLOW}RESULT: {status} ({len(board.move_stack)} moves)\n")
+
+    finally:
+        if e1: e1.quit()
+        if e2: e2.quit()
+
+    return results, name1, name2
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="UCI Engine Match Runner")
+    parser.add_argument("engine1", type=str, help="Path to Engine 1")
+    parser.add_argument("engine2", type=str, help="Path to Engine 2")
+    parser.add_argument("--games", type=int, default=10, help="Number of games")
+    parser.add_argument("--time", type=float, default=0.1, help="Seconds per move")
+    parser.add_argument("--debug", action="store_true", help="Show UCI raw traffic")
+    
+    args = parser.parse_args()
+
+    res, n1, n2 = play_match(args.engine1, args.engine2, args.games, args.time, args.debug)
+    
+    print(f"\n{Fore.YELLOW}FINAL SCORE: {n1} ({res['E1']}) - {n2} ({res['E2']}) | Draws: {res['Draws']}")

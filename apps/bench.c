@@ -104,15 +104,11 @@ void run_benchmark(SearchFn search, EvalFn eval, OrderFn order) {
 
 int main(int argc, char** argv)
 {
-    if(!nnue_load(NNUE_DEFAULT_PATH)){
-        ERRO("Could not load nnue %s\n", NNUE_DEFAULT_PATH);
-        return 1;
-    }
     EngineInit(&engine);
 
     kv_parse(argc, argv);
     const char* search = kv_get("search", "id_ab_q_mo_tt_nmp");
-    const char* eval = kv_get("eval", "nnue");
+    const char* eval = kv_get("eval", "handcrafted");
     int depth = strtol(kv_get("depth", "6"), NULL, 10);
 
     SearchFn searchfn = NULL;
@@ -123,8 +119,13 @@ int main(int argc, char** argv)
             searchfn = search_variants[i].fn;
     }
 
-    if(!strcmp("nnue", eval)) evalfn = nnue_eval;
-    else if(!strcmp("pesto", eval)) evalfn = evaluation;
+    if(!strcmp("nnue", eval)) {
+        if(!nnue_load(NNUE_DEFAULT_PATH)){
+            ERRO("Could not load nnue %s\n", NNUE_DEFAULT_PATH);
+            return 1;
+        }
+        evalfn = nnue_eval;
+    } else if(!strcmp("handcrafted", eval)) evalfn = evaluation;
     else if(!strcmp("material", eval)) evalfn = material_eval;
     else evalfn = evaluation;
 
