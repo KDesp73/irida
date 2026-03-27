@@ -7,6 +7,4 @@ engines:
 
 llm:
   enabled: false
-  gguf: "../data/models/Llama-3.2-1B-Instruct-Q3_K_M.gguf"
-  host: "127.0.0.1"
-  port: 8080
+  prefix: "http://localhost:8000"

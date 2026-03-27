@@ -67,6 +67,14 @@ function connect() {
             }
         } catch (e) {}
 
+        try {
+          const obj = JSON.parse(data);
+          if(obj.type === "explanation") {
+            const el = document.getElementById("llm-explanation");
+            el.innerHTML = obj.text;
+          }
+        } catch (e) {}
+
         log(`< ${data}`, 'in');
 
         if (data.startsWith("bestmove")) {
@@ -131,7 +139,7 @@ function onDrop(source, target) {
 
     const d = document.getElementById("depth").value;
     setThinking(true);
-    setTimeout(() => send(`go depth 4`), 50);
+    setTimeout(() => send(`go depth ${d}`), 50);
 }
 
 function sendRaw() {
