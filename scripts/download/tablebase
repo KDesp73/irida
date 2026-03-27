@@ -1,48 +1,87 @@
 #!/usr/bin/env bash
 
+# --- Defaults ---
 LIST_URL="https://tablebase.lichess.ovh/tables/standard/download.txt"
 LIST_FILE="download.txt"
 THREADS=4
 RETRIES=3
-WDL_DIR="data/tb/wdl"
-DTZ_DIR="data/tb/dtz"
+TARGET_DIR="data/tb"
+PIECES="345"
+MODE="both"
+DRY_RUN=false
 
-# Check for dependencies
+usage() {
+    echo "Usage: $0 [-p pieces] [-t threads] [-d directory] [-m mode] [-n] [-h]"
+    echo "  -p : Piece counts (default: 345)"
+    echo "  -t : Threads (default: 4)"
+    echo "  -d : Base directory (default: data/tb)"
+    echo "  -m : Mode: wdl, dtz, or both (default: both)"
+    echo "  -n : Dry run (show counts, no download)"
+    exit 1
+}
+
+while getopts "p:t:d:m:nh" opt; do
+    case "$opt" in
+        p) PIECES=$OPTARG ;;
+        t) THREADS=$OPTARG ;;
+        d) TARGET_DIR=$OPTARG ;;
+        m) MODE=$OPTARG ;;
+        n) DRY_RUN=true ;;
+        h) usage ;;
+        *) usage ;;
+    esac
+done
+
+# Check for parallel
 if ! command -v parallel &> /dev/null; then
-    echo "Error: 'parallel' (GNU Parallel) is not installed. Install it via brew/apt."
+    echo "Error: 'parallel' is not installed."
     exit 1
 fi
 
-# 1. Fetch the master list if it doesn't exist
+# Fetch list if missing
 if [ ! -f "$LIST_FILE" ]; then
     echo "Fetching master file list..."
     wget -q "$LIST_URL" -O "$LIST_FILE"
 fi
 
-mkdir -p "$WDL_DIR" "$DTZ_DIR"
+# Function to handle the actual grep and download
+run_sync() {
+    local type=$1    # wdl or dtz
+    local ext=$2     # rtbw or rtbz
+    local dest="$TARGET_DIR/$type"
+    
+    # Using your working greedy logic: look for piece digits anywhere in the line
+    local matches=$(grep -E "^.*[${PIECES}].*\.${ext}$" "$LIST_FILE")
+    local count=$(echo "$matches" | grep -v '^$' | wc -l | xargs)
 
-echo "Starting parallel sync for 3, 4, and 5-piece tablebases..."
+    if [ "$count" -eq 0 ]; then
+        echo "No $type files found for pieces: $PIECES"
+        return
+    fi
 
-# 2. Extract URLs into temporary files to keep logic clean
-grep -E '^.*[345].*\.rtbw$' "$LIST_FILE" > wdl_links.tmp
-grep -E '^.*[345].*\.rtbz$' "$LIST_FILE" > dtz_links.tmp
+    if [ "$DRY_RUN" = true ]; then
+        echo "[DRY RUN] Found $count $type files for pieces [$PIECES]"
+        return
+    fi
 
-# 3. Execute Parallel Downloads
-# --jobs: Parallel instances
-# --resume: Continues if the job was interrupted
-# wget -nc: Skip if file exists
-# wget -nv: Non-verbose (keeps the terminal clean)
+    echo "Syncing $count $type files to $dest..."
+    mkdir -p "$dest"
+    echo "$matches" | parallel --jobs "$THREADS" --progress \
+        "wget -nc -nv --tries=$RETRIES -P $dest {}"
+}
 
-echo "Downloading WDL files..."
-parallel --jobs "$THREADS" --progress \
-    "wget -nc -nv --tries=$RETRIES -P $WDL_DIR {}" < wdl_links.tmp
+# Execute based on Mode
+if [[ "$MODE" == "wdl" || "$MODE" == "both" ]]; then
+    run_sync "wdl" "rtbw"
+fi
 
-echo "Downloading DTZ files..."
-parallel --jobs "$THREADS" --progress \
-    "wget -nc -nv --tries=$RETRIES -P $DTZ_DIR {}" < dtz_links.tmp
+if [[ "$MODE" == "dtz" || "$MODE" == "both" ]]; then
+    run_sync "dtz" "rtbz"
+fi
 
 # Clean up
-rm "$LIST_FILE" wdl_links.tmp dtz_links.tmp
+rm -f wdl_links.tmp dtz_links.tmp # Remove old legacy temps if they exist
+# Note: I'm leaving $LIST_FILE so you don't have to re-download it every time.
 
 echo "-------------------------------------------------------"
-echo "Done! Tablebases are in $WDL_DIR and $DTZ_DIR"
+echo "Process complete. Files are in $TARGET_DIR"
