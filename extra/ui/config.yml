@@ -1,0 +1,10 @@
+server:
+  port: 8765
+
+engines:
+  - ../../irida
+  - stockfish
+
+llm: 
+  enabled: true
+  gguf: ""

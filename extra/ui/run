@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+FRONTEND_PORT=${FRONTEND_PORT:-4000}
+BACKEND_PORT=${BACKEND_PORT:-8765}
+FRONTEND_DIR="src"
+BACKEND_SCRIPT="src/server.js"
+
+cleanup() {
+    echo -e "\n\033[0;31mStopping services...\033[0m"
+    # Kill all background processes started by this script
+    kill $(jobs -p) 2>/dev/null
+    exit
+}
+
+trap cleanup SIGINT SIGTERM
+
+check_port() {
+    if lsof -Pi :$1 -sTCP:LISTEN -t >/dev/null ; then
+        echo -e "\033[0;33mWarning: Port $1 is already in use. Please free it and try again.\033[0m"
+        exit 1
+    fi
+}
+
+echo -e "\033[0;34mStarting Chess UI Services...\033[0m"
+check_port $FRONTEND_PORT
+check_port $BACKEND_PORT
+
+
+echo "-> Launching Frontend at http://localhost:$FRONTEND_PORT"
+python3 -m http.server $FRONTEND_PORT -d "$FRONTEND_DIR" > /dev/null 2>&1 &
+
+sleep 1
+
+echo "-> Launching Backend (Node.js)"
+echo -e "\033[0;32mAll systems go. Press Ctrl+C to stop both.\033[0m"
+node "$BACKEND_SCRIPT" $BACKEND_PORT
