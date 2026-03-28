@@ -6,16 +6,17 @@
     <title>Play with Irida</title>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    
+    <link rel="stylesheet" href="/static/libs/chessboard-1.0.0.min.css">
+    <script src="/static/libs/chess.min.js"></script>
+    <script src="/static/libs/chessboard-1.0.0.min.js"></script>
 
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
 <div class="container" id="main-container">
-    <div id="board"></div>
+    <div id="board" style="width: 400px"></div>
 
     <div class="panel">
         <div class="header-row">
@@ -30,7 +31,7 @@
             <div id="llm-explanation">
                 <span class="placeholder">Make a move to see the analysis...</span>
             </div>
-            <div id="llm-loader" style="display: none;">
+            <div id="llm-loader" style="display: none; padding: 10px; color: #60a5fa;">
                 <div class="spinner"></div> Analyzing position...
             </div>
         </div>
@@ -63,7 +64,7 @@
     </div>
 </div>
 
-<script src="./script.js"></script>
+<script src="/static/script.js"></script>
 
 </body>
 </html>

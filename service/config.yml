@@ -1,0 +1,9 @@
+server:
+  port: 8765
+
+engines:
+  - "/home/kdesp73/personal/repos/c/irida/irida"
+  - "stockfish"
+
+llm:
+  enabled: true

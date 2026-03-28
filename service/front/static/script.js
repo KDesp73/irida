@@ -1,6 +1,8 @@
 let socket, board, game = new Chess();
 const container = document.getElementById("main-container");
 const statusLight = document.getElementById("status-light");
+const llmLoader = document.getElementById("llm-loader");
+const llmExp = document.getElementById("llm-explanation");
 
 function log(text, type = '') {
     const c = document.getElementById("console");
@@ -8,10 +10,10 @@ function log(text, type = '') {
     let weight = "normal";
 
     if (type === 'in') color = "#60a5fa";
-    if (type === 'out') color = "#fbbf24"; // Amber
-    if (type === 'sys') color = "#4ade80"; // Emerald
+    if (type === 'out') color = "#fbbf24";
+    if (type === 'sys') color = "#4ade80";
     if (type === 'result') { 
-        color = "#f43f5e"; // Rose
+        color = "#f43f5e";
         weight = "bold";
     }
 
@@ -23,33 +25,19 @@ function setThinking(isThinking) {
     if (isThinking) {
         container.classList.add("thinking");
         statusLight.innerText = "THINKING";
+        llmLoader.style.display = "block";
+        llmExp.style.display = "none";
     } else {
         container.classList.remove("thinking");
         statusLight.innerText = "IDLE";
+        llmLoader.style.display = "none";
+        llmExp.style.display = "block";
     }
-}
-
-function checkStatus() {
-    let status = "";
-    let moveColor = game.turn() === 'b' ? 'Black' : 'White';
-
-    if (game.in_checkmate()) {
-        status = `GAME OVER: ${moveColor} is in checkmate.`;
-    } else if (game.in_draw()) {
-        status = "GAME OVER: Draw.";
-    } else {
-        if (game.in_check()) {
-            log(`${moveColor} is in check!`, 'sys');
-        }
-        return;
-    }
-
-    log(`*** ${status} ***`, 'result');
-    setThinking(false);
 }
 
 function connect() {
-    socket = new WebSocket("ws://127.0.0.1:8765");
+    // Use the dynamic host to match FastAPI port
+    socket = new WebSocket(`ws://${window.location.host}/ws`);
 
     socket.onopen = () => log("CONNECTED TO BACKEND", 'sys');
     socket.onclose = () => log("CONNECTION CLOSED", 'sys');
@@ -57,29 +45,26 @@ function connect() {
     socket.onmessage = (event) => {
         const data = event.data;
 
+        // Handle JSON (Engine List or LLM Explanation)
         try {
             const obj = JSON.parse(data);
             if (obj.type === "engineList") {
                 const sel = document.getElementById("engineSelect");
                 sel.innerHTML = "";
-                obj.engines.forEach(f => sel.add(new Option(f.name, f.path)));
+                obj.engines.forEach(f => sel.add(new Option(f.name, f.name)));
+                return;
+            }
+            if (obj.type === "explanation") {
+                setThinking(false); // Analysis arrived
+                llmExp.innerHTML = `<strong>Move: ${obj.move} (Score: ${obj.score})</strong><br>${obj.text}`;
                 return;
             }
         } catch (e) {}
 
-        try {
-          const obj = JSON.parse(data);
-          if(obj.type === "explanation") {
-            const el = document.getElementById("llm-explanation");
-            el.innerHTML = obj.text;
-            return;
-          }
-        } catch (e) {}
-
+        // Handle raw UCI strings
         log(`< ${data}`, 'in');
 
         if (data.startsWith("bestmove")) {
-            setThinking(false);
             const moveStr = data.split(" ")[1];
             if (moveStr && moveStr !== "(none)") {
                 const move = game.move({
@@ -91,8 +76,6 @@ function connect() {
                     board.position(game.fen());
                     checkStatus();
                 }
-            } else {
-                checkStatus();
             }
         }
     };
@@ -104,24 +87,16 @@ function send(cmd) {
     socket.send(cmd);
 }
 
-function updateOrientation() {
-    board.orientation(document.getElementById("playerSide").value);
-}
-
 function loadEngine() {
     const selectElement = document.getElementById("engineSelect");
+    if (selectElement.selectedIndex === -1) return;
+    
     const engineName = selectElement.options[selectElement.selectedIndex].text;
+    
+    // Sequence: Load -> UCI -> IsReady
     send(`load ${engineName}`);
-    send("uci");
-    send("isready");
-}
-
-function resetGame() {
-    game.reset();
-    board.start();
-    send("ucinewgame");
-    updateOrientation();
-    log("GAME RESET", "sys");
+    setTimeout(() => send("uci"), 200);
+    setTimeout(() => send("isready"), 500);
 }
 
 function onDrop(source, target) {
@@ -129,7 +104,6 @@ function onDrop(source, target) {
     if (!move) return "snapback";
 
     board.position(game.fen());
-
     if (game.game_over()) {
         checkStatus();
         return;
@@ -140,7 +114,28 @@ function onDrop(source, target) {
 
     const d = document.getElementById("depth").value;
     setThinking(true);
-    setTimeout(() => send(`go depth ${d}`), 50);
+    // Slight delay to ensure the position command is processed
+    setTimeout(() => send(`go depth ${d}`), 100);
+}
+
+function checkStatus() {
+    let moveColor = game.turn() === 'b' ? 'Black' : 'White';
+    if (game.in_checkmate()) {
+        log(`*** GAME OVER: ${moveColor} Checkmated ***`, 'result');
+    } else if (game.in_draw()) {
+        log(`*** GAME OVER: Draw ***`, 'result');
+    }
+}
+
+function resetGame() {
+    game.reset();
+    board.start();
+    send("ucinewgame");
+    log("GAME RESET", "sys");
+}
+
+function updateOrientation() {
+    board.orientation(document.getElementById("playerSide").value);
 }
 
 function sendRaw() {
@@ -149,14 +144,12 @@ function sendRaw() {
     el.value = "";
 }
 
-// Ensure DOM is ready before initializing Chessboard
-$(document).ready(function () {
+$(document).ready(() => {
     board = Chessboard('board', {
         draggable: true,
         position: 'start',
         onDrop: onDrop,
         pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
     });
-    updateOrientation();
     connect();
 });
