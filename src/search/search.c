@@ -28,6 +28,7 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 {
     tt_inc_generation();
 
+    // 1. Syzygy Tablebase Probe
     Move tb_move = NULL_MOVE;
     size_t piece_count = castro_PieceCount(board);
     if (config->useSyzygy && piece_count <= config->syzygyProbeLimit) {
@@ -37,54 +38,125 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
         }
     }
 
-    Move best_move = NULL_MOVE;
+    // 2. Statistics and State Initialization
     g_searchStats.nodes = 0;
     g_searchStats.qnodes = 0;
     g_searchStats.selDepth = 0;
+    
+    Move best_move = NULL_MOVE;
+    int last_depth_score = 0; 
 
     search_start_timer(config->timeLimitMs);
 
-    // Iterative Deepening
+    // 3. Iterative Deepening Loop
     for (int currentDepth = 1; currentDepth <= config->maxDepth; currentDepth++) {
         if (search_time_up()) break;
 
-        Moves legal = castro_GenerateLegalMoves(board);
-        order(board, legal.list, legal.count, 0, best_move);
-
+        int delta = 50; 
         int alpha = -INF;
         int beta = INF;
-        int bestScore = -INF;
+
+        if (config->useAspiration && currentDepth >= 3) {
+            alpha = last_depth_score - delta;
+            beta  = last_depth_score + delta;
+        }
+
         Move currentBestMove = NULL_MOVE;
+        Move iterationBestMove = best_move; // ✅ IMPORTANT FIX
+        int bestScore = -INF;
 
-        for (size_t i = 0; i < legal.count; i++) {
-            if (!castro_MakeMove(board, legal.list[i])) continue;
+        int failCount = 0;
+        bool done = false;
 
-            int score = -negamax(board, eval, order, currentDepth - 1, 1, -beta, -alpha, config);
-            castro_UnmakeMove(board);
-
-            // If time ran out, discard results from this depth to avoid playing a blunder
+        while (!done) {
             if (search_should_stop()) break;
 
-            if (score > bestScore) {
-                bestScore = score;
-                currentBestMove = legal.list[i];
+            int originalAlpha = alpha;
+            int originalBeta  = beta;
+
+            bestScore = -INF;
+            currentBestMove = NULL_MOVE;
+
+            // Generate and order moves
+            Moves legal = castro_GenerateLegalMoves(board);
+            order(board, legal.list, legal.count, 0, iterationBestMove);
+
+            // Root move loop
+            for (size_t i = 0; i < legal.count; i++) {
+                if (!castro_MakeMove(board, legal.list[i])) continue;
+                
+                int score = -negamax(board, eval, order,
+                                     currentDepth - 1, 1,
+                                     -beta, -alpha, config);
+                
+                castro_UnmakeMove(board);
+
+                if (search_should_stop()) break;
+
+                if (score > bestScore) {
+                    bestScore = score;
+                    currentBestMove = legal.list[i];
+                }
+
+                if (score > alpha) alpha = score;
+
+                if (alpha >= beta) break; // beta cutoff
             }
-            if (score > alpha) alpha = score;
+
+            if (search_should_stop()) break;
+
+            // If aspiration disabled, accept immediately
+            if (!config->useAspiration || currentDepth < 3) {
+                done = true;
+                break;
+            }
+
+            // Correct fail detection using ORIGINAL bounds
+            if (bestScore <= originalAlpha) {
+                // Fail low
+                alpha = originalAlpha - delta;
+                beta  = originalBeta;
+                delta *= 2;
+                failCount++;
+            }
+            else if (bestScore >= originalBeta) {
+                // Fail high
+                alpha = originalAlpha;
+                beta  = originalBeta + delta;
+                delta *= 2;
+                failCount++;
+            }
+            else {
+                // Success
+                done = true;
+            }
+
+            // Update ordering hint for next re-search
+            if (currentBestMove != NULL_MOVE) {
+                iterationBestMove = currentBestMove;
+            }
+
+            // Emergency fallback: switch to full window
+            if (failCount > 2) {
+                alpha = -INF;
+                beta  = INF;
+                done = true;
+            }
         }
 
-        // Only update the global best_move if we completed the depth (or at least the first move)
-        if (!search_should_stop()) {
-            best_move = currentBestMove;
-            
-            char moveBuf[10];
-            castro_MoveToString(best_move, moveBuf);
-            uci_report_search(currentDepth, bestScore, search_elapsed_ms(), moveBuf);
-            
-            // If we found a mate, no need to search deeper
-            if (bestScore > (INF - MAX_PLY)) break; 
-        } else {
-            break; 
-        }
+        if (search_should_stop()) break;
+
+        best_move = currentBestMove;
+        last_depth_score = bestScore;
+
+        // Report search results to UCI
+        char moveBuf[10];
+        castro_MoveToString(best_move, moveBuf);
+        uci_report_search(currentDepth, last_depth_score,
+                          search_elapsed_ms(), moveBuf);
+
+        // Exit if mate found
+        if (last_depth_score > (INF - MAX_PLY)) break; 
     }
 
     return best_move;
@@ -92,7 +164,7 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 
 static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply, int alpha, int beta, SearchConfig* config)
 {
-    // 1. Static Checks (Repetition / 50-move rule)
+    // 1. Static Checks
     if (ply > 0 && (castro_IsThreefoldRepetition(board) || board->halfmove >= 100)) {
         return 0;
     }

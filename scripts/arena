@@ -3,10 +3,12 @@
 import chess
 import chess.engine
 import chess.pgn
+import chess.polyglot
 import argparse
 import logging
 import re
 import os
+import random
 from datetime import datetime
 from colorama import Fore, init
 
@@ -16,11 +18,10 @@ def sanitize_filename(name):
     """Removes characters that aren't allowed in filenames."""
     return re.sub(r'[^\w\s-]', '', name).strip().replace(' ', '_')
 
-def play_match(engine1_path, engine2_path, num_games, time_limit, debug=False):
+def play_match(engine1_path, engine2_path, num_games, time_limit, book_path=None, debug=False):
     if debug:
         logging.basicConfig(format='%(levelname)s:%(name)s:%(message)s', level=logging.DEBUG)
 
-    results = {"E1": 0, "E2": 0, "Draws": 0}
     e1, e2 = None, None
     
     try:
@@ -29,18 +30,16 @@ def play_match(engine1_path, engine2_path, num_games, time_limit, debug=False):
         e2 = chess.engine.SimpleEngine.popen_uci(engine2_path)
         
         # Parse Names and Versions
-        # id.get("name") usually returns "EngineName v1.2.3"
         name1 = e1.id.get("name", "Engine1")
         name2 = e2.id.get("name", "Engine2")
-        
-        # Some engines provide a separate version string via custom UCI fields
         ver1 = e1.id.get("version", "")
         ver2 = e2.id.get("version", "")
         
-        # Create full identifiers
         full_n1 = f"{name1} {ver1}".strip()
         full_n2 = f"{name2} {ver2}".strip()
         
+        results = {full_n1: 0, full_n2: 0, "Draws": 0}
+
         # Ensure directory exists
         os.makedirs("data/pgn/arena", exist_ok=True)
         
@@ -48,9 +47,11 @@ def play_match(engine1_path, engine2_path, num_games, time_limit, debug=False):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         safe_n1 = sanitize_filename(name1)
         safe_n2 = sanitize_filename(name2)
-        filename = f"data/pgn/arena/Match_{safe_n1}-{ver1}_vs_{safe_n2}-{ver2}_{timestamp}.pgn"
+        filename = f"data/pgn/arena/Match_{safe_n1}_vs_{safe_n2}_{timestamp}.pgn"
 
         print(f"{Fore.CYAN}Match: {Fore.GREEN}{full_n1} {Fore.CYAN}vs {Fore.MAGENTA}{full_n2}")
+        if book_path:
+            print(f"{Fore.YELLOW}Opening Book: {Fore.WHITE}{book_path}")
         print(f"{Fore.BLUE}Logging to: {Fore.WHITE}{filename}\n")
 
         for game_num in range(1, num_games + 1):
@@ -63,29 +64,62 @@ def play_match(engine1_path, engine2_path, num_games, time_limit, debug=False):
             game.headers["Date"] = game_time.strftime("%Y.%m.%d")
             game.headers["Round"] = str(game_num)
             
+            # Determine colors
             if game_num % 2 != 0:
-                white_engine, black_engine, w_label, b_label = e1, e2, "E1", "E2"
+                white_engine, black_engine = e1, e2
                 game.headers["White"], game.headers["Black"] = full_n1, full_n2
+                w_label, b_label = "E1", "E2"
             else:
-                white_engine, black_engine, w_label, b_label = e2, e1, "E2", "E1"
+                white_engine, black_engine = e2, e1
                 game.headers["White"], game.headers["Black"] = full_n2, full_n1
+                w_label, b_label = "E2", "E1"
 
             print(f"{Fore.WHITE}Game {game_num:02d} | {w_label}(W) vs {b_label}(B)", end=" ", flush=True)
 
             aborted = False
             node = game 
             
+            # Opening Book Logic
+            book_reader = None
+            if book_path and os.path.exists(book_path):
+                book_reader = chess.polyglot.open_reader(book_path)
+
             while not board.is_game_over() and not aborted:
                 current_engine = white_engine if board.turn == chess.WHITE else black_engine
-                try:
-                    result = current_engine.play(board, chess.engine.Limit(time=time_limit))
-                    if result.move:
-                        node = node.add_main_variation(result.move)
-                        board.push(result.move)
-                    else:
+                move = None
+
+                # 1. Try Book Move
+                if book_reader:
+                    try:
+                        entries = list(book_reader.find_all(board))
+                        if entries:
+                            # Use weight-based selection for variety
+                            selection = book_reader.weighted_choice(board)
+                            move = selection.move
+                        else:
+                            book_reader.close()
+                            book_reader = None # Book exhausted
+                    except Exception:
+                        book_reader = None
+
+                # 2. Try Engine Move
+                if move is None:
+                    try:
+                        result = current_engine.play(board, chess.engine.Limit(time=time_limit))
+                        move = result.move
+                    except Exception:
                         aborted = True
-                except Exception:
+
+                # 3. Apply Move
+                if move:
+                    node = node.add_main_variation(move)
+                    board.push(move)
+                else:
                     aborted = True
+
+            # Close reader if still open
+            if book_reader:
+                book_reader.close()
 
             # Finalize Result
             if aborted:
@@ -95,14 +129,15 @@ def play_match(engine1_path, engine2_path, num_games, time_limit, debug=False):
                 game.headers["Result"] = board.result()
             
             # Update Score
-            if game.headers["Result"] == "1-0":
-                results["E1" if game_num % 2 != 0 else "E2"] += 1
-            elif game.headers["Result"] == "0-1":
-                results["E2" if game_num % 2 != 0 else "E1"] += 1
+            res = game.headers["Result"]
+            if res == "1-0":
+                results[game.headers["White"]] += 1
+            elif res == "0-1":
+                results[game.headers["Black"]] += 1
             else:
                 results["Draws"] += 1
 
-            print(f"{Fore.YELLOW}{game.headers['Result']}")
+            print(f"{Fore.YELLOW}{res}")
             
             with open(filename, "a") as f:
                 f.write(str(game) + "\n\n")
@@ -115,14 +150,23 @@ def play_match(engine1_path, engine2_path, num_games, time_limit, debug=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="UCI Engine Match Runner")
-    parser.add_argument("engine1", type=str, help="Path to Engine 1")
-    parser.add_argument("engine2", type=str, help="Path to Engine 2")
+    parser.add_argument("engine1", type=str, help="Path to Engine 1 binary")
+    parser.add_argument("engine2", type=str, help="Path to Engine 2 binary")
     parser.add_argument("--games", type=int, default=10, help="Number of games")
     parser.add_argument("--time", type=float, default=0.1, help="Seconds per move")
+    parser.add_argument("--book", type=str, default=None, help="Path to polyglot .bin book")
+    parser.add_argument("--debug", action="store_true", help="Enable debug logging")
     
     args = parser.parse_args()
 
-    res, n1, n2, fname = play_match(args.engine1, args.engine2, args.games, args.time)
+    res, n1, n2, fname = play_match(
+        args.engine1, 
+        args.engine2, 
+        args.games, 
+        args.time, 
+        book_path=args.book,
+        debug=args.debug
+    )
     
-    print(f"\n{Fore.GREEN}FINAL SCORE: {n1} ({res['E1']}) - {n2} ({res['E2']}) | Draws: {res['Draws']}")
+    print(f"\n{Fore.GREEN}FINAL SCORE: {n1} ({res[n1]}) - {n2} ({res[n2]}) | Draws: {res['Draws']}")
     print(f"File saved: {fname}")

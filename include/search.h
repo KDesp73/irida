@@ -38,8 +38,8 @@ typedef struct {
     bool useQuiescence;
     bool useSyzygy;
 
-    int syzygyProbeDepth;
-    int syzygyProbeLimit;
+    size_t syzygyProbeDepth;
+    size_t syzygyProbeLimit;
     bool syzygy50MoveRule;
 } SearchConfig;
 
@@ -61,20 +61,13 @@ typedef Move (*SearchFn)(Board* board,
                          OrderFn order,
                          SearchConfig* config);
 
-/* Search variant naming (function name suffixes):
- *   id  — iterative deepening at the root (successive depths until time/depth)
- *   ab  — alpha-beta (negamax formulation with [alpha,beta] pruning)
- *   q   — quiescence at leaves instead of raw eval
- *   mo  — move ordering (MVV-LVA, killers, history, TT move)
- *   tt  — transposition table (hash probes/stores)
- *   nmp — null-move pruning
- *   lmr — late move reductions (scout + re-search)
- *   aw  — aspiration windows at root (narrow alpha/beta around previous score)
- *   pvs — principal variation search (zero-window scouts off the PV)
- * Later names extend earlier ones (e.g. id_ab_q_mo_tt adds TT to id_ab_q_mo).
- */
-
+// @function random_move
+// @returns Move A random move
 Move random_move(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
+
+// @function search
+// @desc The main search function. Implements negamax with plenty of optimizations
+// @returns Move The best move
 Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 
 static const struct { const char *name; SearchFn fn; } search_variants[] = {
