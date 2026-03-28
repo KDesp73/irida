@@ -52,17 +52,17 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
     for (int currentDepth = 1; currentDepth <= config->maxDepth; currentDepth++) {
         if (search_time_up()) break;
 
-        int delta = 50; 
+        int delta = 40 + abs(last_depth_score) / 4;
         int alpha = -INF;
         int beta = INF;
 
-        if (config->useAspiration && currentDepth >= 3) {
+        if (config->useAspiration && currentDepth >= 5) {
             alpha = last_depth_score - delta;
             beta  = last_depth_score + delta;
         }
 
         Move currentBestMove = NULL_MOVE;
-        Move iterationBestMove = best_move; // ✅ IMPORTANT FIX
+        Move iterationBestMove = best_move;
         int bestScore = -INF;
 
         int failCount = 0;
@@ -106,7 +106,7 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
             if (search_should_stop()) break;
 
             // If aspiration disabled, accept immediately
-            if (!config->useAspiration || currentDepth < 3) {
+            if (!config->useAspiration || currentDepth < 5) {
                 done = true;
                 break;
             }

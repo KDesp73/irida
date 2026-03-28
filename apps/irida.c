@@ -14,7 +14,7 @@ SearchConfig g_searchConfig = {
     .timeLimitMs = 0, // No limit unless provided by the gui
     .threads = 1,
 
-    .useAspiration = false,
+    .useAspiration = true,
     .usePVS = true,
     .useLMR = false, // NOTE: turn on once move ordering is 100% reliable
     .useNMP = true,
