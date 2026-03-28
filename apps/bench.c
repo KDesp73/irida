@@ -22,24 +22,7 @@
 #define C_TIME   "\033[38;5;251m"  /* Snow White */
 #define C_RATE   "\033[38;5;215m"  /* Aurora Orange */
 
-Engine engine;
-UciState uci_state;
-
-SearchStats g_searchStats = {0};
-SearchConfig g_searchConfig = {
-    .maxDepth = 6,
-    .timeLimitMs = 0,
-    .threads = 1,
-    .useAspiration = true,
-    .usePVS = true,
-    .useLMR = false,
-    .useNMP = true,
-    .useTT = true,
-    .useQuiescence = true,
-    .syzygyProbeDepth = 1,
-    .syzygyProbeLimit = 4,
-    .syzygy50MoveRule = true,
-};
+#include "shared.h"
 
 static double now_s(void) {
     struct timespec ts;
