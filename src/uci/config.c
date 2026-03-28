@@ -104,6 +104,16 @@ void LoadUciConfig(UciState* state)
         },
         .default_value = "7"
     };
+
+    if(state->uciOptionCount >= MAX_UCI_OPTIONS) return;
+    state->uciOptions[state->uciOptionCount++] = (UciOption) {
+        .name = "MoveOverhead",
+        .type = UCI_SPIN,
+        .value.spin = 10, // ms
+        .params.min = 0,
+        .params.max = 5000,
+        .default_value = "10"
+    };
 }
 
 void PrintUciOptions(UciState* state)
