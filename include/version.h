@@ -14,7 +14,7 @@ extern "C" {
 
 // @const VERSION_MINOR
 // @desc Minor version number.
-#define VERSION_MINOR 7
+#define VERSION_MINOR 8
 
 // @const VERSION_PATCH
 // @desc Patch version number.

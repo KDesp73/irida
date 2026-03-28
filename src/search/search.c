@@ -7,6 +7,7 @@
 //   + Transposition Table
 //   + Null Move Pruning
 //   + Late Move Reductions
+//   + Aspiration Windows
 //   + Syzygy
 
 #include "search.h"

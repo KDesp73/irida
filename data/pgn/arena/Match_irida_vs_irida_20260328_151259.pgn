@@ -1,0 +1,70 @@
+[Event "Castro Engine Match"]
+[Site "Local Arena"]
+[Date "2026.03.28"]
+[Round "4"]
+[White "irida 0.7.0"]
+[Black "irida 0.7.0"]
+[Result "1-0"]
+
+1. e4 c5 2. Nf3 Nc6 3. Nc3 e5 4. Bc4 d6 5. d3 Be7 6. O-O Nf6 7. Ng5 O-O 8. f4 Bg4 9. Qe1 exf4 10. Bxf4 Nd4 11. Qd2 Qb6 12. Bxf7+ Rxf7 13. Nxf7 Kxf7 14. Rab1 Qb4 15. Be3 Kg6 16. Qf2 Rg8 17. a3 Qb6 18. Nd5 Ne2+ 19. Kh1 Qd8 20. h3 Bxh3 21. gxh3 Nd4 22. Qg1+ Kf7 23. Bxd4 cxd4 24. Nxe7 Kxe7 25. Rbe1 Qc8 26. Qg2 Ne8 27. e5 Rh8 28. exd6+ Kxd6 29. Rf7 Qc5 30. Qxb7 Qxc2 31. Rxe8 Qc1+ 32. Kh2 Qd2+ 33. Kg1 Qc1+ 34. Kf2 Qc2+ 35. Re2 Qxd3 36. Qc7+ Kd5 37. Re5# 1-0
+
+[Event "Castro Engine Match"]
+[Site "Local Arena"]
+[Date "2026.03.28"]
+[Round "5"]
+[White "irida 0.7.0"]
+[Black "irida 0.7.0"]
+[Result "1-0"]
+
+1. d4 Nf6 2. c4 e6 3. Nf3 d5 4. Nc3 c5 5. cxd5 Nxd5 6. e4 Nxc3 7. bxc3 cxd4 8. cxd4 Bb4+ 9. Bd2 Bxd2+ 10. Qxd2 O-O 11. Bc4 Nc6 12. O-O-O Qf6 13. Rdg1 Rd8 14. e5 Qh6 15. Qxh6 gxh6 16. Kb2 Nxd4 17. Rd1 Nc6 18. Rxd8+ Nxd8 19. Bb5 Nc6 20. Rd1 Rb8 21. Ka3 Ra8 22. Bxc6 bxc6 23. Rd8+ Kg7 24. Kb3 Bb7 25. Rd7 Rb8 26. Kc3 c5 27. Rc7 Kf8 28. Nh4 Kg7 29. Nf3 Kg6 30. Nh4+ Kg5 31. g3 Bd5 32. Rxa7 Rf8 33. Kd2 Kg4 34. a3 Kh3 35. Rc7 c4 36. Rc5 Kxh2 37. Rc7 Kg1 38. Ke3 Ra8 39. Rxf7 Rxa3+ 40. Ke2 Ra2+ 41. Ke3 c3 42. Rxh7 Rxf2 43. Rc7 c2 44. Rc8 Kf1 45. Kd3 Ke1 46. Rc7 c1=R 47. Rxc1# 1-0
+
+[Event "Castro Engine Match"]
+[Site "Local Arena"]
+[Date "2026.03.28"]
+[Round "6"]
+[White "irida 0.7.0"]
+[Black "irida 0.7.0"]
+[Result "1/2-1/2"]
+
+1. d4 Nf6 2. c4 e6 3. Nc3 d5 4. Bg5 Be7 5. e3 O-O 6. Nf3 h6 7. Bh4 b6 8. Be2 Bb7 9. Bxf6 Bxf6 10. cxd5 exd5 11. O-O Qd6 12. Qb3 Nd7 13. Nb5 Qe7 14. Rfc1 c6 15. Nc3 Qe6 16. Kh1 Rfe8 17. Bd3 c5 18. Qa3 cxd4 19. exd4 Be7 20. Qb3 Bf6 21. Rg1 Qc6 22. Bb5 Qd6 23. Qa4 Re7 24. Bxd7 Rxd7 25. Nb5 Qf4 26. Qa3 Bc6 27. Qb3 Kf8 28. Na3 Re8 29. Raf1 Re2 30. Qc3 Bb7 31. Qb4+ Kg8 32. Qb5 Rde7 33. Nb1 Rc2 34. Qb3 Rcc7 35. Nc3 Rc4 36. Nb5 Bc6 37. g3 Qf5 38. Nd6 Qd7 39. Nxc4 dxc4 40. Qd1 Qxd4 41. Kg2 Qxb2 42. Qd6 Bxf3+ 43. Kxf3 Qe2+ 44. Kg2 Qxa2 45. Ra1 Qe2 46. Rxa7 Qe4+ 47. Kh3 Rxa7 48. Qb8+ Kh7 49. Qxa7 Qf5+ 50. Kg2 Bd4 51. Qa2 Qd5+ 52. Kf1 Kh8 53. Qd2 Qe4 54. Qe2 Qf5 55. Rh1 Qd5 56. f3 Kg8 57. Qe8+ Kh7 58. Ke2 Kg6 59. Rb1 c3 60. Rd1 c2 61. Rc1 Qc4+ 62. Kd2 Qc3+ 63. Ke2 Kf6 64. Qd8+ Ke6 65. Qe8+ Kf6 66. Qd8+ Ke6 67. Qe8+ Kf6 68. Qd8+ Ke6 69. Qe8+ Kf6 70. Qd8+ Ke6 71. Qe8+ Kf6 1/2-1/2
+
+[Event "Castro Engine Match"]
+[Site "Local Arena"]
+[Date "2026.03.28"]
+[Round "7"]
+[White "irida 0.7.0"]
+[Black "irida 0.7.0"]
+[Result "1-0"]
+
+1. Nf3 d6 2. Nc3 Bg4 3. h3 Bxf3 4. exf3 Nc6 5. Bb5 Nf6 6. Ne4 Qc8 7. Nxf6+ gxf6 8. Qe2 Bh6 9. Qc4 Qe6+ 10. Qxe6 fxe6 11. Bxc6+ bxc6 12. d3 Bxc1 13. Rxc1 Rb8 14. Rb1 Rg8 15. Rg1 Kf7 16. Kd1 Rg5 17. Ke2 Ra5 18. a3 Rab5 19. b3 Re5+ 20. Kd2 Rd8 21. Ra1 Rc5 22. Ra2 Rg8 23. Raa1 Rcg5 24. g3 Rf5 25. Ke2 Re5+ 26. Kd2 Rh5 27. Rh1 Rf5 28. f4 Rd5 29. Rhf1 Rb8 30. Rae1 Ra5 31. Re4 Rxa3 32. Rfe1 e5 33. fxe5 fxe5 34. Rh4 Kg6 35. Rg4+ Kf6 36. Rh4 Kg7 37. Rg4+ Kh8 38. Rh4 Ra2 39. Kc3 Rf8 40. Re2 Rf3 41. b4 Kg7 42. Rc4 Ra6 43. b5 Ra3+ 44. Kb2 Ra5 45. bxc6 Rb5+ 46. Kc1 Rb8 47. Rg4+ Kf6 48. Ra4 Ra8 49. Kb2 Kf7 50. Rb4 e6 51. Rb7 Kg6 52. Rxc7 Rb8+ 53. Rb7 Rxb7+ 54. cxb7 Rf8 55. d4 Rb8 56. dxe5 Rxb7+ 57. Ka2 d5 58. Re1 Rf7 59. Rf1 Rf5 60. Kb3 Rxe5 61. Rg1 Rf5 62. f4 Rh5 63. h4 Rf5 64. Re1 Rf6 65. Kc3 Kg7 66. Kb2 Kg8 67. h5 Kg7 68. Kc3 Kf8 69. Rb1 Rf7 70. Rb8+ Kg7 71. Re8 Rc7+ 72. Kd3 Kf6 73. Kd2 Kf7 74. Rh8 Kg7 75. Rd8 Rf7 76. Re8 Kf6 77. Kc3 Rg7 78. Rf8+ Ke7 79. Ra8 Kd6 80. h6 Rc7+ 81. Kd2 Rb7 82. Ke2 Rf7 83. Rd8+ Kc6 84. Re8 Rc7 85. Kd2 1-0
+
+[Event "Castro Engine Match"]
+[Site "Local Arena"]
+[Date "2026.03.28"]
+[Round "8"]
+[White "irida 0.7.0"]
+[Black "irida 0.7.0"]
+[Result "0-1"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 Nf6 4. O-O Nxe4 5. d4 Nd6 6. Bxc6 dxc6 7. dxe5 Nf5 8. Qxd8+ Kxd8 9. Nc3 Bd7 10. b3 h6 11. Bb2 Kc8 12. Rad1 b6 13. e6 Bxe6 14. Rfe1 Bb4 15. Re4 Be7 16. Rc1 Bf6 17. Ree1 Kb7 18. Rb1 Rhg8 19. Kh1 Nd4 20. Ne4 Nxf3 21. gxf3 Bxb2 22. Rxb2 Bd5 23. c4 Bxe4 24. fxe4 Rad8 25. Rg1 Ka6 26. b4 Rd4 27. b5+ Kb7 28. c5 bxc5 29. Rc1 Rxe4 30. Rxc5 Re1+ 31. Kg2 cxb5 32. Rcxb5+ Kc6 33. Rb7 Ra8 34. Kf3 Ra1 35. Kg3 Rxa2 36. Rxa2 Kxb7 37. Re2 Rf8 38. Rb2+ Kc6 39. Rc2+ Kb6 0-1
+
+[Event "Castro Engine Match"]
+[Site "Local Arena"]
+[Date "2026.03.28"]
+[Round "9"]
+[White "irida 0.7.0"]
+[Black "irida 0.7.0"]
+[Result "1-0"]
+
+1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Bg5 e6 7. f4 Be7 8. Qf3 Qc7 9. O-O-O Nbd7 10. g4 b5 11. Bxf6 Nxf6 12. g5 Nd7 13. f5 Rb8 14. fxe6 Bxg5+ 15. Kb1 Nb6 16. exf7+ Qxf7 17. Rg1 Bh4 18. Qxf7+ Kxf7 19. Nc6 g6 20. Nxb8 Be7 21. Nc6 Bb7 22. Nxe7 Kxe7 23. Re1 Kf6 24. Bd3 b4 25. Rgf1+ Kg7 26. Nd5 Nxd5 27. exd5 Bxd5 28. Re7+ Kh6 29. Rf6 Rd8 30. Rf4 b3 31. axb3 a5 32. Ra4 Rb8 33. Ka2 Ra8 34. Rd4 Bg8 35. Rxd6 a4 36. Bc4 1-0
+
+[Event "Castro Engine Match"]
+[Site "Local Arena"]
+[Date "2026.03.28"]
+[Round "10"]
+[White "irida 0.7.0"]
+[Black "irida 0.7.0"]
+[Result "1-0"]
+
+1. d4 d5 2. c4 Nc6 3. Nf3 Bg4 4. Nc3 e6 5. cxd5 exd5 6. Qa4 Bxf3 7. exf3 Qe7+ 8. Be3 Qb4 9. Bb5 Qxb2 10. Bxc6+ Kd8 11. O-O Qxc3 12. Bxb7 Rb8 13. Qxa7 Rxb7 14. Qxb7 Bd6 15. Qxd5 Ke7 16. Qg5+ Nf6 17. Rac1 Qb2 18. Rb1 Qxa2 19. Rfe1 Rg8 20. Ra1 Qd5 21. Kh1 Kd7 22. Ra6 Qe6 23. Qb5+ Kd8 24. Bd2 Qc8 25. Rxd6+ cxd6 26. Ba5+ Qc7 27. Qb8+ Kd7 28. Qxc7# 1-0
+
