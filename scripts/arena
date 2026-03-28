@@ -35,8 +35,8 @@ def play_match(engine1_path, engine2_path, num_games, time_limit, book_path=None
         ver1 = e1.id.get("version", "")
         ver2 = e2.id.get("version", "")
         
-        full_n1 = f"{name1} {ver1}".strip()
-        full_n2 = f"{name2} {ver2}".strip()
+        full_n1 = f"{name1} {ver1} as E1".strip()
+        full_n2 = f"{name2} {ver2} as E2".strip()
         
         results = {full_n1: 0, full_n2: 0, "Draws": 0}
 
@@ -59,7 +59,7 @@ def play_match(engine1_path, engine2_path, num_games, time_limit, book_path=None
             game_time = datetime.now()
             
             game = chess.pgn.Game()
-            game.headers["Event"] = "Castro Engine Match"
+            game.headers["Event"] = "Engine V Engine"
             game.headers["Site"] = "Local Arena"
             game.headers["Date"] = game_time.strftime("%Y.%m.%d")
             game.headers["Round"] = str(game_num)

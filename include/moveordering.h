@@ -26,16 +26,7 @@ int mvv_lva_score(Board *board, Move m);
 // @param ply Current ply.
 void order_moves(Board *board, Move moves[], size_t count, size_t ply, Move tt_move);
 
-// @function update_killer
-// @desc Killer moves heuristic.
-// @param move Move to record as killer.
-// @param ply Ply of the move.
-void update_killer(Move move, int ply);
-
-// @function update_history
-// @desc History heuristic.
-// @param move Move to update.
-// @param depth Depth of the search that caused the cutoff.
-void update_history(Move move, int depth);
+#define HISTORY_MAX 100000
+extern int history_heuristic[2][64][64]; 
 
 #endif // MOVE_ORDERING_H

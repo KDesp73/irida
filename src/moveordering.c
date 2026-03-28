@@ -6,6 +6,9 @@
 // 12×12 MVV-LVA table: [attacker][victim]
 static int MVV_LVA[12][12];
 
+int history_heuristic[2][64][64]; 
+
+// [side][from][to]
 void init_mvv_lva(void)
 {
     for (int attacker = 0; attacker < 12; attacker++) {
@@ -45,26 +48,41 @@ int mvv_lva_score(Board *board, Move m)
     return MVV_LVA[attacker][victim];
 }
 
-/* * Simplified Move Ordering:
- * 1. TT Move (Highest Priority)
- * 2. Captures (Ordered by MVV-LVA)
- */
+
 void order_moves(Board *board, Move moves[], size_t count, size_t ply, Move tt_move)
 {
     int scores[MAX_MOVES];
 
-    // 1. Assign scores based on TT status and MVV-LVA
     for (size_t i = 0; i < count; i++) {
-        if (moves[i] == tt_move && tt_move != NULL_MOVE) {
-            // Give the TT move a score higher than any possible MVV-LVA result
-            scores[i] = 1000000; 
-        } 
-        else {
-            scores[i] = mvv_lva_score(board, moves[i]);
+        Move m = moves[i];
+
+        // --- 1. TT Move (absolute priority) ---
+        if (m == tt_move && tt_move != NULL_MOVE) {
+            scores[i] = 1000000;
+            continue;
         }
+
+        // --- 2. Captures (MVV-LVA) ---
+        if (castro_IsCapture(board, m)) {
+            scores[i] = 100000 + mvv_lva_score(board, m);
+            continue;
+        }
+
+        // --- 3. Promotions ---
+        if (castro_IsPromotion(board, &m)) {
+            scores[i] = 90000;
+            continue;
+        }
+
+        // --- 4. Quiet moves (history heuristic) ---
+        int from = castro_GetFrom(m);
+        int to   = castro_GetTo(m);
+        int side = board->turn;
+
+        scores[i] = history_heuristic[side][from][to];
     }
 
-    // 2. Selection Sort (Descending)
+    // --- Selection Sort (descending) ---
     for (size_t i = 0; i < count; i++) {
         size_t best_idx = i;
         for (size_t j = i + 1; j < count; j++) {
