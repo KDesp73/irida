@@ -15,14 +15,14 @@ SearchConfig g_searchConfig = {
 
     .useAspiration = true,
     .usePVS = true,
-    .useLMR = false, // NOTE: turn on once move ordering is 100% reliable
+    .useLMR = true,
     .useNMP = true,
     .useTT = true,
     .useQuiescence = true,
     .useSyzygy = true,
 
     .syzygyProbeDepth = 1,
-    .syzygyProbeLimit = 4,
+    .syzygyProbeLimit = 5,
     .syzygy50MoveRule = true,
 };
 
