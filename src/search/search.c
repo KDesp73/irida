@@ -10,7 +10,7 @@
 //   + Syzygy
 
 #include "search.h"
-#include "castro_additions.h"
+#include "castro.h"
 #include "syzygy.h"
 #include "tt.h"
 #include "uci.h"

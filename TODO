@@ -1,7 +1,6 @@
 TODO: wire killer/history updates into search
 TODO: Verify syzygy promotion encoding
 TODO: Bake masks into castro
-TODO: Add castro_additions.h into castro
 TODO: pick a license
 TODO: texel tuning
 TODO: aspiration windows
@@ -29,3 +28,4 @@ DONE: pick a name
 DONE: late move reductions
 DONE: move translation before prompting
 DONE: MoveOverhead uci option
+DONE: Add castro_additions.h into castro
