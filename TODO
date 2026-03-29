@@ -3,10 +3,10 @@ TODO: Verify syzygy promotion encoding
 TODO: Bake masks into castro
 TODO: pick a license
 TODO: texel tuning
-TODO: aspiration windows
 TODO: principal variation search
 TODO: opening list for llm
 TODO: resolve warnings
+TODO: move ordering improvements
 DONE: engine testing
 DONE: cache
 DONE: tests
@@ -29,3 +29,4 @@ DONE: late move reductions
 DONE: move translation before prompting
 DONE: MoveOverhead uci option
 DONE: Add castro_additions.h into castro
+DONE: aspiration windows

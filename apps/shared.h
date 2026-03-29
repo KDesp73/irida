@@ -14,7 +14,7 @@ SearchConfig g_searchConfig = {
     .threads = 1,
 
     .useAspiration = true,
-    .usePVS = false,
+    .usePVS = false, // NOTE: turn on once move ordering is 100% reliable
     .useLMR = false, // NOTE: turn on once move ordering is 100% reliable
     .useNMP = true,
     .useTT = true,
