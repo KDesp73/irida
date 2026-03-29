@@ -5,9 +5,7 @@
 *.dll
 *.exe
 *.dSYM/
-bin/*
-!bin/books/
-!bin/past/
+bin
 
 bench
 nnue
