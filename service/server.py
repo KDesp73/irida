@@ -86,10 +86,15 @@ async def uci_bridge(websocket: WebSocket):
                         engine.quit()
 
                     raw_path = target["path"]
-                    if os.path.exists(raw_path):
+                    if os.path.isfile(raw_path):
                         engine_path = os.path.abspath(raw_path)
-                    else:
+                    elif not os.path.exists(raw_path):
                         engine_path = raw_path
+                    else:
+                        await websocket.send_text(
+                            f"info string error loading engine: not an executable file: {raw_path}"
+                        )
+                        continue
 
                     try:
                         engine = await asyncio.to_thread(ChessEngineWrapper, engine_path)

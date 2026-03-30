@@ -1,14 +1,16 @@
-from llama_cpp import Llama
 from .translator import translate_move
 
-class LLM():
+
+class LLM:
     def __init__(
         self,
         gguf: str = "./data/models/Llama-3.2-1B-Instruct-Q3_K_M.gguf",
         n_ctx: int = 2048,
         n_threads: int = 4,
-        temperature: float = 0.4
+        temperature: float = 0.4,
     ):
+        from llama_cpp import Llama
+
         self.llm = Llama(
             model_path=gguf,
             n_ctx=n_ctx,

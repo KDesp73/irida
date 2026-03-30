@@ -25,6 +25,9 @@ data/tb
 download.txt
 dist/
 
+# make docker-package-artifacts
+/artifacts/
+
 # --- Python & Cache ---
 __pycache__/
 .cache/

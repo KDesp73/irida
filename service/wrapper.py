@@ -1,10 +1,30 @@
 from __future__ import annotations
 
+import os
 import queue
 import subprocess
 import threading
 import time
-from typing import Optional
+from typing import Dict, Optional
+
+
+def _engine_subprocess_env() -> Dict[str, str]:
+    """Copy of the process environment with extra LD_LIBRARY_PATH dirs for Docker mounts."""
+    env = os.environ.copy()
+    extra_dirs: list[str] = []
+    for d in ("/engines/lib", "/src/deps/lib/linux"):
+        if os.path.isdir(d):
+            try:
+                if any(name.endswith(".so") for name in os.listdir(d)):
+                    extra_dirs.append(d)
+            except OSError:
+                pass
+    if not extra_dirs:
+        return env
+    prev = env.get("LD_LIBRARY_PATH", "")
+    prefix = ":".join(extra_dirs)
+    env["LD_LIBRARY_PATH"] = f"{prefix}:{prev}" if prev else prefix
+    return env
 
 
 class ChessEngineWrapper:
@@ -15,13 +35,15 @@ class ChessEngineWrapper:
     """
 
     def __init__(self, executable_path):
+        path = os.path.abspath(executable_path)
         self.engine = subprocess.Popen(
-            [executable_path],
+            [path],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
             text=True,
             bufsize=1,
+            env=_engine_subprocess_env(),
         )
         self._line_queue: queue.Queue[Optional[str]] = queue.Queue()
 
