@@ -2,7 +2,8 @@ import json
 import argparse
 from .wrapper import ChessEngineWrapper
 from .model import LLM
-from .api import main as api_main
+from .server import main as api_main
+from .config import CONFIG
 
 STARTING_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
@@ -12,7 +13,7 @@ def parse_cli():
     parser.add_argument("--engine", default="./irida", type=str, help="Specify the engine we will use")
     parser.add_argument("--serve", action="store_true", help="Start the REST API")
     parser.add_argument("--host", default="0.0.0.0", type=str, help="Specify the host")
-    parser.add_argument("--port", default=8000, type=int, help="Specify the port")
+    parser.add_argument("--port", default=CONFIG["server"]["port"], type=int, help="Specify the port")
     return parser.parse_args()
 
 
