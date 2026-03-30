@@ -19,86 +19,81 @@
 <body>
 
 <div class="shell">
-    <header class="shell-header">
-        <div class="shell-header-inner">
-            <h1 class="logo">Irida</h1>
-            <p class="tagline">UCI chess engine</p>
+    <header class="toolbar">
+        <span class="toolbar-brand">Irida</span>
+
+        <div class="toolbar-group">
+            <select id="engineSelect" title="Engine"></select>
+            <button type="button" class="btn btn-primary" onclick="loadEngine()">Load</button>
+        </div>
+
+        <div class="toolbar-group">
+            <label class="toolbar-mini" for="depth">Depth</label>
+            <input id="depth" class="input-depth" type="number" value="6" min="1" max="64">
+        </div>
+
+        <div class="toolbar-group">
+            <label class="toolbar-mini" for="playerSide">Side</label>
+            <select id="playerSide" title="Your color" onchange="updateOrientation()">
+                <option value="white">White</option>
+                <option value="black">Black</option>
+            </select>
+        </div>
+
+        <button type="button" class="btn" onclick="resetGame()">Reset</button>
+        <button type="button" id="btnEngineTurn" class="btn btn-primary" onclick="requestEngineMove()" hidden>Engine</button>
+
+        <span class="toolbar-fill"></span>
+
+        <div class="toolbar-status" role="status">
+            <span id="status-phase">Idle</span><span id="status-turn"></span>
         </div>
     </header>
 
-    <div class="shell-body">
-        <div class="layout" id="main-container">
-            <!-- Column 1: board + position tools -->
-            <div class="layout-col layout-col--board">
-                <div class="card card--board">
-                    <div id="board" class="chessboard-root"></div>
-                </div>
-
-                <div class="card">
-                    <h2 class="card-title">Position</h2>
-                    <label class="label" for="fenInput">FEN</label>
-                    <textarea id="fenInput" class="input-fen" rows="2" spellcheck="false" placeholder="Paste FEN…"></textarea>
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-primary" onclick="loadFenFromField()">Load</button>
-                        <button type="button" class="btn" onclick="syncFenFromBoard()">From board</button>
-                    </div>
-                    <h2 class="card-title card-title--sub">PGN</h2>
-                    <div class="btn-group">
-                        <button type="button" class="btn" onclick="downloadPgn()">Download</button>
-                        <button type="button" class="btn" onclick="copyPgn()">Copy</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Column 2: engine + output -->
-            <div class="layout-col layout-col--side">
-                <div class="card">
-                    <div class="card-head">
-                        <h2 class="card-title">Engine</h2>
-                        <span id="status-light" class="badge" role="status">Idle</span>
-                    </div>
-                    <div class="field-row">
-                        <select id="engineSelect" class="input-block" title="Engine"></select>
-                        <button type="button" class="btn btn-primary" onclick="loadEngine()">Load</button>
-                    </div>
-                    <div class="field-row field-row--split">
-                        <select id="playerSide" class="input-block" onchange="updateOrientation()">
-                            <option value="white">White</option>
-                            <option value="black">Black</option>
-                        </select>
-                        <label class="label-inline" for="depth">Depth</label>
-                        <input id="depth" class="input-depth" type="number" value="6" min="1" max="64">
-                        <button type="button" class="btn" onclick="resetGame()">Reset</button>
-                    </div>
-                    <div class="field-row">
-                        <input id="raw" class="input-block" placeholder="UCI command…" autocomplete="off">
-                        <button type="button" class="btn" onclick="sendRaw()">Send</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2 class="card-title">Analysis</h2>
-                    <div id="llm-explanation" class="analysis">
-                        <span class="muted">No analysis yet.</span>
-                    </div>
-                    <div id="llm-loader" class="loader" hidden>
-                        <span class="spinner" aria-hidden="true"></span>
-                        <span>Thinking…</span>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2 class="card-title">Moves</h2>
-                    <div id="move-list" class="move-list"></div>
-                </div>
-
-                <div class="card card--log">
-                    <h2 class="card-title">UCI log</h2>
-                    <div id="console" class="log" role="log" aria-live="polite"></div>
-                </div>
-            </div>
-        </div>
+    <div class="toolbar toolbar--uci">
+        <label class="toolbar-mini" for="raw">UCI</label>
+        <input id="raw" class="toolbar-raw" type="text" placeholder="Command…" autocomplete="off">
+        <button type="button" class="btn" onclick="sendRaw()">Send</button>
     </div>
+
+    <main class="main">
+        <div class="board-wrap board-wrap--locked" id="board-wrap">
+            <div id="board" class="chessboard-root"></div>
+        </div>
+
+        <div class="grid-2">
+            <section class="card">
+                <h2 class="card-title">Moves</h2>
+                <div id="move-list" class="move-list"></div>
+            </section>
+            <section class="card">
+                <h2 class="card-title">Analysis</h2>
+                <div id="llm-explanation" class="analysis">
+                    <span class="muted">—</span>
+                </div>
+                <div id="llm-loader" class="loader" hidden>
+                    <span class="spinner" aria-hidden="true"></span>
+                    <span>…</span>
+                </div>
+            </section>
+        </div>
+
+        <section class="card card--log">
+            <h2 class="card-title">Log</h2>
+            <div id="console" class="log" role="log" aria-live="polite"></div>
+        </section>
+
+        <section class="card">
+            <h2 class="card-title">FEN / PGN</h2>
+            <textarea id="fenInput" class="input-fen" rows="2" spellcheck="false" placeholder="FEN"></textarea>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary" onclick="loadFenFromField()">Load FEN</button>
+                <button type="button" class="btn" onclick="syncFenFromBoard()">From board</button>
+                <button type="button" class="btn" onclick="downloadPgn()">PGN file</button>
+                <button type="button" class="btn" onclick="copyPgn()">Copy PGN</button>
+            </div>
+        </section>
+    </main>
 </div>
 
 <script src="/static/script.js"></script>

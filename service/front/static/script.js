@@ -1,15 +1,78 @@
 let socket, board, game = new Chess();
-const container = document.getElementById("main-container");
-const statusLight = document.getElementById("status-light");
+let engineLoaded = false;
+
+const container = document.querySelector(".shell");
 const llmLoader = document.getElementById("llm-loader");
 const llmExp = document.getElementById("llm-explanation");
+
+function humanColor() {
+    return document.getElementById("playerSide").value === "white" ? "w" : "b";
+}
+
+function setBoardWidth() {
+    return Math.min(window.innerWidth * 0.92, 480);
+}
+
+function rebuildBoard() {
+    const bw = setBoardWidth();
+    $("#board").css("width", bw + "px");
+    if (board) {
+        try {
+            board.destroy();
+        } catch (e) {
+            $("#board").empty();
+        }
+        board = null;
+    }
+    board = Chessboard("board", {
+        position: game.fen(),
+        width: bw,
+        draggable: engineLoaded,
+        orientation: document.getElementById("playerSide").value,
+        onDrop: onDrop,
+        pieceTheme: "https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png"
+    });
+    setBoardLockedState();
+    updateStatusTurn();
+    updateEngineTurnButton();
+}
+
+function setBoardLockedState() {
+    const wrap = document.getElementById("board-wrap");
+    if (!wrap) return;
+    wrap.classList.toggle("board-wrap--locked", !engineLoaded);
+}
+
+function updateStatusTurn() {
+    const el = document.getElementById("status-turn");
+    if (!el) return;
+    if (!engineLoaded) {
+        el.textContent = " · load engine";
+        return;
+    }
+    if (game.game_over()) {
+        el.textContent = "";
+        return;
+    }
+    const human = humanColor();
+    el.textContent = game.turn() === human ? " · you" : " · engine";
+}
+
+function updateEngineTurnButton() {
+    const btn = document.getElementById("btnEngineTurn");
+    if (!btn) return;
+    const human = humanColor();
+    const thinking = container.classList.contains("thinking");
+    const needEngine =
+        engineLoaded && !game.game_over() && !thinking && game.turn() !== human;
+    btn.hidden = !needEngine;
+}
 
 function syncFenFromBoard() {
     const el = document.getElementById("fenInput");
     if (el) el.value = game.fen();
 }
 
-/** PGN result token for headers */
 function pgnResultToken() {
     if (game.in_checkmate()) return game.turn() === "w" ? "0-1" : "1-0";
     if (game.in_draw()) return "1/2-1/2";
@@ -72,6 +135,8 @@ function loadFenFromField() {
     syncFenFromBoard();
     send(`position fen ${game.fen()}`);
     log("Position loaded from FEN.", "sys");
+    updateStatusTurn();
+    updateEngineTurnButton();
 }
 
 function refreshMoveList() {
@@ -92,13 +157,13 @@ function refreshMoveList() {
     el.textContent = rows.join("  ");
 }
 
-function log(text, type = '') {
+function log(text, type = "") {
     const c = document.getElementById("console");
     const cls = ["log-line"];
-    if (type === 'in') cls.push("log-line--in");
-    if (type === 'out') cls.push("log-line--out");
-    if (type === 'sys') cls.push("log-line--sys");
-    if (type === 'result') cls.push("log-line--result");
+    if (type === "in") cls.push("log-line--in");
+    if (type === "out") cls.push("log-line--out");
+    if (type === "sys") cls.push("log-line--sys");
+    if (type === "result") cls.push("log-line--result");
 
     const row = document.createElement("div");
     row.className = cls.join(" ");
@@ -108,16 +173,32 @@ function log(text, type = '') {
 }
 
 function setThinking(isThinking) {
+    const phase = document.getElementById("status-phase");
     if (isThinking) {
         container.classList.add("thinking");
-        statusLight.innerText = "Thinking";
+        if (phase) phase.textContent = "Thinking";
         llmLoader.hidden = false;
         llmExp.hidden = true;
     } else {
         container.classList.remove("thinking");
-        statusLight.innerText = "Idle";
+        if (phase) phase.textContent = "Idle";
         llmLoader.hidden = true;
         llmExp.hidden = false;
+    }
+    updateEngineTurnButton();
+    updateStatusTurn();
+}
+
+function handleEngineStatusLine(data) {
+    if (typeof data !== "string") return;
+    const lower = data.toLowerCase();
+    if (lower.includes("engine loaded:")) {
+        engineLoaded = true;
+        rebuildBoard();
+    }
+    if (lower.includes("error loading engine")) {
+        engineLoaded = false;
+        rebuildBoard();
     }
 }
 
@@ -125,30 +206,30 @@ function connect() {
     const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
     socket = new WebSocket(`${proto}//${window.location.host}/ws`);
 
-    socket.onopen = () => log("CONNECTED TO BACKEND", 'sys');
-    socket.onclose = () => log("CONNECTION CLOSED", 'sys');
+    socket.onopen = () => log("CONNECTED TO BACKEND", "sys");
+    socket.onclose = () => log("CONNECTION CLOSED", "sys");
 
     socket.onmessage = (event) => {
         const data = event.data;
 
-        // Handle JSON (Engine List or LLM Explanation)
         try {
             const obj = JSON.parse(data);
             if (obj.type === "engineList") {
                 const sel = document.getElementById("engineSelect");
                 sel.innerHTML = "";
-                obj.engines.forEach(f => sel.add(new Option(f.name, f.name)));
+                obj.engines.forEach((f) => sel.add(new Option(f.name, f.name)));
                 return;
             }
             if (obj.type === "explanation") {
-                setThinking(false); // Analysis arrived
+                setThinking(false);
                 llmExp.innerHTML = `<strong>Move: ${obj.move} (Score: ${obj.score})</strong><br>${obj.text}`;
                 return;
             }
         } catch (e) {}
 
-        // Handle raw UCI strings
-        log(`< ${data}`, 'in');
+        handleEngineStatusLine(data);
+
+        log(`< ${data}`, "in");
 
         if (data.startsWith("bestmove")) {
             const moveStr = data.split(" ")[1];
@@ -172,23 +253,43 @@ function connect() {
 
 function send(cmd) {
     if (!socket || socket.readyState !== 1) return;
-    log(`> ${cmd}`, 'out');
+    log(`> ${cmd}`, "out");
     socket.send(cmd);
 }
 
 function loadEngine() {
     const selectElement = document.getElementById("engineSelect");
-    if (selectElement.selectedIndex === -1) return;
-    
+    if (selectElement.selectedIndex < 0) return;
+
     const engineName = selectElement.options[selectElement.selectedIndex].text;
-    
-    // Sequence: Load -> UCI -> IsReady
+
     send(`load ${engineName}`);
     setTimeout(() => send("uci"), 200);
     setTimeout(() => send("isready"), 500);
 }
 
+function requestEngineMove() {
+    if (!engineLoaded || game.game_over()) return;
+    const human = humanColor();
+    if (game.turn() === human) return;
+    send(`position fen ${game.fen()}`);
+    const d = document.getElementById("depth").value;
+    setThinking(true);
+    setTimeout(() => send(`go depth ${d}`), 50);
+}
+
 function onDrop(source, target) {
+    if (!engineLoaded) {
+        log("Load an engine first.", "result");
+        return "snapback";
+    }
+
+    const human = humanColor();
+    const piece = game.get(source);
+    if (!piece || piece.color !== human) {
+        return "snapback";
+    }
+
     const move = game.move({ from: source, to: target, promotion: "q" });
     if (!move) return "snapback";
 
@@ -197,10 +298,11 @@ function onDrop(source, target) {
     syncFenFromBoard();
     if (game.game_over()) {
         checkStatus();
+        updateStatusTurn();
+        updateEngineTurnButton();
         return;
     }
 
-    // Full FEN keeps server/engine in sync (UCI "position startpos moves ..." was not tracked server-side).
     send(`position fen ${game.fen()}`);
 
     const d = document.getElementById("depth").value;
@@ -209,26 +311,28 @@ function onDrop(source, target) {
 }
 
 function checkStatus() {
-    let moveColor = game.turn() === 'b' ? 'Black' : 'White';
+    const moveColor = game.turn() === "b" ? "Black" : "White";
     if (game.in_checkmate()) {
-        log(`*** GAME OVER: ${moveColor} Checkmated ***`, 'result');
+        log(`*** GAME OVER: ${moveColor} Checkmated ***`, "result");
     } else if (game.in_draw()) {
-        log(`*** GAME OVER: Draw ***`, 'result');
+        log(`*** GAME OVER: Draw ***`, "result");
     }
 }
 
 function resetGame() {
     game.reset();
-    board.start();
     refreshMoveList();
     syncFenFromBoard();
+    rebuildBoard();
     send("ucinewgame");
     send(`position fen ${game.fen()}`);
     log("GAME RESET", "sys");
 }
 
 function updateOrientation() {
-    board.orientation(document.getElementById("playerSide").value);
+    if (board) board.orientation(document.getElementById("playerSide").value);
+    updateStatusTurn();
+    updateEngineTurnButton();
 }
 
 function sendRaw() {
@@ -238,11 +342,10 @@ function sendRaw() {
 }
 
 $(document).ready(() => {
-    const setBoardWidth = () => Math.min(window.innerWidth * 0.92, 480);
     const bw = setBoardWidth();
     $("#board").css("width", bw + "px");
     board = Chessboard("board", {
-        draggable: true,
+        draggable: false,
         position: "start",
         width: bw,
         onDrop: onDrop,
@@ -251,8 +354,11 @@ $(document).ready(() => {
     $(window).on("resize", () => {
         const w = setBoardWidth();
         $("#board").css("width", w + "px");
-        board.resize();
+        if (board) board.resize();
     });
     syncFenFromBoard();
+    setBoardLockedState();
+    updateStatusTurn();
+    updateEngineTurnButton();
     connect();
 });
