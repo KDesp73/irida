@@ -3,68 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Play with Irida</title>
+    <title>Irida</title>
+    <meta name="theme-color" content="#141414">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
     <link rel="stylesheet" href="/static/libs/chessboard-1.0.0.min.css">
     <script src="/static/libs/chess.min.js"></script>
     <script src="/static/libs/chessboard-1.0.0.min.js"></script>
-
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
-<div class="container" id="main-container">
-    <div id="board" style="width: 400px"></div>
-
-    <div class="panel">
-        <div class="header-row">
-            <h3>UCI Engine</h3>
-            <div id="status-light">IDLE</div>
+<div class="shell">
+    <header class="shell-header">
+        <div class="shell-header-inner">
+            <h1 class="logo">Irida</h1>
+            <p class="tagline">UCI chess engine</p>
         </div>
+    </header>
 
-        <div id="console"></div>
+    <div class="shell-body">
+        <div class="layout" id="main-container">
+            <!-- Column 1: board + position tools -->
+            <div class="layout-col layout-col--board">
+                <div class="card card--board">
+                    <div id="board" class="chessboard-root"></div>
+                </div>
 
-        <div class="explanation-box">
-            <h4>Move Analysis</h4>
-            <div id="llm-explanation">
-                <span class="placeholder">Make a move to see the analysis...</span>
-            </div>
-            <div id="llm-loader" style="display: none; padding: 10px; color: #60a5fa;">
-                <div class="spinner"></div> Analyzing position...
-            </div>
-        </div>
-
-        <div class="move-history">
-            <h4>History</h4>
-            <div id="move-list"></div>
-        </div>
-
-        <div class="control-group">
-            <div class="input-row">
-                <select id="engineSelect" style="flex-grow: 1;"></select>
-                <button onclick="loadEngine()">Load</button>
-            </div>
-
-            <div class="input-row">
-                <select id="playerSide" onchange="updateOrientation()" style="flex-grow: 1;">
-                    <option value="white">Play as White</option>
-                    <option value="black">Play as Black</option>
-                </select>
-                <input id="depth" type="number" value="6" style="width: 50px;" title="Search Depth">
-                <button class="secondary-btn" onclick="resetGame()">Reset</button>
+                <div class="card">
+                    <h2 class="card-title">Position</h2>
+                    <label class="label" for="fenInput">FEN</label>
+                    <textarea id="fenInput" class="input-fen" rows="2" spellcheck="false" placeholder="Paste FEN…"></textarea>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary" onclick="loadFenFromField()">Load</button>
+                        <button type="button" class="btn" onclick="syncFenFromBoard()">From board</button>
+                    </div>
+                    <h2 class="card-title card-title--sub">PGN</h2>
+                    <div class="btn-group">
+                        <button type="button" class="btn" onclick="downloadPgn()">Download</button>
+                        <button type="button" class="btn" onclick="copyPgn()">Copy</button>
+                    </div>
+                </div>
             </div>
 
-            <div class="input-row">
-                <input id="raw" placeholder="Command..." style="flex-grow: 1;">
-                <button class="secondary-btn" onclick="sendRaw()">Send</button>
+            <!-- Column 2: engine + output -->
+            <div class="layout-col layout-col--side">
+                <div class="card">
+                    <div class="card-head">
+                        <h2 class="card-title">Engine</h2>
+                        <span id="status-light" class="badge" role="status">Idle</span>
+                    </div>
+                    <div class="field-row">
+                        <select id="engineSelect" class="input-block" title="Engine"></select>
+                        <button type="button" class="btn btn-primary" onclick="loadEngine()">Load</button>
+                    </div>
+                    <div class="field-row field-row--split">
+                        <select id="playerSide" class="input-block" onchange="updateOrientation()">
+                            <option value="white">White</option>
+                            <option value="black">Black</option>
+                        </select>
+                        <label class="label-inline" for="depth">Depth</label>
+                        <input id="depth" class="input-depth" type="number" value="6" min="1" max="64">
+                        <button type="button" class="btn" onclick="resetGame()">Reset</button>
+                    </div>
+                    <div class="field-row">
+                        <input id="raw" class="input-block" placeholder="UCI command…" autocomplete="off">
+                        <button type="button" class="btn" onclick="sendRaw()">Send</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Analysis</h2>
+                    <div id="llm-explanation" class="analysis">
+                        <span class="muted">No analysis yet.</span>
+                    </div>
+                    <div id="llm-loader" class="loader" hidden>
+                        <span class="spinner" aria-hidden="true"></span>
+                        <span>Thinking…</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Moves</h2>
+                    <div id="move-list" class="move-list"></div>
+                </div>
+
+                <div class="card card--log">
+                    <h2 class="card-title">UCI log</h2>
+                    <div id="console" class="log" role="log" aria-live="polite"></div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script src="/static/script.js"></script>
-
 </body>
 </html>

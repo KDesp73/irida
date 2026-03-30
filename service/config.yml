@@ -1,9 +1,11 @@
 server:
   port: 8765
 
+# Paths to UCI executables (first component is the label in the UI = basename)
 engines:
-  - "/home/kdesp73/personal/repos/c/irida/irida"
+  - "./irida"
   - "stockfish"
 
 llm:
-  enabled: true
+  # Set true only if llama-cpp-python and a GGUF model are installed (see service/model.py).
+  enabled: false

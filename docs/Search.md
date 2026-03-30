@@ -23,5 +23,5 @@
 
 ## Optimizations
 
-- [ ] 9. Aspiration Windows
+- [x] 9. Aspiration Windows
 - [ ] 10. Principal Variation Search

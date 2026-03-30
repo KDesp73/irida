@@ -4,40 +4,126 @@ const statusLight = document.getElementById("status-light");
 const llmLoader = document.getElementById("llm-loader");
 const llmExp = document.getElementById("llm-explanation");
 
+function syncFenFromBoard() {
+    const el = document.getElementById("fenInput");
+    if (el) el.value = game.fen();
+}
+
+/** PGN result token for headers */
+function pgnResultToken() {
+    if (game.in_checkmate()) return game.turn() === "w" ? "0-1" : "1-0";
+    if (game.in_draw()) return "1/2-1/2";
+    return "*";
+}
+
+function buildPgnDocument() {
+    const date = new Date().toISOString().slice(0, 10).replace(/-/g, ".");
+    const result = pgnResultToken();
+    const body = game.pgn({ max_width: 79 }).trim();
+    const movesLine = body ? `${body} ${result}` : result;
+    return [
+        `[Event "Irida"]`,
+        `[Site "?"]`,
+        `[Date "${date}"]`,
+        `[Round "?"]`,
+        `[White "?"]`,
+        `[Black "?"]`,
+        `[Result "${result}"]`,
+        ``,
+        movesLine
+    ].join("\n");
+}
+
+function downloadPgn() {
+    const text = buildPgnDocument();
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `irida-${new Date().toISOString().slice(0, 10)}.pgn`;
+    a.click();
+    URL.revokeObjectURL(url);
+    log("PGN downloaded.", "sys");
+}
+
+function copyPgn() {
+    const text = buildPgnDocument();
+    navigator.clipboard.writeText(text).then(
+        () => log("PGN copied to clipboard.", "sys"),
+        () => log("Could not copy PGN (clipboard permission?).", "result")
+    );
+}
+
+function loadFenFromField() {
+    const el = document.getElementById("fenInput");
+    if (!el) return;
+    const raw = el.value.trim();
+    if (!raw) {
+        log("FEN field is empty.", "result");
+        return;
+    }
+    const ok = game.load(raw);
+    if (!ok) {
+        log("Invalid FEN — check the string (6 fields).", "result");
+        return;
+    }
+    board.position(game.fen());
+    refreshMoveList();
+    syncFenFromBoard();
+    send(`position fen ${game.fen()}`);
+    log("Position loaded from FEN.", "sys");
+}
+
+function refreshMoveList() {
+    const el = document.getElementById("move-list");
+    if (!el) return;
+    const history = game.history();
+    if (history.length === 0) {
+        el.textContent = "";
+        return;
+    }
+    const rows = [];
+    for (let i = 0; i < history.length; i += 2) {
+        const n = Math.floor(i / 2) + 1;
+        const w = history[i];
+        const b = history[i + 1];
+        rows.push(b ? `${n}. ${w} ${b}` : `${n}. ${w}`);
+    }
+    el.textContent = rows.join("  ");
+}
+
 function log(text, type = '') {
     const c = document.getElementById("console");
-    let color = "inherit";
-    let weight = "normal";
+    const cls = ["log-line"];
+    if (type === 'in') cls.push("log-line--in");
+    if (type === 'out') cls.push("log-line--out");
+    if (type === 'sys') cls.push("log-line--sys");
+    if (type === 'result') cls.push("log-line--result");
 
-    if (type === 'in') color = "#60a5fa";
-    if (type === 'out') color = "#fbbf24";
-    if (type === 'sys') color = "#4ade80";
-    if (type === 'result') { 
-        color = "#f43f5e";
-        weight = "bold";
-    }
-
-    c.innerHTML += `<div style="color:${color}; font-weight:${weight}">${text}</div>`;
+    const row = document.createElement("div");
+    row.className = cls.join(" ");
+    row.innerHTML = text;
+    c.appendChild(row);
     c.scrollTop = c.scrollHeight;
 }
 
 function setThinking(isThinking) {
     if (isThinking) {
         container.classList.add("thinking");
-        statusLight.innerText = "THINKING";
-        llmLoader.style.display = "block";
-        llmExp.style.display = "none";
+        statusLight.innerText = "Thinking";
+        llmLoader.hidden = false;
+        llmExp.hidden = true;
     } else {
         container.classList.remove("thinking");
-        statusLight.innerText = "IDLE";
-        llmLoader.style.display = "none";
-        llmExp.style.display = "block";
+        statusLight.innerText = "Idle";
+        llmLoader.hidden = true;
+        llmExp.hidden = false;
     }
 }
 
 function connect() {
-    // Use the dynamic host to match FastAPI port
-    socket = new WebSocket(`ws://${window.location.host}/ws`);
+    const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
+    socket = new WebSocket(`${proto}//${window.location.host}/ws`);
 
     socket.onopen = () => log("CONNECTED TO BACKEND", 'sys');
     socket.onclose = () => log("CONNECTION CLOSED", 'sys');
@@ -74,9 +160,12 @@ function connect() {
                 });
                 if (move) {
                     board.position(game.fen());
+                    refreshMoveList();
+                    syncFenFromBoard();
                     checkStatus();
                 }
             }
+            setThinking(false);
         }
     };
 }
@@ -104,18 +193,19 @@ function onDrop(source, target) {
     if (!move) return "snapback";
 
     board.position(game.fen());
+    refreshMoveList();
+    syncFenFromBoard();
     if (game.game_over()) {
         checkStatus();
         return;
     }
 
-    const history = game.history({ verbose: true }).map(m => m.from + m.to).join(" ");
-    send(`position startpos moves ${history}`);
+    // Full FEN keeps server/engine in sync (UCI "position startpos moves ..." was not tracked server-side).
+    send(`position fen ${game.fen()}`);
 
     const d = document.getElementById("depth").value;
     setThinking(true);
-    // Slight delay to ensure the position command is processed
-    setTimeout(() => send(`go depth ${d}`), 100);
+    setTimeout(() => send(`go depth ${d}`), 50);
 }
 
 function checkStatus() {
@@ -130,7 +220,10 @@ function checkStatus() {
 function resetGame() {
     game.reset();
     board.start();
+    refreshMoveList();
+    syncFenFromBoard();
     send("ucinewgame");
+    send(`position fen ${game.fen()}`);
     log("GAME RESET", "sys");
 }
 
@@ -145,11 +238,21 @@ function sendRaw() {
 }
 
 $(document).ready(() => {
-    board = Chessboard('board', {
+    const setBoardWidth = () => Math.min(window.innerWidth * 0.92, 480);
+    const bw = setBoardWidth();
+    $("#board").css("width", bw + "px");
+    board = Chessboard("board", {
         draggable: true,
-        position: 'start',
+        position: "start",
+        width: bw,
         onDrop: onDrop,
-        pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+        pieceTheme: "https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png"
     });
+    $(window).on("resize", () => {
+        const w = setBoardWidth();
+        $("#board").css("width", w + "px");
+        board.resize();
+    });
+    syncFenFromBoard();
     connect();
 });
