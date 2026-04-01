@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""
+Engine match runner with fairer defaults: same opening line for each color-reversed
+pair (so luck of the book does not favor one engine), shared time/depth limits, and
+optional identical UCI options on both sides.
+"""
 
 import chess
 import chess.engine
@@ -9,62 +14,211 @@ import logging
 import re
 import os
 import random
+import sys
 from datetime import datetime
 from colorama import Fore, init
 
 init(autoreset=True)
 
+# Polyglot walk used to be unbounded: big books can supply moves for hundreds of plies
+# and look “hung”. Paired openings default to a normal opening depth.
+DEFAULT_PAIR_BOOK_MAX_PLIES = 24
+BOOK_GEN_HARD_CAP = 512
+
+
 def sanitize_filename(name):
     """Removes characters that aren't allowed in filenames."""
-    return re.sub(r'[^\w\s-]', '', name).strip().replace(' ', '_')
+    return re.sub(r"[^\w\s-]", "", name).strip().replace(" ", "_")
 
-def play_match(engine1_path, engine2_path, num_games, time_limit, book_path=None, debug=False):
+
+def parse_setoption(spec: str):
+    """Parse 'Name=value' into (name, value) for engine.configure."""
+    if "=" not in spec:
+        raise argparse.ArgumentTypeError(f"setoption must be Name=value, got: {spec!r}")
+    name, value = spec.split("=", 1)
+    name = name.strip()
+    value = value.strip()
+    if not name:
+        raise argparse.ArgumentTypeError("empty option name")
+    return name, value
+
+
+def generate_book_line(book_path, rng, max_book_plies):
+    """
+    Walk from the root using polyglot weighted_choice with a dedicated RNG.
+    max_book_plies: max half-moves (plies); must be set (use DEFAULT_PAIR_BOOK_MAX_PLIES
+    or BOOK_GEN_HARD_CAP from callers). Stops early if the book ends or the game is over.
+    """
+    cap = min(int(max_book_plies), BOOK_GEN_HARD_CAP)
+    moves = []
+    board = chess.Board()
+    with chess.polyglot.open_reader(book_path) as reader:
+        while len(moves) < cap:
+            if board.is_game_over():
+                break
+            try:
+                entry = reader.weighted_choice(board, random=rng)
+            except (IndexError, ValueError):
+                break
+            moves.append(entry.move)
+            board.push(entry.move)
+            if board.is_repetition(2):
+                board.pop()
+                moves.pop()
+                break
+    return moves
+
+
+def apply_engine_options(engine, options):
+    if not options:
+        return
+    cfg = {}
+    for name, value in options:
+        low = value.lower()
+        if low in ("true", "false"):
+            cfg[name] = low == "true"
+        else:
+            try:
+                cfg[name] = int(value)
+            except ValueError:
+                cfg[name] = value
+    engine.configure(cfg)
+
+
+def build_limit(time_s, depth, nodes):
+    kw = {}
+    if time_s is not None and time_s > 0:
+        kw["time"] = time_s
+    if depth is not None:
+        kw["depth"] = depth
+    if nodes is not None:
+        kw["nodes"] = nodes
+    if not kw:
+        kw["time"] = 0.1
+    return chess.engine.Limit(**kw)
+
+
+def play_match(
+    engine1_path,
+    engine2_path,
+    num_games,
+    limit,
+    book_path=None,
+    pair_openings=True,
+    match_seed=None,
+    max_book_plies=None,
+    setoptions=None,
+    debug=False,
+):
     if debug:
-        logging.basicConfig(format='%(levelname)s:%(name)s:%(message)s', level=logging.DEBUG)
+        logging.basicConfig(
+            format="%(levelname)s:%(name)s:%(message)s", level=logging.DEBUG
+        )
+
+    if match_seed is None:
+        match_seed = random.randrange(2**31)
 
     e1, e2 = None, None
-    
+    setoptions = setoptions or []
+
     try:
-        # Start engines
         e1 = chess.engine.SimpleEngine.popen_uci(engine1_path)
         e2 = chess.engine.SimpleEngine.popen_uci(engine2_path)
-        
-        # Parse Names and Versions
+
+        apply_engine_options(e1, setoptions)
+        apply_engine_options(e2, setoptions)
+
         name1 = e1.id.get("name", "Engine1")
         name2 = e2.id.get("name", "Engine2")
         ver1 = e1.id.get("version", "")
         ver2 = e2.id.get("version", "")
-        
+
         full_n1 = f"{name1} {ver1} as E1".strip()
         full_n2 = f"{name2} {ver2} as E2".strip()
-        
-        results = {full_n1: 0, full_n2: 0, "Draws": 0}
 
-        # Ensure directory exists
+        results = {full_n1: 0, full_n2: 0, "Draws": 0}
+        # Extra stats for balance reporting
+        stats = {
+            full_n1: {"W": 0, "B": 0, "points": 0.0},
+            full_n2: {"W": 0, "B": 0, "points": 0.0},
+        }
+
         os.makedirs("data/pgn/arena", exist_ok=True)
-        
-        # Create dynamic filename
+
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         safe_n1 = sanitize_filename(name1)
         safe_n2 = sanitize_filename(name2)
         filename = f"data/pgn/arena/Match_{safe_n1}_vs_{safe_n2}_{timestamp}.pgn"
 
         print(f"{Fore.CYAN}Match: {Fore.GREEN}{full_n1} {Fore.CYAN}vs {Fore.MAGENTA}{full_n2}")
+        print(f"{Fore.CYAN}Fairness: {Fore.WHITE}seed={match_seed}  pair_openings={pair_openings}")
+        gen_plies_cap = (
+            min(max_book_plies, BOOK_GEN_HARD_CAP)
+            if max_book_plies is not None
+            else DEFAULT_PAIR_BOOK_MAX_PLIES
+        )
         if book_path:
-            print(f"{Fore.YELLOW}Opening Book: {Fore.WHITE}{book_path}")
-        print(f"{Fore.BLUE}Logging to: {Fore.WHITE}{filename}\n")
+            print(f"{Fore.YELLOW}Opening book: {Fore.WHITE}{book_path}")
+            if pair_openings:
+                extra = ""
+                if max_book_plies is not None and max_book_plies > BOOK_GEN_HARD_CAP:
+                    extra = f" (requested {max_book_plies}, clamped to {BOOK_GEN_HARD_CAP})"
+                print(
+                    f"{Fore.YELLOW}Paired book walk: {Fore.WHITE}"
+                    f"≤{gen_plies_cap} half-moves{extra} "
+                    f"(default {DEFAULT_PAIR_BOOK_MAX_PLIES} if unset; --book-max-plies)"
+                )
+            elif max_book_plies is not None:
+                print(
+                    f"{Fore.YELLOW}Live book cap: {Fore.WHITE}{max_book_plies} half-moves"
+                )
+        if setoptions:
+            print(f"{Fore.YELLOW}Shared UCI options: {Fore.WHITE}{setoptions}")
+        print(f"{Fore.BLUE}PGN log: {Fore.WHITE}{filename}\n")
+
+        num_pairs = (num_games + 1) // 2
+        pair_openings_list = []
+        for p in range(num_pairs):
+            if (
+                pair_openings
+                and book_path
+                and os.path.exists(book_path)
+                and num_pairs > 1
+            ):
+                print(
+                    f"{Fore.LIGHTBLACK_EX}Preparing paired opening {p + 1}/{num_pairs}...{Fore.RESET}",
+                    end="",
+                    flush=True,
+                )
+            rng = random.Random(match_seed ^ (p * 1_000_003))
+            if (
+                pair_openings
+                and book_path
+                and os.path.exists(book_path)
+            ):
+                line = generate_book_line(book_path, rng, gen_plies_cap)
+                pair_openings_list.append(line)
+                if pair_openings and num_pairs > 1:
+                    print(
+                        f" {Fore.GREEN}ok ({len(line)} plies){Fore.RESET}",
+                        flush=True,
+                    )
+            else:
+                pair_openings_list.append([])
 
         for game_num in range(1, num_games + 1):
             board = chess.Board()
             game_time = datetime.now()
-            
+
             game = chess.pgn.Game()
             game.headers["Event"] = "Engine V Engine"
             game.headers["Site"] = "Local Arena"
             game.headers["Date"] = game_time.strftime("%Y.%m.%d")
             game.headers["Round"] = str(game_num)
-            
-            # Determine colors
+            game.headers["Annotator"] = (
+                f"Irida arena seed={match_seed} pair={(game_num - 1) // 2 + 1}"
+            )
+
             if game_num % 2 != 0:
                 white_engine, black_engine = e1, e2
                 game.headers["White"], game.headers["Black"] = full_n1, full_n2
@@ -74,99 +228,208 @@ def play_match(engine1_path, engine2_path, num_games, time_limit, book_path=None
                 game.headers["White"], game.headers["Black"] = full_n2, full_n1
                 w_label, b_label = "E2", "E1"
 
-            print(f"{Fore.WHITE}Game {game_num:02d} | {w_label}(W) vs {b_label}(B)", end=" ", flush=True)
+            pair_idx = (game_num - 1) // 2
+            opening_moves = list(pair_openings_list[pair_idx])
+            game.headers["Opening"] = (
+                f"Arena pair {pair_idx + 1} line_len={len(opening_moves)}"
+            )
+
+            done_before = game_num - 1
+            pct = (100.0 * done_before / num_games) if num_games else 0.0
+            running = (
+                f"{Fore.CYAN}[{game_num}/{num_games} {pct:.0f}%]{Fore.RESET} "
+                f"{Fore.GREEN}E1 {results[full_n1]}{Fore.RESET} — "
+                f"{Fore.MAGENTA}E2 {results[full_n2]}{Fore.RESET} — "
+                f"{Fore.YELLOW}D {results['Draws']}{Fore.RESET} | "
+                f"{Fore.WHITE}Game {game_num:02d} | {w_label}(W) vs {b_label}(B){Fore.RESET}"
+            )
+            print(running, end=" ", flush=True)
 
             aborted = False
-            node = game 
-            
-            # Opening Book Logic
+            node = game
+            oi = 0
+            printed_engine_moves = False
             book_reader = None
-            if book_path and os.path.exists(book_path):
+            use_live_book = (
+                not pair_openings
+                and book_path
+                and os.path.exists(book_path)
+            )
+            if use_live_book:
                 book_reader = chess.polyglot.open_reader(book_path)
 
-            while not board.is_game_over() and not aborted:
-                current_engine = white_engine if board.turn == chess.WHITE else black_engine
-                move = None
+            try:
+                while not board.is_game_over() and not aborted:
+                    move = None
 
-                # 1. Try Book Move
-                if book_reader:
-                    try:
-                        entries = list(book_reader.find_all(board))
-                        if entries:
-                            # Use weight-based selection for variety
-                            selection = book_reader.weighted_choice(board)
-                            move = selection.move
-                        else:
+                    if oi < len(opening_moves):
+                        move = opening_moves[oi]
+                        oi += 1
+                    elif book_reader:
+                        try:
+                            entries = list(book_reader.find_all(board))
+                            if entries:
+                                move = book_reader.weighted_choice(board).move
+                            else:
+                                book_reader.close()
+                                book_reader = None
+                        except Exception:
                             book_reader.close()
-                            book_reader = None # Book exhausted
-                    except Exception:
-                        book_reader = None
+                            book_reader = None
 
-                # 2. Try Engine Move
-                if move is None:
-                    try:
-                        result = current_engine.play(board, chess.engine.Limit(time=time_limit))
-                        move = result.move
-                    except Exception:
+                    if move is None and not aborted:
+                        current_engine = (
+                            white_engine if board.turn == chess.WHITE else black_engine
+                        )
+                        try:
+                            result = current_engine.play(board, limit)
+                            move = result.move
+                            if move is not None:
+                                san = board.san(move)
+                                print(
+                                    f"{Fore.LIGHTBLACK_EX}{san}{Fore.RESET} ",
+                                    end="",
+                                    flush=True,
+                                )
+                                printed_engine_moves = True
+                        except Exception:
+                            aborted = True
+                            move = None
+
+                    if move:
+                        node = node.add_main_variation(move)
+                        board.push(move)
+                    else:
                         aborted = True
+            finally:
+                if book_reader:
+                    book_reader.close()
 
-                # 3. Apply Move
-                if move:
-                    node = node.add_main_variation(move)
-                    board.push(move)
-                else:
-                    aborted = True
-
-            # Close reader if still open
-            if book_reader:
-                book_reader.close()
-
-            # Finalize Result
             if aborted:
                 res_str = "0-1" if board.turn == chess.WHITE else "1-0"
                 game.headers["Result"] = res_str
             else:
                 game.headers["Result"] = board.result()
-            
-            # Update Score
+
             res = game.headers["Result"]
+            white_name = game.headers["White"]
+            black_name = game.headers["Black"]
+
             if res == "1-0":
-                results[game.headers["White"]] += 1
+                results[white_name] += 1
+                stats[white_name]["W"] += 1
+                stats[white_name]["points"] += 1.0
+                stats[black_name]["points"] += 0.0
             elif res == "0-1":
-                results[game.headers["Black"]] += 1
+                results[black_name] += 1
+                stats[black_name]["B"] += 1
+                stats[black_name]["points"] += 1.0
+                stats[white_name]["points"] += 0.0
             else:
                 results["Draws"] += 1
+                stats[white_name]["points"] += 0.5
+                stats[black_name]["points"] += 0.5
 
-            print(f"{Fore.YELLOW}{res}")
-            
-            with open(filename, "a") as f:
+            if printed_engine_moves:
+                print(f"{Fore.YELLOW}→ {res}{Fore.RESET}")
+            else:
+                print(f"{Fore.YELLOW}{res}{Fore.RESET}")
+
+            with open(filename, "a", encoding="utf-8") as f:
                 f.write(str(game) + "\n\n")
 
     finally:
-        if e1: e1.quit()
-        if e2: e2.quit()
+        if e1:
+            e1.quit()
+        if e2:
+            e2.quit()
 
-    return results, full_n1, full_n2, filename
+    return results, stats, full_n1, full_n2, filename, match_seed
+
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="UCI Engine Match Runner")
-    parser.add_argument("engine1", type=str, help="Path to Engine 1 binary")
-    parser.add_argument("engine2", type=str, help="Path to Engine 2 binary")
-    parser.add_argument("--games", type=int, default=10, help="Number of games")
-    parser.add_argument("--time", type=float, default=0.1, help="Seconds per move")
-    parser.add_argument("--book", type=str, default=None, help="Path to polyglot .bin book")
-    parser.add_argument("--debug", action="store_true", help="Enable debug logging")
-    
+    parser = argparse.ArgumentParser(
+        description="UCI engine match: paired openings and shared limits for fairer comparison."
+    )
+    parser.add_argument("engine1", type=str, help="Path to engine 1 (E1)")
+    parser.add_argument("engine2", type=str, help="Path to engine 2 (E2)")
+    parser.add_argument("--games", type=int, default=10, help="Games (default 10)")
+    parser.add_argument(
+        "--time",
+        type=float,
+        default=None,
+        help="Seconds per move (default 0.1 if no depth/nodes)",
+    )
+    parser.add_argument("--depth", type=int, default=None, help="Fixed search depth")
+    parser.add_argument("--nodes", type=int, default=None, help="Fixed nodes per move")
+    parser.add_argument("--book", type=str, default=None, help="Polyglot .bin book")
+    parser.add_argument(
+        "--no-pair-openings",
+        action="store_true",
+        help="Independent random book per game (old behavior; less fair)",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="RNG seed for opening pairs (default: random, printed in header)",
+    )
+    parser.add_argument(
+        "--book-max-plies",
+        type=int,
+        default=None,
+        help=(
+            "Half-move cap for polyglot book (paired pre-gen defaults to "
+            f"{DEFAULT_PAIR_BOOK_MAX_PLIES}; hard max {BOOK_GEN_HARD_CAP}). "
+            "Live book (--no-pair-openings): only applies if set."
+        ),
+    )
+    parser.add_argument(
+        "--setoption",
+        action="append",
+        default=[],
+        metavar="Name=value",
+        help="UCI option sent to BOTH engines (repeatable). Booleans: true/false.",
+    )
+    parser.add_argument("--debug", action="store_true", help="Verbose logging")
+
     args = parser.parse_args()
 
-    res, n1, n2, fname = play_match(
-        args.engine1, 
-        args.engine2, 
-        args.games, 
-        args.time, 
+    try:
+        setoptions = [parse_setoption(s) for s in args.setoption]
+    except argparse.ArgumentTypeError as e:
+        print(e, file=sys.stderr)
+        sys.exit(2)
+
+    t = args.time
+    if t is None and args.depth is None and args.nodes is None:
+        t = 0.1
+    limit = build_limit(t, args.depth, args.nodes)
+
+    res, stats, n1, n2, fname, used_seed = play_match(
+        args.engine1,
+        args.engine2,
+        args.games,
+        limit,
         book_path=args.book,
-        debug=args.debug
+        pair_openings=not args.no_pair_openings,
+        match_seed=args.seed,
+        max_book_plies=args.book_max_plies,
+        setoptions=setoptions,
+        debug=args.debug,
     )
-    
-    print(f"\n{Fore.GREEN}FINAL SCORE: {n1} ({res[n1]}) - {n2} ({res[n2]}) | Draws: {res['Draws']}")
-    print(f"File saved: {fname}")
+
+    print(
+        f"\n{Fore.GREEN}FINAL: {n1} ({res[n1]}) — {n2} ({res[n2]}) | Draws: {res['Draws']}"
+    )
+    print(
+        f"{Fore.CYAN}Points (W=1 D=0.5): {n1} {stats[n1]['points']:.1f} — "
+        f"{n2} {stats[n2]['points']:.1f}"
+    )
+    print(
+        f"{Fore.CYAN}Wins as White / Black: "
+        f"{n1} {stats[n1]['W']}/{stats[n1]['B']} | "
+        f"{n2} {stats[n2]['W']}/{stats[n2]['B']}"
+    )
+    print(f"{Fore.CYAN}Match seed (re-run with --seed {used_seed}): {Fore.WHITE}{used_seed}")
+    print(f"{Fore.BLUE}PGN: {fname}")
