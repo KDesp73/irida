@@ -20,6 +20,28 @@ from colorama import Fore, init
 
 init(autoreset=True)
 
+
+class ArenaUciEngine(chess.engine.SimpleEngine):
+    """
+    python-chess SimpleEngine.play() uses asyncio.wait_for(..., timeout) where
+    timeout=None when the Limit has no .time (depth- or nodes-only). That waits
+    forever if the engine hangs. Cap those cases with a finite timeout.
+    """
+
+    def _timeout_for(self, limit):
+        t = super()._timeout_for(limit)
+        if t is not None:
+            return t
+        if limit is None:
+            return float(self.timeout) + 30.0
+        if limit.depth is not None:
+            d = max(1, int(limit.depth))
+            return float(self.timeout) + min(900.0, 25.0 * d)
+        if limit.nodes is not None:
+            return float(self.timeout) + min(900.0, 90.0 + float(limit.nodes) / 15000.0)
+        return float(self.timeout) + 30.0
+
+
 # Polyglot walk used to be unbounded: big books can supply moves for hundreds of plies
 # and look “hung”. Paired openings default to a normal opening depth.
 DEFAULT_PAIR_BOOK_MAX_PLIES = 24
@@ -109,6 +131,7 @@ def play_match(
     max_book_plies=None,
     setoptions=None,
     debug=False,
+    engine_timeout_s=30.0,
 ):
     if debug:
         logging.basicConfig(
@@ -123,14 +146,9 @@ def play_match(
 
     # Generous timeout: play() uses timeout+movetime; quit() uses this alone. Hung
     # searches that ignore stop need engine fixes, but we still force-close on quit.
-    engine_timeout_s = 30.0
     try:
-        e1 = chess.engine.SimpleEngine.popen_uci(
-            engine1_path, timeout=engine_timeout_s
-        )
-        e2 = chess.engine.SimpleEngine.popen_uci(
-            engine2_path, timeout=engine_timeout_s
-        )
+        e1 = ArenaUciEngine.popen_uci(engine1_path, timeout=engine_timeout_s)
+        e2 = ArenaUciEngine.popen_uci(engine2_path, timeout=engine_timeout_s)
 
         apply_engine_options(e1, setoptions)
         apply_engine_options(e2, setoptions)
@@ -159,6 +177,14 @@ def play_match(
 
         print(f"{Fore.CYAN}Match: {Fore.GREEN}{full_n1} {Fore.CYAN}vs {Fore.MAGENTA}{full_n2}")
         print(f"{Fore.CYAN}Fairness: {Fore.WHITE}seed={match_seed}  pair_openings={pair_openings}")
+        if limit.time is not None and limit.depth is None and limit.nodes is None:
+            print(
+                f"{Fore.YELLOW}Reproducibility:{Fore.WHITE} wall-clock per move "
+                f"(time={limit.time}s) ⇒ search depth varies by machine load; "
+                f"same --seed does not guarantee identical games. "
+                f"Use {Fore.CYAN}--depth N{Fore.WHITE} or {Fore.CYAN}--nodes N{Fore.WHITE} "
+                f"for deterministic play."
+            )
         gen_plies_cap = (
             min(max_book_plies, BOOK_GEN_HARD_CAP)
             if max_book_plies is not None
@@ -262,6 +288,7 @@ def play_match(
                 and book_path
                 and os.path.exists(book_path)
             )
+            live_book_rng = random.Random(match_seed ^ (game_num * 0x9E3779B9))
             if use_live_book:
                 book_reader = chess.polyglot.open_reader(book_path)
 
@@ -276,7 +303,9 @@ def play_match(
                         try:
                             entries = list(book_reader.find_all(board))
                             if entries:
-                                move = book_reader.weighted_choice(board).move
+                                move = book_reader.weighted_choice(
+                                    board, random=live_book_rng
+                                ).move
                             else:
                                 book_reader.close()
                                 book_reader = None
@@ -405,6 +434,14 @@ if __name__ == "__main__":
         help="UCI option sent to BOTH engines (repeatable). Booleans: true/false.",
     )
     parser.add_argument("--debug", action="store_true", help="Verbose logging")
+    parser.add_argument(
+        "--engine-timeout",
+        type=float,
+        default=30.0,
+        metavar="SEC",
+        help="UCI handshake / base timeout for python-chess (default 30). "
+        "Per-move wait is this + movetime, or a capped estimate for depth/nodes-only limits.",
+    )
 
     args = parser.parse_args()
 
@@ -430,6 +467,7 @@ if __name__ == "__main__":
         max_book_plies=args.book_max_plies,
         setoptions=setoptions,
         debug=args.debug,
+        engine_timeout_s=args.engine_timeout,
     )
 
     print(
