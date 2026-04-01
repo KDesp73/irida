@@ -50,6 +50,7 @@ body {
     max-width: 1080px;
     margin: 0 auto;
     padding: 1rem 1rem 2rem;
+    padding-bottom: max(2rem, env(safe-area-inset-bottom, 0px));
 }
 
 /* Desktop-style toolbar */
@@ -147,6 +148,7 @@ body {
     justify-content: center;
     width: 100%;
     margin: 0 auto;
+    touch-action: manipulation;
 }
 
 .board-wrap--locked #board {
@@ -215,10 +217,15 @@ body {
     margin: 0;
 }
 
-/* Board */
+/* Board — fewer double-tap-zoom / pan fights on touch */
 #board.chessboard-root {
     border-radius: 4px;
     overflow: hidden;
+    touch-action: manipulation;
+}
+
+#board .square--tap-selected {
+    box-shadow: inset 0 0 0 3px rgba(74, 222, 128, 0.85);
 }
 
 /* Forms */

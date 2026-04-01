@@ -1,5 +1,7 @@
 let socket, board, game = new Chess();
 let engineLoaded = false;
+let tapSelection = null;
+let boardInputTapMode = null;
 
 const container = document.querySelector(".shell");
 const llmLoader = document.getElementById("llm-loader");
@@ -13,8 +15,45 @@ function setBoardWidth() {
     return Math.min(window.innerWidth * 0.92, 480);
 }
 
+/** Drag fights vertical scroll on phones; tap-to-move avoids that. */
+function preferTapMoves() {
+    if (window.matchMedia("(pointer: coarse)").matches) return true;
+    if ("ontouchstart" in window && window.matchMedia("(max-width: 560px)").matches) return true;
+    return false;
+}
+
+function clearTapSelection() {
+    if (tapSelection) {
+        const prev = document.querySelector(`#board [data-square="${tapSelection}"]`);
+        if (prev) prev.classList.remove("square--tap-selected");
+    }
+    tapSelection = null;
+}
+
+function setTapSelection(square) {
+    clearTapSelection();
+    tapSelection = square;
+    const el = document.querySelector(`#board [data-square="${square}"]`);
+    if (el) el.classList.add("square--tap-selected");
+}
+
+function bindBoardTapHandlers(useTap) {
+    const $b = $("#board");
+    $b.off("click.tapMove");
+    tapSelection = null;
+    if (!useTap) return;
+    $b.on("click.tapMove", (ev) => {
+        const sqEl = ev.target.closest("[data-square]");
+        if (!sqEl) return;
+        const square = sqEl.getAttribute("data-square");
+        if (!square) return;
+        onBoardTap(square);
+    });
+}
+
 function rebuildBoard() {
     const bw = setBoardWidth();
+    const tap = preferTapMoves();
     $("#board").css("width", bw + "px");
     if (board) {
         try {
@@ -27,11 +66,13 @@ function rebuildBoard() {
     board = Chessboard("board", {
         position: game.fen(),
         width: bw,
-        draggable: engineLoaded,
+        draggable: engineLoaded && !tap,
         orientation: document.getElementById("playerSide").value,
         onDrop: onDrop,
         pieceTheme: "https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png"
     });
+    bindBoardTapHandlers(tap);
+    boardInputTapMode = tap;
     setBoardLockedState();
     updateStatusTurn();
     updateEngineTurnButton();
@@ -278,19 +319,20 @@ function requestEngineMove() {
     setTimeout(() => send(`go depth ${d}`), 50);
 }
 
-function onDrop(source, target) {
+/** @returns {"snapback"|undefined} snapback if the move was rejected */
+function applyHumanMove(from, to) {
     if (!engineLoaded) {
         log("Load an engine first.", "result");
         return "snapback";
     }
 
     const human = humanColor();
-    const piece = game.get(source);
+    const piece = game.get(from);
     if (!piece || piece.color !== human) {
         return "snapback";
     }
 
-    const move = game.move({ from: source, to: target, promotion: "q" });
+    const move = game.move({ from, to, promotion: "q" });
     if (!move) return "snapback";
 
     board.position(game.fen());
@@ -308,6 +350,41 @@ function onDrop(source, target) {
     const d = document.getElementById("depth").value;
     setThinking(true);
     setTimeout(() => send(`go depth ${d}`), 50);
+}
+
+function onDrop(source, target) {
+    return applyHumanMove(source, target);
+}
+
+function onBoardTap(square) {
+    if (!preferTapMoves()) return;
+    if (!engineLoaded) {
+        log("Load an engine first.", "result");
+        clearTapSelection();
+        return;
+    }
+
+    const human = humanColor();
+    const piece = game.get(square);
+
+    if (tapSelection === null) {
+        if (piece && piece.color === human) {
+            setTapSelection(square);
+        }
+        return;
+    }
+
+    if (square === tapSelection) {
+        clearTapSelection();
+        return;
+    }
+
+    const from = tapSelection;
+    clearTapSelection();
+    const result = applyHumanMove(from, square);
+    if (result === "snapback" && piece && piece.color === human) {
+        setTapSelection(square);
+    }
 }
 
 function checkStatus() {
@@ -343,6 +420,7 @@ function sendRaw() {
 
 $(document).ready(() => {
     const bw = setBoardWidth();
+    const tap = preferTapMoves();
     $("#board").css("width", bw + "px");
     board = Chessboard("board", {
         draggable: false,
@@ -351,10 +429,17 @@ $(document).ready(() => {
         onDrop: onDrop,
         pieceTheme: "https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png"
     });
+    bindBoardTapHandlers(tap);
+    boardInputTapMode = tap;
     $(window).on("resize", () => {
         const w = setBoardWidth();
         $("#board").css("width", w + "px");
-        if (board) board.resize();
+        const tapNow = preferTapMoves();
+        if (tapNow !== boardInputTapMode) {
+            rebuildBoard();
+        } else if (board) {
+            board.resize();
+        }
     });
     syncFenFromBoard();
     setBoardLockedState();
