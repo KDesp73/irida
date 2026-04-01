@@ -1,0 +1,240 @@
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "1"]
+[White "irida 0.8.0 as E1"]
+[Black "irida 0.8.0 as E2"]
+[Result "1-0"]
+[Annotator "Irida arena seed=536733383 pair=1"]
+[Opening "Arena pair 1 line_len=15"]
+
+1. e4 e6 2. d4 d5 3. Nc3 Nf6 4. Bg5 dxe4 5. Nxe4 Nbd7 6. Nxf6+ Nxf6 7. Nf3 c5 8. Bc4 Qb6 9. Bb3 c4 10. Bxf6 gxf6 11. Ba4+ Kd8 12. b3 Bd6 13. Kf1 cxb3 14. Bxb3 Qb5+ 15. Qe2 Qxe2+ 16. Kxe2 Bd7 17. Rad1 Re8 18. d5 e5 19. Kf1 e4 20. Nd4 Bg4 21. Re1 Bc5 22. c3 Re5 23. Bc2 f5 24. Bb3 f4 25. Bc2 e3 26. f3 Bd7 27. Bxh7 Kc7 28. Rb1 Rh8 29. Be4 Bd6 30. Kg1 Kc8 31. Bd3 Rg5 32. h4 Rgh5 33. Bc4 Rxh4 34. Rxh4 Rxh4 35. Bb5 Bxb5 36. Nf5 Ba3 37. Nxh4 Bc4 38. d6 Bxd6 39. Nf5 Bc5 40. Ra1 e2+ 41. Kh1 Bxa2 42. Re1 Bc4 43. Nd4 Kc7 44. Nxe2 Bf2 45. Rc1 Kb8 46. Nxf4 Bh4 47. Rd1 Bg5 48. Rd4 Ba2 49. Ra4 Bb3 50. Rb4 Ba2 51. Nh5 Be7 52. Re4 Bc5 53. Re5 Bd6 54. Re1 Bc4 55. Re8+ Kc7 56. Ra8 Bc5 57. Nf6 Be3 58. Re8 Bg5 59. Ne4 Kd7 60. Re5 Bh6 61. Rc5 Be6 62. Nf6+ Kd8 63. Ra5 Be3 64. Rh5 Bd2 65. Ne4 Bf4 66. Nc5 Kc8 67. Rh8+ Kc7 68. Nxe6+ fxe6 69. Rh7+ Kc6 70. Re7 e5 71. Kg1 Bd2 72. c4 Bc3 73. Kf2 Bd4+ 74. Ke2 Kb6 75. Rd7 Kc6 76. Rd5 Bc3 77. Kd3 Bd4 78. f4 Bb6 79. Rxe5 Bc7 80. Rf5 Bd6 81. Rf7 Kb6 82. Ke4 Kc6 83. Kf3 Bc5 84. Rh7 Bf8 85. Rh8 Bd6 86. Ra8 Kb6 87. Re8 Kc7 88. Rg8 Bc5 89. Rg5 Bd4 90. Ke4 Bc3 91. Rg4 Bb4 92. Rg5 Bc3 93. Rh5 Bb4 94. Rh7+ Kc8 95. Kf3 Ba3 96. Rh5 Kb8 97. Rd5 Be7 98. Rh5 Bf6 99. Rf5 Bc3 100. Rf8+ Kc7 101. Rf7+ 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "2"]
+[White "irida 0.8.0 as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1-0"]
+[Annotator "Irida arena seed=536733383 pair=1"]
+[Opening "Arena pair 1 line_len=15"]
+
+1. e4 e6 2. d4 d5 3. Nc3 Nf6 4. Bg5 dxe4 5. Nxe4 Nbd7 6. Nxf6+ Nxf6 7. Nf3 c5 8. Bc4 Qb6 9. Bb3 c4 10. Bxf6 gxf6 11. Ba4+ Kd8 12. b3 Bd6 13. Qe2 cxb3 14. cxb3 Bd7 15. Bxd7 Kxd7 16. Rd1 Qc6 17. d5 exd5 18. Qd3 Rae8+ 19. Kf1 Qc5 20. Qf5+ Kc6 21. Qxf6 Rhf8 22. Kg1 Qb4 23. Qf5 Qe4 24. Qxe4 Rxe4 25. Ng5 Rg4 26. Nxh7 Rfg8 27. g3 R4g6 28. h4 Rh6 29. Ng5 Rf6 30. Nh3 Rg4 31. Rh2 Re6 32. Ng5 Rf6 33. Kg2 Rf5 34. Kh3 Rb4 35. f4 d4 36. Nf3 Rc5 37. Rhd2 Rd5 38. Nxd4+ Kc5 39. Nf3 Rxd2 40. Nxd2 Rd4 41. Rc1+ Kb4 42. Nc4 Bb8 43. Re1 b5 44. Ne5 Bxe5 45. Rxe5 Rd2 46. Re7 Rxa2 47. Rxf7 Kxb3 48. Kg4 Kc4 49. Rc7+ Kd5 50. Kf3 Kd6 51. Rb7 Kc6 52. Re7 Kb6 53. Re6+ Kc7 54. Re7+ Kb6 55. Re6+ Kc7 56. Re5 Kc6 57. Re7 Kd6 58. Re1 Rc2 59. Re8 Kc7 60. Re7+ Kb6 61. Rd7 Rc7 62. Rd8 Rc3+ 63. Kg4 Rc1 64. Rb8+ Ka6 65. Kf3 Rc3+ 66. Kg2 Rc1 67. Rd8 Kb7 68. Rd7+ Rc7 69. Rd5 Rc2+ 70. Kf3 Rc3+ 71. Kg4 Kc6 72. Re5 Rd3 73. h5 Rd1 74. Re7 Rd7 75. Rxd7 Kc5 76. Rg7 b4 77. h6 b3 78. h7 a5 79. h8=Q a4 80. Rc7+ Kb6 81. Qb8+ Ka6 82. Ra7# 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "3"]
+[White "irida 0.8.0 as E1"]
+[Black "irida 0.8.0 as E2"]
+[Result "1-0"]
+[Annotator "Irida arena seed=536733383 pair=2"]
+[Opening "Arena pair 2 line_len=20"]
+
+1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 Nc6 5. Nc3 d6 6. Be3 Nf6 7. Qd2 Be7 8. f3 O-O 9. g4 a6 10. O-O-O Nxd4 11. Bxd4 Qa5 12. Qe1 Re8 13. e5 dxe5 14. Qxe5 Qxe5 15. Bxe5 Nd5 16. Bd3 Bb4 17. Rhg1 Nxc3 18. Bxc3 Bxc3 19. bxc3 Kh8 20. Bc4 b5 21. Bb3 Ra7 22. Rh1 a5 23. a4 Rc7 24. Kb2 Bb7 25. Rd3 Bc6 26. axb5 Bxb5 27. Re3 Rb8 28. Ka3 Bc6 29. Rd1 a4 30. Red3 Rcc8 31. Ba2 Bb5 32. Re3 Rd8 33. Rb1 Bc6 34. Rxb8 Rxb8 35. Bc4 Rd8 36. Kb2 Rd2 37. Re2 Rd1 38. Rf2 Kg8 39. Bd3 Rg1 40. Bc4 Rd1 41. f4 Be4 42. g5 Rd8 43. Re2 Bd5 44. Bxd5 Rxd5 45. Ka3 Ra5 46. Kb4 Ra8 47. Re1 a3 48. Ra1 a2 49. Kb3 Rb8+ 50. Kxa2 Rb5 51. Rd1 Ra5+ 52. Kb3 Rb5+ 53. Ka4 Rb8 54. Rd7 Kf8 55. Ka3 Ke8 56. Rd1 Rb6 57. Re1 Rc6 58. Kb4 Rb6+ 59. Ka3 Kd7 60. Rd1+ Kc7 61. Rd4 Rb5 62. Rc4+ Kd7 63. Rb4 Rf5 64. Kb3 Kc7 65. Rc4+ Kb7 66. Rd4 Kc7 67. Ra4 Rb5+ 68. Ka2 Kc6 69. Ra8 Rd5 70. Rh8 Rd2 71. Rxh7 Rxc2+ 72. Kb3 Rf2 73. Rxg7 Rxf4 74. g6 fxg6 75. Rxg6 Re4 76. Rg2 Re1 77. Rf2 Kd6 78. Kc2 Ke7 79. Rg2 Rf1 80. Kb2 Kf6 81. Ka3 Kf7 82. Rd2 Kg6 83. Kb2 Kf7 84. Kb3 Kg6 85. Rc2 Kf6 86. Rd2 Rb1+ 87. Kc2 Rb8 88. Kd3 Rb1 89. Kc2 Rf1 90. Kb3 Kg6 91. Kc2 Kf6 92. Kb3 Kg6 93. Kc4 Rc1 94. Kb3 Kf6 95. Rf2+ Ke5 96. Kb2 Rd1 97. Kc2 Rd8 98. Kc1 Rc8 99. Kb2 Rb8+ 100. Ka3 Kd6 101. Rb2 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "4"]
+[White "irida 0.8.0 as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1/2-1/2"]
+[Annotator "Irida arena seed=536733383 pair=2"]
+[Opening "Arena pair 2 line_len=20"]
+
+1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 Nc6 5. Nc3 d6 6. Be3 Nf6 7. Qd2 Be7 8. f3 O-O 9. g4 a6 10. O-O-O Nxd4 11. Bxd4 Bd7 12. Bxf6 gxf6 13. Kb1 Qa5 14. Nd5 Qd8 15. Nxe7+ Qxe7 16. Rg1 Bb5 17. Bxb5 axb5 18. Qxd6 Qxd6 19. Rxd6 Rfb8 20. Rgd1 Rc8 21. R1d2 Rab8 22. Rb6 Rc7 23. Rxb5 Kh8 24. Rh5 Kg7 25. Ra5 Kf8 26. Kc1 Kg8 27. Ra7 Rbc8 28. Kd1 Kh8 29. Ke2 Rf8 30. Kf2 Kg7 31. Ke2 Rfc8 32. c3 Kh6 33. Rd6 Kg6 34. Kf2 Re8 35. Kg3 Rb8 36. f4 Kg7 37. Kf3 Re8 38. f5 exf5 39. gxf5 Re5 40. Rd5 Rxd5 41. exd5 Rd7 42. d6 Kh6 43. Kg4 Kg7 44. Kg3 Kh6 45. Kg4 Kg7 46. Kh5 Rxd6 47. Rxb7 Rd2 48. h3 Rg2 49. Rb5 Rg1 50. Kh4 Ra1 51. a3 Rg1 52. Rb4 Rf1 53. Kg4 Rg1+ 54. Kf3 Rf1+ 55. Kg4 Rg1+ 56. Kf3 Rf1+ 57. Kg4 Rg1+ 58. Kf3 Rf1+ 59. Kg4 Rg1+ 60. Kf3 Rf1+ 61. Kg4 1/2-1/2
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "5"]
+[White "irida 0.8.0 as E1"]
+[Black "irida 0.8.0 as E2"]
+[Result "0-1"]
+[Annotator "Irida arena seed=536733383 pair=3"]
+[Opening "Arena pair 3 line_len=20"]
+
+1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Be3 e5 7. Nb3 Be6 8. f3 Be7 9. Qd2 O-O 10. O-O-O Nbd7 11. Nd5 Bxd5 12. exd5 a5 13. Qd3 a4 14. Nd2 a3 15. bxa3 Qa5 16. Nc4 Qa4 17. Bg5 h6 18. Bxf6 Nxf6 19. Be2 Rac8 20. Nb6 Qf4+ 21. Kb1 Rb8 22. Qc3 Bd8 23. g3 Qf5 24. Nc4 Be7 25. Nb6 Bd8 26. Nc4 Be7 27. Qb4 Qh3 28. Ne3 Rfc8 29. Rdg1 Kf8 30. Qa5 Ra8 31. Qb6 Rxa3 32. Bd3 Rca8 33. Qxb7 Rxa2 34. Re1 R2a7 35. Qb4 Qc8 36. Kc1 Ra4 37. Qd2 Ra1+ 38. Kb2 Qb7+ 39. Bb5 Qxb5+ 40. Kc3 R1a3# 0-1
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "6"]
+[White "irida 0.8.0 as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "0-1"]
+[Annotator "Irida arena seed=536733383 pair=3"]
+[Opening "Arena pair 3 line_len=20"]
+
+1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Be3 e5 7. Nb3 Be6 8. f3 Be7 9. Qd2 O-O 10. O-O-O Nbd7 11. Nd5 Bxd5 12. exd5 a5 13. Qd3 a4 14. Nd2 a3 15. bxa3 Nb6 16. Bf2 Nbxd5 17. Rg1 Qc7 18. Qb3 Qc3 19. Bc4 Rfc8 20. Bxd5 Nxd5 21. Ne4 Qxb3 22. axb3 Nf4 23. Kb1 d5 24. Ng3 Bxa3 25. Rde1 Re8 26. Be3 Kh8 27. Bxf4 exf4 28. Rxe8+ Rxe8 29. Nh5 Re2 30. Nxf4 Rf2 31. Re1 g5 32. Nh5 h6 33. Re8+ Kh7 34. Ra8 Bd6 35. Nf6+ Kg6 36. Nxd5 Bxh2 37. Rg8+ Kf5 38. Re8 Bg3 39. Kc1 Kg6 40. Re7 Rxg2 41. Rxb7 Rf2 42. Ne7+ Kf6 43. Ng8+ Kg7 44. Nxh6 Kxh6 45. Rxf7 Kg6 46. Rf8 Bd6 47. Rg8+ Kf7 48. Rd8 Ke7 49. Rg8 Rxf3 50. Kd1 Rf1+ 51. Ke2 Rc1 52. Kd3 Bf4 53. Rc8 Rd1+ 54. Kc4 Kf7 55. Kb5 Rd2 56. Rc3 Rf2 57. Rc8 Ke7 58. Kb6 Be5 59. Kb7 Re2 60. Kb6 Kf7 61. Kb5 Re1 62. Kc4 Re4+ 63. Kd3 Rd4+ 64. Ke3 Rd1 65. Ke2 Rh1 66. Rc5 Rh2+ 67. Kd3 Bf4 68. Kc3 Kg6 69. Rc8 Kf7 70. Rc5 Rf2 71. Kb2 g4 72. Rd5 Kg6 73. Kc3 Kf7 74. Rd7+ Kg6 75. Re7 Bg5 76. Re4 g3 77. Rg4 g2 78. Rg3 Rf3+ 79. Rxf3 g1=Q 80. Rd3 Qe1+ 81. Kc4 Bf6 82. Kb5 Qe2 83. Kb6 Kf7 84. Kb5 Qxc2 85. Rd6 Qxb3+ 86. Kc6 Qc4+ 87. Kb6 Bd4+ 88. Kb7 Qb4+ 89. Kc6 Qc5+ 90. Kd7 Be5 91. Rg6 Qc7# 0-1
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "7"]
+[White "irida 0.8.0 as E1"]
+[Black "irida 0.8.0 as E2"]
+[Result "1-0"]
+[Annotator "Irida arena seed=536733383 pair=4"]
+[Opening "Arena pair 4 line_len=20"]
+
+1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nf3 Nxe4 5. d4 d5 6. Bd3 Be7 7. O-O Nc6 8. Nc3 Nxc3 9. bxc3 O-O 10. Re1 Bg4 11. Rb1 Qc8 12. Rb5 Bf6 13. h3 Bh5 14. Rxd5 Bxf3 15. Qxf3 Re8 16. Be3 Qe6 17. Rb5 Bxd4 18. cxd4 Nxd4 19. Bxd4 Qxe1+ 20. Kh2 Qe6 21. Qg3 g6 22. Rxb7 Re7 23. Bc5 Rd7 24. Bxa7 Qxa2 25. Be3 Qe6 26. Rxc7 Re8 27. Bc4 Qf5 28. Rc5 Qe4 29. Bb5 Qb7 30. Bh6 Re4 31. Bc6 Qc7 32. Bxe4 Qd8 33. Bf5 Rd2 34. Qe5 f6 35. Qe6+ Kh8 36. Rc8 Rd7 37. Qxd7 Qxc8 38. Qxc8# 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "8"]
+[White "irida 0.8.0 as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1-0"]
+[Annotator "Irida arena seed=536733383 pair=4"]
+[Opening "Arena pair 4 line_len=20"]
+
+1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nf3 Nxe4 5. d4 d5 6. Bd3 Be7 7. O-O Nc6 8. Nc3 Nxc3 9. bxc3 O-O 10. Re1 Bg4 11. h3 Bh5 12. Bf4 Bd6 13. Bxd6 Qxd6 14. Rb1 Rab8 15. Rb5 a6 16. Rb1 Qa3 17. g4 Bg6 18. Qd2 Rfd8 19. Ng5 h6 20. Bxg6 hxg5 21. Bd3 Kh8 22. Rb3 Qxa2 23. Qc1 Qa5 24. Ra3 Qb6 25. Qxg5 Kg8 26. Qh4 g6 27. Rb3 Qa5 28. Reb1 Kg7 29. Qg3 b5 30. g5 Kg8 31. Qf4 Rbc8 32. Qc1 Rb8 33. Ra3 Qb6 34. Qd1 Rd6 35. Rba1 Ra8 36. Qg4 a5 37. Rb3 b4 38. Re1 a4 39. Rbb1 b3 40. Qf4 Qa5 41. Re3 Rf8 42. cxb3 Qxc3 43. bxa4 Nxd4 44. Qg4 Rb6 45. Rxb6 cxb6 46. Qd7 Qc6 47. Qxc6 Nxc6 48. Bb5 Nd4 49. Rd3 Nxb5 50. axb5 Rd8 51. Rd4 Kf8 52. Kg2 Ke7 53. Kg3 Kd6 54. Ra4 Rd7 55. Ra1 Kc5 56. Ra2 Kxb5 57. Rb2+ Kc6 58. Rc2+ Kb7 59. Rd2 d4 60. Kf4 Rd5 61. Ke4 Rxg5 62. Rxd4 Rf5 63. Ke3 Rc5 64. Rf4 Rc7 65. Kf3 Ka6 66. Rf6 Kb5 67. Kg3 Ka5 68. Kf3 Kb5 69. Kf4 Ra7 70. Ke3 Kc5 71. Kf3 Rd7 72. Kg3 Re7 73. Rf3 Rd7 74. Rc3+ Kb5 75. Kg2 Ka5 76. Rc8 Ka6 77. Rg8 Rd5 78. Rg7 Rf5 79. Rg8 Kb5 80. Re8 Kc6 81. Re7 Kb5 82. Rc7 Kb4 83. Kg3 Kb5 84. h4 Rf6 85. Kg2 Rf4 86. Kg3 Rf5 87. Kg2 Kb4 88. Kg3 Kb5 89. Kg2 Kb4 90. Kg3 Kb5 91. Kg2 Kb4 92. Kg3 Ka4 93. Rb7 Rf6 94. Rb8 Kb5 95. Rb7 Kc6 96. Ra7 Rf5 97. Re7 Kc5 98. Rd7 Kc6 99. Re7 Kc5 100. Rd7 Kc6 101. Re7 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "9"]
+[White "irida 0.8.0 as E1"]
+[Black "irida 0.8.0 as E2"]
+[Result "1/2-1/2"]
+[Annotator "Irida arena seed=536733383 pair=5"]
+[Opening "Arena pair 5 line_len=12"]
+
+1. d4 g6 2. e4 Bg7 3. c4 c5 4. Nf3 Nc6 5. d5 Nd4 6. Nxd4 cxd4 7. Bd3 Qb6 8. Nd2 d6 9. Nf3 Nf6 10. Qc2 Bg4 11. Bg5 Nd7 12. Ke2 Ne5 13. Rhe1 Kf8 14. Rf1 Re8 15. Qb3 Kg8 16. Qxb6 axb6 17. Rg1 h6 18. Bf4 Bxf3+ 19. gxf3 Kh7 20. Rge1 Nd7 21. Rh1 Nc5 22. Kd2 Rd8 23. Kc2 Ra8 24. Bg3 g5 25. f4 Rhc8 26. Kd2 Rd8 27. Ke2 Kg8 28. fxg5 hxg5 29. Rhg1 Ra4 30. f4 Rb4 31. b3 Ra8 32. fxg5 Kh7 33. Rgd1 b5 34. Be1 bxc4 35. Bxb4 Nxd3 36. Bxd6 exd6 37. Rf1 Kg6 38. bxc4 Nc5 39. Kf3 d3 40. Rae1 Bd4 41. e5 dxe5 42. Kg3 Rxa2 43. Rf6+ Kg7 44. Rf5 Rb2 45. Kh3 Kg8 46. Ref1 Ne4 47. g6 fxg6 48. Rf8+ Kh7 49. R1f7+ Kh6 50. Kg4 g5 51. Rd7 d2 52. Rh8+ Kg6 53. Rg8+ Kh6 54. Rh8+ Kg6 55. Rg8+ Kh6 56. Rh8+ Kg6 57. Rg8+ Kh6 58. Rh8+ Kg6 59. Rg8+ Kh6 60. Rh8+ 1/2-1/2
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "10"]
+[White "irida 0.8.0 as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1/2-1/2"]
+[Annotator "Irida arena seed=536733383 pair=5"]
+[Opening "Arena pair 5 line_len=12"]
+
+1. d4 g6 2. e4 Bg7 3. c4 c5 4. Nf3 Nc6 5. d5 Nd4 6. Nxd4 cxd4 7. Bd3 Nf6 8. e5 Ng8 9. Nd2 Bxe5 10. Nf3 Bd6 11. Bg5 Qb6 12. Qb3 Qxb3 13. axb3 h6 14. Bh4 Kf8 15. O-O Kg7 16. Nxd4 Bc5 17. Nb5 h5 18. b4 Bxb4 19. Nc7 Rb8 20. Rxa7 Bc5 21. Ra2 Nf6 22. Bg3 Kg8 23. Be5 d6 24. Bxf6 exf6 25. Ne8 Kf8 26. Nxf6 Bd4 27. Ne4 Bf5 28. Rd1 Bg4 29. Rd2 Ke7 30. h3 Bd7 31. Re2 Rhe8 32. Kf1 h4 33. Ng5+ Kf6 34. Rxe8 Rxe8 35. Nf3 Bc5 36. Nxh4 g5 37. Nf3 g4 38. hxg4 Bxg4 39. Nd2 Bd4 40. Nb3 Be5 41. Nd2 Bd4 42. Nb3 Be5 43. Nd2 Re7 44. c5 dxc5 45. Ne4+ Kg7 46. d6 Rd7 47. Ra8 Bxb2 48. Bb5 Bf5 49. Ng3 Be6 50. Ne4 Bd4 51. Re8 Bf5 52. Ng3 Bg4 53. Re4 Rxd6 54. Rxg4+ Kf8 55. Nf5 Rd5 56. Nxd4 Rxd4 57. Rxd4 cxd4 58. Ke2 Kg7 59. Bc4 b6 60. Kd3 Kf6 61. Kxd4 Kg7 62. Kd5 Kf6 63. Ba2 Ke7 64. Kc6 Kf6 65. Bd5 Kg6 66. Kxb6 Kf6 67. Kc5 Kg6 68. Kd6 Kf6 69. Be4 Kg5 70. Ke7 f5 71. Bd3 f4 72. Ke6 f3 73. gxf3 Kf4 74. Be4 Kg5 75. Ke5 Kh6 76. Kf6 Kh5 77. Bd3 Kh6 78. Be4 Kh5 79. Bd3 Kh6 80. Be4 Kh5 81. Bd3 Kh6 82. Be4 Kh5 83. Bd3 Kh6 84. Be4 1/2-1/2
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "11"]
+[White "irida 0.8.0 as E1"]
+[Black "irida 0.8.0 as E2"]
+[Result "1-0"]
+[Annotator "Irida arena seed=536733383 pair=6"]
+[Opening "Arena pair 6 line_len=17"]
+
+1. d4 Nf6 2. c4 g6 3. Nc3 Bg7 4. e4 d6 5. Be2 O-O 6. Nf3 Bg4 7. Be3 Nfd7 8. Ng1 Bxe2 9. Ngxe2 Nb6 10. Qb3 Nc6 11. c5 dxc5 12. dxc5 Na5 13. Qb5 Nbc4 14. Rd1 c6 15. Qa4 Qc8 16. Bc1 Qg4 17. O-O Qh5 18. b4 Rad8 19. Nf4 Qe5 20. bxa5 Qxc5 21. Nce2 Be5 22. a6 b5 23. Qc2 Qb6 24. Nd3 Qxa6 25. Nxe5 Nxe5 26. Bg5 f6 27. Be3 Ng4 28. Bc5 b4 29. h3 Nh6 30. Bxe7 Rxd1 31. Rxd1 Rf7 32. Bxb4 Qb5 33. Rd8+ Kg7 34. Nd4 Qe5 35. f4 Qxd4+ 36. Rxd4 Rc7 37. Qc5 Rf7 38. Rd7 g5 39. f5 Kh8 40. Rxf7 Ng8 41. Qxa7 Nh6 42. Rxh7+ Kg8 43. Qg7# 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "12"]
+[White "irida 0.8.0 as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1-0"]
+[Annotator "Irida arena seed=536733383 pair=6"]
+[Opening "Arena pair 6 line_len=17"]
+
+1. d4 Nf6 2. c4 g6 3. Nc3 Bg7 4. e4 d6 5. Be2 O-O 6. Nf3 Bg4 7. Be3 Nfd7 8. Ng1 Bxe2 9. Ngxe2 Nb6 10. Qb3 Nc6 11. c5 dxc5 12. dxc5 Na5 13. Qb5 Nbc4 14. Rd1 c6 15. Qa4 Qc8 16. Qb4 Qg4 17. Rg1 Be5 18. g3 Qf3 19. Bf4 Kh8 20. b3 Bxc3+ 21. Qxc3+ Qxc3+ 22. Nxc3 Rfd8 23. bxc4 Nxc4 24. Ke2 Na3 25. Bg5 f6 26. Bh6 Nc2 27. Rb1 Nd4+ 28. Kf1 Rab8 29. Bf4 e5 30. Be3 Ne6 31. Ke2 Nd4+ 32. Kf1 Ne6 33. Ke2 Nd4+ 34. Kf1 Ne6 35. Ke2 Nd4+ 36. Kf1 Ne6 37. Ke2 Nd4+ 38. Bxd4 Rxd4 39. Rb3 Kg8 40. Ra3 a6 41. Rd1 Re8 42. Rb3 Re7 43. Rdb1 Rdd7 44. Rd1 Rd4 45. Rdb1 Rdd7 46. R3b2 Kf7 47. Kf1 Kg8 48. Kg2 Rg7 49. Kh3 Rge7 50. Nd1 Kf7 51. Ne3 Kf8 52. Nc4 Rd4 53. Nd6 b5 54. Nc8 Rc7 55. Nb6 Rxe4 56. Rd2 Kf7 57. Rbd1 Rb4 58. Rd7+ Rxd7 59. Rxd7+ Kg8 60. Nc8 Rb2 61. Ne7+ Kf8 62. Kg2 Rxa2 63. Nxc6 e4 64. Nb4 Ra4 65. Nd5 Rd4 66. Nxf6 Rxd7 67. Nxd7+ Kf7 68. Nb8 a5 69. c6 h5 70. c7 e3 71. fxe3 h4 72. gxh4 b4 73. c8=Q b3 74. Qc7+ Kf6 75. Qxa5 Kg7 76. Nd7 b2 77. Qb6 b1=Q 78. Qxb1 Kf7 79. Qb6 g5 80. hxg5 Ke8 81. Qe6+ Kd8 82. g6 Kc7 83. g7 Kb7 84. g8=Q Ka7 85. Qb8# 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "13"]
+[White "irida 0.8.0 as E1"]
+[Black "irida 0.8.0 as E2"]
+[Result "0-1"]
+[Annotator "Irida arena seed=536733383 pair=7"]
+[Opening "Arena pair 7 line_len=15"]
+
+1. e4 c6 2. d4 d5 3. Nd2 dxe4 4. Nxe4 Nf6 5. Nxf6+ gxf6 6. c3 Bf5 7. Nf3 e6 8. g3 Qd5 9. Be2 Bg4 10. O-O Rg8 11. Bf4 Nd7 12. Re1 O-O-O 13. Nd2 Qf5 14. Bxg4 Rxg4 15. Qf3 Nc5 16. Nc4 Nd3 17. Ne3 Qxf4 18. Qxf4 Rxf4 19. gxf4 Nxe1 20. Rxe1 Bh6 21. f5 Re8 22. Nc4 Bf4 23. Re4 Bc7 24. Ne3 Rg8+ 25. Rg4 Rg5 26. Rxg5 fxg5 27. fxe6 fxe6 28. Ng4 Bd8 29. Kg2 Be7 30. Ne5 Bf6 31. Kf3 Kd8 32. Kg4 Ke7 33. Nf3 h6 34. Kg3 Kf7 35. Ne5+ Ke7 36. Kf3 Bxe5 37. dxe5 Kf8 38. Ke4 Kg8 39. Ke3 Kg7 40. Kd4 Kh8 41. Kc5 Kg7 42. Kd6 c5 43. Kc7 b5 44. Kb7 b4 45. cxb4 cxb4 46. Kxa7 Kg6 47. Kb6 Kf5 48. Kc5 b3 49. axb3 Kxe5 50. Kc6 Ke4 51. Kd7 Kf3 52. Kxe6 Kxf2 53. Kf5 Kg2 54. h4 gxh4 55. Kg6 h3 56. Kxh6 h2 57. Kg6 h1=Q 58. Kf5 Qh3+ 59. Ke4 Qxb3 60. Kd4 Qxb2+ 61. Kd3 Qb3+ 62. Kd4 Qc2 63. Ke5 Kg3 64. Kd4 Kf4 65. Kd5 Qc3 66. Kd6 Qe5+ 67. Kc6 Kf5 68. Kb6 Qd5 69. Kc7 Qe6 70. Kb7 Qd6 71. Kc8 Qb6 72. Kd7 Qc5 73. Kd8 Ke6 74. Ke8 Qc8# 0-1
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "14"]
+[White "irida 0.8.0 as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1/2-1/2"]
+[Annotator "Irida arena seed=536733383 pair=7"]
+[Opening "Arena pair 7 line_len=15"]
+
+1. e4 c6 2. d4 d5 3. Nd2 dxe4 4. Nxe4 Nf6 5. Nxf6+ gxf6 6. c3 Bf5 7. Nf3 e6 8. g3 Qd5 9. Bg2 Nd7 10. Nh4 Be4 11. c4 Bb4+ 12. Bd2 Qxc4 13. Bxe4 Qxd4 14. Bg2 Qxb2 15. Rc1 Rd8 16. Qc2 Bxd2+ 17. Qxd2 Qe5+ 18. Qe2 Qa5+ 19. Kf1 Ne5 20. Nf3 Nxf3 21. Qxf3 Ke7 22. Qb3 Qa6+ 23. Ke1 Rd7 24. Be4 Qa5+ 25. Kf1 f5 26. Bf3 Rg8 27. Kg2 Kf6 28. Rhd1 Rgd8 29. Rxd7 Rxd7 30. Rb1 Qc5 31. Qb2+ Kg6 32. Rd1 Rxd1 33. Bxd1 Qe7 34. Bf3 e5 35. Be2 e4 36. Qb3 Qc7 37. Qa3 Qb6 38. Bc4 Qd4 39. Qb4 Qd7 40. Qf8 f6 41. Qa8 f4 42. Qxa7 f3+ 43. Kg1 Qd1+ 44. Bf1 Qb1 45. Qd4 Qxa2 46. Qxe4+ f5 47. Qxf3 Qb1 48. Qd3 Qxd3 49. Bxd3 Kf6 50. Bc4 Ke5 51. Bg8 h6 52. Bc4 f4 53. Kg2 fxg3 54. Kxg3 Kf5 55. Bd3+ Ke5 56. Kg4 Kd5 57. Kh5 Kd4 58. Bf5 Kc5 59. Kxh6 Kd6 60. Kg5 Kc5 61. Kf4 Kd6 62. Kf3 Kc5 63. Ke3 Kd6 64. Kf4 Kc5 65. Kf3 Kd6 66. Bh3 Kc7 67. Bf5 Kd6 68. Ke3 Kc5 69. Kf3 Kd6 70. Ke3 Kc5 71. Kf3 Kd6 72. Ke3 Kc5 73. Ke2 Kd6 74. Ke3 Kc5 75. Kf4 Kd6 76. Kf3 Kc5 77. Kg3 Kd6 78. Kf4 Kc5 79. Kf3 Kd6 1/2-1/2
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "15"]
+[White "irida 0.8.0 as E1"]
+[Black "irida 0.8.0 as E2"]
+[Result "1/2-1/2"]
+[Annotator "Irida arena seed=536733383 pair=8"]
+[Opening "Arena pair 8 line_len=7"]
+
+1. Nf3 Nf6 2. g3 d5 3. Bg2 Bf5 4. c4 d4 5. d3 Nc6 6. Qb3 Qd7 7. Qxb7 Rb8 8. Nxd4 Rxb7 9. Bxc6 e5 10. Bxd7+ Bxd7 11. Nf3 Bc6 12. O-O Bxf3 13. exf3 Bb4 14. Bg5 Ba5 15. b3 Ke7 16. Nd2 Bxd2 17. Bxd2 Rd8 18. Rfd1 Ke6 19. Bc3 Nd7 20. d4 e4 21. d5+ Kf5 22. d6 c6 23. fxe4+ Kg6 24. Re1 Nc5 25. e5 Ne6 26. Re2 Rbd7 27. Kg2 Ng5 28. Bd2 Ne6 29. Rg1 Kf5 30. Be3 Re8 31. Rd1 Nd8 32. Bd4 Rxd6 33. Ree1 Rd7 34. Bc3 Rde7 35. Rd6 c5 36. Kf3 Ne6 37. g4+ Kg6 38. Red1 Rb7 39. Bd2 h5 40. Be3 hxg4+ 41. Kxg4 Rh8 42. Kg3 Rh5 43. Rd7 Rxd7 44. Rxd7 a6 45. Ra7 Rxe5 46. Rxa6 Kf6 47. Ra8 Ke7 48. Ra7+ Ke8 49. Kf3 Rh5 50. Kg3 Re5 51. Kf3 Rh5 52. Kg3 Re5 53. Kf3 Rh5 54. Kg3 Re5 55. Kf3 Rh5 56. Kg3 Re5 1/2-1/2
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "16"]
+[White "irida 0.8.0 as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1-0"]
+[Annotator "Irida arena seed=536733383 pair=8"]
+[Opening "Arena pair 8 line_len=7"]
+
+1. Nf3 Nf6 2. g3 d5 3. Bg2 Bf5 4. c4 Nbd7 5. Nc3 Nc5 6. cxd5 Nxd5 7. Na4 Nb4 8. Nxc5 Bc2 9. a3 Bxd1 10. Kxd1 Nc6 11. Nh4 Qd4 12. Nxb7 Kd7 13. Nf3 Qxf2 14. Ne1 Rb8 15. Bh3+ Ke8 16. Nd3 Qd4 17. Nbc5 e6 18. Bg2 Nd8 19. Ne4 Be7 20. Nc3 Bd6 21. a4 Kd7 22. Nb5 Qc4 23. Ra3 Re8 24. b3 Qg4 25. Nxd6 cxd6 26. Bb2 Nc6 27. Rf1 Re7 28. Bf3 Qg5 29. Kc2 Qg6 30. Bc3 Nb4+ 31. Bxb4 Rxb4 32. Raa1 Kd8 33. Kb2 Rb8 34. Ka2 Qh6 35. Rad1 Rc7 36. Ka3 Ke7 37. Rf2 Rc2 38. Nb4 Rxb4 39. Kxb4 Rxd2 40. Rxd2 Qxd2+ 41. Ka3 Qc1+ 42. Ka2 Qc2+ 43. Ka1 Qxb3 44. Rf1 Qxa4+ 45. Kb2 Qd4+ 46. Kb1 Qc3 47. Ka2 Qd2+ 48. Kb3 Qh6 49. Ra1 Kf6 50. g4 Qf4 51. Kc2 Qc4+ 52. Kb2 Qd4+ 53. Kb1 Qc5 54. Ra2 Qf2 55. Kb2 Qb6+ 56. Kc2 Qb4 57. Rb2 Qc4+ 58. Kb1 Qd4 59. Rb7 Qg1+ 60. Ka2 Qc5 61. Kb3 Qe5 62. Kc2 a6 63. Rb1 Kg6 64. h3 Qc5+ 65. Kd3 Qa3+ 66. Kd2 Qa5+ 67. Kd3 Qa3+ 68. Kd2 Qa5+ 69. Kd3 Qa3+ 70. Kd2 d5 71. Rb7 Qd6 72. h4 Qf4+ 73. Kc2 Kf6 74. h5 Qa4+ 75. Kb2 Qf4 76. Kb3 Qc1 77. Ka2 Qe3 78. Rb8 d4 79. Rb3 Qd2+ 80. Kb1 Qf4 81. Kc2 Qe5 82. Rb7 Qa5 83. Be4 Qe5 84. Bd3 Qd5 85. Rb4 Kg5 86. h6 Kxh6 87. Rc4 Kg5 88. Rc7 Kf6 89. Rc8 Qg2 90. Rh8 h6 91. Rd8 Qxg4 92. Bxa6 Qh5 93. Rxd4 Qc5+ 94. Rc4 Qf5+ 95. Kb2 Qa5 96. Bc8 Qe5+ 97. Rc3 Qxe2+ 98. Rc2 Qe4 99. Rc3 Qe5 100. Kb3 Kg6 101. Rc2 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "17"]
+[White "irida 0.8.0 as E1"]
+[Black "irida 0.8.0 as E2"]
+[Result "1-0"]
+[Annotator "Irida arena seed=536733383 pair=9"]
+[Opening "Arena pair 9 line_len=20"]
+
+1. d4 Nf6 2. c4 e6 3. Nc3 Bb4 4. Qc2 c5 5. dxc5 Bxc5 6. Nf3 b6 7. Bg5 Bb7 8. e3 Be7 9. Be2 O-O 10. O-O Na6 11. Rfd1 h6 12. Bh4 Re8 13. Qd2 Bb4 14. Ne5 g5 15. Bg3 Re7 16. Qc1 Nc5 17. Nb5 Qf8 18. Nd6 Ba6 19. Bf3 Rd8 20. Qc2 h5 21. a3 Ba5 22. b4 h4 23. Nexf7 Rxf7 24. Nxf7 Qxf7 25. Be5 g4 26. Be2 Nfe4 27. Bxg4 Qg6 28. f3 Qg5 29. Bf4 Qg7 30. bxa5 e5 31. Qb2 exf4 32. Qxg7+ Kxg7 33. fxe4 fxe3 34. axb6 axb6 35. Rab1 Bxc4 36. Rxb6 Bd3 37. Rd6 Bxe4 38. Rc1 Nb7 39. Rxd7+ Rxd7 40. Bxd7 Nd6 41. Re1 Bd5 42. Rxe3 Nc4 43. Rd3 Nb6 44. Rd4 Kf6 45. Bb5 Kg5 46. Kf2 Bf7 47. Be2 Bh5 48. Bxh5 Kxh5 49. Rb4 Nd7 50. Rd4 Nf6 51. Kf3 Kg5 52. Rf4 Nd7 53. Re4 Nf6 54. Rb4 Kh5 55. Rc4 Nd7 56. Re4 Nf6 57. Rc4 Nd7 58. Rd4 Ne5+ 59. Kf4 Ng6+ 60. Kf3 Ne7 61. Re4 Ng6 62. Rd4 Ne5+ 63. Kf4 Ng6+ 64. Ke4 Kg5 65. Rd8 Kf6 66. Re8 Kg7 67. Rb8 Kf6 68. Rb6+ Kf7 69. Kf5 Ne7+ 70. Kg4 Nd5 71. Rb7+ Kg6 72. Kxh4 Ne3 73. Kg3 Kf6 74. Rb3 Nf1+ 75. Kh3 Nd2 76. Rd3 Ne4 77. Kh4 Ng5 78. Rd5 Ne4 79. Rd8 Ke7 80. Rd1 Nd6 81. Rd3 Ke6 82. Rf3 Ke5 83. Rf8 Ke6 84. Kg3 Nb5 85. Rf3 Nd4 86. Rd3 Ke5 87. Kf2 Ne6 88. Re3+ Kd6 89. Kg3 Nc7 90. Rd3+ Ke7 91. Re3+ Ne6 92. Re1 Kf6 93. Re3 Nd4 94. Rd3 Nf5+ 95. Kf2 Nh6 96. Rc3 Ke5 97. Re3+ Kf4 98. Re8 Ng4+ 99. Kg1 Kf5 100. Rd8 Ke6 101. Rb8 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "18"]
+[White "irida 0.8.0 as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1-0"]
+[Annotator "Irida arena seed=536733383 pair=9"]
+[Opening "Arena pair 9 line_len=20"]
+
+1. d4 Nf6 2. c4 e6 3. Nc3 Bb4 4. Qc2 c5 5. dxc5 Bxc5 6. Nf3 b6 7. Bg5 Bb7 8. e3 Be7 9. Be2 O-O 10. O-O Na6 11. Rfd1 h6 12. Bxf6 Bxf6 13. e4 Nc7 14. e5 Be7 15. Qd3 Bc6 16. Nd4 Bb7 17. Nb3 Bc6 18. Bf3 Bb4 19. Nd4 Qg5 20. Bxc6 Rad8 21. Ba4 Qxe5 22. Nc2 Bxc3 23. Qxc3 Qxc3 24. bxc3 d6 25. Nd4 d5 26. Nc6 Ra8 27. Ne7+ Kh8 28. cxd5 b5 29. Bb3 Rfe8 30. d6 Na6 31. Nc6 Nc5 32. d7 Red8 33. Nxd8 Rxd8 34. Bc2 Kg8 35. Rab1 a6 36. Rd6 g5 37. Rbd1 Kg7 38. Rc6 Rxd7 39. Rxc5 Rxd1+ 40. Bxd1 Kf6 41. Bh5 g4 42. Rc6 a5 43. Rc7 Kg5 44. Bxf7 Kf6 45. Bh5 g3 46. hxg3 b4 47. cxb4 axb4 48. Rb7 Kg5 49. Rb5+ Kf6 50. Bg4 e5 51. Bh3 b3 52. Rxb3 Kg7 53. Rb6 e4 54. Re6 e3 55. fxe3 h5 56. Bf5 Kf7 57. Rh6 Kg7 58. Rxh5 Kf6 59. Kf1 Ke5 60. Ke2 Kd5 61. Rh8 Ke5 62. Rf8 Kd6 63. Rf7 Kc6 64. Rd7 Kb6 65. Be4 Kb5 66. Kd3 Kc5 67. Kc2 Kb4 68. Kd3 Kc5 69. Kc3 Kb5 70. Kd4 Kb4 71. Bd3 Ka4 72. Kc3 Ka5 73. Rb7 Ka4 74. Ra7# 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "19"]
+[White "irida 0.8.0 as E1"]
+[Black "irida 0.8.0 as E2"]
+[Result "1-0"]
+[Annotator "Irida arena seed=536733383 pair=10"]
+[Opening "Arena pair 10 line_len=14"]
+
+1. d4 Nf6 2. c4 e6 3. Nc3 d5 4. cxd5 exd5 5. Bg5 Be7 6. e3 O-O 7. Bd3 Nbd7 8. Qb3 c5 9. Bf5 Nb6 10. Bxc8 Rxc8 11. Nb5 Nbd7 12. Nf3 Qb6 13. O-O a6 14. Nc3 Qxb3 15. axb3 cxd4 16. Nxd4 Bb4 17. Na2 Bc5 18. Nf3 Rfe8 19. Rfd1 Ne4 20. Rxd5 Nb6 21. Rdd1 Nxg5 22. Nxg5 Be7 23. Nf3 Rc2 24. Rab1 Bf6 25. Rd6 Re6 26. Rxe6 fxe6 27. Nb4 Rc5 28. Nd3 Rc2 29. Rd1 Bxb2 30. Nfe1 Re2 31. Kf1 Rxe1+ 32. Nxe1 Nd5 33. Nd3 Ba3 34. Ne5 Bc5 35. e4 Nf6 36. Rd8+ Bf8 37. Nd7 Nxd7 38. Rxd7 b6 39. Ra7 a5 40. Rd7 Ba3 41. Rb7 Bc5 42. Ke2 Kf8 43. Rd7 Bb4 44. Kf3 Kg8 45. Kg4 Bc3 46. Rd6 Kf7 47. Rxb6 Be5 48. f4 Bc3 49. Rb7+ Kf8 50. Rd7 Ke8 51. Ra7 Kf8 52. f5 exf5+ 53. Kxf5 Kg8 54. Ke6 g6 55. Rd7 Be1 56. Ke5 Bf2 57. Kf4 Kh8 58. Rd8+ Kg7 59. Rd5 Bb6 60. Rd7+ Kg8 61. Kg3 Be3 62. Rd6 Bc5 63. Ra6 Bb4 64. Ra8+ Kg7 65. Ra7+ Kg8 66. Rd7 Bc5 67. Rd8+ Kg7 68. Rd5 Bb6 69. Rd7+ Kg8 70. Rb7 Bd4 71. Rb5 Bc3 72. Rc5 Be1+ 73. Kf3 Kf7 74. Rc7+ Kg8 75. Rc1 Bb4 76. e5 Bd2 77. Rc8+ Kg7 78. Rc2 Bb4 79. Rc7+ Kg8 80. Ke2 Ba3 81. Kf3 Bb2 82. Rc5 a4 83. bxa4 Kf7 84. Ke4 Ke6 85. Rc6+ Ke7 86. Kd5 Kd8 87. Rb6 Bc1 88. Rb7 h5 89. Ke4 g5 90. Rb1 Ba3 91. Kf5 Be7 92. Rb7 g4 93. e6 Bc5 94. Rh7 Bf2 95. Kf4 Ke8 96. Rxh5 Ke7 97. Re5 Bb6 98. Kxg4 Bc7 99. Re1 Bd6 100. g3 Kf6 101. Re2 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "20"]
+[White "irida 0.8.0 as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1/2-1/2"]
+[Annotator "Irida arena seed=536733383 pair=10"]
+[Opening "Arena pair 10 line_len=14"]
+
+1. d4 Nf6 2. c4 e6 3. Nc3 d5 4. cxd5 exd5 5. Bg5 Be7 6. e3 O-O 7. Bd3 Nbd7 8. Qf3 h6 9. Bh4 g5 10. Bg3 Nc5 11. Bf5 Nd3+ 12. Kf1 g4 13. Bh7+ Kxh7 14. Qe2 Nb4 15. a3 Nc6 16. Qc2+ Kg8 17. Bf4 Bd7 18. Bxh6 Re8 19. Bg5 Be6 20. Nge2 Nh5 21. Bxe7 Rxe7 22. Rg1 Re8 23. Ng3 Nxg3+ 24. hxg3 Kg7 25. Qa4 Kf6 26. Rh1 Rb8 27. Rc1 Rh8 28. Ke2 Rxh1 29. Rxh1 Qd7 30. Qb5 Qd6 31. Qa4 a6 32. Qc2 Kg5 33. Qh7 Qf8 34. Nxd5 Bxd5 35. Rh5+ Kf6 36. Rxd5 Re8 37. Qf5+ Kg7 38. Qxg4+ Kh7 39. Rh5+ Qh6 40. Kf3 Qxh5 41. Qxh5+ Kg7 42. Qg4+ Kh7 43. Qd7 Re7 44. Qc8 Re6 45. Qxb7 Nd8 46. Qxc7 Rf6+ 47. Ke2 Ne6 48. Qe5 Rg6 49. d5 Ng7 50. Qc7 Kg8 51. Qb8+ Kh7 52. Qb7 Kg8 53. d6 Nh5 54. Qxa6 Nf6 55. Qc8+ Kg7 56. d7 Nxd7 57. Qxd7 Rh6 58. Qd4+ Kg8 59. Qd8+ Kg7 60. Qg5+ Rg6 61. Qe5+ Kg8 62. Qh5 Rb6 63. Qg5+ Kh7 64. Qh4+ Kg6 65. Qe4+ Kh6 66. Qh4+ Kg6 67. Qe4+ Kh6 68. Qh4+ Kg6 69. Qe4+ Kh6 70. Qh4+ Kg6 71. Qe4+ Kh6 72. Qh4+ Kg6 1/2-1/2
+
