@@ -9,6 +9,7 @@
 // @desc Engine core: Engine struct, init, and global engine instance.
 
 // @const ENGINE_NAME
+// @desc Default UCI id before apps/irida.c may override with IRIDA_UCI_NAME.
 #define ENGINE_NAME "irida"
 
 // @const ENGINE_AUTHOR

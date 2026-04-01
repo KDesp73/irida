@@ -121,9 +121,16 @@ def play_match(
     e1, e2 = None, None
     setoptions = setoptions or []
 
+    # Generous timeout: play() uses timeout+movetime; quit() uses this alone. Hung
+    # searches that ignore stop need engine fixes, but we still force-close on quit.
+    engine_timeout_s = 30.0
     try:
-        e1 = chess.engine.SimpleEngine.popen_uci(engine1_path)
-        e2 = chess.engine.SimpleEngine.popen_uci(engine2_path)
+        e1 = chess.engine.SimpleEngine.popen_uci(
+            engine1_path, timeout=engine_timeout_s
+        )
+        e2 = chess.engine.SimpleEngine.popen_uci(
+            engine2_path, timeout=engine_timeout_s
+        )
 
         apply_engine_options(e1, setoptions)
         apply_engine_options(e2, setoptions)
@@ -339,10 +346,16 @@ def play_match(
                 f.write(str(game) + "\n\n")
 
     finally:
-        if e1:
-            e1.quit()
-        if e2:
-            e2.quit()
+        for eng in (e1, e2):
+            if eng is None:
+                continue
+            try:
+                eng.quit()
+            except Exception:
+                try:
+                    eng.close()
+                except Exception:
+                    pass
 
     return results, stats, full_n1, full_n2, filename, match_seed
 

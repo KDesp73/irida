@@ -242,6 +242,10 @@ bool syzygy_probe_root(Board* board, bool use_rule50, Move* best_move_out)
     if (!g_syzygy_loaded || !best_move_out) {
         return false;
     }
+    /* Fathom only has tables through TB_LARGEST pieces; skip root work otherwise. */
+    if (TB_LARGEST == 0 || syzygy_piece_count(board) > TB_LARGEST) {
+        return false;
+    }
     if (board->castling_rights != 0) {
         return false;
     }

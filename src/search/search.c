@@ -13,7 +13,9 @@
 
 #include "search.h"
 #include "castro.h"
+#include <string.h>
 #include "syzygy.h"
+#include "tbprobe.h"
 #include "tt.h"
 #include "uci.h"
 
@@ -23,12 +25,14 @@ static int negamax(
     OrderFn order,
     int depth, int ply,
     int a, int b,
+    bool tt_exact_ok,
     SearchConfig* config
 );
 
-/* PVS is sound only if the principal continuation is searched first with a full
- * window. Ordering should already rank the TT / iteration move highest; we also
- * swap it to index 0 when present so i==0 always matches that hint. */
+/* PVS: the principal continuation must be searched with a full window first.
+ * We swap the TT move to list slot 0 when present; the actual PV flag is set on
+ * the first MakeMove that succeeds, not on i==0 (slot 0 can fail if the TT move
+ * is stale). LMR must not apply to that first successful extension. */
 static void prioritize_hash_move(Move list[], size_t count, Move hash_move)
 {
     if (hash_move == NULL_MOVE || count == 0)
@@ -52,7 +56,8 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
     // 1. Syzygy Tablebase Probe
     Move tb_move = NULL_MOVE;
     size_t piece_count = castro_PieceCount(board);
-    if (config->useSyzygy && piece_count <= config->syzygyProbeLimit) {
+    if (config->useSyzygy && piece_count <= config->syzygyProbeLimit &&
+        TB_LARGEST > 0 && piece_count <= TB_LARGEST) {
         if (syzygy_probe_root(board, config->syzygy50MoveRule, &tb_move)) {
             printf("info string tablebase hit\n");
             return tb_move; 
@@ -128,7 +133,7 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
                 
                 int score = -negamax(board, eval, order,
                                      currentDepth - 1, 1,
-                                     -beta, -alpha, config);
+                                     -beta, -alpha, true, config);
 
                 if (search_should_stop()) break;
 
@@ -183,19 +188,30 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
             }
         }
 
-        if (search_should_stop()) break;
-
+        /* Commit this depth before checking stop: if movetime/stop fires right after
+         * the aspiration loop, we must not skip assignment or UCI sends bestmove (none). */
         best_move = currentBestMove;
         last_depth_score = bestScore;
 
-        // Report search results to UCI
         char moveBuf[10];
         castro_MoveToString(best_move, moveBuf);
         uci_report_search(currentDepth, last_depth_score,
                           search_elapsed_ms(), moveBuf);
 
+        if (search_should_stop()) break;
+
         // Exit if mate found
-        if (last_depth_score > (INF - MAX_PLY)) break; 
+        if (last_depth_score > (INF - MAX_PLY)) break;
+    }
+
+    if (best_move == NULL_MOVE) {
+        Board fb;
+        memset(&fb, 0, sizeof(fb));
+        castro_BoardInitFen(&fb, root_fen_snapshot);
+        Moves m = castro_GenerateLegalMoves(&fb);
+        if (m.count > 0)
+            best_move = m.list[0];
+        castro_BoardFree(&fb);
     }
 
     return best_move;
@@ -203,6 +219,7 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 
 static int negamax(Board* board, EvalFn eval, OrderFn order,
                    int depth, int ply, int alpha, int beta,
+                   bool tt_exact_ok,
                    SearchConfig* config)
 {
     int alphaOrig = alpha;
@@ -221,7 +238,7 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
     if (alpha < mated_score) alpha = mated_score;
     if (beta <= alpha) return alpha;
 
-    if ((g_searchStats.nodes & 2047) == 0 && search_time_up())
+    if ((g_searchStats.nodes & 1023) == 0 && search_time_up())
         uci_state.stopRequested = true;
     if (search_should_stop()) return 0;
 
@@ -229,8 +246,14 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
     if (ply > g_searchStats.selDepth) g_searchStats.selDepth = ply;
 
     // --- 3. Syzygy Probe ---
-    int piece_count = castro_PieceCount(board);
-    if (config->useSyzygy && ply > 0 && piece_count <= config->syzygyProbeLimit) {
+    /* Stockfish-style: always probe below the user piece cap; at the cap, require
+     * remaining depth >= SyzygyProbeDepth so shallow nodes do not hammer TB. */
+    size_t piece_count = castro_PieceCount(board);
+    bool tb_wdl_eligible = config->useSyzygy && ply > 0 &&
+        piece_count <= config->syzygyProbeLimit &&
+        (piece_count < config->syzygyProbeLimit ||
+         (depth >= 0 && (size_t)depth >= config->syzygyProbeDepth));
+    if (tb_wdl_eligible) {
         int tb_score = syzygy_probe_wdl(board, config->syzygy50MoveRule);
         if (tb_score != SYZYGY_PROBE_FAILED) {
             if (config->useTT)
@@ -249,7 +272,8 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
         castro_HasNonPawnMaterial(board, board->turn))
     {
         castro_MakeNullMove(board);
-        int score = -negamax(board, eval, order, depth - 1 - 3, ply + 1, -beta, -beta + 1, config);
+        int score = -negamax(board, eval, order, depth - 1 - 3, ply + 1, -beta, -beta + 1,
+                             false, config);
         castro_UnmakeNullMove(board);
 
         if (score >= beta)
@@ -268,6 +292,12 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
     int bestScore = -INF;
     const bool parent_in_check = castro_IsInCheck(board);
 
+    /* PVS: the first *successfully played* legal move must use a full window.
+     * Using list index i==0 is wrong when MakeMove fails for that slot (e.g. TT
+     * best move inconsistent with the board); the next sibling would incorrectly
+     * get a zero-window scout and the tree can blow up. */
+    bool first_legal_extension = true;
+
     // Store quiet moves searched (for penalties)
     Move quiets_tried[MAX_MOVES];
     int quiet_count = 0;
@@ -284,12 +314,12 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
 
         int score;
 
-        const bool pv_node = (i == 0)
-            || (tt_move != NULL_MOVE && move == tt_move);
+        const bool pv_node = first_legal_extension;
+        first_legal_extension = false;
 
         /* LMR is independent of PVS: disabling PVS must not disable reductions. */
         int newDepth = depth - 1;
-        if (config->useLMR && depth >= 3 && i >= 4 &&
+        if (config->useLMR && depth >= 3 && i >= 4 && !pv_node &&
                 !parent_in_check && !is_capture && !gives_check &&
                 !(tt_move != NULL_MOVE && move == tt_move))
         {
@@ -301,17 +331,24 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
         const bool use_zw = config->usePVS && !pv_node;
 
         if (!use_zw) {
-            score = -negamax(board, eval, order, newDepth, ply + 1, -beta, -alpha, config);
+            score = -negamax(board, eval, order, newDepth, ply + 1, -beta, -alpha,
+                              tt_exact_ok, config);
             if (config->useLMR && newDepth < depth - 1 && score > alpha) {
-                score = -negamax(board, eval, order, depth - 1, ply + 1, -beta, -alpha, config);
+                score = -negamax(board, eval, order, depth - 1, ply + 1, -beta, -alpha,
+                                 tt_exact_ok, config);
             }
         } else {
             score = -negamax(board, eval, order, newDepth, ply + 1,
-                    -(alpha + 1), -alpha, config);
+                    -(alpha + 1), -alpha, false, config);
 
-            if (score > alpha) {
+            /* PVS: only re-search with a full window when the zero-window result is
+             * inside (alpha, beta). If score >= beta, the scout already failed high;
+             * re-searching every cutoff move explodes node count (looks like a hang).
+             * After LMR, the scout depth is shallow — always verify when it beats alpha. */
+            if (score > alpha &&
+                (newDepth < depth - 1 || score < beta)) {
                 score = -negamax(board, eval, order, depth - 1, ply + 1,
-                        -beta, -alpha, config);
+                        -beta, -alpha, tt_exact_ok, config);
             }
         }
 
@@ -361,6 +398,9 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
         if (bestScore <= alphaOrig) type = TT_UPPERBOUND;
         else if (bestScore >= beta) type = TT_LOWERBOUND;
         else type = TT_EXACT;
+
+        if (type == TT_EXACT && !tt_exact_ok)
+            type = TT_LOWERBOUND;
 
         tt_store(board->hash, depth, bestScore, type, bestMove, ply);
     }

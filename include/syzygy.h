@@ -27,7 +27,7 @@ bool syzygy_available(void);
 #define SYZYGY_PROBE_FAILED (-1000001)
 
 // @function syzygy_probe_wdl
-// @desc Probe WDL for current position. Returns score in centipawns (or draw/mate-like) if probe succeeds; otherwise SYZYGY_PROBE_FAILED. Call only when piece count <= limit, depth <= probe_depth, and (if 50-move rule) halfmove == 0 and castling == 0.
+// @desc Probe WDL for current position. Returns score in centipawns (or draw/mate-like) if probe succeeds; otherwise SYZYGY_PROBE_FAILED. Search gates probes by piece limit and SyzygyProbeDepth (Stockfish-style); Fathom also requires halfmove == 0 and no castling.
 // @param board Board position.
 // @param use_rule50 Whether to apply 50-move rule for TB.
 // @returns int WDL score or SYZYGY_PROBE_FAILED.
