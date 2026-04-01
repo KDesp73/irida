@@ -176,10 +176,8 @@ int syzygy_probe_wdl(Board* board, bool use_rule50)
         [TB_CURSED_WIN]   = 0,
         [TB_WIN]          = 10000,
     };
-    int score = (wdl < 5) ? score_tbl[wdl] : 0;
-    if (!board->turn)
-        score = -score;
-    return score;
+    /* Fathom WDL is from the side-to-move perspective (see tbprobe.h). */
+    return (wdl < 5) ? score_tbl[wdl] : 0;
 }
 
 bool syzygy_probe_root(Board* board, bool use_rule50, Move* best_move_out)

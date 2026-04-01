@@ -8,6 +8,7 @@
 //   + Null Move Pruning
 //   + Late Move Reductions
 //   + Aspiration Windows
+//   + PVS
 //   + Syzygy
 
 #include "search.h"
@@ -24,6 +25,25 @@ static int negamax(
     int a, int b,
     SearchConfig* config
 );
+
+/* PVS is sound only if the principal continuation is searched first with a full
+ * window. Ordering should already rank the TT / iteration move highest; we also
+ * swap it to index 0 when present so i==0 always matches that hint. */
+static void prioritize_hash_move(Move list[], size_t count, Move hash_move)
+{
+    if (hash_move == NULL_MOVE || count == 0)
+        return;
+    for (size_t j = 0; j < count; j++) {
+        if (list[j] != hash_move)
+            continue;
+        if (j != 0) {
+            Move tmp = list[0];
+            list[0] = list[j];
+            list[j] = tmp;
+        }
+        return;
+    }
+}
 
 Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 {
@@ -49,8 +69,18 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 
     search_start_timer(config->timeLimitMs);
 
+    char root_fen_snapshot[256];
+    castro_FenExport(board, root_fen_snapshot);
+    root_fen_snapshot[255] = '\0';
+
     // 3. Iterative Deepening Loop
     for (int currentDepth = 1; currentDepth <= config->maxDepth; currentDepth++) {
+        /* Deep search can leave side-to-move / fullmove out of sync with the
+         * piece grid while history.count is 0 (castro undo/metadata edge cases).
+         * Reload the root each depth so iterative deepening stays consistent. */
+        castro_BoardFree(board);
+        castro_BoardInitFen(board, root_fen_snapshot);
+
         if (search_time_up()) break;
 
         int delta = 40 + abs(last_depth_score) / 4;
@@ -78,19 +108,27 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
             bestScore = -INF;
             currentBestMove = NULL_MOVE;
 
+            /* Aspiration re-searches and deep negamax can leave root metadata wrong.
+             * Always rebuild root before generating moves. */
+            castro_BoardFree(board);
+            castro_BoardInitFen(board, root_fen_snapshot);
+
             // Generate and order moves
             Moves legal = castro_GenerateLegalMoves(board);
             order(board, legal.list, legal.count, 0, iterationBestMove);
+            prioritize_hash_move(legal.list, legal.count, iterationBestMove);
 
-            // Root move loop
+            // Root move loop: fresh root before each line so a bad unmake cannot
+            // poison the next sibling (or MoveToString / legality).
             for (size_t i = 0; i < legal.count; i++) {
+                castro_BoardFree(board);
+                castro_BoardInitFen(board, root_fen_snapshot);
+
                 if (!castro_MakeMove(board, legal.list[i])) continue;
                 
                 int score = -negamax(board, eval, order,
                                      currentDepth - 1, 1,
                                      -beta, -alpha, config);
-                
-                castro_UnmakeMove(board);
 
                 if (search_should_stop()) break;
 
@@ -163,36 +201,34 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
     return best_move;
 }
 
-static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply, int alpha, int beta, SearchConfig* config)
+static int negamax(Board* board, EvalFn eval, OrderFn order,
+                   int depth, int ply, int alpha, int beta,
+                   SearchConfig* config)
 {
-    // 1. Static Checks
-    if (ply > 0 && (castro_IsThreefoldRepetition(board) || board->halfmove >= 100)) {
-        return 0;
-    }
+    int alphaOrig = alpha;
 
-    // 2. TT Probe: Fastest check, do this first.
+    // --- 1. Static Checks ---
+    if (ply > 0 && (castro_IsThreefoldRepetition(board) || board->halfmove >= 100))
+        return 0;
+
+    // --- 2. TT Probe ---
     Move tt_move = NULL_MOVE;
     int tt_score = 0;
-    if (config->useTT && tt_probe(board->hash, depth, alpha, beta, ply, &tt_score, &tt_move)) {
+    if (config->useTT && tt_probe(board->hash, depth, alpha, beta, ply, &tt_score, &tt_move))
         return tt_score;
-    }
 
     int mated_score = -INF + ply;
     if (alpha < mated_score) alpha = mated_score;
     if (beta <= alpha) return alpha;
 
-    if ((g_searchStats.nodes & 2047) == 0) {
-        if (search_time_up()) {
-            uci_state.stopRequested = true;
-        }
-    }
+    if ((g_searchStats.nodes & 2047) == 0 && search_time_up())
+        uci_state.stopRequested = true;
     if (search_should_stop()) return 0;
 
     g_searchStats.nodes++;
-    if (ply > g_searchStats.selDepth)
-        g_searchStats.selDepth = ply;
+    if (ply > g_searchStats.selDepth) g_searchStats.selDepth = ply;
 
-    // 3. Syzygy Probe: Only if TT didn't give us a result.
+    // --- 3. Syzygy Probe ---
     int piece_count = castro_PieceCount(board);
     if (config->useSyzygy && ply > 0 && piece_count <= config->syzygyProbeLimit) {
         int tb_score = syzygy_probe_wdl(board, config->syzygy50MoveRule);
@@ -204,84 +240,123 @@ static int negamax(Board* board, EvalFn eval, OrderFn order, int depth, int ply,
         }
     }
 
-    // 4. Base Case: Leaf Node
-    if (depth <= 0) return config->useQuiescence ? quiescence(board, alpha, beta, ply, eval, order) : 0;
+    // --- 4. Base Case ---
+    if (depth <= 0)
+        return config->useQuiescence ? quiescence(board, alpha, beta, ply, eval, order) : 0;
 
-    // 5. Null Move Pruning
-    if (config->useNMP && depth >= 3 && !castro_IsInCheck(board) && castro_HasNonPawnMaterial(board, board->turn)) {
+    // --- 5. Null Move Pruning ---
+    if (config->useNMP && depth >= 3 && !castro_IsInCheck(board) &&
+        castro_HasNonPawnMaterial(board, board->turn))
+    {
         castro_MakeNullMove(board);
         int score = -negamax(board, eval, order, depth - 1 - 3, ply + 1, -beta, -beta + 1, config);
         castro_UnmakeNullMove(board);
 
-        if (score >= beta) {
-            // Prune if the null move search fails high
-            return (score >= MATE_SCORE) ? beta : score; 
-        }
+        if (score >= beta)
+            return (score >= MATE_SCORE) ? beta : score;
     }
 
-    // 6. Move Generation and Search
-    int original_alpha = alpha;
+    // --- 6. Move Generation ---
     Moves legal = castro_GenerateLegalMoves(board);
-    if (legal.count == 0) {
-        if (castro_IsInCheck(board)) return -INF + ply;
-        return 0;
-    }
+    if (legal.count == 0)
+        return castro_IsInCheck(board) ? -INF + ply : 0;
 
     order(board, legal.list, legal.count, ply, tt_move);
+    prioritize_hash_move(legal.list, legal.count, tt_move);
 
     Move bestMove = NULL_MOVE;
     int bestScore = -INF;
     const bool parent_in_check = castro_IsInCheck(board);
 
+    // Store quiet moves searched (for penalties)
+    Move quiets_tried[MAX_MOVES];
+    int quiet_count = 0;
+
     for (size_t i = 0; i < legal.count; ++i) {
-        bool is_capture = castro_IsCapture(board, legal.list[i]);
-        if (!castro_MakeMove(board, legal.list[i])) continue;
+        Move move = legal.list[i];
+        int side = board->turn;
+
+        bool is_capture = castro_IsCapture(board, move);
+
+        if (!castro_MakeMove(board, move)) continue;
+
         bool gives_check = castro_IsInCheck(board);
-        
-        // Only reduce quiet moves (not captures/checks) searched late in the list
-        bool use_lmr = config->useLMR && depth >= 3 && i >= 4 
-                       && !parent_in_check && !is_capture && !gives_check;
 
-        int score = 0;
-        if (use_lmr) {
-            int R = 1 + (depth / 6) + (i / 10); // Standard linear-ish reduction
-            int reduced_depth = depth - 1 - R;
-            if (reduced_depth < 1) reduced_depth = 1; // Don't reduce into Quiescence
+        int score;
 
-            // 1. Reduced Depth, Null Window Search
-            score = -negamax(board, eval, order, reduced_depth, ply + 1, -(alpha + 1), -alpha, config);
+        const bool pv_node = (i == 0)
+            || (tt_move != NULL_MOVE && move == tt_move);
 
-            // 2. If it still looks promising, re-search at Full Depth, Null Window
-            if (score > alpha && reduced_depth < depth - 1) {
-                score = -negamax(board, eval, order, depth - 1, ply + 1, -(alpha + 1), -alpha, config);
-            }
-
-            // 3. If it's STILL better than alpha, finally do a Full Depth, Full Window search
-            if (score > alpha) {
-                score = -negamax(board, eval, order, depth - 1, ply + 1, -beta, -alpha, config);
-            }
-        } else {
-            // Standard Full Depth Search
+        if (pv_node || !config->usePVS) {
             score = -negamax(board, eval, order, depth - 1, ply + 1, -beta, -alpha, config);
+        } 
+        else {
+            int newDepth = depth - 1;
+
+            if (config->useLMR && depth >= 3 && i >= 4 &&
+                    !parent_in_check && !is_capture && !gives_check &&
+                    !(tt_move != NULL_MOVE && move == tt_move))
+            {
+                int R = 1 + depth / 6 + i / 10;
+                newDepth -= R;
+                if (newDepth < 1) newDepth = 1;
+            }
+
+            score = -negamax(board, eval, order, newDepth, ply + 1,
+                    -(alpha + 1), -alpha, config);
+
+            if (score > alpha) {
+                score = -negamax(board, eval, order, depth - 1, ply + 1,
+                        -beta, -alpha, config);
+            }
         }
 
         castro_UnmakeMove(board);
 
         if (search_should_stop()) return 0;
 
+        // Quiet tracking
+        if (!is_capture && !gives_check) {
+            quiets_tried[quiet_count++] = move;
+        }
+
         if (score > bestScore) {
             bestScore = score;
-            bestMove = legal.list[i];
+            bestMove = move;
         }
 
         if (score > alpha) alpha = score;
-        if (alpha >= beta) break; 
+
+        if (alpha >= beta) {
+            if (!is_capture) {
+                int from = castro_GetFrom(move);
+                int to   = castro_GetTo(move);
+
+                int *h = &history_heuristic[side][from][to];
+                *h += depth * depth;
+
+                if (*h > HISTORY_MAX) *h = HISTORY_MAX;
+
+                for (int j = 0; j < quiet_count - 1; j++) {
+                    int f = castro_GetFrom(quiets_tried[j]);
+                    int t = castro_GetTo(quiets_tried[j]);
+
+                    int *hp = &history_heuristic[side][f][t];
+                    *hp -= depth * depth;
+
+                    if (*hp < -HISTORY_MAX) *hp = -HISTORY_MAX;
+                }
+            }
+            break;
+        }
     }
 
-    // 7. Store Result
+    // --- 7. TT Store ---
     if (config->useTT) {
-        TTNodeType type = (bestScore <= original_alpha) ? TT_UPPERBOUND : 
-            (bestScore >= beta) ? TT_LOWERBOUND : TT_EXACT;
+        TTNodeType type;
+        if (bestScore <= alphaOrig) type = TT_UPPERBOUND;
+        else if (bestScore >= beta) type = TT_LOWERBOUND;
+        else type = TT_EXACT;
 
         tt_store(board->hash, depth, bestScore, type, bestMove, ply);
     }

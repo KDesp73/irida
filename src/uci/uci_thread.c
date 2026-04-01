@@ -65,6 +65,12 @@ static void* search_thread_main(void* arg)
         g_search_running = true;
         pthread_mutex_unlock(&g_mutex);
 
+        /* Rebuild root from the last UCI position so a new "go" never searches
+         * a board left on the opponent's side to move after a prior search.
+         * BoardFree avoids leaking history.positions.entries before FenImport memset. */
+        castro_BoardFree(&engine.board);
+        castro_BoardInitFen(&engine.board, uci_state.gameFen);
+
         Move move = engine.search(&engine.board, engine.eval, engine.order, &g_searchConfig);
 
         pthread_mutex_lock(&g_mutex);

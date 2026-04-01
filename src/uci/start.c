@@ -35,5 +35,7 @@ int UciMain(void)
 {
     InitState(&uci_state);
     LoadUciConfig(&uci_state);
+    /* Line-buffer stdout so "info" lines appear promptly when stdout is a pipe. */
+    setvbuf(stdout, NULL, _IOLBF, 0);
     return UciMainLoop();
 }

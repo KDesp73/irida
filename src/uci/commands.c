@@ -254,6 +254,9 @@ void uci_position(UciState* state, const char* command)
             }
         }
     }
+
+    castro_FenExport(&engine.board, state->gameFen);
+    state->gameFen[sizeof(state->gameFen) - 1] = '\0';
 }
 
 void uci_uci(UciState* state)

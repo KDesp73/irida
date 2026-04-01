@@ -71,6 +71,7 @@ typedef struct {
 // @desc Full UCI state: start FEN, mode flags, time, options, status, last command.
 typedef struct {
     char startPositionFen[128];    // The starting position in FEN notation
+    char gameFen[256];           // Current position (after position + moves); resync before each search
     bool uciMode;                  // Whether the engine is currently running in UCI mode
     bool debugMode;                // Debug mode
     int depthLimit;                // Search depth limit for the engine
@@ -184,7 +185,10 @@ static inline void StateSetStartPos(UciState* state, const char* startpos)
 {
     strncpy(state->startPositionFen, startpos, sizeof(state->startPositionFen) - 1);
     state->startPositionFen[sizeof(state->startPositionFen) - 1] = '\0'; // Null-terminate
+    castro_BoardFree(&engine.board);
     castro_BoardInitFen(&engine.board, state->startPositionFen);
+    castro_FenExport(&engine.board, state->gameFen);
+    state->gameFen[sizeof(state->gameFen) - 1] = '\0';
 }
 
 // @function InitState

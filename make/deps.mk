@@ -33,7 +33,7 @@ build.castro: vendor/castro ## Build castro move-generation library
 	@[ "$(UNAME_S)" = Darwin ] && (cd vendor/castro && grep -q 'SHARED_FLAG' Makefile || (patch -N -p0 < ../../make/patches/castro-darwin.patch || true; rm -f Makefile.rej); \
 		sed -e 's/-L\. -l:$$(A_NAME)/$$(A_NAME)/g' -e 's/-shared /$$(SHARED_FLAG) /g' Makefile > Makefile.tmp && mv Makefile.tmp Makefile) || true
 	@cd vendor/castro && make all type=RELEASE
-	@cp vendor/castro/libcastro.a 
+	@[ "$(UNAME_S)" = Darwin ] && cp vendor/castro/libcastro.a deps/lib/macos/libcastro.a || cp vendor/castro/libcastro.a deps/lib/linux/libcastro.a
 
 build.nnue-probe: vendor/nnue-probe ## Build nnue-probe (Mac: clang, Linux: gcc)
 	@[ "$(UNAME_S)" = Darwin ] && [ "$$(uname -m)" = arm64 ] && ( \
