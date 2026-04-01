@@ -1,0 +1,200 @@
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "1"]
+[White "irida 0.8.0 as E1"]
+[Black "Stockfish dev-20250702-ce73441f  as E2"]
+[Result "0-1"]
+
+1. e4 e6 2. d4 d5 3. Nd2 Be7 4. Ngf3 Nf6 5. Bd3 c5 6. dxc5 dxe4 7. Nxe4 Nxe4 8. Bxe4 Qxd1+ 9. Kxd1 Bxc5 10. Bxb7 Bxb7 11. a3 a5 0-1
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "2"]
+[White "Stockfish dev-20250702-ce73441f  as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1-0"]
+
+1. d4 g6 2. e4 Bg7 3. Be3 d6 4. Nc3 c6 5. Qd2 b5 6. Bd3 Bxd4 7. Bxd4 b4 8. Bxh8 bxc3 9. Bxc3 c5 10. Ne2 c4 11. Bxc4 d5 12. Bxd5 Qxd5 13. Qxd5 g5 14. Qxa8 g4 15. Qxb8 e5 16. Qxc8+ Ke7 17. Rd1 f5 18. Rd7+ Kf6 19. Bxe5+ Ke6 20. Qe8+ Ne7 21. Qxe7# 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "3"]
+[White "irida 0.8.0 as E1"]
+[Black "Stockfish dev-20250702-ce73441f  as E2"]
+[Result "0-1"]
+
+1. Nf3 Nf6 2. c4 c6 3. d4 g6 4. g3 Bg7 5. Bg2 d5 6. cxd5 cxd5 7. Nc3 O-O 8. Ne5 e6 9. O-O Nfd7 10. f4 Nc6 11. Be3 Nb6 12. Bf2 a5 13. Nxc6 bxc6 14. Nxd5 exd5 15. Bxd5 cxd5 16. a3 Nc4 17. b3 Nd6 18. e3 Ne4 19. h3 Bxh3 20. a4 h5 21. Qxh5 gxh5 22. b4 Bxf1 23. Kxf1 axb4 24. g4 Qc8 25. gxh5 Kh7 26. a5 Qc2 27. Be1 b3 28. f5 Qh2 29. a6 Qh1+ 30. Ke2 Qg2+ 31. Bf2 Qxf2+ 0-1
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "4"]
+[White "Stockfish dev-20250702-ce73441f  as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1-0"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 g6 4. c3 a6 5. Ba4 d6 6. d4 Bd7 7. O-O Bg7 8. d5 Nce7 9. Bxd7+ Qxd7 10. c4 h6 11. Nc3 f5 12. Ne1 Nf6 13. f3 O-O 14. Nd3 g5 15. Bd2 Ng6 16. Nf2 f4 17. b4 Rf7 18. c5 Bf8 19. Na4 Re8 20. Rc1 h5 21. c6 Qc8 22. cxb7 Qxb7 23. Qe2 Rg7 24. Rc6 Ra8 25. Rfc1 Nh4 26. h3 g4 27. fxg4 hxg4 28. Nxg4 Nxg4 29. hxg4 Qb5 30. Qd1 Be7 31. Be1 Rf8 32. Nc3 Qxb4 33. Rb1 Qd4+ 34. Qxd4 exd4 35. Ne2 Nxg2 36. Kxg2 f3+ 37. Kf1 fxe2+ 38. Kxe2 Rxg4 39. Rxc7 Bg5 40. Kd3 Rf3+ 41. Kc4 Rxe4 42. Rb8+ Rf8 43. Rxf8+ Kxf8 44. Bf2 Re2 45. Bxd4 Rc2+ 46. Bc3 Rxa2 47. Kb3 Re2 48. Rc6 a5 49. Rxd6 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "5"]
+[White "irida 0.8.0 as E1"]
+[Black "Stockfish dev-20250702-ce73441f  as E2"]
+[Result "0-1"]
+
+1. d4 Nf6 2. Nf3 e6 3. g3 d5 4. Bg2 Be7 5. c4 O-O 6. O-O dxc4 7. Qc2 a6 8. Qxc4 b5 9. Qc2 Bb7 10. Bf4 Nc6 11. Rd1 Nb4 12. Qc1 Qc8 13. Bg5 c5 14. Bxf6 gxf6 15. dxc5 Qxc5 16. Qxc5 Bxc5 17. a3 Nc2 18. b3 Nxa1 19. e3 Rfd8 0-1
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "6"]
+[White "Stockfish dev-20250702-ce73441f  as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1-0"]
+
+1. c4 Nf6 2. Nc3 e6 3. Nf3 d5 4. d4 Be7 5. Bf4 O-O 6. e3 Nbd7 7. c5 c6 8. Bd3 b6 9. b4 a5 10. a3 Ba6 11. O-O Qc8 12. h3 h6 13. Qc2 Bxd3 14. Qxd3 Qb7 15. Rfc1 axb4 16. axb4 Rxa1 17. Rxa1 bxc5 18. bxc5 Nxc5 19. dxc5 Bxc5 20. Qa6 Qxa6 21. Rxa6 Bxe3 22. fxe3 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "7"]
+[White "irida 0.8.0 as E1"]
+[Black "Stockfish dev-20250702-ce73441f  as E2"]
+[Result "0-1"]
+
+1. d4 Nf6 2. c4 e6 3. Nf3 b6 4. g3 Ba6 5. Qa4 c5 6. Bg2 Bb7 7. dxc5 Bxc5 8. Nc3 O-O 9. O-O Be7 10. Bf4 Na6 11. Rfd1 Nc5 12. Qc2 Qc8 13. Rac1 Nce4 14. Nd4 Nxc3 15. Qxc3 a6 16. Bxb7 Qxb7 17. Nxe6 fxe6 18. Qxf6 Rxf6 19. Rxd7 Qxd7 20. a3 Rxf4 21. gxf4 Rd8 22. b3 Qd2 23. e3 Qxc1+ 24. Kg2 Qe1 25. h3 Rd2 26. Kf3 Qxf2+ 27. Ke4 Bf6 28. a4 Qg2# 0-1
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "8"]
+[White "Stockfish dev-20250702-ce73441f  as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1-0"]
+
+1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Be3 e6 7. Qd2 b5 8. f3 Nbd7 9. g4 Nb6 10. a4 Nc4 11. Bxc4 bxc4 12. g5 Nxe4 13. fxe4 Qxg5 14. Bxg5 a5 15. Ndb5 d5 16. Nc7+ Kd7 17. Nxa8 d4 18. Qxd4+ Bd6 19. O-O-O f6 20. Qxd6+ Ke8 21. Qc7 Bd7 22. Rxd7 fxg5 23. Rd8# 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "9"]
+[White "irida 0.8.0 as E1"]
+[Black "Stockfish dev-20250702-ce73441f  as E2"]
+[Result "0-1"]
+
+1. d4 Nf6 2. c4 e6 3. Nf3 b6 4. g3 Ba6 5. b3 Bb4+ 6. Bd2 Be7 7. Bg2 c6 8. Bc3 d5 9. Nbd2 Nbd7 10. Qc2 c5 11. e4 dxc4 12. bxc4 cxd4 13. Nxd4 Bb7 14. O-O Qc8 15. a4 O-O 16. a5 Nc5 17. axb6 axb6 18. Rfb1 Rxa1 19. Bxa1 Nfd7 20. Nxe6 fxe6 21. Bxg7 Kxg7 22. Rxb6 Nxb6 23. f3 Nbd7 24. h3 Kh8 25. f4 Bf6 26. g4 Bg7 27. h4 Qc7 28. e5 Rxf4 29. Bxb7 Qxb7 30. Qxh7+ Kxh7 31. g5 Qb2 32. g6+ Kh6 33. Nf1 Qf2+ 0-1
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "10"]
+[White "Stockfish dev-20250702-ce73441f  as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1/2-1/2"]
+
+1. e4 c5 2. Nf3 Nc6 3. Bb5 g6 4. Bxc6 dxc6 5. d3 Bg7 6. h3 Nf6 7. Nc3 O-O 8. Be3 b6 9. Qd2 e5 10. Bh6 Qd6 11. g4 Be6 12. Qe3 a5 13. Ne2 a4 14. a3 b5 15. Ng3 Ne8 16. O-O f6 17. Nd2 Rd8 18. Bxg7 Nxg7 19. f4 exf4 20. Qxf4 Qxf4 21. Rxf4 c4 22. Rf3 Bc8 23. Ndf1 Ne6 24. Ne2 cxd3 25. Rxd3 Rxd3 26. cxd3 Rd8 27. Rc1 c5 28. Rc3 Ba6 29. Kf2 Rd6 30. b4 axb3 31. Rxb3 b4 32. axb4 Bxd3 33. bxc5 Nxc5 34. Rb8+ Kg7 35. Nfg3 Nxe4+ 36. Nxe4 Bxe4 37. Re8 Bd5 38. Re7+ Bf7 39. Ra7 Kf8 40. Ra8+ Be8 41. Ke3 Re6+ 42. Kf2 Re4 43. Nc3 Re5 44. Rd8 Kg7 45. Nd5 Bf7 46. Ne3 h5 47. Rd7 Kf8 48. Rc7 h4 49. Rc8+ Kg7 50. Rc7 Ra5 51. Kf3 Ra2 52. Ng2 Ra3+ 53. Ne3 Kf8 54. Rc8+ Ke7 55. Rc7+ Ke8 56. Kf2 Be6 57. Rc2 Ke7 58. Re2 Kf7 59. Rd2 Ra4 60. Kf3 Bc8 61. Rb2 Ra7 62. Kf2 Bb7 63. Ng2 g5 64. Ne1 Be4 65. Re2 Bd5 66. Re3 Ra4 67. Kg1 Be4 68. Nf3 Ra1+ 69. Kf2 Ra2+ 70. Kf1 Bd5 71. Kg1 Ra4 72. Ne1 Be4 73. Nf3 Ra1+ 74. Kf2 Ra2+ 75. Kf1 Bd5 76. Kg1 Ra4 77. Ne1 Be4 78. Nf3 Ra1+ 79. Kf2 Ra2+ 80. Kf1 Bd5 81. Kg1 Ra4 82. Ne1 Be4 83. Nf3 Ra1+ 84. Kf2 Ra2+ 85. Kf1 Bd5 86. Kg1 Ra4 87. Ne1 1/2-1/2
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "11"]
+[White "irida 0.8.0 as E1"]
+[Black "Stockfish dev-20250702-ce73441f  as E2"]
+[Result "0-1"]
+
+1. e4 e6 2. d4 d5 3. Nc3 Bb4 4. e5 c5 5. a3 Bxc3+ 6. bxc3 Ne7 7. h4 Nbc6 8. h5 Qa5 9. Bd2 h6 10. dxc5 Nxe5 11. Bxh6 Rxh6 12. Qxd5 exd5 13. f3 Qxc3+ 14. Kd1 Qxa1+ 15. Kd2 Qxf1 16. c3 Nc4+ 17. Kc2 Bf5+ 18. Kb3 Qb1+ 19. Ka4 Ra6# 0-1
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "12"]
+[White "Stockfish dev-20250702-ce73441f  as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1-0"]
+
+1. e4 d6 2. d4 Nf6 3. Nc3 g6 4. Nf3 Bg7 5. Be2 O-O 6. O-O Bg4 7. Be3 Nc6 8. Qd2 e5 9. dxe5 dxe5 10. Rad1 Qc8 11. Qc1 Bxf3 12. Bxf3 Nxe4 13. Bxe4 g5 14. Bxg5 a5 15. Bxc6 bxc6 16. Bh6 Bxh6 17. Qxh6 a4 18. Qg5+ Kh8 19. Qf6+ Kg8 20. Qg5+ Kh8 21. Qf6+ Kg8 22. Rd3 h5 23. Qg5+ Kh7 24. Qxh5+ Kg7 25. Qg5+ Kh7 26. Rg3 Qg4 27. Qxg4 a3 28. Qg7# 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "13"]
+[White "irida 0.8.0 as E1"]
+[Black "Stockfish dev-20250702-ce73441f  as E2"]
+[Result "0-1"]
+
+1. d4 d5 2. c4 dxc4 3. Nf3 e6 4. e3 Nf6 5. Bxc4 c5 6. O-O a6 7. Bb3 cxd4 8. exd4 Nc6 9. Nc3 Be7 10. Re1 O-O 11. a3 Na5 12. Bc2 b5 13. d5 exd5 14. Rxe7 Qxe7 15. Nxb5 axb5 16. Bxh7+ Nxh7 17. Qxd5 Rd8 18. Qxd8+ Qxd8 19. g3 Qd1+ 20. Ne1 Qxe1+ 21. Kg2 Qe4+ 22. f3 Qe2+ 23. Kg1 Bh3 24. b4 Qg2# 0-1
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "14"]
+[White "Stockfish dev-20250702-ce73441f  as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1-0"]
+
+1. e4 e5 2. Nf3 Nf6 3. Nc3 Nc6 4. Bb5 Nd4 5. Ba4 c6 6. Nxe5 d6 7. Nd3 b5 8. Bb3 a5 9. a3 d5 10. e5 Ne4 11. O-O Nc5 12. Nxc5 Bxc5 13. Kh1 O-O 14. Ne2 a4 15. Ba2 f6 16. Nxd4 Bxd4 17. c3 Bxe5 18. d4 Bb8 19. Bb1 Ra7 20. Qf3 g5 21. Qh5 Qe8 22. Qxe8 Rxe8 23. Bd3 Bg4 24. Bd2 Be2 25. Rfe1 Rae7 26. Bf5 Kg7 27. Kg1 h5 28. g3 Bd6 29. Be3 Bg4 30. Bd3 Bf3 31. Bd2 Be4 32. Bxe4 Rxe4 33. Rxe4 Rxe4 34. Re1 g4 35. Kg2 f5 36. f3 Rxe1 37. Bxe1 f4 38. Bd2 fxg3 39. hxg3 Kg6 40. fxg4 hxg4 41. Bf4 Be7 42. Kf2 c5 43. dxc5 Bxc5+ 44. Be3 Bd6 45. Bf4 Bc5+ 46. Be3 Bd6 47. Bf4 Bc5+ 48. Be3 Bf8 49. Bf4 Kf5 50. Ke3 Bg7 51. Kd3 Bf6 52. Bb8 Ke6 53. Bf4 Bg7 54. Bb8 d4 55. cxd4 Kd5 56. Ba7 Bf8 57. Bb8 b4 58. axb4 Bxb4 59. Bf4 Be1 60. Be5 Bf2 61. Kc3 Be1+ 62. Kd3 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "15"]
+[White "irida 0.8.0 as E1"]
+[Black "Stockfish dev-20250702-ce73441f  as E2"]
+[Result "0-1"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Nxe4 6. d4 b5 7. Bb3 d5 8. dxe5 Be6 9. Nbd2 Nc5 10. c3 Bg4 11. Bc2 Qd7 12. Re1 d4 13. Nb3 dxc3 14. Qxd7+ Bxd7 15. bxc3 Nd8 16. Ng5 h6 17. Ne4 Nxe4 18. Bxe4 Bc6 19. a4 b4 20. Bd2 bxc3 21. Bxc3 Bxe4 22. Rxe4 Rb8 23. Nd2 Ne6 24. f4 g6 25. g4 h5 26. f5 Nc5 27. Rc4 gxf5 28. gxf5 Rg8+ 29. Kf1 Rd8 30. Rb1 Rg5 31. f6 Ne6 32. Ne4 Rg4 33. h3 Rf4+ 34. Ke2 h4 35. Rg1 c5 36. Rf1 Rxf1 37. Kxf1 Rd3 38. Nf2 Re3 39. Bb2 Rb3 40. Bc3 Kd7 41. Nd1 Nd4 42. Bxd4 cxd4 43. Rxd4+ Ke6 44. Rxh4 Kxe5 0-1
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "16"]
+[White "Stockfish dev-20250702-ce73441f  as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1/2-1/2"]
+
+1. Nf3 e6 2. c4 d5 3. d4 dxc4 4. e3 Nf6 5. Bxc4 c5 6. O-O a6 7. Bd3 cxd4 8. exd4 Be7 9. Ne5 O-O 10. Be3 Bd7 11. Nc3 Nc6 12. Rc1 Rc8 13. a3 Bd6 14. Nxd7 Qxd7 15. Qf3 Ne7 16. Bg5 Ned5 17. Bxf6 Nxf6 18. d5 Nxd5 19. Nxd5 Rxc1 20. Bxh7+ Kxh7 21. Qh5+ Kg8 22. Nf6+ gxf6 23. Qg4+ Kh7 24. Qh4+ Kg7 25. Qg4+ Kh7 26. Qh4+ Kg7 27. Qg4+ Kh7 28. Qh4+ Kg7 29. Qg4+ Kh7 30. Qh4+ Kg7 31. Qg4+ Kh7 1/2-1/2
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "17"]
+[White "irida 0.8.0 as E1"]
+[Black "Stockfish dev-20250702-ce73441f  as E2"]
+[Result "0-1"]
+
+1. d4 Nf6 2. c4 g6 3. Nf3 Bg7 4. Nc3 O-O 5. e4 d6 6. Be2 e5 7. O-O Nc6 8. d5 Ne7 9. Ne1 Nd7 10. Be3 f5 11. f3 f4 12. Bf2 g5 13. a4 a5 14. Nd3 b6 15. b4 axb4 16. Nxb4 Nc5 17. Bxc5 dxc5 18. g3 cxb4 19. gxf4 bxc3 20. fxe5 Bxe5 21. h3 Ng6 22. f4 gxf4 23. Rxf4 Qg5+ 24. Bg4 Qxf4 25. Bf3 Qh2+ 0-1
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "18"]
+[White "Stockfish dev-20250702-ce73441f  as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1-0"]
+
+1. e4 c6 2. d4 d5 3. Nc3 dxe4 4. Nxe4 Bf5 5. Ng3 Bg6 6. h4 h6 7. Nf3 Nd7 8. h5 Bh7 9. Bd3 Bxd3 10. Qxd3 Ngf6 11. Bd2 Nxh5 12. Rxh5 c5 13. dxc5 Nxc5 14. Rxc5 Qxd3 15. cxd3 h5 16. Ne4 h4 17. Ke2 h3 18. gxh3 Rxh3 19. Rac1 Rxf3 20. Kxf3 a5 21. Rc8+ Rxc8 22. Rxc8+ Kd7 23. Rxf8 a4 24. Rxf7 a3 25. bxa3 b5 26. Rxg7 b4 27. Bxb4 Kc6 28. Rxe7 Kd5 29. Nc5 Kd4 30. Re6 Kd5 31. Kf4 Kd4 32. Rd6# 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "19"]
+[White "irida 0.8.0 as E1"]
+[Black "Stockfish dev-20250702-ce73441f  as E2"]
+[Result "0-1"]
+
+1. d4 Nf6 2. Nf3 e6 3. e3 d5 4. Bd3 c5 5. b3 Nc6 6. dxc5 e5 7. Nxe5 Nxe5 8. Bxh7 Rxh7 9. Qxd5 Qxd5 10. a3 Qxg2 11. c3 Bg4 12. c4 O-O-O 0-1
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.03.29"]
+[Round "20"]
+[White "Stockfish dev-20250702-ce73441f  as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1-0"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O b5 6. Bb3 Bb7 7. Re1 Bc5 8. c3 d6 9. d4 Bb6 10. a4 h6 11. Be3 bxa4 12. dxe5 axb3 13. exf6 Bxe3 14. fxg7 Bxf2+ 15. Kxf2 a5 16. gxh8=Q+ Kd7 17. Qxh6 a4 18. Qh3+ f5 19. Qxf5+ Ke7 20. Qh7+ Kf6 21. Qd2 Ne5 22. Qdh6+ Ng6 23. Q6xg6# 1-0
+

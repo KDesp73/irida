@@ -1,4 +1,4 @@
-DIST_INCLUDE = $(INCLUDE_DIR) $(SO_NAME) $(A_NAME) $(TARGET) deps apps/
+DIST_INCLUDE = $(INCLUDE_DIR) $(SO_NAME) $(A_NAME) $(TARGET) deps apps/ Makefile make src service
 
 .PHONY: dist
 dist: build.all ## Create a tarball of the project
