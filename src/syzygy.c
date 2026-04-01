@@ -13,9 +13,13 @@
 #include "syzygy.h"
 #include "IncludeOnly/logging.h"
 #include "castro.h"
+#include <stdint.h>
 #include <string.h>
 
 #include "tbprobe.h"
+
+/* Fathom tbchess.c:is_valid — pawns may not sit on 1st/8th rank. */
+#define SYZYGY_BOARD_FILE_EDGE (0xFF000000000000FFull)
 
 static bool g_syzygy_loaded = false;
 static char g_syzygy_path[512];
@@ -140,9 +144,62 @@ static unsigned ep_square(const Board* b)
     return (unsigned)b->enpassant_square;
 }
 
+/* Fathom builds a material key from (white & queens), etc. If board->white/black
+ * lag behind bitboards[], keys disagree with piece masks and tbprobe can hit
+ * lsb(0) in fill_squares (assert in tbprobe.c). Mirror tbchess is_valid
+ * occupancy rules; skip is_legal() to avoid duplicating Fathom movegen. */
+static bool syzygy_fathom_layout_ok(Board* board)
+{
+    castro_BoardUpdateOccupancy(board);
+
+    if (TB_LARGEST == 0)
+        return false;
+
+    unsigned n = syzygy_piece_count(board);
+    if (n == 0 || n > TB_LARGEST)
+        return false;
+
+    uint64_t w = bitboard_white(board);
+    uint64_t blk = bitboard_black(board);
+    if (w & blk)
+        return false;
+
+    uint64_t k = bitboard_kings(board);
+    uint64_t q = bitboard_queens(board);
+    uint64_t r = bitboard_rooks(board);
+    uint64_t bs = bitboard_bishops(board);
+    uint64_t n2 = bitboard_knights(board);
+    uint64_t p = bitboard_pawns(board);
+
+    if (__builtin_popcountll(k) != 2u)
+        return false;
+    if (__builtin_popcountll(k & w) != 1u || __builtin_popcountll(k & blk) != 1u)
+        return false;
+
+    if ((k & q) || (k & r) || (k & bs) || (k & n2) || (k & p))
+        return false;
+    if ((q & r) || (q & bs) || (q & n2) || (q & p))
+        return false;
+    if ((r & bs) || (r & n2) || (r & p))
+        return false;
+    if ((bs & n2) || (bs & p) || (n2 & p))
+        return false;
+
+    if (p & SYZYGY_BOARD_FILE_EDGE)
+        return false;
+
+    if ((w | blk) != (k | q | r | bs | n2 | p))
+        return false;
+
+    return true;
+}
+
 int syzygy_probe_wdl(Board* board, bool use_rule50)
 {
     if (!g_syzygy_loaded)
+        return SYZYGY_PROBE_FAILED;
+
+    if (!syzygy_fathom_layout_ok(board))
         return SYZYGY_PROBE_FAILED;
 
     /* Fathom's public tb_probe_wdl requires halfmove == 0 and castling == 0. */
@@ -188,6 +245,8 @@ bool syzygy_probe_root(Board* board, bool use_rule50, Move* best_move_out)
     if (board->castling_rights != 0) {
         return false;
     }
+    if (!syzygy_fathom_layout_ok(board))
+        return false;
 
     struct TbRootMoves root_moves;
     memset(&root_moves, 0, sizeof(root_moves));

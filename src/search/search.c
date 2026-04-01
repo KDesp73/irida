@@ -287,21 +287,25 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
         const bool pv_node = (i == 0)
             || (tt_move != NULL_MOVE && move == tt_move);
 
-        if (pv_node || !config->usePVS) {
-            score = -negamax(board, eval, order, depth - 1, ply + 1, -beta, -alpha, config);
-        } 
-        else {
-            int newDepth = depth - 1;
+        /* LMR is independent of PVS: disabling PVS must not disable reductions. */
+        int newDepth = depth - 1;
+        if (config->useLMR && depth >= 3 && i >= 4 &&
+                !parent_in_check && !is_capture && !gives_check &&
+                !(tt_move != NULL_MOVE && move == tt_move))
+        {
+            int R = 1 + depth / 6 + i / 10;
+            newDepth -= R;
+            if (newDepth < 1) newDepth = 1;
+        }
 
-            if (config->useLMR && depth >= 3 && i >= 4 &&
-                    !parent_in_check && !is_capture && !gives_check &&
-                    !(tt_move != NULL_MOVE && move == tt_move))
-            {
-                int R = 1 + depth / 6 + i / 10;
-                newDepth -= R;
-                if (newDepth < 1) newDepth = 1;
+        const bool use_zw = config->usePVS && !pv_node;
+
+        if (!use_zw) {
+            score = -negamax(board, eval, order, newDepth, ply + 1, -beta, -alpha, config);
+            if (config->useLMR && newDepth < depth - 1 && score > alpha) {
+                score = -negamax(board, eval, order, depth - 1, ply + 1, -beta, -alpha, config);
             }
-
+        } else {
             score = -negamax(board, eval, order, newDepth, ply + 1,
                     -(alpha + 1), -alpha, config);
 
