@@ -14,12 +14,20 @@
 #include "eval.h"
 #include "moveordering.h"
 #include "search.h"
+#include "uci.h"
 
 int quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, OrderFn order)
 {
     g_searchStats.qnodes++;
     if (ply > g_searchStats.selDepth)
         g_searchStats.selDepth = ply;
+
+    /* Quiescence can explode on capture sequences; negamax only polls time/stop
+     * every N nodes at its own ply. Poll here so movetime / quit are honored. */
+    if ((g_searchStats.qnodes & 1023u) == 0u && search_time_up())
+        uci_state.stopRequested = true;
+    if (search_should_stop())
+        return alpha;
 
     // Pseudocode doesn't define MAX_PLY, but we keep it for safety
     if (ply >= MAX_PLY)
@@ -45,6 +53,9 @@ int quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, OrderFn 
     // until( every_capture_has_been_examined )
     for (size_t i = 0; i < moves.count; i++) {
         Move move = moves.list[i];
+
+        if (search_should_stop())
+            return alpha;
 
         if (!castro_MakeMove(board, move))
             continue;

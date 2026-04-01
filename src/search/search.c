@@ -370,6 +370,7 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
 
         if (alpha >= beta) {
             if (!is_capture) {
+                killer_store(move, ply);
                 int from = castro_GetFrom(move);
                 int to   = castro_GetTo(move);
 

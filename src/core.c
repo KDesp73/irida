@@ -15,6 +15,7 @@ void EngineInit(Engine* engine)
     castro_InitMagic();
     pesto_init();
     init_mvv_lva();
+    ordering_reset();
     tt_init(16);
 
     srand(time(NULL));
