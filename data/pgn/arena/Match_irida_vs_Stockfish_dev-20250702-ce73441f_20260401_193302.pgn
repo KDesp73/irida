@@ -1,0 +1,60 @@
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "1"]
+[White "irida 0.8.0 as E1"]
+[Black "Stockfish dev-20250702-ce73441f  as E2"]
+[Result "0-1"]
+[Annotator "Irida arena seed=1675206988 pair=1"]
+[Opening "Arena pair 1 line_len=10"]
+
+1. d4 Nf6 2. c4 e6 3. g3 d5 4. Nf3 dxc4 5. Qa4+ Nbd7 6. Qxc4 c5 7. dxc5 Bxc5 8. Nc3 a6 9. Bg5 Qb6 10. O-O-O O-O 11. Na4 Qa7 12. a3 b5 13. Qc2 bxa4 14. Bxf6 Nxf6 15. Ng5 e5 16. Bg2 Rb8 17. Be4 g6 18. Qc3 Qe7 19. b3 Re8 20. b4 Bd4 21. Qc2 Bd7 22. Bd3 Rec8 23. e3 Rxc2+ 24. Bxc2 Bb6 25. Rhg1 h6 26. f3 Rd8 27. Ne4 Nxe4 28. Bxe4 Be6 29. Rxd8+ Qxd8 30. h3 a5 31. Bxg6 fxg6 32. Rf1 Bxe3+ 33. Kb1 Qd3+ 34. Ka1 Bd4# 0-1
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "2"]
+[White "Stockfish dev-20250702-ce73441f  as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1-0"]
+[Annotator "Irida arena seed=1675206988 pair=1"]
+[Opening "Arena pair 1 line_len=10"]
+
+1. d4 Nf6 2. c4 e6 3. g3 d5 4. Nf3 dxc4 5. Qa4+ Nbd7 6. Bg2 Ke7 7. Na3 Nb6 8. Qa5 Qd5 9. Bd2 Bd7 10. Rc1 Bc6 11. Nc2 Qxa5 12. Bxa5 Ke8 13. Kf1 Bd6 14. Ne3 c3 15. Bxc3 Nbd5 16. Nxd5 Bxd5 17. Ne1 Rf8 18. Bxd5 Nxd5 19. e4 Nxc3 20. bxc3 Kd7 21. f4 Rae8 22. Ke2 e5 23. fxe5 Ba3 24. Rb1 Kc8 25. Rg1 Re6 26. Kd3 Rd8 27. Nc2 Be7 28. Rbf1 a5 29. Rxf7 Rg8 30. a4 b5 31. axb5 a4 32. Ra1 a3 33. Nxa3 Bxa3 34. Rxa3 c5 35. Ra8# 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "3"]
+[White "irida 0.8.0 as E1"]
+[Black "Stockfish dev-20250702-ce73441f  as E2"]
+[Result "0-1"]
+[Annotator "Irida arena seed=1675206988 pair=2"]
+[Opening "Arena pair 2 line_len=24"]
+
+1. d4 Nf6 2. c4 g6 3. Nc3 Bg7 4. e4 d6 5. Nf3 O-O 6. Be2 e5 7. O-O Nc6 8. d5 Ne7 9. b4 a5 10. Ba3 b6 11. bxa5 Rxa5 12. Bb4 Ra8 13. Qd2 Bd7 14. a3 Re8 15. g3 c5 16. Qg5 h6 17. Qe3 Kh7 18. h3 Bxh3 19. Rfe1 Bd7 20. Nb5 Bxb5 21. cxb5 cxb4 22. axb4 Rb8 23. Ra7 Ra8 24. g4 Rxa7 25. g5 Nh5 26. gxh6 Bxh6 27. Nd2 Ng8 28. f4 Bxf4 29. Qh3 Nh6 30. Nb1 Kg7 31. Bxh5 Ra8 32. Bf3 Rg8 33. Nd2 Bxd2 34. Bd1 Qg5+ 35. Bg4 Nxg4 36. Ra1 Rxa1+ 37. Qf1 Nf6+ 38. Kh1 Rh8# 0-1
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "4"]
+[White "Stockfish dev-20250702-ce73441f  as E2"]
+[Black "irida 0.8.0 as E1"]
+[Result "1-0"]
+[Annotator "Irida arena seed=1675206988 pair=2"]
+[Opening "Arena pair 2 line_len=24"]
+
+1. d4 Nf6 2. c4 g6 3. Nc3 Bg7 4. e4 d6 5. Nf3 O-O 6. Be2 e5 7. O-O Nc6 8. d5 Ne7 9. b4 a5 10. Ba3 b6 11. bxa5 Rxa5 12. Bb4 Ra8 13. a4 b5 14. cxb5 g5 15. a5 g4 16. Ne1 Re8 17. Nc2 Bd7 18. Ra4 g3 19. Ne3 gxh2+ 20. Kh1 Bh6 21. Ng4 Bxg4 22. Bxg4 Ng6 23. g3 Bg5 24. Bf5 Ne7 25. a6 c5 26. bxc6 Qb8 27. Bh3 h5 28. Qf3 Ra7 29. Rb1 h4 30. Qe2 hxg3 31. Ra3 gxf2 32. Ra2 Bh4 33. Ba3 f1=Q+ 34. Rxf1 Nxe4 35. Nxe4 f5 36. Rb2 Qa8 37. Qf3 Rxa6 38. Rg2+ Ng6 39. Rxg6+ Kf7 40. Qxf5+ Bf6 41. Nxd6+ Ke7 42. Qxf6# 1-0
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.01"]
+[Round "5"]
+[White "irida 0.8.0 as E1"]
+[Black "Stockfish dev-20250702-ce73441f  as E2"]
+[Result "0-1"]
+[Annotator "Irida arena seed=1675206988 pair=3"]
+[Opening "Arena pair 3 line_len=9"]
+
+1. Nf3 Nf6 2. d4 e6 3. g3 b5 4. Bg2 Bb7 5. O-O c5 6. Bf4 d5 7. dxc5 Nc6 8. a3 Bxc5 9. Nc3 Ba6 10. b3 O-O 11. e3 h6 12. Qd3 Rc8 13. b4 Bd6 14. Bxd6 Qxd6 15. Rfe1 Ne5 16. h3 Nxd3 17. cxd3 Qb8 18. a4 Kh7 19. d4 Rfe8 20. axb5 Bxb5 21. e4 Bc4 22. Re3 dxe4 23. Nxe4 Nxe4 24. g4 Nd6 25. Ne5 Red8 26. f3 Kg8 27. Nxc4 Nxc4 28. f4 Nxe3 29. h4 Nc2 30. Ra2 Kh8 31. b5 Qxb5 32. d5 exd5 33. f5 Qb4 34. g5 Qe1+ 35. Bf1 Qg3+ 36. Bg2 Ne3 37. h5 Rc1# 0-1
+

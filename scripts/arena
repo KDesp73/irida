@@ -20,6 +20,19 @@ from colorama import Fore, init
 
 init(autoreset=True)
 
+STOCKFISH_ELO = 1320
+
+def maybe_limit_stockfish(engine, name):
+    if "stockfish" in name.lower():
+        try:
+            engine.configure({
+                "UCI_LimitStrength": True,
+                "UCI_Elo": STOCKFISH_ELO
+            })
+            print(f"{Fore.YELLOW}Applied Stockfish Elo limit (2000) to: {name}{Fore.RESET}")
+        except Exception as e:
+            print(f"{Fore.RED}Failed to set Elo for {name}: {e}{Fore.RESET}")
+
 
 class ArenaUciEngine(chess.engine.SimpleEngine):
     """
@@ -155,6 +168,10 @@ def play_match(
 
         name1 = e1.id.get("name", "Engine1")
         name2 = e2.id.get("name", "Engine2")
+
+        maybe_limit_stockfish(e1, name1)
+        maybe_limit_stockfish(e2, name2)
+
         ver1 = e1.id.get("version", "")
         ver2 = e2.id.get("version", "")
 
