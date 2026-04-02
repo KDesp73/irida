@@ -39,7 +39,7 @@ else
 	LDFLAGS_CASTRO := -l:libcastro.a
 endif
 
-WARNINGS = -Wall -Wextra
+WARNINGS = -Wall -Wextra -Werror
 INCLUDES = -I$(INCLUDE_DIR) -Ideps/include -Ideps/include/fathom -Ideps/include/nnue-probe
 
 # Flags

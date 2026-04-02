@@ -10,12 +10,10 @@
 #include "castro.h"
 #include "core.h"
 #include "moveordering.h"
-#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "IncludeOnly/ansi.h"
-#include "IncludeOnly/kv.h"
 #include "uci.h"
 
 void print_moves(Moves moves)
@@ -75,13 +73,6 @@ void moves_diff(Moves m1, Moves m2) {
 //     return 0;
 // }
 
-static char* split_left(char* str) {
-    size_t i = 0;
-    while (str[i] && !isspace((unsigned char)str[i])) i++;
-    if (str[i]) i++;
-    return str + i;
-}
-
 static void wait_enter()
 {
     printf("Press Enter to continue...");
@@ -91,6 +82,8 @@ static void wait_enter()
 
 int main(int argc, char** argv)
 {
+    (void)argc;
+    (void)argv;
     EngineInit(&engine);
 
     char command[] = "position startpos moves g1f3 g8f6 c2c4 g7g6 b1c3 f8g7 e2e4 d7d6 d2d4 e8g8 f1e2 e7e5 c1e3 c7c6 d4d5 b8a6 e1g1 f6g4 e3g5 f7f6 g5h4 c6c5 f3e1 h7h5 a2a3 d8e7 b2b3 a6c7 g1h1 g4h6 e2d3 g6g5 h4g5 f6g5 d1h5 c8g4 f2f3 a7a5 h5g4 c7d5 c4d5 f8f3 e1f3 a5a4 g4g5 a4b3 g2g3 b3b2 g5g6 b2a1q g6g5 a8a7 g5e5 a1f1 f3g1 f1g1 h1g1 e7h4 g3h4 d6e5 h2h3 a7a4 d3c4 h6g4 h4h5 g7h6 g1h1 a4a3 h3g4 a3b3 d5d6 g8g7 g4g5 b7b5 c3d5 b3d3 g5g6 b5b4 c4d3 h6d2 h5h6 d2h6 d6d7 b4b3 d7d8r b3b2 d8d7 g7g6 d7d6 g6g5 h1g2 b2b1q d6h6 b1b3 h6f6 c5c4 f6f5 g5g6 d3e2 b3b1 d5c3 b1c2 f5e5 c2c3 e2d1 c3a1 e5d5 c4c3 e4e5 a1b2 g2f3 g6f5 e5e6 f5e6 d5h5 b2b1 h5b5 b1d1";

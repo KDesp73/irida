@@ -102,7 +102,6 @@ static void parse_go_command(const char* command)
     int maxDepth = g_searchConfig.maxDepth;
     int timeLimitMs = g_searchConfig.timeLimitMs;
     bool saw_wtime = false, saw_btime = false;
-    bool go_infinite = false;
 
     const char* p = command + 2;  /* skip "go" */
     while (*p) {
@@ -126,7 +125,6 @@ static void parse_go_command(const char* command)
         if (strncmp(p, "infinite", 8) == 0 && (p[8] == '\0' || p[8] == ' ')) {
             timeLimitMs = 0;
             maxDepth = 128;
-            go_infinite = true;
             p += 8;
             continue;
         }

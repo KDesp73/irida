@@ -16,7 +16,7 @@ int test_search(const char* fen, int depth_limit)
     SearchConfig config = {
         .maxDepth = depth_limit,
         .timeLimitMs = 100,
-        .useNullMove = true,
+        .useNMP = true,
         .useLMR = true,
         .useAspiration = true,
         .usePVS = true,
@@ -26,7 +26,7 @@ int test_search(const char* fen, int depth_limit)
         .syzygyProbeLimit = 7,
         .syzygy50MoveRule = true,
     };
-    Move move = negamax_id_ab_q_mo_tt_nmp(&board, evaluation, order_moves, &config);
+    Move move = search(&board, evaluation, order_moves, &config);
     castro_BoardFree(&board);
     (void)move;
     SUCC("search_root depth %d completed", depth_limit);

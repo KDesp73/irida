@@ -5,9 +5,6 @@ TODO: pick a license
 TODO: texel tuning
 TODO: principal variation search
 TODO: opening list for llm
-TODO: resolve warnings
-TODO: move ordering improvements
-TODO: playing illegal moves at certain depths issue
 DONE: engine testing
 DONE: cache
 DONE: tests
@@ -31,3 +28,6 @@ DONE: move translation before prompting
 DONE: MoveOverhead uci option
 DONE: Add castro_additions.h into castro
 DONE: aspiration windows
+DONE: playing illegal moves at certain depths issue
+DONE: move ordering improvements
+DONE: resolve warnings

@@ -11,9 +11,9 @@
 #include "IncludeOnly/logging.h"
 #include "eval.h"
 #include "castro.h"
-#include <string.h>
 #include <stdio.h>
-#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define FEN_BUFFER_SIZE 256
 

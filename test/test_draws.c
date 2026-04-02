@@ -2,7 +2,6 @@ int test_draws(const char* fen, int expected);
 
 #define TAG "draws"
 #include "IncludeOnly/test.h"
-#include "castro_additions.h"
 #include "castro.h"
 #include <string.h>
 
