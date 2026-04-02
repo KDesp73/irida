@@ -5,7 +5,6 @@ include make/dist.mk
 include make/docs.mk
 include make/install.mk
 include make/models.mk
-include make/service.mk
 include make/targets.mk
 include make/test.mk
 include make/training.mk
