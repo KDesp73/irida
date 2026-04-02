@@ -43,10 +43,12 @@ The search is based on the negamax algorithm with plenty of optimizations.
 + Transposition Table
 + Null Move Pruning
 + Late Move Reductions
++ Aspiration Windows
++ Principal Variation Search
 
 ### Syzygy
 
-Syzygy is enabled by default as long as the tablebase is installed
+Syzygy is enabled by default as long as the tablebase can be located
 
 
 ## License
@@ -57,4 +59,4 @@ Currently closed-source
 
 Konstantinos Despoindis ([KDesp73](https://github.com/KDesp73))
 
-> This engine is a work-in-progress, developed for learning, experimentation, and future research.
+> This engine is a work-in-progress, developed with learning, experimentation, and future research in mind.
