@@ -1,6 +1,6 @@
-# Move Ordering
+## Move Ordering
 
-## Role in the engine
+### Role in the engine
 
 `OrderFn` is a function pointer type: it receives the board, a **mutable** move array, the move count, the current **ply**, and an optional **TT / PV hint** move. The canonical implementation is `order_moves` in `src/moveordering.c`. The UCI binary sets `engine.order = order_moves` in `apps/irida.c` (and similarly in `apps/bench.c`).
 
@@ -14,14 +14,14 @@ Search calls ordering in three places:
 typedef void (*OrderFn)(Board* board, Move moves[], size_t count, size_t ply, Move tt_move);
 ```
 
-## Initialization and reset
+### Initialization and reset
 
 `EngineInit` (`src/core.c`) calls `init_mvv_lva()` to fill a static `MVV_LVA[12][12]` table and `ordering_reset()` to clear killers and history. `ordering_reset` is also the right hook for `ucinewgame`-style resets (killers + `history_heuristic`).
 
 **MVV-LVA table** (`init_mvv_lva`): for each attacker/victim piece type (12 = 6 white + 6 black in your indexing), the score is  
 `PIECE_VALUES[victim % 6] * 10 - PIECE_VALUES[attacker % 6]`, so trades prefer **Most Valuable Victim / Least Valuable Attacker**, using the same `PIECE_VALUES` as in `core.h` (pawn..queen; king 0).
 
-## Scoring tiers (single combined score, then `qsort`)
+### Scoring tiers (single combined score, then `qsort`)
 
 Each move gets one integer score. The design comment in code summarizes the priority:
 
@@ -57,13 +57,13 @@ Rough ordering:
 
 If `ply >= KILLER_MAX_PLIES`, the killer branch is skipped and quiets use history only (same clamping).
 
-## Sorting and stability
+### Sorting and stability
 
 For each move you build a `MoveScore { m, score, orig_idx }`, then `qsort` with `cmp_move_score_desc`: higher score first; on a tie, **lower `orig_idx` first** (deterministic, preserves original order among equals).
 
 For up to 256 moves you use a stack buffer; above that you `malloc` a row of `MoveScore` (if allocation fails, the function returns without reordering—worth knowing for edge-case robustness).
 
-## Killer moves: storage
+### Killer moves: storage
 
 `killer_store(m, ply)` is invoked from `negamax` only on a **beta cutoff** caused by a **non-capture** (`search.c`). It:
 
@@ -73,7 +73,7 @@ For up to 256 moves you use a stack buffer; above that you `malloc` a row of `Mo
 
 So you keep the two most recent distinct quiet cutoffs at that ply (standard two-killer scheme).
 
-## History heuristic: updates
+### History heuristic: updates
 
 Still in `negamax`, on a **quiet** beta cutoff (`!is_capture`):
 
@@ -82,11 +82,11 @@ Still in `negamax`, on a **quiet** beta cutoff (`!is_capture`):
 
 That is a **Butterfly-style** history: reward the move that refuted the node, penalize other quiet tries that did not. Only quiet moves participate; captures do not update history on cutoff.
 
-## Interaction with transposition table and `prioritize_hash_move`
+### Interaction with transposition table and `prioritize_hash_move`
 
 Ordering puts the TT/hint move at the top **score tier**, and `prioritize_hash_move` in `search.c` additionally swaps that encoded move into list index `0` when found. That supports the comment there: PVS treats the first **successfully played** extension as PV-related; if the best-scoring move fails `MakeMove`, you still want the hash/PV move in front when it exists in the list.
 
-## Quiescence-specific behavior
+### Quiescence-specific behavior
 
 Quiescence generates only captures (`MOVE_CAPTURE`), then calls `order(..., NULL_MOVE)`. So you only see **capture scoring** (MVV-LVA + promo bonus + en passant rule)—no TT tier, no killers, no history for those moves in the current pipeline (history could still affect ordering if you ever passed a non-null hint or mixed move types; with pure captures, you are in the capture branch only).
 
