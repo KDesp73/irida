@@ -29,6 +29,144 @@ static int negamax(
     SearchConfig* config
 );
 
+static int lmr_new_depth(
+    int depth,
+    size_t move_index,
+    bool pv_node,
+    bool parent_in_check,
+    bool is_capture,
+    bool gives_check,
+    Move tt_move,
+    Move move,
+    SearchConfig* config)
+{
+    int newDepth = depth - 1;
+    if (config->useLMR && depth >= 3 && move_index >= 4 && !pv_node &&
+        !parent_in_check && !is_capture && !gives_check &&
+        !(tt_move != NULL_MOVE && move == tt_move))
+    {
+        int R = 1 + depth / 6 + (int)move_index / 10;
+        newDepth -= R;
+        if (newDepth < 1)
+            newDepth = 1;
+    }
+    return newDepth;
+}
+
+static bool nmp_try_cutoff(
+    Board* board,
+    EvalFn eval,
+    OrderFn order,
+    int depth,
+    int ply,
+    int beta,
+    SearchConfig* config,
+    int* out_score)
+{
+    if (!config->useNMP || depth < 3 || castro_IsInCheck(board) ||
+        !castro_HasNonPawnMaterial(board, board->turn))
+        return false;
+
+    castro_MakeNullMove(board);
+    int score = -negamax(board, eval, order, depth - 1 - 3, ply + 1, -beta, -beta + 1,
+                         false, config);
+    castro_UnmakeNullMove(board);
+
+    if (score >= beta) {
+        *out_score = (score >= MATE_SCORE) ? beta : score;
+        return true;
+    }
+    return false;
+}
+
+/* Full window for the PV child; zero-window scout for siblings. Re-search when the scout
+ * beats alpha and either LMR was used (verify at full depth) or score < beta (avoid
+ * re-searching every fail-high, which explodes node count). */
+static int pvs_negamax_move(
+    Board* board,
+    EvalFn eval,
+    OrderFn order,
+    int depth,
+    int ply,
+    int alpha,
+    int beta,
+    int newDepth,
+    bool use_zw,
+    bool tt_exact_ok,
+    SearchConfig* config)
+{
+    int score;
+    const bool lmr_reduced = (newDepth < depth - 1);
+
+    if (!use_zw) {
+        score = -negamax(board, eval, order, newDepth, ply + 1, -beta, -alpha,
+                         tt_exact_ok, config);
+        if (config->useLMR && lmr_reduced && score > alpha) {
+            score = -negamax(board, eval, order, depth - 1, ply + 1, -beta, -alpha,
+                             tt_exact_ok, config);
+        }
+    } else {
+        score = -negamax(board, eval, order, newDepth, ply + 1,
+                         -(alpha + 1), -alpha, false, config);
+
+        if (score > alpha && (lmr_reduced || score < beta)) {
+            score = -negamax(board, eval, order, depth - 1, ply + 1,
+                             -beta, -alpha, tt_exact_ok, config);
+        }
+    }
+    return score;
+}
+
+static void aspiration_init_window(
+    SearchConfig* config,
+    int currentDepth,
+    int last_depth_score,
+    int* delta,
+    int* alpha,
+    int* beta)
+{
+    *delta = 40 + abs(last_depth_score) / 4;
+    *alpha = -INF;
+    *beta = INF;
+    if (config->useAspiration && currentDepth >= 5) {
+        *alpha = last_depth_score - *delta;
+        *beta = last_depth_score + *delta;
+    }
+}
+
+/* Aspiration is enabled and currentDepth >= 5. Returns true when the loop should stop
+ * (score inside window, or full-window fallback after repeated fails). */
+static bool aspiration_try_finish(
+    int bestScore,
+    int originalAlpha,
+    int originalBeta,
+    int* alpha,
+    int* beta,
+    int* delta,
+    int* failCount)
+{
+    if (bestScore <= originalAlpha) {
+        *alpha = originalAlpha - *delta;
+        *beta = originalBeta;
+        *delta *= 2;
+        (*failCount)++;
+    } else if (bestScore >= originalBeta) {
+        *alpha = originalAlpha;
+        *beta = originalBeta + *delta;
+        *delta *= 2;
+        (*failCount)++;
+    } else {
+        return true;
+    }
+
+    if (*failCount > 2) {
+        *alpha = -INF;
+        *beta = INF;
+        return true;
+    }
+    return false;
+}
+
 /* PVS: the principal continuation must be searched with a full window first.
  * We swap the TT move to list slot 0 when present; the actual PV flag is set on
  * the first MakeMove that succeeds, not on i==0 (slot 0 can fail if the TT move
@@ -88,14 +226,8 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 
         if (search_time_up()) break;
 
-        int delta = 40 + abs(last_depth_score) / 4;
-        int alpha = -INF;
-        int beta = INF;
-
-        if (config->useAspiration && currentDepth >= 5) {
-            alpha = last_depth_score - delta;
-            beta  = last_depth_score + delta;
-        }
+        int delta, alpha, beta;
+        aspiration_init_window(config, currentDepth, last_depth_score, &delta, &alpha, &beta);
 
         Move currentBestMove = NULL_MOVE;
         Move iterationBestMove = best_move;
@@ -149,43 +281,17 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 
             if (search_should_stop()) break;
 
-            // If aspiration disabled, accept immediately
             if (!config->useAspiration || currentDepth < 5) {
                 done = true;
                 break;
             }
 
-            // Correct fail detection using ORIGINAL bounds
-            if (bestScore <= originalAlpha) {
-                // Fail low
-                alpha = originalAlpha - delta;
-                beta  = originalBeta;
-                delta *= 2;
-                failCount++;
-            }
-            else if (bestScore >= originalBeta) {
-                // Fail high
-                alpha = originalAlpha;
-                beta  = originalBeta + delta;
-                delta *= 2;
-                failCount++;
-            }
-            else {
-                // Success
-                done = true;
-            }
-
-            // Update ordering hint for next re-search
-            if (currentBestMove != NULL_MOVE) {
+            if (currentBestMove != NULL_MOVE)
                 iterationBestMove = currentBestMove;
-            }
 
-            // Emergency fallback: switch to full window
-            if (failCount > 2) {
-                alpha = -INF;
-                beta  = INF;
+            if (aspiration_try_finish(bestScore, originalAlpha, originalBeta,
+                                     &alpha, &beta, &delta, &failCount))
                 done = true;
-            }
         }
 
         /* Commit this depth before checking stop: if movetime/stop fires right after
@@ -268,17 +374,9 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
         return config->useQuiescence ? quiescence(board, alpha, beta, ply, eval, order) : 0;
 
     // --- 5. Null Move Pruning ---
-    if (config->useNMP && depth >= 3 && !castro_IsInCheck(board) &&
-        castro_HasNonPawnMaterial(board, board->turn))
-    {
-        castro_MakeNullMove(board);
-        int score = -negamax(board, eval, order, depth - 1 - 3, ply + 1, -beta, -beta + 1,
-                             false, config);
-        castro_UnmakeNullMove(board);
-
-        if (score >= beta)
-            return (score >= MATE_SCORE) ? beta : score;
-    }
+    int nmp_score = 0;
+    if (nmp_try_cutoff(board, eval, order, depth, ply, beta, config, &nmp_score))
+        return nmp_score;
 
     // --- 6. Move Generation ---
     Moves legal = castro_GenerateLegalMoves(board);
@@ -317,40 +415,13 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
         const bool pv_node = first_legal_extension;
         first_legal_extension = false;
 
-        /* LMR is independent of PVS: disabling PVS must not disable reductions. */
-        int newDepth = depth - 1;
-        if (config->useLMR && depth >= 3 && i >= 4 && !pv_node &&
-                !parent_in_check && !is_capture && !gives_check &&
-                !(tt_move != NULL_MOVE && move == tt_move))
-        {
-            int R = 1 + depth / 6 + i / 10;
-            newDepth -= R;
-            if (newDepth < 1) newDepth = 1;
-        }
+        int newDepth = lmr_new_depth(depth, i, pv_node, parent_in_check,
+                                     is_capture, gives_check, tt_move, move, config);
 
         const bool use_zw = config->usePVS && !pv_node;
 
-        if (!use_zw) {
-            score = -negamax(board, eval, order, newDepth, ply + 1, -beta, -alpha,
-                              tt_exact_ok, config);
-            if (config->useLMR && newDepth < depth - 1 && score > alpha) {
-                score = -negamax(board, eval, order, depth - 1, ply + 1, -beta, -alpha,
-                                 tt_exact_ok, config);
-            }
-        } else {
-            score = -negamax(board, eval, order, newDepth, ply + 1,
-                    -(alpha + 1), -alpha, false, config);
-
-            /* PVS: only re-search with a full window when the zero-window result is
-             * inside (alpha, beta). If score >= beta, the scout already failed high;
-             * re-searching every cutoff move explodes node count (looks like a hang).
-             * After LMR, the scout depth is shallow — always verify when it beats alpha. */
-            if (score > alpha &&
-                (newDepth < depth - 1 || score < beta)) {
-                score = -negamax(board, eval, order, depth - 1, ply + 1,
-                        -beta, -alpha, tt_exact_ok, config);
-            }
-        }
+        score = pvs_negamax_move(board, eval, order, depth, ply, alpha, beta,
+                                 newDepth, use_zw, tt_exact_ok, config);
 
         castro_UnmakeMove(board);
 
