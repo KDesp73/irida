@@ -48,8 +48,8 @@ bool irida_SearchTimeUp(void)
 /* Elapsed ms since search_start_timer; used for UCI nps/time reporting. */
 uint64_t irida_SearchElapsedMs(void)
 {
-    if (g_timeLimitMs == 0)
-        return 0;
+    // if (g_timeLimitMs == 0)
+    //     return 0;
 
     uint64_t now = current_time_ms();
     return now - g_startTimeMs;
