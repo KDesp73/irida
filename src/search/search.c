@@ -19,6 +19,8 @@
 #include "tt.h"
 #include "uci.h"
 
+#define NMP_MIN_PIECES 8
+
 static int negamax(
     Board* board,
     EvalFn eval,
@@ -26,6 +28,7 @@ static int negamax(
     int depth, int ply,
     int a, int b,
     bool tt_exact_ok,
+    bool allow_nmp,
     SearchConfig* config
 );
 
@@ -64,16 +67,29 @@ static bool nmp_try_cutoff(
     int* out_score)
 {
     if (!config->useNMP || depth < 3 || castro_IsInCheck(board) ||
-        !castro_HasNonPawnMaterial(board, board->turn))
+        ply == 0 ||
+        !castro_HasNonPawnMaterial(board, board->turn) ||
+        castro_PieceCount(board) < NMP_MIN_PIECES)
         return false;
 
+    const int R = 2;
+
     castro_MakeNullMove(board);
-    int score = -negamax(board, eval, order, depth - 1 - 3, ply + 1, -beta, -beta + 1,
-                         false, config);
+    int score = -negamax(board, eval, order, depth - 1 - R, ply + 1, -(beta), -(beta - 1),
+                         false, true, config);
     castro_UnmakeNullMove(board);
 
-    if (score >= beta) {
-        *out_score = (score >= MATE_SCORE) ? beta : score;
+    if (irida_SearchShouldStop()) return false;
+
+    if (score < beta || score >= MATE_SCORE_THRESHOLD)
+        return false;
+
+    int verify = -negamax(board, eval, order, depth - 1, ply, -(beta), -(beta - 1), false, false, config);
+
+    if (irida_SearchShouldStop()) return false;
+
+    if (verify >= beta) {
+        *out_score = verify;
         return true;
     }
     return false;
@@ -92,6 +108,7 @@ static int pvs_negamax_move(
     int beta,
     int newDepth,
     bool use_zw,
+    bool allow_nmp,
     bool tt_exact_ok,
     SearchConfig* config)
 {
@@ -100,18 +117,18 @@ static int pvs_negamax_move(
 
     if (!use_zw) {
         score = -negamax(board, eval, order, newDepth, ply + 1, -beta, -alpha,
-                         tt_exact_ok, config);
+                         tt_exact_ok, allow_nmp, config);
         if (config->useLMR && lmr_reduced && score > alpha) {
             score = -negamax(board, eval, order, depth - 1, ply + 1, -beta, -alpha,
-                             tt_exact_ok, config);
+                             tt_exact_ok, allow_nmp, config);
         }
     } else {
         score = -negamax(board, eval, order, newDepth, ply + 1,
-                         -(alpha + 1), -alpha, false, config);
+                         -(alpha + 1), -alpha, false, allow_nmp, config);
 
         if (score > alpha && (lmr_reduced || score < beta)) {
             score = -negamax(board, eval, order, depth - 1, ply + 1,
-                             -beta, -alpha, tt_exact_ok, config);
+                             -beta, -alpha, tt_exact_ok, allow_nmp, config);
         }
     }
     return score;
@@ -265,7 +282,7 @@ Move irida_Search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config
                 
                 int score = -negamax(board, eval, order,
                                      currentDepth - 1, 1,
-                                     -beta, -alpha, true, config);
+                                     -beta, -alpha, true, true, config);
 
                 if (irida_SearchShouldStop()) break;
 
@@ -325,7 +342,7 @@ Move irida_Search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config
 
 static int negamax(Board* board, EvalFn eval, OrderFn order,
                    int depth, int ply, int alpha, int beta,
-                   bool tt_exact_ok,
+                   bool tt_exact_ok, bool allow_nmp,
                    SearchConfig* config)
 {
     int alphaOrig = alpha;
@@ -379,7 +396,7 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
 
     // --- 5. Null Move Pruning ---
     int nmp_score = 0;
-    if (nmp_try_cutoff(board, eval, order, depth, ply, beta, config, &nmp_score))
+    if (allow_nmp && nmp_try_cutoff(board, eval, order, depth, ply, beta, config, &nmp_score))
         return nmp_score;
 
     // --- 6. Move Generation ---
@@ -419,13 +436,20 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
         const bool pv_node = first_legal_extension;
         first_legal_extension = false;
 
-        int newDepth = lmr_new_depth(depth, i, pv_node, parent_in_check,
-                                     is_capture, gives_check, tt_move, move, config);
+        int newDepth = lmr_new_depth(depth, i, pv_node, parent_in_check, is_capture, gives_check, tt_move, move, config);
 
-        const bool use_zw = config->usePVS && !pv_node;
+        if (!config->usePVS) {
+            // Standard Alpha-Beta behavior
+            score = -negamax(board, eval, order, newDepth, ply + 1, -beta, -alpha, tt_exact_ok, allow_nmp, config);
 
-        score = pvs_negamax_move(board, eval, order, depth, ply, alpha, beta,
-                                 newDepth, use_zw, tt_exact_ok, config);
+            // If LMR was used and it failed high, we MUST re-search at full depth
+            if (config->useLMR && newDepth < depth - 1 && score > alpha) {
+                score = -negamax(board, eval, order, depth - 1, ply + 1, -beta, -alpha, tt_exact_ok, allow_nmp, config);
+            }
+        } else {
+            // PVS behavior (Scout search + Re-searches)
+            score = pvs_negamax_move(board, eval, order, depth, ply, alpha, beta, newDepth, !pv_node, tt_exact_ok, allow_nmp, config);
+        }
 
         castro_UnmakeMove(board);
 

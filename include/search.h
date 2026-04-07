@@ -23,6 +23,8 @@
 // @desc Maximum search ply.
 #define MAX_PLY    128
 
+#define MATE_SCORE_THRESHOLD (MATE_SCORE - MAX_PLY)
+
 // @struct SearchConfig
 // @desc Search parameters: depth, time, null-move, LMR, aspiration, TT, quiescence, Syzygy options.
 typedef struct {

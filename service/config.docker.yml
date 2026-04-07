@@ -1,9 +1,0 @@
-server:
-  port: 8765
-
-engines:
-  - "/engines/irida"
-  - "/usr/games/stockfish"
-
-llm:
-  enabled: false
