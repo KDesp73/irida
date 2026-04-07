@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+# --- Default Values ---
+SEED=1665215631
+BOOK="data/books/book.bin"
+GAMES=200
+THREADS=2  # Number of parallel arenas to run
+ARENA="./scripts/arena"
+
+# --- CLI Parameter Parsing ---
+usage() {
+    echo "Usage: $0 [-s seed] [-b book] [-g games] [-t threads]"
+    exit 1
+}
+
+while getopts "s:b:g:t:h" opt; do
+    case $opt in
+        s) SEED=$OPTARG ;;
+        b) BOOK=$OPTARG ;;
+        g) GAMES=$OPTARG ;;
+        t) THREADS=$OPTARG ;;
+        h) usage ;;
+        *) usage ;;
+    esac
+done
+
+# Build the targets
+make ab-testing-targets -B
+
+# --- Parallel Execution ---
+# We define the pairs we want to test
+pairs=(
+    "./irida-plain ./irida-q"
+    "./irida-q ./irida-q-tt"
+    "./irida-q-tt ./irida-q-tt-nmp"
+    "./irida-q-tt-nmp ./irida-q-tt-nmp-lmr"
+    "./irida-q-tt-nmp-lmr ./irida-q-tt-nmp-lmr-aw"
+    "./irida-q-tt-nmp-lmr-aw ./irida-q-tt-nmp-lmr-aw-pvs"
+)
+
+echo "Starting A/B testing with $THREADS parallel workers..."
+
+# Use GNU Parallel to run the commands
+# -j is the number of jobs (threads)
+# --colsep lets us split the pair into two arguments {1} and {2}
+printf "%s\n" "${pairs[@]}" | parallel -j "$THREADS" --colsep ' ' \
+    "$ARENA {1} {2} --book $BOOK --games $GAMES --seed $SEED"
+
+echo "All tests completed."
