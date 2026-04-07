@@ -280,10 +280,19 @@ bool irida_SyzygyProbeRoot(Board* board, bool use_rule50, Move* best_move_out)
     struct TbRootMove* rm = &root_moves.moves[0];
     unsigned from = TB_MOVE_FROM(rm->move);
     unsigned to   = TB_MOVE_TO(rm->move);
-    unsigned promotion = TB_MOVE_PROMOTES(rm->move);
 
-    // TODO: check that fathom's promotion encoding matches ours
-    *best_move_out = castro_MoveEncode(from, to, promotion, FLAG_NORMAL);
+    static const uint8_t TB_PROMO_TO_CASTRO[] = {
+        PROMOTION_NONE,
+        PROMOTION_QUEEN,
+        PROMOTION_ROOK,
+        PROMOTION_BISHOP,
+        PROMOTION_KNIGHT,
+    };
+    unsigned tb_promo = TB_MOVE_PROMOTES(rm->move);
+    uint8_t tb_promotion = (tb_promo < sizeof(TB_PROMO_TO_CASTRO))
+        ? TB_PROMO_TO_CASTRO[tb_promo]
+        : PROMOTION_NONE;
+    *best_move_out = castro_MoveEncode(from, to, tb_promotion, FLAG_NORMAL);
 
     return true;
 }

@@ -14,7 +14,7 @@ SearchConfig g_searchConfig = {
     .threads = 1,
 
     .useAspiration = true,
-    .usePVS = true,
+    .usePVS = false,
     .useLMR = true,
     .useNMP = true,
     .useTT = true,

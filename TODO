@@ -1,9 +1,7 @@
-TODO: Verify syzygy promotion encoding
 TODO: Bake masks into castro
 TODO: pick a license
 TODO: texel tuning
 TODO: opening list for llm
-TODO: prefix irida API
 DONE: engine testing
 DONE: cache
 DONE: tests
@@ -33,3 +31,5 @@ DONE: resolve warnings
 DONE: add veriance to draw score to avoid blindness to 3-fold lines
 DONE: principal variation search
 DONE: wire killer/history updates into search
+DONE: prefix irida API
+DONE: Verify syzygy promotion encoding
