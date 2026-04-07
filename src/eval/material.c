@@ -9,7 +9,7 @@
 #include "castro.h"
 #include "eval.h"
 
-int irida_material_eval(Board* board)
+int irida_EvalMaterial(Board* board)
 {
     size_t white = 0, black = 0;
 

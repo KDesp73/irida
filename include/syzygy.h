@@ -11,16 +11,16 @@
 // @desc Initialize Syzygy tablebases from path.
 // @param path Path to Syzygy .rtbw/.rtbz files.
 // @returns bool True on success.
-bool irida_syzygy_init(const char* path);
+bool irida_SyzygyInit(const char* path);
 
 // @function syzygy_free
 // @desc Free Syzygy resources.
-void irida_syzygy_free(void);
+void irida_SyzygyFree(void);
 
 // @function syzygy_available
 // @desc Whether tablebases are loaded and usable.
 // @returns bool True if loaded.
-bool irida_syzygy_available(void);
+bool irida_SyzygyAvailable(void);
 
 // @const SYZYGY_PROBE_FAILED
 // @desc Return value when probe fails; caller uses normal eval.
@@ -31,7 +31,7 @@ bool irida_syzygy_available(void);
 // @param board Board position.
 // @param use_rule50 Whether to apply 50-move rule for TB.
 // @returns int WDL score or SYZYGY_PROBE_FAILED.
-int irida_syzygy_probe_wdl(Board* board, bool use_rule50);
+int irida_SyzygyProbeWdl(Board* board, bool use_rule50);
 
 // @function syzygy_probe_root
 // @desc At root: probe DTZ and fill in best move if position is in TB.
@@ -39,13 +39,13 @@ int irida_syzygy_probe_wdl(Board* board, bool use_rule50);
 // @param use_rule50 Whether to apply 50-move rule.
 // @param best_move_out Output: best move if TB hit.
 // @returns bool True if TB move was chosen (best_move_out set).
-bool irida_syzygy_probe_root(Board* board, bool use_rule50, Move* best_move_out);
+bool irida_SyzygyProbeRoot(Board* board, bool use_rule50, Move* best_move_out);
 
 // @function syzygy_piece_count
 // @desc Total piece count (both sides).
 // @param board Board position.
 // @returns unsigned Piece count.
-unsigned irida_syzygy_piece_count(Board* board);
+unsigned irida_SyzygyPieceCount(Board* board);
 
 #define SYZYGY_DEFAULT_PATH "~/.irida/tb/dtz:~/.irida/tb/wdl"
 

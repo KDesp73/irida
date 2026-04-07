@@ -1,5 +1,6 @@
 #include "castro.h"
 #include "core.h"
+#include "moveordering.h"
 #include "tt.h"
 #include "version.h"
 #include <stdlib.h>
@@ -16,8 +17,8 @@ void irida_EngineInit(Engine* engine)
     // TODO: bake masks and magic into castro
     castro_InitMasks();
     castro_InitMagic();
-    irida_pesto_init();
-    irida_init_mvv_lva();
-    irida_ordering_reset();
-    irida_tt_init(16);
+    irida_EvalPestoInit();
+    irida_MVVLVAInit();
+    irida_OrderingReset();
+    irida_TTInit(16);
 }

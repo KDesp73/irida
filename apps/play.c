@@ -2,6 +2,9 @@
 #include "IncludeOnly/logging.h"
 #include "castro.h"
 #include "core.h"
+#include "eval.h"
+#include "moveordering.h"
+#include "search.h"
 #include "shared.h"
 #include <stdio.h>
 #include <string.h>
@@ -39,10 +42,10 @@ int main(int argc, char** argv)
     kv_parse(argc, argv);
     PieceColor playas = strcmp(kv_get("playas", "white"), "black") == 0 ? COLOR_BLACK : COLOR_WHITE;
 
-    EngineInit(&engine);
-    engine.eval = evaluation;
-    engine.search = search;
-    engine.order = order_moves;
+    irida_EngineInit(&engine);
+    engine.eval = irida_Evaluation;
+    engine.search = irida_Search;
+    engine.order = irida_OrderMoves;
 
     ansi_clear_screen();
     castro_BoardInitFen(&engine.board, STARTING_FEN);

@@ -55,7 +55,7 @@ void run_benchmark(SearchFn search, EvalFn eval, OrderFn order) {
         Board board;
         castro_BoardInitFen(&board, test_positions[i]);
         
-        irida_tt_clear(); 
+        irida_TTClear(); 
         g_searchStats.nodes = 0;
         g_searchStats.qnodes = 0;
 
@@ -103,21 +103,21 @@ int main(int argc, char** argv)
     }
 
     if(!strcmp("nnue", eval)) {
-        if(!irida_nnue_load(NNUE_DEFAULT_PATH)){
+        if(!irida_NNUELoad(NNUE_DEFAULT_PATH)){
             ERRO("Could not load nnue %s\n", NNUE_DEFAULT_PATH);
             return 1;
         }
-        evalfn = irida_nnue_eval;
-    } else if(!strcmp("handcrafted", eval)) evalfn = irida_evaluation;
-    else if(!strcmp("material", eval)) evalfn = irida_material_eval;
-    else evalfn = irida_evaluation;
+        evalfn = irida_EvalNNUE;
+    } else if(!strcmp("handcrafted", eval)) evalfn = irida_Evaluation;
+    else if(!strcmp("material", eval)) evalfn = irida_EvalMaterial;
+    else evalfn = irida_Evaluation;
 
     engine.search = searchfn;
     engine.eval = evalfn;
-    engine.order = irida_order_moves;
+    engine.order = irida_OrderMoves;
     g_searchConfig.maxDepth = depth;
 
-    run_benchmark(searchfn, evalfn, irida_order_moves);
+    run_benchmark(searchfn, evalfn, irida_OrderMoves);
 
     return 0;
 }

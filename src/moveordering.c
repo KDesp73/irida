@@ -45,7 +45,7 @@ static int cmp_move_score_desc(const void *a, const void *b)
     return 0;
 }
 
-void irida_init_mvv_lva(void)
+void irida_MVVLVAInit(void)
 {
     for (int attacker = 0; attacker < 12; attacker++) {
         for (int victim = 0; victim < 12; victim++) {
@@ -66,7 +66,7 @@ static inline int piece_index(char ch)
     }
 }
 
-int irida_mvv_lva_score(Board *board, Move m)
+int irida_MVVLVAScore(Board *board, Move m)
 {
     int from = castro_GetFrom(m);
     int to   = castro_GetTo(m);
@@ -83,7 +83,7 @@ int irida_mvv_lva_score(Board *board, Move m)
     return MVV_LVA[attacker][victim];
 }
 
-void irida_killer_store(Move m, int ply)
+void irida_KillerStore(Move m, int ply)
 {
     if (ply < 0 || ply >= KILLER_MAX_PLIES)
         return;
@@ -95,13 +95,13 @@ void irida_killer_store(Move m, int ply)
     killer_moves[ply][0] = m;
 }
 
-void irida_ordering_reset(void)
+void irida_OrderingReset(void)
 {
     memset(killer_moves, 0, sizeof(killer_moves));
     memset(history_heuristic, 0, sizeof(history_heuristic));
 }
 
-void irida_order_moves(Board *board, Move moves[], size_t count, size_t ply, Move tt_move)
+void irida_OrderMoves(Board *board, Move moves[], size_t count, size_t ply, Move tt_move)
 {
     if (count == 0)
         return;
@@ -129,7 +129,7 @@ void irida_order_moves(Board *board, Move moves[], size_t count, size_t ply, Mov
             if (castro_GetFlag(m) == FLAG_ENPASSANT) {
                 s = SCORE_CAPTURE_BASE + (PIECE_VALUES[0] * 10) - PIECE_VALUES[0];
             } else {
-                s = SCORE_CAPTURE_BASE + irida_mvv_lva_score(board, m);
+                s = SCORE_CAPTURE_BASE + irida_MVVLVAScore(board, m);
             }
             Move mp = m;
             if (castro_IsPromotion(board, &mp))

@@ -23,12 +23,12 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    if(!syzygy_init(path)) {
+    if(!irida_SyzygyInit(path)) {
         ERRO("Could not initialize syzygy");
         return 1;
     }
 
-    if(!syzygy_available()) {
+    if(!irida_SyzygyAvailable()) {
         ERRO("Syzygy is not available");
         return 2;
     }
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
     castro_BoardInitFen(&board, fen);
     Move best;
 
-    if(!syzygy_probe_root(&board, true, &best)){
+    if(!irida_SyzygyProbeRoot(&board, true, &best)){
         ERRO("Could not probe best move");
         castro_BoardFree(&board);
         return 3;

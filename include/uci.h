@@ -201,7 +201,7 @@ static inline void irida_InitState(UciState* state)
 
 static inline bool irida_search_should_stop(void)
 {
-    return irida_search_time_up() || uci_state.stopRequested;
+    return irida_SearchTimeUp() || uci_state.stopRequested;
 }
 
 #endif // ENGINE_UCI_H

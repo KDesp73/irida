@@ -10,9 +10,9 @@ int test_eval_breakdown(const char* fen)
 {
     Board board;
     castro_BoardInitFen(&board, fen);
-    int score = irida_evaluation(&board);
+    int score = irida_Evaluation(&board);
     EvalBreakdown b;
-    int score2 = irida_eval_breakdown(&board, &b);
+    int score2 = irida_EvalBreakdown(&board, &b);
     castro_BoardFree(&board);
     if (score != score2) {
         FAIL("pesto_eval %d != pesto_eval_breakdown %d", score, score2);

@@ -12,8 +12,8 @@ int test_eval_log(const char* fen)
     castro_BoardInitFen(&board, fen);
     fprintf(stderr, "[eval] FEN: %s\n", fen);
     EvalBreakdown b = {0};
-    irida_eval_breakdown(&board, &b);
-    irida_log_breakdown(b);
+    irida_EvalBreakdown(&board, &b);
+    irida_EvalBreakdownLog(b);
     castro_BoardFree(&board);
     SUCC("logged breakdown");
     return 1;

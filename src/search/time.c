@@ -25,7 +25,7 @@ static uint64_t current_time_ms(void)
            (uint64_t)ts.tv_nsec / 1000000ULL;
 }
 
-void irida_search_start_timer(int timeLimitMs)
+void irida_SearchStartTimer(int timeLimitMs)
 {
     if (timeLimitMs <= 0) {
         g_timeLimitMs = 0;
@@ -36,7 +36,7 @@ void irida_search_start_timer(int timeLimitMs)
     g_startTimeMs = current_time_ms();
 }
 
-bool irida_search_time_up(void)
+bool irida_SearchTimeUp(void)
 {
     if (g_timeLimitMs == 0)
         return false;
@@ -46,7 +46,7 @@ bool irida_search_time_up(void)
 }
 
 /* Elapsed ms since search_start_timer; used for UCI nps/time reporting. */
-uint64_t irida_search_elapsed_ms(void)
+uint64_t irida_SearchElapsedMs(void)
 {
     if (g_timeLimitMs == 0)
         return 0;

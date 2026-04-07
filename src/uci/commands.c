@@ -60,7 +60,7 @@ void uci_setoption(UciState* state, const char *command)
                     if (strcmp(option_name, "Hash") == 0) {
                         if (v < 1) v = 1;
                         if (v > 2048) v = 2048;
-                        irida_tt_init((size_t)v);
+                        irida_TTInit((size_t)v);
                     } else if (strcmp(option_name, "SyzygyProbeDepth") == 0) {
                         g_searchConfig.syzygyProbeDepth = (v < 1) ? 1 : (v > 100) ? 100 : v;
                     } else if (strcmp(option_name, "SyzygyProbeLimit") == 0) {
@@ -74,12 +74,12 @@ void uci_setoption(UciState* state, const char *command)
                 case UCI_STRING:
                     snprintf(state->uciOptions[i].value.string, sizeof(state->uciOptions[i].value.string), "%s", option_value);
                     if (strcmp(option_name, "EvalFile") == 0) {
-                        if (irida_nnue_load(option_value))
+                        if (irida_NNUELoad(option_value))
                             printf("info string EvalFile loaded: %s\n", option_value);
                         else
                             printf("info string Failed to load EvalFile '%s' (using PeSTO evaluation)\n", option_value);
                     } else if (strcmp(option_name, "SyzygyPath") == 0)
-                        irida_syzygy_init(option_value);
+                        irida_SyzygyInit(option_value);
                     break;
                 default:
                     printf("info string Unknown option type\n");
@@ -276,7 +276,7 @@ void uci_uci(UciState* state)
             //     printf("error Could not load nnue %s\n", option.value.string);
             // }
         } else if(!strcmp(option.name, "SyzygyPath")) {
-            if(!irida_syzygy_init(option.value.string)) {
+            if(!irida_SyzygyInit(option.value.string)) {
                 printf("error Could not load syzygy tablebase from %s\n", option.value.string);
             }
         }
@@ -293,8 +293,8 @@ void uci_isready(UciState* state)
 
 void uci_ucinewgame(UciState* state)
 {
-    irida_tt_clear();
-    irida_ordering_reset();
+    irida_TTClear();
+    irida_OrderingReset();
     irida_InitState(state);
     printf("info New game started.\n");
 }
@@ -335,22 +335,22 @@ void uci_seteval(UciState* state, const char* command)
     const char* eval_name = command + strlen(COMMAND_SETEVAL) + 1; // +1 for the space
 
     if(!strcmp(eval_name, "pesto")) {
-        engine.eval = irida_evaluation;
+        engine.eval = irida_Evaluation;
     } else if (!strcmp(eval_name, "nnue")) {
         for (size_t i = 0; i < state->uciOptionCount; i++) {
             if (strcmp(state->uciOptions[i].name, "EvalFile") == 0
                 && state->uciOptions[i].value.string[0] != '\0') {
                 const char* path = state->uciOptions[i].value.string;
-                if (irida_nnue_load(path))
+                if (irida_NNUELoad(path))
                     printf("info string EvalFile loaded: %s\n", path);
                 else
                     printf("info string Failed to load EvalFile '%s' (using PeSTO evaluation)\n", path);
                 break;
             }
         }
-        engine.eval = irida_nnue_eval;
+        engine.eval = irida_EvalNNUE;
     } else if (!strcmp(eval_name, "material")) {
-        engine.eval = irida_material_eval;
+        engine.eval = irida_EvalMaterial;
     } else {
         fprintf(stderr, "error Invalid evaluation function name\n");
         return;

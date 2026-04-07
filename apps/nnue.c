@@ -25,7 +25,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    if(!nnue_load(path)) {
+    if(!irida_NNUELoad(path)) {
         ERRO("Could not load nnue %s", path);
         return 1;
     }
@@ -33,7 +33,7 @@ int main(int argc, char** argv)
     Board board = {0};
     castro_BoardInitFen(&board, fen);
 
-    int eval = nnue_eval(&board);
+    int eval = irida_EvalNNUE(&board);
     printf("%.2f\n", (float) eval / 100);
 
     castro_BoardFree(&board);
