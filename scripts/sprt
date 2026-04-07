@@ -50,9 +50,9 @@ def analyze_pgn(file_path, elo0=0, elo1=5):
                 
                 result = game.headers.get("Result")
                 if result == "1-0":
-                    wins += 1
-                elif result == "0-1":
                     losses += 1
+                elif result == "0-1":
+                    wins += 1
                 elif result == "1/2-1/2":
                     draws += 1
     except FileNotFoundError:

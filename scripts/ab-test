@@ -4,7 +4,7 @@
 SEED=1665215631
 BOOK="data/books/book.bin"
 GAMES=200
-THREADS=2  # Number of parallel arenas to run
+THREADS=4  # Number of parallel arenas to run
 ARENA="./scripts/arena"
 
 # --- CLI Parameter Parsing ---
@@ -25,7 +25,7 @@ while getopts "s:b:g:t:h" opt; do
 done
 
 # Build the targets
-make ab-testing-targets -B
+make ab-testing-targets
 
 # --- Parallel Execution ---
 # We define the pairs we want to test
