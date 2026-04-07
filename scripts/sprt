@@ -1,0 +1,86 @@
+#!/usr/bin/env python3
+
+import chess.pgn
+import math
+import sys
+
+def calculate_llr(wins, losses, draws, elo0, elo1):
+    """
+    Calculates the Log-Likelihood Ratio for a set of games.
+    elo0: The Null Hypothesis (H0) - usually 0.
+    elo1: The Alternative Hypothesis (H1) - the Elo gain you are testing for.
+    """
+    total = wins + losses + draws
+    if total == 0:
+        return 0.0
+
+    # Probabilities based on game results
+    w = wins / total
+    l = losses / total
+    d = draws / total
+
+    # Convert Elo to expected scores (Logistic distribution)
+    def elo_to_score(elo):
+        return 1 / (1 + 10**(-elo / 400))
+
+    s0 = elo_to_score(elo0)
+    s1 = elo_to_score(elo1)
+
+    # Simplified SPRT calculation (Bernoulli approximation)
+    # Note: Modern engines use Pentanomial, but Bernoulli is standard for PGN pairs.
+    score = (wins + 0.5 * draws) / total
+    
+    # Avoid log(0)
+    variance = w + 0.25 * d - score**2
+    if variance <= 0:
+        return 0.0
+
+    llr = (s1 - s0) * (2 * score - (s1 + s0)) / (2 * variance) * total
+    return llr
+
+def analyze_pgn(file_path, elo0=0, elo1=5):
+    wins, losses, draws = 0, 0, 0
+    
+    try:
+        with open(file_path) as pgn_file:
+            while True:
+                game = chess.pgn.read_game(pgn_file)
+                if game is None:
+                    break
+                
+                result = game.headers.get("Result")
+                if result == "1-0":
+                    wins += 1
+                elif result == "0-1":
+                    losses += 1
+                elif result == "1/2-1/2":
+                    draws += 1
+    except FileNotFoundError:
+        print(f"Error: File '{file_path}' not found.")
+        return
+
+    total = wins + losses + draws
+    llr = calculate_llr(wins, losses, draws, elo0, elo1)
+
+    print(f"--- SPRT Analysis Results ---")
+    print(f"Games: {total} (W: {wins}, L: {losses}, D: {draws})")
+    print(f"H0 (Null): {elo0} Elo | H1 (Alt): {elo1} Elo")
+    print(f"LLR: {llr:.4f}")
+    
+    # Standard bounds for SPRT (alpha=0.05, beta=0.05)
+    lower_bound = math.log(0.05 / 0.95) # ~ -2.94
+    upper_bound = math.log(0.95 / 0.05) # ~  2.94
+
+    if llr >= upper_bound:
+        print("Result: H1 ACCEPTED (Statistically significant gain)")
+    elif llr <= lower_bound:
+        print("Result: H0 ACCEPTED (Rejecting gain / H1 failed)")
+    else:
+        print("Result: CONTINUE (Not enough data to conclude)")
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: sprt <path_to_pgn>")
+    else:
+        # Default testing for a 5 Elo gain
+        analyze_pgn(sys.argv[1], elo0=0, elo1=5)
