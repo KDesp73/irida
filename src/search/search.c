@@ -237,7 +237,7 @@ Move irida_Search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config
         bool done = false;
 
         while (!done) {
-            if (irida_search_should_stop()) break;
+            if (irida_SearchShouldStop()) break;
 
             int originalAlpha = alpha;
             int originalBeta  = beta;
@@ -267,7 +267,7 @@ Move irida_Search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config
                                      currentDepth - 1, 1,
                                      -beta, -alpha, true, config);
 
-                if (irida_search_should_stop()) break;
+                if (irida_SearchShouldStop()) break;
 
                 if (score > bestScore) {
                     bestScore = score;
@@ -279,7 +279,7 @@ Move irida_Search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config
                 if (alpha >= beta) break; // beta cutoff
             }
 
-            if (irida_search_should_stop()) break;
+            if (irida_SearchShouldStop()) break;
 
             if (!config->useAspiration || currentDepth < 5) {
                 done = true;
@@ -304,7 +304,7 @@ Move irida_Search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config
         uci_report_search(currentDepth, last_depth_score,
                           irida_SearchElapsedMs(), moveBuf);
 
-        if (irida_search_should_stop()) break;
+        if (irida_SearchShouldStop()) break;
 
         // Exit if mate found
         if (last_depth_score > (INF - MAX_PLY)) break;
@@ -350,7 +350,7 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
 
     if ((g_searchStats.nodes & 1023) == 0 && irida_SearchTimeUp())
         uci_state.stopRequested = true;
-    if (irida_search_should_stop()) return 0;
+    if (irida_SearchShouldStop()) return 0;
 
     g_searchStats.nodes++;
     if (ply > g_searchStats.selDepth) g_searchStats.selDepth = ply;
@@ -429,7 +429,7 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
 
         castro_UnmakeMove(board);
 
-        if (irida_search_should_stop()) return 0;
+        if (irida_SearchShouldStop()) return 0;
 
         // Quiet tracking
         if (!is_capture && !gives_check) {

@@ -61,11 +61,11 @@ typedef Move (*SearchFn)(Board* board,
                          OrderFn order,
                          SearchConfig* config);
 
-// @function random_move
+// @function RandomMove 
 // @returns Move A random move
 Move irida_RandomMove(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
 
-// @function search
+// @function Search
 // @desc The main search function. Implements negamax with plenty of optimizations
 // @returns Move The best move
 Move irida_Search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config);
@@ -75,7 +75,7 @@ static const struct { const char *name; SearchFn fn; } search_variants[] = {
     { "search", irida_Search },
 };
 
-// @function quiescence
+// @function Quiescence
 // @desc Quiescence search (captures only).
 // @param board Board position.
 // @param alpha Alpha bound.
@@ -92,15 +92,15 @@ int irida_Quiescence(Board* board,
                OrderFn order);
 
 
-// @function search_start_timer
+// @function SearchStartTimer
 // @param timeLimitMs Time limit in milliseconds (0 = no limit).
 void irida_SearchStartTimer(int timeLimitMs);
 
-// @function search_time_up
+// @function SearchTimeUp
 // @returns bool True if time limit exceeded.
 bool irida_SearchTimeUp(void);
 
-// @function search_elapsed_ms
+// @function SearchElapsedMs
 // @returns uint64_t Elapsed milliseconds since timer start.
 uint64_t irida_SearchElapsedMs(void);
 

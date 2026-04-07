@@ -26,7 +26,7 @@ int irida_Quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, Or
      * every N nodes at its own ply. Poll here so movetime / quit are honored. */
     if ((g_searchStats.qnodes & 1023u) == 0u && irida_SearchTimeUp())
         uci_state.stopRequested = true;
-    if (irida_search_should_stop())
+    if (irida_SearchShouldStop())
         return alpha;
 
     // Pseudocode doesn't define MAX_PLY, but we keep it for safety
@@ -54,7 +54,7 @@ int irida_Quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, Or
     for (size_t i = 0; i < moves.count; i++) {
         Move move = moves.list[i];
 
-        if (irida_search_should_stop())
+        if (irida_SearchShouldStop())
             return alpha;
 
         if (!castro_MakeMove(board, move))

@@ -199,7 +199,10 @@ static inline void irida_InitState(UciState* state)
     irida_StateSetStartPos(state, STARTING_FEN);
 }
 
-static inline bool irida_search_should_stop(void)
+// @function @SearchShouldStop
+// @desc Checks if the search should stop because of time constraint
+// or explicit request
+static inline bool irida_SearchShouldStop(void)
 {
     return irida_SearchTimeUp() || uci_state.stopRequested;
 }

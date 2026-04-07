@@ -10,27 +10,27 @@
 // @desc Function pointer: order moves in place (board, moves, count, ply).
 typedef void (*OrderFn)(Board* board, Move moves[], size_t count, size_t ply, Move tt_move);
 
-// @function init_mvv_lva
+// @function MVVLVAInit
 void irida_MVVLVAInit(void);
 
-// @function mvv_lva_score
+// @function MVVLVAScore
 // @param board Board (for piece types).
 // @param m Move to score.
 // @returns int MVV-LVA score (higher = try first).
 int irida_MVVLVAScore(Board *board, Move m);
 
-// @function order_moves
+// @function OrderMoves 
 // @param board Board position.
 // @param moves Array of moves to order (modified in place).
 // @param count Number of moves.
 // @param ply Current ply (for killer slots).
 void irida_OrderMoves(Board *board, Move moves[], size_t count, size_t ply, Move tt_move);
 
-// @function killer_store
+// @function KillerStore 
 // @desc On a quiet beta cutoff at this ply, remember the move (two-slot shift).
 void irida_KillerStore(Move m, int ply);
 
-// @function ordering_reset
+// @function OrderingReset 
 // @desc Clear killers and history (e.g. ucinewgame).
 void irida_OrderingReset(void);
 

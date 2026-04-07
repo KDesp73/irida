@@ -26,21 +26,21 @@ typedef struct {
     uint16_t generation;  /* search generation: only use entry if matches current */
 } TTEntry;
 
-// @function tt_init
+// @function TTInit
 // @param mb Size in megabytes.
 void irida_TTInit(size_t mb);
 
-// @function tt_clear
+// @function TTClear
 // @desc Completely clears the transposition table.
 // Typically called at the start of a new game or when 
 // requested by the GUI to reset engine state.
 void irida_TTClear(void);
 
-// @function tt_inc_generation
+// @function TTIncGeneration
 // @desc Call at start of each search_root.
 void irida_TTIncGeneration(void);
 
-// @function tt_probe
+// @function TTProbe
 // @param key Position key.
 // @param depth Stored depth.
 // @param alpha Alpha bound.
@@ -57,12 +57,12 @@ bool irida_TTProbe(uint64_t key,
               int* outScore,
               Move* outMove);
 
-// @function tt_probe_pv
+// @function TTProbePV
 // @desc For PV construction: return stored best move if key and generation match (ignore depth).
 // @returns bool True if entry exists and *outMove was set.
 bool irida_TTProbePV(uint64_t key, Move* outMove);
 
-// @function tt_store
+// @function TTStore
 // @param key Position key.
 // @param depth Depth of score.
 // @param score Score to store.
@@ -76,18 +76,18 @@ void irida_TTStore(uint64_t key,
               Move bestMove,
               int ply);
 
-// @function tt_hashfull
+// @function TTHashfull
 // @desc Returns the "hashfull" value for UCI.
 // Measures how many slots in the first 1000 entries are occupied 
 // by the current search generation. Returns a value from 0 to 1000.
 int irida_TTHashfull(void);
 
-// @function tt_adjust_score
+// @function TTAdjustScore
 // @desc Converts a search score (relative to the root) into a 
 // position-independent score for storage in the TT.
 int irida_TTAdjustScore(int stored, int ply);
 
-// @function tt_unadjust_score
+// @function TTUnadjustScore
 // @desc Converts a stored TT score (position-independent) back into 
 // a search score relative to the current search ply.
 int irida_TTUnadjustScore(int stored, int ply);
