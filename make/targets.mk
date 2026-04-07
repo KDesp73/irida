@@ -62,34 +62,31 @@ irida-q-tt-nmp-lmr: apps/irida.c apps/shared.h $(A_NAME) ## irida-q-tt-nmp + lmr
 		-DIRIDA_UCI_NAME=\"$@\" $< -o $@ \
 		$(LDFLAGS_ENGINE) $(LDFLAGS_CASTRO) $(LDFLAGS)
 
-.PHONY: irida-q-tt-nmp-lmr-syzygy
-irida-q-tt-nmp-lmr-syzygy: apps/irida.c apps/shared.h $(A_NAME) ## irida-q-tt-nmp-lmr + syzygy
+.PHONY: irida-q-tt-nmp-lmr-aw
+irida-q-tt-nmp-lmr-aw: apps/irida.c apps/shared.h $(A_NAME) ## irida-q-tt-nmp-lmr-syzygy + aw
 	@echo "[INFO] Building executable: $@"
 	$(CC) $(CFLAGS) \
 		-DENABLE_QUIESCENCE \
 		-DENABLE_TT \
 		-DENABLE_NMP \
 		-DENABLE_LMR \
-		-DENABLE_SYZYGY \
-		-DIRIDA_UCI_NAME=\"$@\" $< -o $@ \
-		$(LDFLAGS_ENGINE) $(LDFLAGS_CASTRO) $(LDFLAGS)
-
-.PHONY: irida-q-tt-nmp-lmr-syzygy-aw
-irida-q-tt-nmp-lmr-syzygy-aw: apps/irida.c apps/shared.h $(A_NAME) ## irida-q-tt-nmp-lmr-syzygy + aw
-	@echo "[INFO] Building executable: $@"
-	$(CC) $(CFLAGS) \
-		-DENABLE_QUIESCENCE \
-		-DENABLE_TT \
-		-DENABLE_NMP \
-		-DENABLE_LMR \
-		-DENABLE_SYZYGY \
 		-DENABLE_ASPIRATION \
 		-DIRIDA_UCI_NAME=\"$@\" $< -o $@ \
 		$(LDFLAGS_ENGINE) $(LDFLAGS_CASTRO) $(LDFLAGS)
 
-.PHONY: irida-q-tt-nmp-lmr-syzygy-aw-pvs
-irida-q-tt-nmp-lmr-syzygy-aw-pvs: irida ## irida-q-tt-nmp-lmr-syzygy-aw + pvs. Same as irida
-	cp irida $@
+.PHONY: irida-q-tt-nmp-lmr-aw-pvs
+irida-q-tt-nmp-lmr-aw-pvs: apps/irida.c apps/shared.h $(A_NAME) ## irida-q-tt-nmp-lmr-syzygy-aw-pvs
+	@echo "[INFO] Building executable: $@"
+	$(CC) $(CFLAGS) \
+		-DENABLE_QUIESCENCE \
+		-DENABLE_TT \
+		-DENABLE_NMP \
+		-DENABLE_LMR \
+		-DENABLE_ASPIRATION \
+		-DENABLE_PVS \
+		-DIRIDA_UCI_NAME=\"$@\" $< -o $@ \
+		$(LDFLAGS_ENGINE) $(LDFLAGS_CASTRO) $(LDFLAGS)
+
 
 .PHONY: ab-testing-targets
 ab-testing-targets: ## Make all A/B Testing targets
@@ -98,6 +95,5 @@ ab-testing-targets: ## Make all A/B Testing targets
 	make irida-q-tt
 	make irida-q-tt-nmp
 	make irida-q-tt-nmp-lmr
-	make irida-q-tt-nmp-lmr-syzygy
-	make irida-q-tt-nmp-lmr-syzygy-aw
-	make irida-q-tt-nmp-lmr-syzygy-aw-pvs
+	make irida-q-tt-nmp-lmr-aw
+	make irida-q-tt-nmp-lmr-aw-pvs
