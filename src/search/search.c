@@ -331,8 +331,10 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
     int alphaOrig = alpha;
 
     // --- 1. Static Checks ---
-    if (ply > 0 && (castro_IsThreefoldRepetition(board) || board->halfmove >= 100))
-        return config->contempt;
+    if (ply > 0 && (castro_IsThreefoldRepetition(board) || board->halfmove >= 100)) {
+        // Return a tiny fluctuating value to break ties
+        return (g_searchStats.nodes & 2) ? 1 : -1;
+    }
 
     // --- 2. TT Probe ---
     Move tt_move = NULL_MOVE;

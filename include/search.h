@@ -29,7 +29,6 @@ typedef struct {
     int maxDepth;
     int timeLimitMs;      // 0 = no limit
     int threads;
-    int contempt;
 
     bool useNMP;
     bool useLMR;
