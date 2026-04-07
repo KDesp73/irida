@@ -7,12 +7,12 @@ int irida_UciMainLoop(void)
 {
     char input[1024];
 
-    uci_stdout_lock();
+    irida_UciStdoutLock();
     printf("%s v%s by %s\n", engine.name, VERSION_STRING, engine.author);
     fflush(stdout);
-    uci_stdout_unlock();
+    irida_UciStdoutUnlock();
 
-    uci_search_thread_start();
+    irida_UciSearchThreadStart();
 
     while (!uci_state.quitRequested) {
 
@@ -21,13 +21,13 @@ int irida_UciMainLoop(void)
 
         input[strcspn(input, "\n")] = '\0';
 
-        uci_stdout_lock();
+        irida_UciStdoutLock();
         irida_UciHandleCommand(&uci_state, input);
         fflush(stdout);
-        uci_stdout_unlock();
+        irida_UciStdoutUnlock();
     }
 
-    uci_search_thread_join();
+    irida_UciSearchThreadJoin();
     return 0;
 }
 

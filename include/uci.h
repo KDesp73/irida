@@ -150,32 +150,32 @@ void uci_seteval(UciState* state, const char* command);
 void uci_setsearch(UciState* state, const char* command);
 
 
-// @function uci_stdout_lock
+// @function UciStdoutLock 
 // @desc Lock before writing to stdout from any thread.
-void uci_stdout_lock(void);
+void irida_UciStdoutLock(void);
 
-// @function uci_stdout_unlock
-void uci_stdout_unlock(void);
+// @function UciStdoutUnlock 
+void irida_UciStdoutUnlock(void);
 
-// @function uci_search_wait_done
+// @function UciSearchWaitDone 
 // @desc Block until the search thread is idle.
-void uci_search_wait_done(void);
+void irida_UciSearchWaitDone(void);
 
-// @function uci_search_start
+// @function UciSearchStart 
 // @desc Signal the search thread to run search (called from uci_go).
-void uci_search_start(void);
+void irida_UciSearchStart(void);
 
-// @function uci_search_thread_start
+// @function UciSearchThreadStart
 // @desc Start the search worker thread. Call once from UciMain before the command loop.
-void uci_search_thread_start(void);
+void irida_UciSearchThreadStart(void);
 
-// @function uci_search_thread_join
+// @function UciSearchThreadJoin 
 // @desc Ask the search thread to exit and wait for it. Call before process exit.
-void uci_search_thread_join(void);
+void irida_UciSearchThreadJoin(void);
 
-// @function uci_report_search
+// @function UciSearchReport
 // @desc UCI-compatible search process logging
-void uci_report_search(int depth, int bestScore, uint64_t timeMs, const char* pvBuf);
+void irida_UciSearchReport(int depth, int bestScore, uint64_t timeMs, const char* pvBuf);
 
 // @function StateSetStartPos
 // @desc Set start position FEN and init board.

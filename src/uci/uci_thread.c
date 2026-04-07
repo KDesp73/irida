@@ -24,17 +24,17 @@ static volatile bool g_search_running = false;
 static volatile bool g_quit = false;
 static pthread_t g_search_tid;
 
-void uci_stdout_lock(void)
+void irida_UciStdoutLock(void)
 {
     pthread_mutex_lock(&g_stdout_mutex);
 }
 
-void uci_stdout_unlock(void)
+void irida_UciStdoutUnlock(void)
 {
     pthread_mutex_unlock(&g_stdout_mutex);
 }
 
-void uci_search_wait_done(void)
+void irida_UciSearchWaitDone(void)
 {
     pthread_mutex_lock(&g_mutex);
     while (g_search_running)
@@ -42,7 +42,7 @@ void uci_search_wait_done(void)
     pthread_mutex_unlock(&g_mutex);
 }
 
-void uci_search_start(void)
+void irida_UciSearchStart(void)
 {
     pthread_mutex_lock(&g_mutex);
     g_go_pending = true;
@@ -80,26 +80,26 @@ static void* search_thread_main(void* arg)
 
         char bestmove[16];
         castro_MoveToString(move, bestmove);
-        uci_stdout_lock();
+        irida_UciStdoutLock();
         printf("bestmove %s\n", bestmove);
         fflush(stdout);
-        uci_stdout_unlock();
+        irida_UciStdoutUnlock();
     }
 }
 
-void uci_search_thread_start(void)
+void irida_UciSearchThreadStart(void)
 {
     g_quit = false;
     g_go_pending = false;
     g_search_running = false;
     if (pthread_create(&g_search_tid, NULL, search_thread_main, NULL) != 0) {
-        uci_stdout_lock();
+        irida_UciStdoutLock();
         fprintf(stderr, "info string Failed to create search thread\n");
-        uci_stdout_unlock();
+        irida_UciStdoutUnlock();
     }
 }
 
-void uci_search_thread_join(void)
+void irida_UciSearchThreadJoin(void)
 {
     pthread_mutex_lock(&g_mutex);
     g_quit = true;

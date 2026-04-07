@@ -301,7 +301,7 @@ Move irida_Search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config
 
         char moveBuf[10];
         castro_MoveToString(best_move, moveBuf);
-        uci_report_search(currentDepth, last_depth_score,
+        irida_UciSearchReport(currentDepth, last_depth_score,
                           irida_SearchElapsedMs(), moveBuf);
 
         if (irida_SearchShouldStop()) break;

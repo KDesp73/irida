@@ -1,7 +1,7 @@
 #include "tt.h"
 #include "uci.h"
 
-void uci_report_search(int depth, int bestScore, uint64_t timeMs, const char* pvBuf)
+void irida_UciSearchReport(int depth, int bestScore, uint64_t timeMs, const char* pvBuf)
 {
     const int mateThreshold = MATE_SCORE - MAX_PLY;
     uint64_t total_nodes = g_searchStats.nodes + g_searchStats.qnodes;
@@ -9,7 +9,7 @@ void uci_report_search(int depth, int bestScore, uint64_t timeMs, const char* pv
     
     int hashfull = irida_TTHashfull(); 
 
-    uci_stdout_lock();
+    irida_UciStdoutLock();
     printf("info depth %d seldepth %d score ", depth, g_searchStats.selDepth);
 
     if (bestScore > mateThreshold) {
@@ -26,5 +26,5 @@ void uci_report_search(int depth, int bestScore, uint64_t timeMs, const char* pv
            (unsigned long long)g_searchStats.tbHits, (unsigned long long)timeMs, pvBuf);
     
     fflush(stdout);
-    uci_stdout_unlock();
+    irida_UciStdoutUnlock();
 }

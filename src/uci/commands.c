@@ -195,13 +195,13 @@ void uci_go(UciState* state, const char* command)
     } else {
         parse_go_command(command);
         state->stopRequested = false;  /* clear so search runs until time or explicit stop */
-        uci_search_start();  /* run search in worker thread; bestmove printed there */
+        irida_UciSearchStart();  /* run search in worker thread; bestmove printed there */
     }
 }
 
 void uci_position(UciState* state, const char* command)
 {
-    uci_search_wait_done();  /* don't touch board while search is running */
+    irida_UciSearchWaitDone();  /* don't touch board while search is running */
 
     char fen[128] = "";
     const char* moves_str = NULL;
