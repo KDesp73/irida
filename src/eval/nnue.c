@@ -102,7 +102,7 @@ static bool fen_basic_valid(const char* fen)
     return ranks == 8 && white_kings > 0 && black_kings > 0;
 }
 
-bool nnue_load(const char* path)
+bool irida_nnue_load(const char* path)
 {
     if (!path || path[0] == '\0') {
         g_nnue_loaded = false;
@@ -137,15 +137,15 @@ bool nnue_load(const char* path)
     return true;
 }
 
-bool nnue_available(void)
+bool irida_nnue_available(void)
 {
     return g_nnue_loaded;
 }
 
-int nnue_eval(Board* board)
+int irida_nnue_eval(Board* board)
 {
     // Fallback
-    if (!g_nnue_loaded) return evaluation(board);
+    if (!g_nnue_loaded) return irida_evaluation(board);
 
     char fen[FEN_BUFFER_SIZE];
     fen[0] = '\0';
@@ -155,7 +155,7 @@ int nnue_eval(Board* board)
     // The NNUE probe is a black box and has been crashing on malformed inputs.
     // If the exported FEN is malformed, fall back to the PeSTO evaluator.
     if (!fen_basic_valid(fen))
-        return evaluation(board);
+        return irida_evaluation(board);
 
     int score = nnue_evaluate_fen(fen);
     if (!board->turn)  // black to move

@@ -18,14 +18,14 @@
 
 int main(void)
 {
-    EngineInit(&engine);
+    irida_EngineInit(&engine);
     strncpy(engine.name, IRIDA_UCI_NAME, sizeof(engine.name) - 1);
     engine.name[sizeof(engine.name) - 1] = '\0';
-    engine.eval = evaluation;
-    engine.search = search;
-    engine.order = order_moves;
+    engine.eval = irida_evaluation;
+    engine.search = irida_search;
+    engine.order = irida_order_moves;
 
-    UciMain();
+    irida_UciMain();
 
     castro_BoardFree(&engine.board);
 }

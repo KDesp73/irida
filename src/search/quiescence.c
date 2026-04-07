@@ -16,7 +16,7 @@
 #include "search.h"
 #include "uci.h"
 
-int quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, OrderFn order)
+int irida_quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, OrderFn order)
 {
     g_searchStats.qnodes++;
     if (ply > g_searchStats.selDepth)
@@ -24,9 +24,9 @@ int quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, OrderFn 
 
     /* Quiescence can explode on capture sequences; negamax only polls time/stop
      * every N nodes at its own ply. Poll here so movetime / quit are honored. */
-    if ((g_searchStats.qnodes & 1023u) == 0u && search_time_up())
+    if ((g_searchStats.qnodes & 1023u) == 0u && irida_search_time_up())
         uci_state.stopRequested = true;
-    if (search_should_stop())
+    if (irida_search_should_stop())
         return alpha;
 
     // Pseudocode doesn't define MAX_PLY, but we keep it for safety
@@ -54,14 +54,14 @@ int quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, OrderFn 
     for (size_t i = 0; i < moves.count; i++) {
         Move move = moves.list[i];
 
-        if (search_should_stop())
+        if (irida_search_should_stop())
             return alpha;
 
         if (!castro_MakeMove(board, move))
             continue;
 
         // score = -Quiesce( -beta, -alpha );
-        int score = -quiescence(board, -beta, -alpha, ply + 1, eval, order);
+        int score = -irida_quiescence(board, -beta, -alpha, ply + 1, eval, order);
         castro_UnmakeMove(board);
 
         // if( score >= beta ) return score;

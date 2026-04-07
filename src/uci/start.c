@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-int UciMainLoop(void)
+int irida_UciMainLoop(void)
 {
     char input[1024];
 
@@ -22,7 +22,7 @@ int UciMainLoop(void)
         input[strcspn(input, "\n")] = '\0';
 
         uci_stdout_lock();
-        UciHandleCommand(&uci_state, input);
+        irida_UciHandleCommand(&uci_state, input);
         fflush(stdout);
         uci_stdout_unlock();
     }
@@ -31,11 +31,11 @@ int UciMainLoop(void)
     return 0;
 }
 
-int UciMain(void)
+int irida_UciMain(void)
 {
-    InitState(&uci_state);
-    LoadUciConfig(&uci_state);
+    irida_InitState(&uci_state);
+    irida_LoadUciConfig(&uci_state);
     /* Line-buffer stdout so "info" lines appear promptly when stdout is a pipe. */
     setvbuf(stdout, NULL, _IOLBF, 0);
-    return UciMainLoop();
+    return irida_UciMainLoop();
 }

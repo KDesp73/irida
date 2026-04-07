@@ -7,7 +7,7 @@ void uci_report_search(int depth, int bestScore, uint64_t timeMs, const char* pv
     uint64_t total_nodes = g_searchStats.nodes + g_searchStats.qnodes;
     uint64_t nps = timeMs > 0 ? (total_nodes * 1000) / timeMs : 0;
     
-    int hashfull = tt_hashfull(); 
+    int hashfull = irida_tt_hashfull(); 
 
     uci_stdout_lock();
     printf("info depth %d seldepth %d score ", depth, g_searchStats.selDepth);

@@ -24,11 +24,11 @@ static size_t ttSize = 0;
 static size_t ttMask = 0;
 static uint16_t g_tt_generation = 0;
 
-void tt_inc_generation(void) { g_tt_generation++; }
+void irida_tt_inc_generation(void) { g_tt_generation++; }
 
 static inline size_t tt_index(uint64_t key) { return key & ttMask; }
 
-void tt_init(size_t mb) {
+void irida_tt_init(size_t mb) {
     if (ttTable) free(ttTable);
     size_t bytes = mb * 1024ULL * 1024ULL;
     size_t entries = bytes / sizeof(TTEntry);
@@ -40,7 +40,7 @@ void tt_init(size_t mb) {
     memset(ttTable, 0, ttSize * sizeof(TTEntry));
 }
 
-void tt_clear(void)
+void irida_tt_clear(void)
 {
     if (ttTable && ttSize > 0) {
         // Zero out the entire memory block allocated for the table
@@ -48,7 +48,7 @@ void tt_clear(void)
     }
 }
 
-bool tt_probe(uint64_t key, int depth, int alpha, int beta, int ply, int* outScore, Move* outMove) {
+bool irida_tt_probe(uint64_t key, int depth, int alpha, int beta, int ply, int* outScore, Move* outMove) {
     if (!ttTable) return false;
 
     TTEntry* entry = &ttTable[tt_index(key)];
@@ -59,7 +59,7 @@ bool tt_probe(uint64_t key, int depth, int alpha, int beta, int ply, int* outSco
     *outMove = entry->bestMove;
 
     if (entry->depth >= depth) {
-        int score = tt_unadjust_score(entry->score, ply);
+        int score = irida_tt_unadjust_score(entry->score, ply);
 
         if (entry->type == TT_EXACT) {
             *outScore = score;
@@ -77,7 +77,7 @@ bool tt_probe(uint64_t key, int depth, int alpha, int beta, int ply, int* outSco
     return false;
 }
 
-void tt_store(uint64_t key, int depth, int score, TTNodeType type, Move bestMove, int ply) {
+void irida_tt_store(uint64_t key, int depth, int score, TTNodeType type, Move bestMove, int ply) {
     if (!ttTable) return;
 
     TTEntry* entry = &ttTable[tt_index(key)];
@@ -100,14 +100,14 @@ void tt_store(uint64_t key, int depth, int score, TTNodeType type, Move bestMove
 
         entry->key = key;
         entry->depth = depth;
-        entry->score = tt_adjust_score(score, ply);
+        entry->score = irida_tt_adjust_score(score, ply);
         entry->type = type;
         entry->bestMove = move_to_store;
         entry->generation = g_tt_generation;
     }
 }
 
-int tt_adjust_score(int score, int ply)
+int irida_tt_adjust_score(int score, int ply)
 {
     // If the score is a mate score (very high or very low)
     if (score > MATE_THRESHOLD) {
@@ -121,7 +121,7 @@ int tt_adjust_score(int score, int ply)
     return score;
 }
 
-int tt_unadjust_score(int stored, int ply)
+int irida_tt_unadjust_score(int stored, int ply)
 {
     // If the stored value indicates a mate
     if (stored > MATE_THRESHOLD) {
@@ -135,7 +135,7 @@ int tt_unadjust_score(int stored, int ply)
     return stored;
 }
 
-int tt_hashfull(void)
+int irida_tt_hashfull(void)
 {
     // If the table isn't initialized, it's obviously empty
     if (!ttTable || ttSize == 0) {
@@ -164,7 +164,7 @@ int tt_hashfull(void)
  * A simplified probe that only retrieves the best move.
  * Used for PV extraction and reporting to the GUI.
  */
-bool tt_probe_pv(uint64_t key, Move* outMove)
+bool irida_tt_probe_pv(uint64_t key, Move* outMove)
 {
     if (!ttTable)
         return false;

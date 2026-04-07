@@ -55,7 +55,7 @@ void run_benchmark(SearchFn search, EvalFn eval, OrderFn order) {
         Board board;
         castro_BoardInitFen(&board, test_positions[i]);
         
-        tt_clear(); 
+        irida_tt_clear(); 
         g_searchStats.nodes = 0;
         g_searchStats.qnodes = 0;
 
@@ -87,7 +87,7 @@ void run_benchmark(SearchFn search, EvalFn eval, OrderFn order) {
 
 int main(int argc, char** argv)
 {
-    EngineInit(&engine);
+    irida_EngineInit(&engine);
 
     kv_parse(argc, argv);
     const char* search = kv_get("search", "id_ab_q_mo_tt_nmp");
@@ -103,21 +103,21 @@ int main(int argc, char** argv)
     }
 
     if(!strcmp("nnue", eval)) {
-        if(!nnue_load(NNUE_DEFAULT_PATH)){
+        if(!irida_nnue_load(NNUE_DEFAULT_PATH)){
             ERRO("Could not load nnue %s\n", NNUE_DEFAULT_PATH);
             return 1;
         }
-        evalfn = nnue_eval;
-    } else if(!strcmp("handcrafted", eval)) evalfn = evaluation;
-    else if(!strcmp("material", eval)) evalfn = material_eval;
-    else evalfn = evaluation;
+        evalfn = irida_nnue_eval;
+    } else if(!strcmp("handcrafted", eval)) evalfn = irida_evaluation;
+    else if(!strcmp("material", eval)) evalfn = irida_material_eval;
+    else evalfn = irida_evaluation;
 
     engine.search = searchfn;
     engine.eval = evalfn;
-    engine.order = order_moves;
+    engine.order = irida_order_moves;
     g_searchConfig.maxDepth = depth;
 
-    run_benchmark(searchfn, evalfn, order_moves);
+    run_benchmark(searchfn, evalfn, irida_order_moves);
 
     return 0;
 }

@@ -9,7 +9,7 @@
     (strncmp(command, check, strlen(check)) == 0 && \
     (command[strlen(check)] == '\0' || command[strlen(check)] == ' '))
 
-bool UciHandleCommand(UciState* uci_state, const char *command)
+bool irida_UciHandleCommand(UciState* uci_state, const char *command)
 {
     if (IS_COMMAND(command, COMMAND_UCI)) {
         uci_uci(uci_state);
@@ -44,7 +44,7 @@ bool UciHandleCommand(UciState* uci_state, const char *command)
 }
 
 
-void StatePrint(const UciState* uci_state)
+void irida_StatePrint(const UciState* uci_state)
 {
     if (!uci_state) {
         printf("State is NULL\n");

@@ -45,9 +45,9 @@ int main(int argc, char** argv)
 {
     castro_InitMasks();
     castro_InitMagic();
-    pesto_init();
-    init_mvv_lva();
-    tt_init(16);
+    irida_pesto_init();
+    irida_init_mvv_lva();
+    irida_tt_init(16);
 
     test_set_dispatcher(dispatch_test_by_name);
 

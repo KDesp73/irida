@@ -7,7 +7,7 @@
 #include "utils.h"
 #include <stdlib.h>
 
-Move random_move(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
+Move irida_random_move(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 {
     UNUSED(eval);
     UNUSED(order);

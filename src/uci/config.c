@@ -4,7 +4,7 @@
 #include "nnue.h"
 #include <string.h>
 
-bool GetUciOption(const UciState* state, char* name, UciOption* opt)
+bool irida_GetUciOption(const UciState* state, char* name, UciOption* opt)
 {
     for(size_t i = 0; i < state->uciOptionCount; i++){
         if(!strcmp(name, state->uciOptions[i].name)){
@@ -15,7 +15,7 @@ bool GetUciOption(const UciState* state, char* name, UciOption* opt)
     return false;
 }
 
-void LoadUciConfig(UciState* state)
+void irida_LoadUciConfig(UciState* state)
 {
     strncpy(state->startPositionFen, STARTING_FEN, sizeof(state->startPositionFen));
     state->uciMode = true;
@@ -116,7 +116,7 @@ void LoadUciConfig(UciState* state)
     };
 }
 
-void PrintUciOptions(UciState* state)
+void irida_PrintUciOptions(UciState* state)
 {
     UciOption* options = state->uciOptions;
 

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void EngineInit(Engine* engine)
+void irida_EngineInit(Engine* engine)
 {
     strncpy(engine->name, ENGINE_NAME, sizeof(engine->name));
     strncpy(engine->author, ENGINE_AUTHOR, sizeof(engine->author));
@@ -16,8 +16,8 @@ void EngineInit(Engine* engine)
     // TODO: bake masks and magic into castro
     castro_InitMasks();
     castro_InitMagic();
-    pesto_init();
-    init_mvv_lva();
-    ordering_reset();
-    tt_init(16);
+    irida_pesto_init();
+    irida_init_mvv_lva();
+    irida_ordering_reset();
+    irida_tt_init(16);
 }

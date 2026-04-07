@@ -96,22 +96,22 @@ extern UciState uci_state;
 
 // @function LoadUciConfig
 // @param state UciState to load into.
-void LoadUciConfig(UciState* state);
+void irida_LoadUciConfig(UciState* state);
 
 // @function PrintUciOptions
 // @param state UciState with options.
-void PrintUciOptions(UciState* state);
+void irida_PrintUciOptions(UciState* state);
 
 // @function StatePrint
 // @param state UciState to print.
-void StatePrint(const UciState* state);
+void irida_StatePrint(const UciState* state);
 
 // @function GetUciOption
 // @param state UciState.
 // @param name Option name.
 // @param opt Output option (if found).
 // @returns bool True if option found.
-bool GetUciOption(const UciState* state, char* name, UciOption* opt);
+bool irida_GetUciOption(const UciState* state, char* name, UciOption* opt);
 
 #define COMMAND_DEBUG      "debug"
 #define COMMAND_GO         "go"
@@ -127,12 +127,12 @@ bool GetUciOption(const UciState* state, char* name, UciOption* opt);
 #define COMMAND_SETEVAL    "seteval"
 #define COMMAND_SETSEARCH  "setsearch"
 
-int UciMain(void);
+int irida_UciMain(void);
 
 /** Run the UCI command loop only (state and config must already be initialized). */
-int UciMainLoop(void);
+int irida_UciMainLoop(void);
 
-bool UciHandleCommand(UciState* state, const char *command);
+bool irida_UciHandleCommand(UciState* state, const char *command);
 
 void uci_debug(UciState* state, const char* command);
 void uci_go(UciState* state, const char* command);
@@ -181,7 +181,7 @@ void uci_report_search(int depth, int bestScore, uint64_t timeMs, const char* pv
 // @desc Set start position FEN and init board.
 // @param state UciState.
 // @param startpos FEN string (e.g. "startpos" or full FEN).
-static inline void StateSetStartPos(UciState* state, const char* startpos)
+static inline void irida_StateSetStartPos(UciState* state, const char* startpos)
 {
     strncpy(state->startPositionFen, startpos, sizeof(state->startPositionFen) - 1);
     state->startPositionFen[sizeof(state->startPositionFen) - 1] = '\0'; // Null-terminate
@@ -194,14 +194,14 @@ static inline void StateSetStartPos(UciState* state, const char* startpos)
 // @function InitState
 // @desc Initialize state with starting position.
 // @param state UciState.
-static inline void InitState(UciState* state)
+static inline void irida_InitState(UciState* state)
 {
-    StateSetStartPos(state, STARTING_FEN);
+    irida_StateSetStartPos(state, STARTING_FEN);
 }
 
-static inline bool search_should_stop(void)
+static inline bool irida_search_should_stop(void)
 {
-    return search_time_up() || uci_state.stopRequested;
+    return irida_search_time_up() || uci_state.stopRequested;
 }
 
 #endif // ENGINE_UCI_H

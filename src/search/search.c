@@ -187,16 +187,16 @@ static void prioritize_hash_move(Move list[], size_t count, Move hash_move)
     }
 }
 
-Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
+Move irida_search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
 {
-    tt_inc_generation();
+    irida_tt_inc_generation();
 
     // 1. Syzygy Tablebase Probe
     Move tb_move = NULL_MOVE;
     size_t piece_count = castro_PieceCount(board);
     if (config->useSyzygy && piece_count <= config->syzygyProbeLimit &&
         TB_LARGEST > 0 && piece_count <= TB_LARGEST) {
-        if (syzygy_probe_root(board, config->syzygy50MoveRule, &tb_move)) {
+        if (irida_syzygy_probe_root(board, config->syzygy50MoveRule, &tb_move)) {
             printf("info string tablebase hit\n");
             return tb_move; 
         }
@@ -210,7 +210,7 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
     Move best_move = NULL_MOVE;
     int last_depth_score = 0; 
 
-    search_start_timer(config->timeLimitMs);
+    irida_search_start_timer(config->timeLimitMs);
 
     char root_fen_snapshot[256];
     castro_FenExport(board, root_fen_snapshot);
@@ -224,7 +224,7 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
         castro_BoardFree(board);
         castro_BoardInitFen(board, root_fen_snapshot);
 
-        if (search_time_up()) break;
+        if (irida_search_time_up()) break;
 
         int delta, alpha, beta;
         aspiration_init_window(config, currentDepth, last_depth_score, &delta, &alpha, &beta);
@@ -237,7 +237,7 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
         bool done = false;
 
         while (!done) {
-            if (search_should_stop()) break;
+            if (irida_search_should_stop()) break;
 
             int originalAlpha = alpha;
             int originalBeta  = beta;
@@ -267,7 +267,7 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
                                      currentDepth - 1, 1,
                                      -beta, -alpha, true, config);
 
-                if (search_should_stop()) break;
+                if (irida_search_should_stop()) break;
 
                 if (score > bestScore) {
                     bestScore = score;
@@ -279,7 +279,7 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
                 if (alpha >= beta) break; // beta cutoff
             }
 
-            if (search_should_stop()) break;
+            if (irida_search_should_stop()) break;
 
             if (!config->useAspiration || currentDepth < 5) {
                 done = true;
@@ -302,9 +302,9 @@ Move search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config)
         char moveBuf[10];
         castro_MoveToString(best_move, moveBuf);
         uci_report_search(currentDepth, last_depth_score,
-                          search_elapsed_ms(), moveBuf);
+                          irida_search_elapsed_ms(), moveBuf);
 
-        if (search_should_stop()) break;
+        if (irida_search_should_stop()) break;
 
         // Exit if mate found
         if (last_depth_score > (INF - MAX_PLY)) break;
@@ -341,16 +341,16 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
     // --- 2. TT Probe ---
     Move tt_move = NULL_MOVE;
     int tt_score = 0;
-    if (config->useTT && tt_probe(board->hash, depth, alpha, beta, ply, &tt_score, &tt_move))
+    if (config->useTT && irida_tt_probe(board->hash, depth, alpha, beta, ply, &tt_score, &tt_move))
         return tt_score;
 
     int mated_score = -INF + ply;
     if (alpha < mated_score) alpha = mated_score;
     if (beta <= alpha) return alpha;
 
-    if ((g_searchStats.nodes & 1023) == 0 && search_time_up())
+    if ((g_searchStats.nodes & 1023) == 0 && irida_search_time_up())
         uci_state.stopRequested = true;
-    if (search_should_stop()) return 0;
+    if (irida_search_should_stop()) return 0;
 
     g_searchStats.nodes++;
     if (ply > g_searchStats.selDepth) g_searchStats.selDepth = ply;
@@ -364,10 +364,10 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
         (piece_count < config->syzygyProbeLimit ||
          (depth >= 0 && (size_t)depth >= config->syzygyProbeDepth));
     if (tb_wdl_eligible) {
-        int tb_score = syzygy_probe_wdl(board, config->syzygy50MoveRule);
+        int tb_score = irida_syzygy_probe_wdl(board, config->syzygy50MoveRule);
         if (tb_score != SYZYGY_PROBE_FAILED) {
             if (config->useTT)
-                tt_store(board->hash, depth, tb_score, TT_EXACT, NULL_MOVE, ply);
+                irida_tt_store(board->hash, depth, tb_score, TT_EXACT, NULL_MOVE, ply);
             g_searchStats.tbHits++;
             return tb_score;
         }
@@ -375,7 +375,7 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
 
     // --- 4. Base Case ---
     if (depth <= 0)
-        return config->useQuiescence ? quiescence(board, alpha, beta, ply, eval, order) : 0;
+        return config->useQuiescence ? irida_quiescence(board, alpha, beta, ply, eval, order) : 0;
 
     // --- 5. Null Move Pruning ---
     int nmp_score = 0;
@@ -429,7 +429,7 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
 
         castro_UnmakeMove(board);
 
-        if (search_should_stop()) return 0;
+        if (irida_search_should_stop()) return 0;
 
         // Quiet tracking
         if (!is_capture && !gives_check) {
@@ -445,7 +445,7 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
 
         if (alpha >= beta) {
             if (!is_capture) {
-                killer_store(move, ply);
+                irida_killer_store(move, ply);
                 int from = castro_GetFrom(move);
                 int to   = castro_GetTo(move);
 
@@ -478,7 +478,7 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
         if (type == TT_EXACT && !tt_exact_ok)
             type = TT_LOWERBOUND;
 
-        tt_store(board->hash, depth, bestScore, type, bestMove, ply);
+        irida_tt_store(board->hash, depth, bestScore, type, bestMove, ply);
     }
 
     return bestScore;

@@ -24,7 +24,7 @@
 static bool g_syzygy_loaded = false;
 static char g_syzygy_path[512];
 
-bool syzygy_init(const char* path)
+bool irida_syzygy_init(const char* path)
 {
     if (!path || path[0] == '\0') {
         g_syzygy_loaded = false;
@@ -73,18 +73,18 @@ bool syzygy_init(const char* path)
     return true;
 }
 
-void syzygy_free(void)
+void irida_syzygy_free(void)
 {
     tb_free();
     g_syzygy_loaded = false;
 }
 
-bool syzygy_available(void)
+bool irida_syzygy_available(void)
 {
     return g_syzygy_loaded;
 }
 
-unsigned syzygy_piece_count(Board* board)
+unsigned irida_syzygy_piece_count(Board* board)
 {
     unsigned n = 0;
     for (int i = 0; i < PIECE_TYPES; i++) {
@@ -155,7 +155,7 @@ static bool syzygy_fathom_layout_ok(Board* board)
     if (TB_LARGEST == 0)
         return false;
 
-    unsigned n = syzygy_piece_count(board);
+    unsigned n = irida_syzygy_piece_count(board);
     if (n == 0 || n > TB_LARGEST)
         return false;
 
@@ -194,7 +194,7 @@ static bool syzygy_fathom_layout_ok(Board* board)
     return true;
 }
 
-int syzygy_probe_wdl(Board* board, bool use_rule50)
+int irida_syzygy_probe_wdl(Board* board, bool use_rule50)
 {
     if (!g_syzygy_loaded)
         return SYZYGY_PROBE_FAILED;
@@ -237,13 +237,13 @@ int syzygy_probe_wdl(Board* board, bool use_rule50)
     return (wdl < 5) ? score_tbl[wdl] : 0;
 }
 
-bool syzygy_probe_root(Board* board, bool use_rule50, Move* best_move_out)
+bool irida_syzygy_probe_root(Board* board, bool use_rule50, Move* best_move_out)
 {
     if (!g_syzygy_loaded || !best_move_out) {
         return false;
     }
     /* Fathom only has tables through TB_LARGEST pieces; skip root work otherwise. */
-    if (TB_LARGEST == 0 || syzygy_piece_count(board) > TB_LARGEST) {
+    if (TB_LARGEST == 0 || irida_syzygy_piece_count(board) > TB_LARGEST) {
         return false;
     }
     if (board->castling_rights != 0) {

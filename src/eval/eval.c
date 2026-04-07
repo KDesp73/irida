@@ -782,17 +782,17 @@ static void rebuild_tables(const int *mg_val, const int *eg_val)
     }
 }
 
-void pesto_init(void)
+void irida_pesto_init(void)
 {
     rebuild_tables(mg_value, eg_value);
 }
 
-void pesto_set_tune_values(const int mg_val[6], const int eg_val[6])
+void irida_pesto_set_tune_values(const int mg_val[6], const int eg_val[6])
 {
     rebuild_tables(mg_val, eg_val);
 }
 
-int pesto_material_pst_eval_white(Board* board)
+int irida_pesto_material_pst_eval_white(Board* board)
 {
     int mg_acc[2] = {0, 0};
     int eg_acc[2] = {0, 0};
@@ -872,7 +872,7 @@ static int pesto_eval_impl(Board* board, EvalBreakdown* out)
 
     int material_pst = (mg_score * game_phase + eg_score * eg_phase) / 24;
     int pawn_structure = evaluate_pawn_structure(board);
-    int material = material_eval(board);
+    int material = irida_material_eval(board);
     int mobility = evaluate_mobility(board);
     int king_safety = evaluate_king_safety(board, game_phase);
     int piece_activity = evaluate_piece_activity(board);
@@ -923,17 +923,17 @@ static int pesto_eval_impl(Board* board, EvalBreakdown* out)
     return score;
 }
 
-int evaluation(Board* board)
+int irida_evaluation(Board* board)
 {
     return pesto_eval_impl(board, NULL);
 }
 
-int eval_breakdown(Board* board, EvalBreakdown* out)
+int irida_eval_breakdown(Board* board, EvalBreakdown* out)
 {
     return pesto_eval_impl(board, out);
 }
 
-void log_breakdown(EvalBreakdown b)
+void irida_log_breakdown(EvalBreakdown b)
 {
     fprintf(stderr, "Evaluation Breakdown\n");
     fprintf(stderr, "\t| Material: %d\n", b.material);

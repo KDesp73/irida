@@ -26,7 +26,7 @@ int test_search(const char* fen, int depth_limit)
         .syzygyProbeLimit = 7,
         .syzygy50MoveRule = true,
     };
-    Move move = search(&board, evaluation, order_moves, &config);
+    Move move = irida_search(&board, irida_evaluation, irida_order_moves, &config);
     castro_BoardFree(&board);
     (void)move;
     SUCC("search_root depth %d completed", depth_limit);

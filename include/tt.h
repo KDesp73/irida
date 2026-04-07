@@ -28,17 +28,17 @@ typedef struct {
 
 // @function tt_init
 // @param mb Size in megabytes.
-void tt_init(size_t mb);
+void irida_tt_init(size_t mb);
 
 // @function tt_clear
 // @desc Completely clears the transposition table.
 // Typically called at the start of a new game or when 
 // requested by the GUI to reset engine state.
-void tt_clear(void);
+void irida_tt_clear(void);
 
 // @function tt_inc_generation
 // @desc Call at start of each search_root.
-void tt_inc_generation(void);
+void irida_tt_inc_generation(void);
 
 // @function tt_probe
 // @param key Position key.
@@ -49,7 +49,7 @@ void tt_inc_generation(void);
 // @param outScore Output score (if hit).
 // @param outMove Output best move (if hit).
 // @returns bool True if probe hit and score/move are valid.
-bool tt_probe(uint64_t key,
+bool irida_tt_probe(uint64_t key,
               int depth,
               int alpha,
               int beta,
@@ -60,7 +60,7 @@ bool tt_probe(uint64_t key,
 // @function tt_probe_pv
 // @desc For PV construction: return stored best move if key and generation match (ignore depth).
 // @returns bool True if entry exists and *outMove was set.
-bool tt_probe_pv(uint64_t key, Move* outMove);
+bool irida_tt_probe_pv(uint64_t key, Move* outMove);
 
 // @function tt_store
 // @param key Position key.
@@ -69,7 +69,7 @@ bool tt_probe_pv(uint64_t key, Move* outMove);
 // @param type TT_EXACT, TT_LOWERBOUND, or TT_UPPERBOUND.
 // @param bestMove Best move at this node.
 // @param ply Current ply (for generation).
-void tt_store(uint64_t key,
+void irida_tt_store(uint64_t key,
               int depth,
               int score,
               TTNodeType type,
@@ -80,16 +80,16 @@ void tt_store(uint64_t key,
 // @desc Returns the "hashfull" value for UCI.
 // Measures how many slots in the first 1000 entries are occupied 
 // by the current search generation. Returns a value from 0 to 1000.
-int tt_hashfull(void);
+int irida_tt_hashfull(void);
 
 // @function tt_adjust_score
 // @desc Converts a search score (relative to the root) into a 
 // position-independent score for storage in the TT.
-int tt_adjust_score(int stored, int ply);
+int irida_tt_adjust_score(int stored, int ply);
 
 // @function tt_unadjust_score
 // @desc Converts a stored TT score (position-independent) back into 
 // a search score relative to the current search ply.
-int tt_unadjust_score(int stored, int ply);
+int irida_tt_unadjust_score(int stored, int ply);
 
 #endif // TT_H
