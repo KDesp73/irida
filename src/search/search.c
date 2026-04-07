@@ -332,8 +332,10 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
 
     // --- 1. Static Checks ---
     if (ply > 0 && (castro_IsThreefoldRepetition(board) || board->halfmove >= 100)) {
-        // Return a tiny fluctuating value to break ties
-        return (g_searchStats.nodes & 2) ? 1 : -1;
+        // Returning a tiny negative value based on ply.
+        // This makes a draw at ply 10 look slightly worse than a draw at ply 2.
+        // It forces the engine to 'prefer' certain draw paths over others.
+        return -1 * (ply & 1);
     }
 
     // --- 2. TT Probe ---
