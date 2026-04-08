@@ -4,83 +4,93 @@ import chess.pgn
 import math
 import sys
 
-def calculate_llr(wins, losses, draws, elo0, elo1):
+def calculate_llr_pentanomial(outcomes, elo0, elo1):
     """
-    Calculates the Log-Likelihood Ratio for a set of games.
-    elo0: The Null Hypothesis (H0) - usually 0.
-    elo1: The Alternative Hypothesis (H1) - the Elo gain you are testing for.
+    Calculates LLR using the Pentanomial model for game pairs.
+    outcomes: [n0, n05, n1, n15, n2] frequencies of pair scores.
     """
-    total = wins + losses + draws
-    if total == 0:
+    total_pairs = sum(outcomes)
+    if total_pairs == 0:
         return 0.0
 
-    # Probabilities based on game results
-    w = wins / total
-    l = losses / total
-    d = draws / total
-
-    # Convert Elo to expected scores (Logistic distribution)
-    def elo_to_score(elo):
-        return 1 / (1 + 10**(-elo / 400))
-
-    s0 = elo_to_score(elo0)
-    s1 = elo_to_score(elo1)
-
-    # Simplified SPRT calculation (Bernoulli approximation)
-    # Note: Modern engines use Pentanomial, but Bernoulli is standard for PGN pairs.
-    score = (wins + 0.5 * draws) / total
+    scores = [0, 0.5, 1.0, 1.5, 2.0]
     
-    # Avoid log(0)
-    variance = w + 0.25 * d - score**2
+    # Sample mean (average score per pair)
+    mu = sum(outcomes[i] * scores[i] for i in range(5)) / total_pairs
+    
+    # Sample variance (variance of the pair scores)
+    raw_variance = sum(outcomes[i] * (scores[i]**2) for i in range(5)) / total_pairs
+    variance = raw_variance - mu**2
+    
     if variance <= 0:
         return 0.0
 
-    llr = (s1 - s0) * (2 * score - (s1 + s0)) / (2 * variance) * total
+    def elo_to_score(elo):
+        return 1 / (1 + 10**(-elo / 400))
+
+    # Target scores for a pair (2 games)
+    s0 = 2 * elo_to_score(elo0)
+    s1 = 2 * elo_to_score(elo1)
+
+    # LLR variance-based approximation
+    sum_scores = mu * total_pairs
+    llr = (s1 - s0) * (2 * sum_scores - total_pairs * (s1 + s0)) / (2 * total_pairs * variance)
     return llr
 
 def analyze_pgn(file_path, elo0=0, elo1=5):
-    wins, losses, draws = 0, 0, 0
-    
+    # n0, n05, n1, n15, n2
+    outcomes = [0, 0, 0, 0, 0]
+    E2_NAME = "as E2"
+
     try:
         with open(file_path) as pgn_file:
             while True:
-                game = chess.pgn.read_game(pgn_file)
-                if game is None:
+                # Read two games at a time (the pair)
+                g1 = chess.pgn.read_game(pgn_file)
+                g2 = chess.pgn.read_game(pgn_file)
+
+                if g1 is None or g2 is None:
                     break
-                
-                result = game.headers.get("Result")
-                if result == "1-0":
-                    losses += 1
-                elif result == "0-1":
-                    wins += 1
-                elif result == "1/2-1/2":
-                    draws += 1
+
+                pair_score = 0.0
+                for game in [g1, g2]:
+                    white = game.headers.get("White")
+                    black = game.headers.get("Black")
+                    res = game.headers.get("Result")
+
+                    if res == "1/2-1/2":
+                        pair_score += 0.5
+                    elif (E2_NAME in white and res == "1-0") or (E2_NAME in black and res == "0-1"):
+                        pair_score += 1.0
+
+                # Map pair score to index (0.0->0, 0.5->1, 1.0->2, 1.5->3, 2.0->4)
+                idx = int(pair_score * 2)
+                outcomes[idx] += 1
+
     except FileNotFoundError:
         print(f"Error: File '{file_path}' not found.")
         return
 
-    total = wins + losses + draws
-    llr = calculate_llr(wins, losses, draws, elo0, elo1)
+    total_pairs = sum(outcomes)
+    llr = calculate_llr_pentanomial(outcomes, elo0, elo1)
 
-    print(f"--- SPRT Analysis Results ---")
-    print(f"Games: {total} (W: {wins}, L: {losses}, D: {draws})")
-    print(f"H0 (Null): {elo0} Elo | H1 (Alt): {elo1} Elo")
+    print(f"--- Pentanomial SPRT Analysis ---")
+    print(f"Pairs: {total_pairs} | Total Games: {total_pairs * 2}")
+    print(f"Outcomes [0, 0.5, 1, 1.5, 2]: {outcomes}")
     print(f"LLR: {llr:.4f}")
-    
-    # Standard bounds for SPRT (alpha=0.05, beta=0.05)
-    lower_bound = math.log(0.05 / 0.95) # ~ -2.94
-    upper_bound = math.log(0.95 / 0.05) # ~  2.94
+
+    lower_bound = math.log(0.05 / 0.95)
+    upper_bound = math.log(0.95 / 0.05)
 
     if llr >= upper_bound:
-        print("Result: H1 ACCEPTED (Statistically significant gain)")
+        print("Result: H1 ACCEPTED")
     elif llr <= lower_bound:
-        print("Result: H0 ACCEPTED (Rejecting gain / H1 failed)")
+        print("Result: H0 ACCEPTED")
     else:
-        print("Result: CONTINUE (Not enough data to conclude)")
+        print("Result: CONTINUE")
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: sprt <path_to_pgn>")
     else:
-        # Default testing for a 5 Elo gain
-        analyze_pgn(sys.argv[1], elo0=0, elo1=5)
+        analyze_pgn(sys.argv[1])

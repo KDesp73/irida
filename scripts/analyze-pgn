@@ -1,0 +1,123 @@
+#!/usr/bin/env python3
+
+import chess.pgn
+import matplotlib.pyplot as plt
+import numpy as np
+from collections import defaultdict
+import math
+
+def calculate_elo_diff(win_rate):
+    """Calculates Elo difference based on win percentage."""
+    if win_rate <= 0 or win_rate >= 100:
+        return 0
+    return -400 * math.log10(1 / (win_rate / 100) - 1)
+
+def analyze_engine_performance(file_path):
+    # stats[engine] = {'W': [w, l, d], 'B': [w, l, d]}
+    stats = defaultdict(lambda: {'W': [0, 0, 0], 'B': [0, 0, 0]})
+    
+    try:
+        with open(file_path, encoding="utf-8") as pgn_file:
+            while True:
+                game = chess.pgn.read_game(pgn_file)
+                if game is None: break
+                
+                white = game.headers.get("White", "Unknown")
+                black = game.headers.get("Black", "Unknown")
+                res = game.headers.get("Result", "*")
+                
+                if res == "1-0":
+                    stats[white]['W'][0] += 1
+                    stats[black]['B'][1] += 1
+                elif res == "0-1":
+                    stats[white]['W'][1] += 1
+                    stats[black]['B'][0] += 1
+                elif res == "1/2-1/2":
+                    stats[white]['W'][2] += 1
+                    stats[black]['B'][2] += 1
+
+        if not stats:
+            print("No data found.")
+            return
+
+        display_enhanced_results(stats)
+
+    except FileNotFoundError:
+        print(f"Error: File '{file_path}' not found.")
+
+def display_enhanced_results(stats):
+    engines = list(stats.keys())
+    
+    # Process totals
+    win_rates = []
+    draw_rates = []
+    white_perfs = []
+    black_perfs = []
+    
+    print(f"{'Engine':<20} | {'Win%':<8} | {'Elo Diff':<10} | {'Draw%':<8} | {'W-Perf':<8} | {'B-Perf':<8}")
+    print("-" * 75)
+
+    for eng in engines:
+        w_stats = stats[eng]['W']
+        b_stats = stats[eng]['B']
+        
+        total_w = sum(w_stats)
+        total_b = sum(b_stats)
+        total_all = total_w + total_b
+        
+        # Points: Win=1, Draw=0.5
+        points = (w_stats[0] + b_stats[0]) + 0.5 * (w_stats[2] + b_stats[2])
+        win_pct = (points / total_all) * 100
+        draw_pct = ((w_stats[2] + b_stats[2]) / total_all) * 100
+        
+        w_perf = ((w_stats[0] + 0.5 * w_stats[2]) / total_w * 100) if total_w > 0 else 0
+        b_perf = ((b_stats[0] + 0.5 * b_stats[2]) / total_b * 100) if total_b > 0 else 0
+        
+        elo_diff = calculate_elo_diff(win_pct)
+        
+        win_rates.append(win_pct)
+        draw_rates.append(draw_pct)
+        white_perfs.append(w_perf)
+        black_perfs.append(b_perf)
+
+        print(f"{eng[:20]:<20} | {win_pct:>6.2f}% | {elo_diff:>+8.1f} | {draw_pct:>6.2f}% | {w_perf:>6.1f}% | {b_perf:>6.1f}%")
+
+    # --- PLOTTING ---
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+    # Diagram 1: Stacked Outcome (Win/Loss/Draw)
+    indices = np.arange(len(engines))
+    width = 0.5
+    
+    wins = [((stats[e]['W'][0] + stats[e]['B'][0]) / (sum(stats[e]['W']) + sum(stats[e]['B']))) * 100 for e in engines]
+    draws = [((stats[e]['W'][2] + stats[e]['B'][2]) / (sum(stats[e]['W']) + sum(stats[e]['B']))) * 100 for e in engines]
+    losses = [100 - (w + d) for w, d in zip(wins, draws)]
+
+    ax1.bar(engines, wins, width, label='Wins', color='#2ecc71')
+    ax1.bar(engines, draws, width, bottom=wins, label='Draws', color='#bdc3c7')
+    ax1.bar(engines, losses, width, bottom=[i+j for i,j in zip(wins, draws)], label='Losses', color='#e74c3c')
+    
+    ax1.set_ylabel('Percentage %')
+    ax1.set_title('Game Outcome Distribution')
+    ax1.legend()
+
+    # Diagram 2: Side-by-Side Color Performance
+    ax2.bar(indices - width/4, white_perfs, width/2, label='White Perf', color='#f1c40f')
+    ax2.bar(indices + width/4, black_perfs, width/2, label='Black Perf', color='#34495e')
+    
+    ax2.axhline(y=50, color='black', linestyle='--', alpha=0.3)
+    ax2.set_xticks(indices)
+    ax2.set_xticklabels(engines)
+    ax2.set_ylabel('Performance %')
+    ax2.set_title('Performance by Color (White vs Black)')
+    ax2.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) > 1:
+        analyze_engine_performance(sys.argv[1])
+    else:
+        print("Usage: python script.py your_file.pgn")
