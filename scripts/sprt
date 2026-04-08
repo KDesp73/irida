@@ -4,48 +4,82 @@ import chess.pgn
 import math
 import sys
 
+
 def calculate_llr_pentanomial(outcomes, elo0, elo1):
     """
-    Calculates LLR using the Pentanomial model for game pairs.
-    outcomes: [n0, n05, n1, n15, n2] frequencies of pair scores.
+    Gaussian approximation to cumulative LLR for paired games (pentanomial counts).
+
+    outcomes: [n0, n05, n1, n15, n2] counts for pair scores 0, 0.5, 1, 1.5, 2.
+
+    Under i.i.d. pair scores with mean mu and per-pair variance sigma^2,
+        LLR = (s1 - s0) * (2 * sum_x - n * (s0 + s1)) / (2 * sigma^2)
+    where s0, s1 are expected total pair scores for E2 under H0 and H1,
+    sum_x is the sum of observed pair scores, and n is the number of pairs.
     """
     total_pairs = sum(outcomes)
     if total_pairs == 0:
         return 0.0
 
     scores = [0, 0.5, 1.0, 1.5, 2.0]
-    
-    # Sample mean (average score per pair)
+
     mu = sum(outcomes[i] * scores[i] for i in range(5)) / total_pairs
-    
-    # Sample variance (variance of the pair scores)
-    raw_variance = sum(outcomes[i] * (scores[i]**2) for i in range(5)) / total_pairs
+    raw_variance = sum(outcomes[i] * (scores[i] ** 2) for i in range(5)) / total_pairs
     variance = raw_variance - mu**2
-    
-    if variance <= 0:
-        return 0.0
 
     def elo_to_score(elo):
-        return 1 / (1 + 10**(-elo / 400))
+        return 1 / (1 + 10 ** (-elo / 400))
 
-    # Target scores for a pair (2 games)
+    # Expected total E2 score over two games in a pair (H0 / H1: Elo diff elo0 / elo1).
     s0 = 2 * elo_to_score(elo0)
     s1 = 2 * elo_to_score(elo1)
 
-    # LLR variance-based approximation
     sum_scores = mu * total_pairs
-    llr = (s1 - s0) * (2 * sum_scores - total_pairs * (s1 + s0)) / (2 * total_pairs * variance)
+    sigma2 = max(variance, 1e-12)
+    llr = (s1 - s0) * (2 * sum_scores - total_pairs * (s1 + s0)) / (2 * sigma2)
     return llr
 
+
+def pair_outcomes_to_sum_scores(outcomes):
+    scores = [0, 0.5, 1.0, 1.5, 2.0]
+    return sum(outcomes[i] * scores[i] for i in range(5))
+
+
+def elo_delta_from_score_rate(S):
+    """
+    Logistic Elo difference R(E2) - R(E1): Δ ≈ 400 * log10(S / (1-S)),
+    where S is E2's mean score per game (0..1).
+    """
+    eps = 1e-9
+    if S <= 0:
+        return float("-inf")
+    if S >= 1:
+        return float("inf")
+    S = min(max(S, eps), 1.0 - eps)
+    return 400.0 * math.log10(S / (1.0 - S))
+
+
+def elo_delta_ci_approx(S, n_games):
+    """
+    Crude 95% CI: i.i.d. games (ignores pairing). Delta method on 400*log10(S/(1-S)).
+    """
+    eps = 1e-9
+    if n_games <= 0 or S <= 0 or S >= 1:
+        return None, None
+    S = min(max(S, eps), 1.0 - eps)
+    var_s = S * (1.0 - S) / n_games
+    d = 400.0 / (math.log(10.0) * S * (1.0 - S))
+    se_d = abs(d) * math.sqrt(var_s)
+    mid = 400.0 * math.log10(S / (1.0 - S))
+    return mid - 1.96 * se_d, mid + 1.96 * se_d
+
+
 def analyze_pgn(file_path, elo0=0, elo1=5):
-    # n0, n05, n1, n15, n2
     outcomes = [0, 0, 0, 0, 0]
     E2_NAME = "as E2"
 
     try:
         with open(file_path) as pgn_file:
             while True:
-                # Read two games at a time (the pair)
                 g1 = chess.pgn.read_game(pgn_file)
                 g2 = chess.pgn.read_game(pgn_file)
 
@@ -63,7 +97,6 @@ def analyze_pgn(file_path, elo0=0, elo1=5):
                     elif (E2_NAME in white and res == "1-0") or (E2_NAME in black and res == "0-1"):
                         pair_score += 1.0
 
-                # Map pair score to index (0.0->0, 0.5->1, 1.0->2, 1.5->3, 2.0->4)
                 idx = int(pair_score * 2)
                 outcomes[idx] += 1
 
@@ -72,11 +105,27 @@ def analyze_pgn(file_path, elo0=0, elo1=5):
         return
 
     total_pairs = sum(outcomes)
-    llr = calculate_llr_pentanomial(outcomes, elo0, elo1)
+    n_games = total_pairs * 2
+    sum_scores = pair_outcomes_to_sum_scores(outcomes)
+    S = sum_scores / n_games if n_games else 0.0
 
-    print(f"--- Pentanomial SPRT Analysis ---")
-    print(f"Pairs: {total_pairs} | Total Games: {total_pairs * 2}")
+    llr = calculate_llr_pentanomial(outcomes, elo0, elo1)
+    delta = elo_delta_from_score_rate(S)
+    lo_hi = elo_delta_ci_approx(S, n_games)
+
+    print("--- Pentanomial SPRT Analysis ---")
+    print(f"Pairs: {total_pairs} | Total games: {n_games}")
     print(f"Outcomes [0, 0.5, 1, 1.5, 2]: {outcomes}")
+    print(f"E2 mean score/game: {S:.4f}  (1 = win every game, 0.5 = all draws)")
+    if math.isfinite(delta):
+        print(f"Elo Δ (E2 − E1), logistic estimate: {delta:+.2f}")
+        if lo_hi[0] is not None:
+            print(
+                f"Elo Δ approx 95% CI (i.i.d. games): [{lo_hi[0]:+.2f}, {lo_hi[1]:+.2f}]"
+            )
+    else:
+        print("Elo Δ: not defined (E2 won/lost every game in the sample)")
+
     print(f"LLR: {llr:.4f}")
 
     lower_bound = math.log(0.05 / 0.95)
@@ -88,6 +137,7 @@ def analyze_pgn(file_path, elo0=0, elo1=5):
         print("Result: H0 ACCEPTED")
     else:
         print("Result: CONTINUE")
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
