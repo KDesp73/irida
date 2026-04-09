@@ -6,6 +6,7 @@ BOOK="data/books/book.bin"
 GAMES=200
 THREADS=4  # Number of parallel arenas to run
 ARENA="./scripts/arena"
+DEPTH=5
 
 # --- CLI Parameter Parsing ---
 usage() {
@@ -44,6 +45,6 @@ echo "Starting A/B testing with $THREADS parallel workers..."
 # -j is the number of jobs (threads)
 # --colsep lets us split the pair into two arguments {1} and {2}
 printf "%s\n" "${pairs[@]}" | parallel -j "$THREADS" --colsep ' ' \
-    "$ARENA {1} {2} --book $BOOK --games $GAMES --seed $SEED"
+    "$ARENA {1} {2} --book $BOOK --games $GAMES --seed $SEED --depth $DEPTH"
 
 echo "All tests completed."

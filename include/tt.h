@@ -62,6 +62,9 @@ bool irida_TTProbe(uint64_t key,
 // @returns bool True if entry exists and *outMove was set.
 bool irida_TTProbePV(uint64_t key, Move* outMove);
 
+// @function TTBuildPV
+void irida_TTBuildPV(const char* root_fen, Move root_best, char* out, size_t out_sz);
+
 // @function TTStore
 // @param key Position key.
 // @param depth Depth of score.

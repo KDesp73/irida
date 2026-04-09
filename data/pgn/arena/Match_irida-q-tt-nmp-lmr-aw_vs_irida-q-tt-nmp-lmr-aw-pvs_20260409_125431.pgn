@@ -1,0 +1,36 @@
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.09"]
+[Round "1"]
+[White "irida-q-tt-nmp-lmr-aw 0.8.0 as E1"]
+[Black "irida-q-tt-nmp-lmr-aw-pvs 0.8.0 as E2"]
+[Result "1/2-1/2"]
+[Annotator "Irida arena seed=1665215631 pair=1"]
+[Opening "Arena pair 1 line_len=11"]
+
+1. d4 Nf6 2. Nf3 c5 3. d5 e6 4. Nc3 exd5 5. Nxd5 Nxd5 6. Qxd5 Qb6 7. Bg5 f6 8. Bc1 Bd6 9. Kd1 Na6 10. Rb1 Nb4 11. Qc4 Qa6 12. Qxa6 bxa6 13. a3 Nc6 14. Nd2 Ke7 15. Ne4 Ne5 16. Nxd6 Kxd6 17. Bf4 Kc6 18. Bxe5 fxe5 19. g3 Kc7 20. Bg2 Rb8 21. Kd2 Rf8 22. Ke3 Bb7 23. Bxb7 Rxb7 24. Rhd1 Kc6 25. Rd3 d5 26. f3 c4 27. Rdd1 Rfb8 28. b3 cxb3 29. Rb2 Kd6 30. c3 Kc6 31. Rdb1 e4 32. fxe4 dxe4 33. Kxe4 Rf7 34. Kd3 Re8 35. Kc4 Re3 36. Kxb3 Rf2 37. Kc4 Rxh2 38. Rb7 Rxg3 39. Rxa7 Rxe2 40. Rxa6+ Kc7 41. Ra7+ Kc6 42. Rbb7 Rc2 43. Rc7+ Kb6 44. Rab7+ Ka6 45. Rxg7 Rcxc3+ 46. Kd4 Rcd3+ 47. Ke4 Rde3+ 48. Kd4 Rd3+ 49. Ke4 Rde3+ 50. Kd4 Rd3+ 51. Ke4 Rde3+ 52. Kd4 Rd3+ 53. Ke4 Rde3+ 54. Kd4 Rd3+ 1/2-1/2
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.09"]
+[Round "2"]
+[White "irida-q-tt-nmp-lmr-aw-pvs 0.8.0 as E2"]
+[Black "irida-q-tt-nmp-lmr-aw 0.8.0 as E1"]
+[Result "1/2-1/2"]
+[Annotator "Irida arena seed=1665215631 pair=1"]
+[Opening "Arena pair 1 line_len=11"]
+
+1. d4 Nf6 2. Nf3 c5 3. d5 e6 4. Nc3 exd5 5. Nxd5 Nxd5 6. Qxd5 Qf6 7. Bg5 Qe6 8. Qxe6+ dxe6 9. O-O-O Be7 10. e3 Bd7 11. Be2 Bc6 12. Bxe7 Kxe7 13. Rhe1 Bd5 14. Kb1 Nd7 15. g3 Rad8 16. g4 Rb8 17. Bb5 Nf6 18. Ne5 Rhd8 19. f3 Ne8 20. e4 Nc7 21. Ba4 f6 22. Nd7 Rxd7 23. Bxd7 Kxd7 24. exd5 exd5 25. Re4 Ra8 26. g5 fxg5 27. Re5 Re8 28. Rxg5 g6 29. Rg4 Kc6 30. Kc1 Nb5 31. Rf4 Re2 32. c4 dxc4 33. Rf6+ Kc7 34. Rd5 b6 35. Rf7+ Kc6 36. Rd2 Re1+ 37. Rd1 Re2 38. Rd2 Re1+ 39. Rd1 Re2 40. Rd2 Re1+ 41. Rd1 Re2 42. Rd2 Re1+ 43. Rd1 Re2 44. Rd2 1/2-1/2
+
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.09"]
+[Round "3"]
+[White "irida-q-tt-nmp-lmr-aw 0.8.0 as E1"]
+[Black "irida-q-tt-nmp-lmr-aw-pvs 0.8.0 as E2"]
+[Result "1-0"]
+[Annotator "Irida arena seed=1665215631 pair=2"]
+[Opening "Arena pair 2 line_len=24"]
+
+1. d4 Nf6 2. c4 e6 3. Nf3 d5 4. Nc3 Be7 5. Bf4 O-O 6. e3 c5 7. dxc5 Bxc5 8. a3 Nc6 9. Be2 dxc4 10. Bxc4 Nh5 11. Qxd8 Rxd8 12. Bc7 Rd7 13. Be5 Bb6 14. Rd1 Rxd1+ 15. Kxd1 Ba5 16. Nb5 Bd7 17. Nd6 f6 18. Bd4 Rb8 19. g4 Nxd4 20. Nxd4 Bc7 21. Ne4 f5 22. Nc5 Bc6 23. Nxc6 bxc6 24. Nxe6 Bd6 25. Nd4+ Kh8 26. gxh5 Rxb2 27. Rf1 Bxa3 28. Nxc6 Bc5 29. Bd3 Rb6 30. Ne5 Bd6 31. Nf3 f4 32. exf4 Rb8 33. Re1 Rc8 34. Re4 Rf8 35. Ng5 h6 36. Ne6 Re8 37. Kd2 Kg8 38. Kc3 Kh8 39. Re2 Kg8 40. Ra2 Re7 41. Bc4 Kh8 42. Ra1 Bb8 43. Nf8 Re8 44. Ng6+ Kh7 45. Rb1 Rc8 46. Ne7 Re8 47. Rb7 Kh8 48. Bf7 Rd8 49. Nc6 Rc8 50. Rxb8 Rxb8 51. Nxb8 a5 52. Nc6 a4 53. Nd4 Kh7 54. Kb4 Kh8 55. Nf5 Kh7 56. Kxa4 Kh8 57. Bd5 Kh7 58. Ne7 g6 59. Be4 Kh8 60. Bxg6 Kg7 61. Nf5+ Kf6 62. Nxh6 Ke6 63. Be4 Kd6 64. Kb3 Kd7 65. Nf5 Kd8 66. h6 Kc8 67. h7 Kc7 68. h8=Q Kd7 69. Qe5 Kc8 70. Bc6 Kd8 71. Qb8# 1-0
+

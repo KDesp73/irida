@@ -316,10 +316,10 @@ Move irida_Search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config
         best_move = currentBestMove;
         last_depth_score = bestScore;
 
-        char moveBuf[10];
-        castro_MoveToString(best_move, moveBuf);
+        char pvBuf[MAX_PLY * 8];
+        irida_TTBuildPV(root_fen_snapshot, best_move, pvBuf, sizeof(pvBuf));
         irida_UciSearchReport(currentDepth, last_depth_score,
-                          irida_SearchElapsedMs(), moveBuf);
+                              irida_SearchElapsedMs(), pvBuf);
 
         if (irida_SearchShouldStop()) break;
 

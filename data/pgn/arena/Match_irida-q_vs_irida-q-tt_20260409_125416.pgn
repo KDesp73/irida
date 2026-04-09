@@ -1,0 +1,12 @@
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.09"]
+[Round "1"]
+[White "irida-q 0.8.0 as E1"]
+[Black "irida-q-tt 0.8.0 as E2"]
+[Result "1/2-1/2"]
+[Annotator "Irida arena seed=1665215631 pair=1"]
+[Opening "Arena pair 1 line_len=11"]
+
+1. d4 Nf6 2. Nf3 c5 3. d5 e6 4. Nc3 exd5 5. Nxd5 Nxd5 6. Qxd5 Qb6 7. Qe4+ Qe6 8. Qxe6+ fxe6 9. Bg5 Nc6 10. O-O-O Be7 11. Bxe7 Kxe7 12. e3 Nb4 13. a3 Nd5 14. Bc4 Nf6 15. Rhe1 Ne4 16. Re2 Kf6 17. Bd3 Ng5 18. Nxg5 Kxg5 19. Bb5 d5 20. Rd3 Rf8 21. Rc3 b6 22. e4 Bb7 23. Rg3+ Kf6 24. e5+ Kf7 25. Rf3+ Kg8 26. Rh3 Rf7 27. Bd3 g6 28. Rg3 c4 29. Bxg6 hxg6 30. Rxg6+ Rg7 31. Rxg7+ Kxg7 32. Re3 Rh8 33. Rg3+ Kf7 34. Rf3+ Kg7 35. Rg3+ Kf7 36. Rf3+ Kg7 37. Rg3+ Kf7 38. Rf3+ Kg7 39. Rg3+ Kf7 40. Rf3+ Kg7 41. Rg3+ 1/2-1/2
+

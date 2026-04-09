@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "tt.h"
+#include "search.h"
 
 #define MATE_THRESHOLD 899488
 
@@ -95,8 +96,13 @@ void irida_TTStore(uint64_t key, int depth, int score, TTNodeType type, Move bes
                    (entry->generation != g_tt_generation);
 
     if (replace) {
-        // If we don't have a new best move, keep the old one (useful for Alpha/Beta bounds)
-        Move move_to_store = (bestMove != NULL_MOVE) ? bestMove : entry->bestMove;
+        /* Only reuse the previous slot's bestMove when this store is for the *same*
+         * position (same key). Otherwise a NULL bestMove from the new search would
+         * incorrectly keep another position's move after an index collision — that
+         * poisons PV extraction and can yield illegal alternating moves. */
+        Move move_to_store = bestMove;
+        if (move_to_store == NULL_MOVE && entry->key == key && entry->bestMove != NULL_MOVE)
+            move_to_store = entry->bestMove;
 
         entry->key = key;
         entry->depth = depth;
@@ -185,4 +191,70 @@ bool irida_TTProbePV(uint64_t key, Move* outMove)
 
     *outMove = entry->bestMove;
     return true;
+}
+
+/* Walk TT best moves from the root position to build a UCI PV string.
+ * The root itself is not stored in the TT (search only negamax's child positions),
+ * so the first ply always comes from root_best; continuation follows TT entries. */
+void irida_TTBuildPV(const char* root_fen, Move root_best, char* out, size_t out_sz)
+{
+    if (out_sz == 0)
+        return;
+    out[0] = '\0';
+
+    if (root_best == NULL_MOVE)
+        return;
+
+    Board walk;
+    memset(&walk, 0, sizeof(walk));
+    castro_BoardInitFen(&walk, root_fen);
+
+    if (!castro_MoveIsValid(&walk, root_best, walk.turn)) {
+        castro_BoardFree(&walk);
+        return;
+    }
+
+    size_t off = 0;
+    {
+        char ms[16];
+        castro_MoveToString(root_best, ms);
+        size_t len = strlen(ms);
+        if (off + len >= out_sz) {
+            castro_BoardFree(&walk);
+            return;
+        }
+        memcpy(out + off, ms, len);
+        off += len;
+        out[off] = '\0';
+    }
+
+    if (!castro_MakeMove(&walk, root_best)) {
+        castro_BoardFree(&walk);
+        return;
+    }
+
+    for (int ply = 1; ply < MAX_PLY; ply++) {
+        Move m = NULL_MOVE;
+        if (!irida_TTProbePV(walk.hash, &m) || m == NULL_MOVE)
+            break;
+        if (!castro_MoveIsValid(&walk, m, walk.turn))
+            break;
+
+        char ms[16];
+        castro_MoveToString(m, ms);
+        size_t len = strlen(ms);
+        if (off + 1 >= out_sz)
+            break;
+        out[off++] = ' ';
+        if (off + len >= out_sz)
+            break;
+        memcpy(out + off, ms, len);
+        off += len;
+        out[off] = '\0';
+
+        if (!castro_MakeMove(&walk, m))
+            break;
+    }
+
+    castro_BoardFree(&walk);
 }
