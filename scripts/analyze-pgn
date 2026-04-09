@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import chess.pgn
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
@@ -27,7 +28,6 @@ def parse_pgn(file_path):
                 black = game.headers.get("Black", "Unknown")
                 res = game.headers.get("Result", "*")
                 
-                # Track game length (plies to full moves)
                 move_count = sum(1 for _ in game.mainline_moves())
                 game_lengths.append(move_count / 2)
 
@@ -85,8 +85,19 @@ def main():
     parser.add_argument("-c", "--color", action="store_true", help="Show White vs Black performance")
     parser.add_argument("-l", "--length", action="store_true", help="Show game length histogram")
     parser.add_argument("-a", "--all", action="store_true", help="Show all diagrams")
+    parser.add_argument("--latex", action="store_true", help="Export to .pgf for LaTeX instead of showing PNG")
 
     args = parser.parse_args()
+    
+    # Configure for LaTeX if requested
+    if args.latex:
+        matplotlib.use("pgf")
+        matplotlib.rcParams.update({
+            "pgf.texsystem": "pdflatex",
+            "font.family": "serif",
+            "text.usetex": True,
+            "pgf.rcfonts": False,
+        })
     
     stats, lengths = parse_pgn(args.pgn)
     engines = list(stats.keys())
@@ -100,7 +111,6 @@ def main():
         wr = (points / total) * 100
         print(f"{eng[:20]:<20} | {wr:>6.2f}% | {calculate_elo_diff(wr):>+8.1f}")
 
-    # Plot Selection
     plots_to_show = []
     if args.outcomes or args.all: plots_to_show.append('outcomes')
     if args.color or args.all: plots_to_show.append('color')
@@ -115,7 +125,13 @@ def main():
             elif ptype == 'length': plot_length(lengths)
         
         plt.tight_layout()
-        plt.show()
+        
+        if args.latex:
+            output_file = "chess_results.pgf"
+            plt.savefig(output_file)
+            print(f"\nLaTeX diagram saved to {output_file}")
+        else:
+            plt.show()
     else:
         print("\nNo diagrams selected. Use -o, -c, -l, or -a.")
 
