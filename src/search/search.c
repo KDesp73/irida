@@ -311,15 +311,19 @@ Move irida_Search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config
                 done = true;
         }
 
-        /* Commit this depth before checking stop: if movetime/stop fires right after
-         * the aspiration loop, we must not skip assignment or UCI sends bestmove (none). */
-        best_move = currentBestMove;
-        last_depth_score = bestScore;
+        /* Commit and report only when at least one root line finished. Otherwise a stop
+         * before the first aspiration iteration can leave bestScore=-INF and
+         * currentBestMove=NULL, which clobbered the prior depth and produced bogus UCI
+         * (mate 49999 from -INF, empty pv) while bestmove fell back to the first legal. */
+        if (currentBestMove != NULL_MOVE) {
+            best_move = currentBestMove;
+            last_depth_score = bestScore;
 
-        char pvBuf[MAX_PLY * 8];
-        irida_TTBuildPV(root_fen_snapshot, best_move, pvBuf, sizeof(pvBuf));
-        irida_UciSearchReport(currentDepth, last_depth_score,
-                              irida_SearchElapsedMs(), pvBuf);
+            char pvBuf[MAX_PLY * 8];
+            irida_TTBuildPV(root_fen_snapshot, best_move, pvBuf, sizeof(pvBuf));
+            irida_UciSearchReport(currentDepth, last_depth_score,
+                                  irida_SearchElapsedMs(), pvBuf);
+        }
 
         if (irida_SearchShouldStop()) break;
 

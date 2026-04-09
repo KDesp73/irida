@@ -1,5 +1,6 @@
 #include "tt.h"
 #include "uci.h"
+#include "search.h"
 
 void irida_UciSearchReport(int depth, int bestScore, uint64_t timeMs, const char* pvBuf)
 {
@@ -12,7 +13,11 @@ void irida_UciSearchReport(int depth, int bestScore, uint64_t timeMs, const char
     irida_UciStdoutLock();
     printf("info depth %d seldepth %d score ", depth, g_searchStats.selDepth);
 
-    if (bestScore > mateThreshold) {
+    /* Exact ±INF is a sentinel (e.g. unfinished depth), not a ply-based mate score; the
+     * mate conversion formula uses MATE_SCORE and would print nonsense (e.g. mate 49999). */
+    if (bestScore <= -INF || bestScore >= INF) {
+        printf("cp 0 ");
+    } else if (bestScore > mateThreshold) {
         // Convert ply-to-mate to moves-to-mate
         printf("mate %d ", (MATE_SCORE - bestScore + 1) / 2);
     } else if (bestScore < -mateThreshold) {
