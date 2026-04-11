@@ -49,7 +49,7 @@ type := RELEASE
 
 # Build type
 ifeq ($(type), RELEASE)
-    CFLAGS += -O3
+    CFLAGS += -O3 -march=native
 else
     SANITIZERS := -fsanitize=address,undefined
     CFLAGS  += -DDEBUG -ggdb $(SANITIZERS)
