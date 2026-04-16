@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite it using the metadata from this file.
+title:  >-
+  KDesp73/irida
+abstract: A UCI compatible chess engine written in C
+type: software
+license: MIT
+url: https://github.com/KDesp73/irida
+keywords: 
+  - c-language
+  - chess
+  - chess-engine
+  - neural-networks
+  - nnue
+  - uci
+authors: 
+  - family-names: Despoinidis
+    given-names: Konstantinos
+date-released: 2026-04-16
