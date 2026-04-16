@@ -1,5 +1,4 @@
 TODO: Bake masks into castro
-TODO: pick a license
 TODO: texel tuning
 TODO: opening list for llm
 DONE: engine testing
@@ -34,3 +33,4 @@ DONE: wire killer/history updates into search
 DONE: prefix irida API
 DONE: Verify syzygy promotion encoding
 DONE: SPRT
+DONE: pick a license

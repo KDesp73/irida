@@ -56,7 +56,7 @@ Syzygy is enabled by default as long as the tablebase can be located
 
 ## License
 
-Currently closed-source
+[MIT](./LICENSE)
 
 ## Author
 
