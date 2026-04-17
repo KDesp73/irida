@@ -26,9 +26,12 @@ typedef struct EvalBreakdown {
     int game_phase;       /* 0..24, for context */
 } EvalBreakdown;
 
+// @function EvalMaterialWhiteMinusBlack
+// @desc Sum(white piece values) − sum(black). Used inside PeSTO composition (white-centric terms).
+int irida_EvalMaterialWhiteMinusBlack(Board* board);
+
 // @function EvalMaterial
-// @param board Board to evaluate.
-// @returns int Material-only eval (centipawns).
+// @desc Material-only score in centipawns from the side-to-move perspective.
 int irida_EvalMaterial(Board* board);
 
 // @function Evaluation

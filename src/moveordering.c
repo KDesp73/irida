@@ -123,7 +123,7 @@ void irida_OrderMoves(Board *board, Move moves[], size_t count, size_t ply, Move
         row[i].orig_idx = i;
         int s = 0;
 
-        if (m == tt_move && tt_move != NULL_MOVE) {
+        if (tt_move != NULL_MOVE && castro_MoveCmp(m, tt_move)) {
             s = SCORE_TT;
         } else if (castro_MoveIsCapture(board, m)) {
             if (castro_GetFlag(m) == FLAG_ENPASSANT) {

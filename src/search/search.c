@@ -46,7 +46,7 @@ static int lmr_new_depth(
     int newDepth = depth - 1;
     if (config->useLMR && depth >= 3 && move_index >= 4 && !pv_node &&
         !parent_in_check && !is_capture && !gives_check &&
-        !(tt_move != NULL_MOVE && move == tt_move))
+        !(tt_move != NULL_MOVE && castro_MoveCmp(tt_move, move)))
     {
         int R = 1 + depth / 6 + (int)move_index / 10;
         newDepth -= R;
@@ -193,7 +193,7 @@ static void prioritize_hash_move(Move list[], size_t count, Move hash_move)
     if (hash_move == NULL_MOVE || count == 0)
         return;
     for (size_t j = 0; j < count; j++) {
-        if (list[j] != hash_move)
+        if (!castro_MoveCmp(list[j], hash_move))
             continue;
         if (j != 0) {
             Move tmp = list[0];
@@ -352,12 +352,8 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
     int alphaOrig = alpha;
 
     // --- 1. Static Checks ---
-    if (ply > 0 && (castro_IsThreefoldRepetition(board) || board->halfmove >= 100)) {
-        // Returning a tiny negative value based on ply.
-        // This makes a draw at ply 10 look slightly worse than a draw at ply 2.
-        // It forces the engine to 'prefer' certain draw paths over others.
-        return -1 * (ply & 1);
-    }
+    if (ply > 0 && (castro_IsThreefoldRepetition(board) || board->halfmove >= 100))
+        return 0;
 
     // --- 2. TT Probe ---
     Move tt_move = NULL_MOVE;
@@ -452,7 +448,7 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
             }
         } else {
             // PVS behavior (Scout search + Re-searches)
-            score = pvs_negamax_move(board, eval, order, depth, ply, alpha, beta, newDepth, !pv_node, tt_exact_ok, allow_nmp, config);
+            score = pvs_negamax_move(board, eval, order, depth, ply, alpha, beta, newDepth, !pv_node, allow_nmp, tt_exact_ok, config);
         }
 
         castro_UnmakeMove(board);

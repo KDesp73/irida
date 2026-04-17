@@ -47,9 +47,15 @@ CFLAGS  := -fPIC $(WARNINGS) $(INCLUDES)
 LDFLAGS += -lpthread -L. $(LDFLAGS_CASTRO) $(LDFLAGS_FATHOM) $(LDFLAGS_NNUE_PROBE) 
 type := RELEASE
 
+# Set NATIVE=1 for -march=native (local max speed; less reproducible across CPUs).
+NATIVE ?= 0
+
 # Build type
 ifeq ($(type), RELEASE)
-    CFLAGS += -O3 -march=native
+    CFLAGS += -O3
+    ifeq ($(NATIVE),1)
+        CFLAGS += -march=native
+    endif
 else
     SANITIZERS := -fsanitize=address,undefined
     CFLAGS  += -DDEBUG -ggdb $(SANITIZERS)

@@ -872,7 +872,7 @@ static int pesto_eval_impl(Board* board, EvalBreakdown* out)
 
     int material_pst = (mg_score * game_phase + eg_score * eg_phase) / 24;
     int pawn_structure = evaluate_pawn_structure(board);
-    int material = irida_EvalMaterial(board);
+    int material = irida_EvalMaterialWhiteMinusBlack(board);
     int mobility = evaluate_mobility(board);
     int king_safety = evaluate_king_safety(board, game_phase);
     int piece_activity = evaluate_piece_activity(board);
@@ -891,7 +891,7 @@ static int pesto_eval_impl(Board* board, EvalBreakdown* out)
                     + space 
                     + threats 
                     + endgame;
-    int score = board->turn == COLOR_WHITE ? score_white : -score_white;
+    int score = board->turn ? score_white : -score_white;
 
     if (out) {
         out->game_phase = game_phase;

@@ -17,7 +17,8 @@ $(SO_NAME): $(BUILD_DIR) $(OBJ_FILES) ## Build the dynamic library
 
 %: apps/%.c apps/shared.h $(A_NAME)
 	@echo "[INFO] Building executable: $@"
-	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS_ENGINE) $(LDFLAGS_CASTRO) $(LDFLAGS) -DENABLE_ALL
+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS_ENGINE) $(LDFLAGS_CASTRO) $(LDFLAGS) \
+		-DENABLE_ASPIRATION -DENABLE_LMR -DENABLE_NMP -DENABLE_TT -DENABLE_QUIESCENCE -DENABLE_SYZYGY
 
 
 .PHONY: irida-plain

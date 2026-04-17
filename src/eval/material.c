@@ -9,7 +9,7 @@
 #include "castro.h"
 #include "eval.h"
 
-int irida_EvalMaterial(Board* board)
+int irida_EvalMaterialWhiteMinusBlack(Board* board)
 {
     size_t white = 0, black = 0;
 
@@ -19,13 +19,13 @@ int irida_EvalMaterial(Board* board)
         330,
         500,
         900,
-        0,  
+        0,
         100,
         320,
         330,
         500,
         900,
-        0   
+        0
     };
 
     for (int i = INDEX_WHITE_PAWN; i <= INDEX_WHITE_QUEEN; i++) {
@@ -45,4 +45,10 @@ int irida_EvalMaterial(Board* board)
     }
 
     return (int)(white - black);
+}
+
+int irida_EvalMaterial(Board* board)
+{
+    int wb = irida_EvalMaterialWhiteMinusBlack(board);
+    return board->turn ? wb : -wb;
 }
