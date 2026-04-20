@@ -279,6 +279,9 @@ void uci_uci(UciState* state)
             if(!irida_SyzygyInit(option.value.string)) {
                 printf("error Could not load syzygy tablebase from %s\n", option.value.string);
             }
+        } else if(!strcmp(option.name, "HashSize")) {
+            size_t hash_size = option.value.spin;
+            irida_TTInit(hash_size);
         }
     }
 
