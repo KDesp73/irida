@@ -2,14 +2,14 @@
 PeSTO-style eval clone for Texel tuning.
 
 Computes material + PST score with game-phase interpolation, matching
-src/eval/pesto.c so we can tune mg_value and eg_value (and optionally K).
+src/eval/eval.c (PeSTO tables) so we can tune mg_value and eg_value (and optionally K).
 Eval is returned from White's perspective (positive = good for White).
 """
 
 from __future__ import annotations
 
 # @module texel.eval
-# @desc PeSTO material + PST with game-phase interpolation; matches src/eval/pesto.c.
+# @desc PeSTO material + PST with game-phase interpolation; matches src/eval/eval.c.
 
 import numpy as np
 from typing import Tuple

@@ -13,8 +13,8 @@ typedef int (*EvalFn)(Board*) ;
 // @struct EvalBreakdown
 // @desc Per-term breakdown for PeSTO eval (centipawns, side-to-move). total equals pesto_eval when convention matches.
 typedef struct EvalBreakdown {
-    int material;
-    int material_pst;     /* Material + piece-square tables (phase-interpolated) */
+    int material;         /* Always 0: piece values are included in material_pst (PeSTO); see irida_EvalMaterial for raw material */
+    int material_pst;     /* PeSTO material + piece-square tables (phase-interpolated) */
     int pawn_structure;
     int mobility;
     int king_safety;
@@ -27,7 +27,7 @@ typedef struct EvalBreakdown {
 } EvalBreakdown;
 
 // @function EvalMaterialWhiteMinusBlack
-// @desc Sum(white piece values) − sum(black). Used inside PeSTO composition (white-centric terms).
+// @desc Sum(white piece values) − sum(black). Debug / material-only eval; not added to irida_Evaluation (PeSTO carries material in PST).
 int irida_EvalMaterialWhiteMinusBlack(Board* board);
 
 // @function EvalMaterial

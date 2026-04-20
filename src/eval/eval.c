@@ -20,9 +20,9 @@
 
 #define EMPTY 12
 
-#define THREAT_WEIGHT 3
+#define THREAT_WEIGHT 2
 #define SPACE_WEIGHT 2
-#define MOBILITY_WEIGHT 4
+#define MOBILITY_WEIGHT 2
 
 static inline int piece_color(int pc) {
     return pc & 1;
@@ -30,6 +30,12 @@ static inline int piece_color(int pc) {
 
 static inline int flip_sq(int sq) {
     return sq ^ 56;
+}
+
+/* PeSTO / a1=0 square index (rank grows a1..a8) vs castro grid row (0=rank8, 7=rank1). */
+static inline int pest_sq_to_castro_r(int sq)
+{
+    return 7 - (sq >> 3);
 }
 
 static inline int is_white_piece_char(char c) {
@@ -231,11 +237,11 @@ static int mg_table[12][64];
 static int eg_table[12][64];
 
 /* --------------------------------------------------------------
- *  Helper terms: pawn structure, mobility, king safety,
+ *  Helper terms: pawn structure, mobility, king attack pressure,
  *  piece activity, space, threats, endgame extras
  * -------------------------------------------------------------- */
 
-static int evaluate_pawn_structure(Board* board)
+static int evaluate_pawn_structure(Board* board, int game_phase)
 {
     int score = 0;
 
@@ -248,16 +254,16 @@ static int evaluate_pawn_structure(Board* board)
     }
 
     for (int sq = 0; sq < 64; sq++) {
-        int r = sq / 8;
-        int f = sq % 8;
+        int r = pest_sq_to_castro_r(sq);
+        int f = sq & 7;
         char ascii = board->grid[r][f];
         if (ascii == 'p' && r > max_black_rank[f]) max_black_rank[f] = r;
         if (ascii == 'P' && r < min_white_rank[f]) min_white_rank[f] = r;
     }
 
     for (int sq = 0; sq < 64; sq++) {
-        int r = sq / 8;
-        int f = sq % 8;
+        int r = pest_sq_to_castro_r(sq);
+        int f = sq & 7;
         char ascii = board->grid[r][f];
         if (ascii == 'P') {
             int passed = 1;
@@ -280,8 +286,8 @@ static int evaluate_pawn_structure(Board* board)
     /* Doubled and isolated pawns */
     int wpawns[8] = {0}, bpawns[8] = {0};
     for (int sq = 0; sq < 64; sq++) {
-        int r = sq / 8;
-        int f = sq % 8;
+        int r = pest_sq_to_castro_r(sq);
+        int f = sq & 7;
         (void)r;
         char c = board->grid[r][f];
         if (c == 'P') wpawns[f]++;
@@ -309,6 +315,78 @@ static int evaluate_pawn_structure(Board* board)
             score += bpawns[f] * 8;
     }
 
+    /* Shelter: pawns in front of own king (stronger in middlegame) */
+    int wk_r = -1, wk_f = -1, bk_r = -1, bk_f = -1;
+    for (int r = 0; r < 8; r++) {
+        for (int f = 0; f < 8; f++) {
+            char c = board->grid[r][f];
+            if (c == 'K') { wk_r = r; wk_f = f; }
+            if (c == 'k') { bk_r = r; bk_f = f; }
+        }
+    }
+    int shelter_w = 0;
+    int shelter_b = 0;
+    int sh_w = (3 * game_phase + 12) / 8;
+    if (sh_w < 2) sh_w = 2;
+    if (sh_w > 10) sh_w = 10;
+    if (wk_r >= 0) {
+        for (int df = -1; df <= 1; df++) {
+            int ff = wk_f + df;
+            if (ff < 0 || ff > 7) continue;
+            for (int dr = 1; dr <= 2; dr++) {
+                int rr = wk_r + dr;
+                if (rr > 7) continue;
+                if (board->grid[rr][ff] == 'P')
+                    shelter_w += sh_w;
+            }
+        }
+    }
+    if (bk_r >= 0) {
+        for (int df = -1; df <= 1; df++) {
+            int ff = bk_f + df;
+            if (ff < 0 || ff > 7) continue;
+            for (int dr = 1; dr <= 2; dr++) {
+                int rr = bk_r - dr;
+                if (rr < 0) continue;
+                if (board->grid[rr][ff] == 'p')
+                    shelter_b += sh_w;
+            }
+        }
+    }
+    score += shelter_w - shelter_b;
+
+    /* Backward pawns: chain behind neighbors on adjacent files */
+    for (int sq = 0; sq < 64; sq++) {
+        int r = pest_sq_to_castro_r(sq);
+        int f = sq & 7;
+        char ascii = board->grid[r][f];
+        if (ascii == 'P') {
+            int max_adj = -1;
+            for (int df = -1; df <= 1; df += 2) {
+                int ff = f + df;
+                if (ff < 0 || ff > 7) continue;
+                for (int rr = 0; rr < 8; rr++)
+                    if (board->grid[rr][ff] == 'P' && rr > max_adj)
+                        max_adj = rr;
+            }
+            if (max_adj > r)
+                score -= 7;
+        }
+        if (ascii == 'p') {
+            int min_adv = 8;
+            for (int df = -1; df <= 1; df += 2) {
+                int ff = f + df;
+                if (ff < 0 || ff > 7) continue;
+                for (int rr = 0; rr < 8; rr++) {
+                    if (board->grid[rr][ff] == 'p' && rr < min_adv)
+                        min_adv = rr;
+                }
+            }
+            if (min_adv < r)
+                score += 7;
+        }
+    }
+
     return score;
 }
 
@@ -324,36 +402,41 @@ static int evaluate_rooks(Board* board)
             if (c != 'R' && c != 'r')
                 continue;
 
-            int sign = (c == 'R') ? 1 : -1;
-
             /* rook on 7th / 8th rank */
             if (c == 'R' && r >= 6)
-                score += 80;
+                score += 28;
             if (c == 'r' && r <= 1)
-                score -= 80;
+                score -= 28;
 
-            /* rook on open file */
-            int file_blocked = 0;
+            int wp_file = 0;
+            int bp_file = 0;
             for (int rr = 0; rr < 8; rr++) {
                 char t = board->grid[rr][f];
-                if (t == 'P' || t == 'p') {
-                    file_blocked = 1;
-                    break;
-                }
+                if (t == 'P') wp_file++;
+                if (t == 'p') bp_file++;
             }
 
-            if (!file_blocked)
-                score += sign * 35;
+            if (c == 'R') {
+                if (wp_file == 0 && bp_file == 0)
+                    score += 16;
+                else if (wp_file == 0 && bp_file > 0)
+                    score += 8;
+            } else {
+                if (wp_file == 0 && bp_file == 0)
+                    score -= 16;
+                else if (bp_file == 0 && wp_file > 0)
+                    score -= 8;
+            }
 
-            /* rook near enemy king file */
+            /* rook on same file as enemy king */
             for (int rr = 0; rr < 8; rr++) {
                 char t = board->grid[rr][f];
 
                 if (c == 'R' && t == 'k')
-                    score += 120;
+                    score += 40;
 
                 if (c == 'r' && t == 'K')
-                    score -= 120;
+                    score -= 40;
             }
         }
     }
@@ -427,7 +510,7 @@ static inline int sliding_mobility(Board* board,
     return mob;
 }
 
-static int evaluate_mobility(Board* board)
+static int evaluate_mobility(Board* board, int game_phase)
 {
     int white_mob = 0;
     int black_mob = 0;
@@ -518,12 +601,16 @@ static int evaluate_mobility(Board* board)
         }
     }
 
-    return (white_mob - black_mob) * MOBILITY_WEIGHT;
+    /* Mobility matters more in the middlegame; damp in pure endgames */
+    int phase_scale = (game_phase * 2 + 8) / 3;
+    if (phase_scale > 24)
+        phase_scale = 24;
+    return ((white_mob - black_mob) * MOBILITY_WEIGHT * phase_scale) / 24;
 }
 
-static int evaluate_king_safety(Board* board, int game_phase)
+/* King attack: friendly pieces pressing the enemy king zone (tapered by phase). */
+static int evaluate_king_attack(Board* board, int game_phase)
 {
-    UNUSED(game_phase);
     int score = 0;
 
     int wk_r = -1, wk_f = -1;
@@ -537,6 +624,12 @@ static int evaluate_king_safety(Board* board, int game_phase)
         }
     }
 
+    int per = (10 * game_phase + 12) / 24;
+    if (per < 2)
+        per = 2;
+    if (per > 10)
+        per = 10;
+
     for (int r = 0; r < 8; r++) {
         for (int f = 0; f < 8; f++) {
 
@@ -546,14 +639,14 @@ static int evaluate_king_safety(Board* board, int game_phase)
 
                 int dist = abs(r - bk_r) + abs(f - bk_f);
                 if (dist <= 2)
-                    score += 30;
+                    score += per;
             }
 
             if (is_black_piece_char(c)) {
 
                 int dist = abs(r - wk_r) + abs(f - wk_f);
                 if (dist <= 2)
-                    score -= 30;
+                    score -= per;
             }
         }
     }
@@ -561,13 +654,30 @@ static int evaluate_king_safety(Board* board, int game_phase)
     return score;
 }
 
+static int black_pawn_attacks_white_square(Board* board, int r, int f)
+{
+    if (f > 0 && r + 1 <= 7 && board->grid[r + 1][f - 1] == 'p')
+        return 1;
+    if (f < 7 && r + 1 <= 7 && board->grid[r + 1][f + 1] == 'p')
+        return 1;
+    return 0;
+}
+
+static int white_pawn_attacks_black_square(Board* board, int r, int f)
+{
+    if (f > 0 && r - 1 >= 0 && board->grid[r - 1][f - 1] == 'P')
+        return 1;
+    if (f < 7 && r - 1 >= 0 && board->grid[r - 1][f + 1] == 'P')
+        return 1;
+    return 0;
+}
+
 static int evaluate_piece_activity(Board* board)
 {
     int score = 0;
     for (int sq = 0; sq < 64; sq++) {
-        int r = sq / 8;
-        int f = sq % 8;
-        (void)f;
+        int r = pest_sq_to_castro_r(sq);
+        int f = sq & 7;
         char c = board->grid[r][f];
         if ((c == 'N' || c == 'B' || c == 'R' || c == 'Q') &&
             r >= 2 && r <= 6)
@@ -575,6 +685,10 @@ static int evaluate_piece_activity(Board* board)
         if ((c == 'n' || c == 'b' || c == 'r' || c == 'q') &&
             r >= 1 && r <= 5)
             score -= 4;
+        if (c == 'N' && r >= 4 && !black_pawn_attacks_white_square(board, r, f))
+            score += 10;
+        if (c == 'n' && r <= 3 && !white_pawn_attacks_black_square(board, r, f))
+            score -= 10;
     }
     return score;
 }
@@ -799,9 +913,9 @@ int irida_EvalPestoMaterialPstEvalWhite(Board* board)
     int game_phase = 0;
 
     for (int sq = 0; sq < 64; sq++) {
-        int rank = sq / 8;
-        int file = sq % 8;
-        char ascii = board->grid[rank][file];
+        int cr = pest_sq_to_castro_r(sq);
+        int file = sq & 7;
+        char ascii = board->grid[cr][file];
         int pc = char_to_piece(ascii);
         if (pc == EMPTY)
             continue;
@@ -846,10 +960,10 @@ static int pesto_eval_impl(Board* board, EvalBreakdown* out)
 
     for (int sq = 0; sq < 64; sq++) {
 
-        int rank = sq / 8;
-        int file = sq % 8;
+        int cr = pest_sq_to_castro_r(sq);
+        int file = sq & 7;
 
-        char ascii = board->grid[rank][file];
+        char ascii = board->grid[cr][file];
         int pc = char_to_piece(ascii);
 
         if (pc == EMPTY)
@@ -871,18 +985,16 @@ static int pesto_eval_impl(Board* board, EvalBreakdown* out)
     int eg_phase = 24 - game_phase;
 
     int material_pst = (mg_score * game_phase + eg_score * eg_phase) / 24;
-    int pawn_structure = evaluate_pawn_structure(board);
-    int material = irida_EvalMaterialWhiteMinusBlack(board);
-    int mobility = evaluate_mobility(board);
-    int king_safety = evaluate_king_safety(board, game_phase);
+    int pawn_structure = evaluate_pawn_structure(board, game_phase);
+    int mobility = evaluate_mobility(board, game_phase);
+    int king_safety = evaluate_king_attack(board, game_phase);
     int piece_activity = evaluate_piece_activity(board);
     int space = evaluate_space(board);
     int threats = evaluate_threats(board);
     int endgame = evaluate_endgame_terms(board, game_phase);
     int rook_activity = evaluate_rooks(board);
 
-    int score_white = material 
-                    + material_pst 
+    int score_white = material_pst 
                     + pawn_structure 
                     + rook_activity 
                     + mobility 
@@ -896,7 +1008,7 @@ static int pesto_eval_impl(Board* board, EvalBreakdown* out)
     if (out) {
         out->game_phase = game_phase;
         if (board->turn) {
-            out->material = material;
+            out->material = 0;
             out->material_pst = material_pst;
             out->pawn_structure = pawn_structure;
             out->mobility = mobility;
@@ -907,7 +1019,7 @@ static int pesto_eval_impl(Board* board, EvalBreakdown* out)
             out->endgame = endgame;
             out->total = score_white;
         } else {
-            out->material = -material;
+            out->material = 0;
             out->material_pst = -material_pst;
             out->pawn_structure = -pawn_structure;
             out->mobility = -mobility;

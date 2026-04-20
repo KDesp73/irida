@@ -8,6 +8,8 @@ int test_eval(const char* fen, int score_min, int score_max);
 #define TEST_test_eval \
 	test_eval("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", -50, 50), \
 	test_eval("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", -100, 100), \
-	test_eval("4k3/8/8/8/8/8/8/4K3 w - - 0 1", -50, 50)
+	test_eval("4k3/8/8/8/8/8/8/4K3 w - - 0 1", -50, 50), \
+	test_eval("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2", -25, 25), \
+	test_eval("rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1", -40, 0)
 
 #endif

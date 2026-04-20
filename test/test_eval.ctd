@@ -2,3 +2,6 @@
 "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", -50, 50
 "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", -100, 100
 "4k3/8/8/8/8/8/8/4K3 w - - 0 1", -50, 50
+# Regression: 1.e4 e5 (white pawn on e4) / 1.d4 — PeSTO material is only in material_pst
+"rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2", -25, 25
+"rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1", -40, 0
