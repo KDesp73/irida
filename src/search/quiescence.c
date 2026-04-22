@@ -15,6 +15,7 @@
 #include "moveordering.h"
 #include "search.h"
 #include "uci.h"
+#include "nnue.h"
 
 int irida_Quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, OrderFn order)
 {
@@ -50,6 +51,8 @@ int irida_Quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, Or
     Moves moves = castro_GenerateMoves(board, MOVE_CAPTURE);
     order(board, moves.list, moves.count, ply, NULL_MOVE);
 
+    const bool use_acc = g_searchConfig.useNNUEAccumulator && irida_NNUEAvailable() && eval == irida_EvalNNUE;
+
     // until( every_capture_has_been_examined )
     for (size_t i = 0; i < moves.count; i++) {
         Move move = moves.list[i];
@@ -57,12 +60,15 @@ int irida_Quiescence(Board* board, int alpha, int beta, int ply, EvalFn eval, Or
         if (irida_SearchShouldStop())
             return alpha;
 
+        if (use_acc) irida_NNUEAccBeforeChild(board, move);
         if (!castro_MakeMove(board, move))
             continue;
+        if (use_acc) irida_NNUEAccCommitChild();
 
         // score = -Quiesce( -beta, -alpha );
         int score = -irida_Quiescence(board, -beta, -alpha, ply + 1, eval, order);
         castro_UnmakeMove(board);
+        if (use_acc) irida_NNUEAccPop();
 
         // if( score >= beta ) return score;
         if (score >= beta)

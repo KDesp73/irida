@@ -35,6 +35,14 @@ void irida_LoadUciConfig(UciState* state)
 
     if(state->uciOptionCount >= MAX_UCI_OPTIONS) return;
     state->uciOptions[state->uciOptionCount++] = (UciOption) {
+        .name = "NNUEUseAccumulator",
+        .type = UCI_CHECK,
+        .value.check = false,
+        .default_value = "false"
+    };
+
+    if(state->uciOptionCount >= MAX_UCI_OPTIONS) return;
+    state->uciOptions[state->uciOptionCount++] = (UciOption) {
         .name = "Hash",
         .type = UCI_SPIN,
         .value.spin = 64,

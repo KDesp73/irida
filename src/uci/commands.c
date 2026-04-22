@@ -53,6 +53,8 @@ void uci_setoption(UciState* state, const char *command)
                     state->uciOptions[i].value.check = (strcmp(option_value, "true") == 0);
                     if (strcmp(option_name, "Syzygy50MoveRule") == 0)
                         g_searchConfig.syzygy50MoveRule = state->uciOptions[i].value.check;
+                    else if (strcmp(option_name, "NNUEUseAccumulator") == 0)
+                        g_searchConfig.useNNUEAccumulator = state->uciOptions[i].value.check;
                     break;
                 case UCI_SPIN: {
                     int v = atoi(option_value);

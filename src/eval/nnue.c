@@ -144,18 +144,26 @@ bool irida_NNUEAvailable(void)
 
 int irida_EvalNNUE(Board* board)
 {
-    // Fallback
     if (!g_nnue_loaded) return irida_Evaluation(board);
+
+    if (irida_NNUEAccShouldUseIncremental()) {
+        int score = irida_NNUEEvalIncrementalForBoard(board);
+        if (!board->turn) score = -score;
+        return score;
+    }
+
+    if (irida_NNUEAccSessionActive() && irida_NNUEAccInNullMove()) {
+        int score = irida_NNUEEvalWithPsq(board);
+        if (!board->turn) score = -score;
+        return score;
+    }
 
     char fen[FEN_BUFFER_SIZE];
     fen[0] = '\0';
     castro_FenExport(board, fen);
     fen[FEN_BUFFER_SIZE - 1] = '\0';
 
-    // The NNUE probe is a black box and has been crashing on malformed inputs.
-    // If the exported FEN is malformed, fall back to the PeSTO evaluator.
-    if (!fen_basic_valid(fen))
-        return irida_Evaluation(board);
+    if (!fen_basic_valid(fen)) return irida_Evaluation(board);
 
     int score = nnue_evaluate_fen(fen);
     if (!board->turn)  // black to move

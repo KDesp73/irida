@@ -37,6 +37,7 @@ SearchConfig g_searchConfig = {
     .syzygyProbeDepth = 1,
     .syzygyProbeLimit = 7,
     .syzygy50MoveRule = true,
+    .useNNUEAccumulator = false,
 };
 
 
@@ -54,14 +55,14 @@ int main(int argc, char** argv)
     char* b0[] = { "test_draws" };
     char* b1[] = { "test_eval", "test_eval_breakdown", "test_eval_log", "test_symmetry" };
     char* b2[] = { "test_search" };
-    char* b3[] = { "test_eval_stockfish" };
+    char* b3[] = { "test_eval_stockfish", "test_nnue_accumulator" };
 
     char** batches[] = { b0, b1, b2, b3 };
     size_t sizes[] = {
-        sizeof(b0) / sizeof(char*),
-        sizeof(b1) / sizeof(char*),
-        sizeof(b2) / sizeof(char*),
-        sizeof(b3) / sizeof(char*),
+        sizeof(b0) / sizeof(b0[0]),
+        sizeof(b1) / sizeof(b1[0]),
+        sizeof(b2) / sizeof(b2[0]),
+        sizeof(b3) / sizeof(b3[0]),
     };
 
     test_batches(batches, sizeof(batches) / sizeof(char**), sizes);

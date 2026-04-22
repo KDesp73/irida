@@ -43,6 +43,9 @@ typedef struct {
     size_t syzygyProbeDepth;
     size_t syzygyProbeLimit;
     bool syzygy50MoveRule;
+
+    /* When true and eval is NNUE: use nnue-probe incremental accumulator in search (opt-in). */
+    bool useNNUEAccumulator;
 } SearchConfig;
 
 // @struct SearchStats

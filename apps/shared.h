@@ -72,6 +72,7 @@ SearchConfig g_searchConfig = {
     .syzygyProbeDepth = 1,
     .syzygyProbeLimit = 4,
     .syzygy50MoveRule = true,
+    .useNNUEAccumulator = false,
 };
 
 

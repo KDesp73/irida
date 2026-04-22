@@ -12,6 +12,7 @@
 #include "test_draws.h"
 #include "test_symmetry.h"
 #include "test_search.h"
+#include "test_nnue_accumulator.h"
 
 // Auto-generated dispatcher
 static int dispatch_test_by_name(const char* name) {
@@ -22,6 +23,7 @@ static int dispatch_test_by_name(const char* name) {
     if (strcmp(name, "test_draws") == 0) return test(TEST_test_draws, END);
     if (strcmp(name, "test_symmetry") == 0) return test(TEST_test_symmetry, END);
     if (strcmp(name, "test_search") == 0) return test(TEST_test_search, END);
+    if (strcmp(name, "test_nnue_accumulator") == 0) return test(TEST_test_nnue_accumulator, END);
     return 1;
 }
 

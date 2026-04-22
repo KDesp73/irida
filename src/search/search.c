@@ -18,6 +18,7 @@
 #include "tbprobe.h"
 #include "tt.h"
 #include "uci.h"
+#include "nnue.h"
 
 #define NMP_MIN_PIECES 8
 
@@ -74,9 +75,12 @@ static bool nmp_try_cutoff(
 
     const int R = 2;
 
+    const bool acc = config->useNNUEAccumulator && irida_NNUEAvailable() && eval == irida_EvalNNUE;
     castro_MakeNullMove(board);
+    if (acc) irida_NNUENullMoveEnter();
     int score = -negamax(board, eval, order, depth - 1 - R, ply + 1, -(beta), -(beta - 1),
                          false, true, config);
+    if (acc) irida_NNUENullMoveExit();
     castro_UnmakeNullMove(board);
 
     if (irida_SearchShouldStop()) return false;
@@ -279,10 +283,15 @@ Move irida_Search(Board* board, EvalFn eval, OrderFn order, SearchConfig* config
                 castro_BoardInitFen(board, root_fen_snapshot);
 
                 if (!castro_MakeMove(board, legal.list[i])) continue;
-                
+
+                const bool acc_line = config->useNNUEAccumulator && irida_NNUEAvailable() && eval == irida_EvalNNUE;
+                if (acc_line) irida_NNUEAccSearchBegin(board);
+
                 int score = -negamax(board, eval, order,
                                      currentDepth - 1, 1,
                                      -beta, -alpha, true, true, config);
+
+                if (acc_line) irida_NNUEAccSearchEnd();
 
                 if (irida_SearchShouldStop()) break;
 
@@ -410,6 +419,7 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
     Move bestMove = NULL_MOVE;
     int bestScore = -INF;
     const bool parent_in_check = castro_IsInCheck(board);
+    const bool use_acc = config->useNNUEAccumulator && irida_NNUEAvailable() && eval == irida_EvalNNUE;
 
     /* PVS: the first *successfully played* legal move must use a full window.
      * Using list index i==0 is wrong when MakeMove fails for that slot (e.g. TT
@@ -427,7 +437,9 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
 
         bool is_capture = castro_IsCapture(board, move);
 
+        if (use_acc) irida_NNUEAccBeforeChild(board, move);
         if (!castro_MakeMove(board, move)) continue;
+        if (use_acc) irida_NNUEAccCommitChild();
 
         bool gives_check = castro_IsInCheck(board);
 
@@ -452,6 +464,7 @@ static int negamax(Board* board, EvalFn eval, OrderFn order,
         }
 
         castro_UnmakeMove(board);
+        if (use_acc) irida_NNUEAccPop();
 
         if (irida_SearchShouldStop()) return 0;
 

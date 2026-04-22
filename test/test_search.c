@@ -25,6 +25,7 @@ int test_search(const char* fen, int depth_limit)
         .syzygyProbeDepth = 1,
         .syzygyProbeLimit = 7,
         .syzygy50MoveRule = true,
+        .useNNUEAccumulator = false,
     };
     Move move = irida_Search(&board, irida_Evaluation, irida_OrderMoves, &config);
     castro_BoardFree(&board);
