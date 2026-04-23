@@ -2,6 +2,7 @@
 #include "core.h"
 #include "eval.h"
 #include "moveordering.h"
+#include "nnue.h"
 #include "search.h"
 #include "uci.h"
 #include <string.h>
@@ -21,7 +22,7 @@ int main(void)
     irida_EngineInit(&engine);
     strncpy(engine.name, IRIDA_UCI_NAME, sizeof(engine.name) - 1);
     engine.name[sizeof(engine.name) - 1] = '\0';
-    engine.eval = irida_Evaluation;
+    engine.eval = irida_EvalNNUE;
     engine.search = irida_Search;
     engine.order = irida_OrderMoves;
 
