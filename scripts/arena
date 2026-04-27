@@ -22,6 +22,8 @@ init(autoreset=True)
 
 STOCKFISH_ELO = 1320
 
+DIR = "data/pgn/ab-depth-tests"
+
 def maybe_limit_stockfish(engine, name):
     if "stockfish" in name.lower():
         try:
@@ -185,12 +187,12 @@ def play_match(
             full_n2: {"W": 0, "B": 0, "points": 0.0},
         }
 
-        os.makedirs("data/pgn/arena", exist_ok=True)
+        os.makedirs(DIR, exist_ok=True)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         safe_n1 = sanitize_filename(name1)
         safe_n2 = sanitize_filename(name2)
-        filename = f"data/pgn/arena/Match_{safe_n1}_vs_{safe_n2}_{timestamp}.pgn"
+        filename = f"{DIR}/Match_{safe_n1}_vs_{safe_n2}_{timestamp}.pgn"
 
         print(f"{Fore.CYAN}Match: {Fore.GREEN}{full_n1} {Fore.CYAN}vs {Fore.MAGENTA}{full_n2}")
         print(f"{Fore.CYAN}Fairness: {Fore.WHITE}seed={match_seed}  pair_openings={pair_openings}")
